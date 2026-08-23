@@ -1559,6 +1559,7 @@
     var lastLightningTime = 0;
 
     var WEATHER_THEMES = {
+      'none': { icon: '🚫', name: 'None (Classic)', ambientHint: 'Normal classic background without weather effects' },
       'rain': { icon: '🌧️', name: 'Monsoon Rain', ambientHint: 'Gentle raindrops & puddles' },
       'thunderstorm': { icon: '⛈️', name: 'Thunderstorm', ambientHint: 'Heavy storm & lightning flashes' },
       'sunny': { icon: '☀️', name: 'Solar Day', ambientHint: 'Golden sunbeams & warmth' },
@@ -1582,12 +1583,18 @@
       particles = [];
       ripples = [];
 
+      if (currentSkyTheme === 'none') {
+        if (ctx && canvas) ctx.clearRect(0, 0, width, height);
+        return;
+      }
+
       if (currentSkyTheme === 'rain' || currentSkyTheme === 'thunderstorm') {
         var count = currentSkyTheme === 'thunderstorm' ? 180 : 120;
         for (var i = 0; i < count; i++) {
           particles.push({
             x: Math.random() * width,
             y: Math.random() * height,
+
             l: Math.random() * 18 + 10,
             vy: Math.random() * 8 + 12,
             vx: Math.random() * 2 - 2.5,
@@ -1684,7 +1691,13 @@
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, width, height);
 
+      if (currentSkyTheme === 'none') {
+        animFrame = requestAnimationFrame(renderParticles);
+        return;
+      }
+
       if (currentSkyTheme === 'rain' || currentSkyTheme === 'thunderstorm') {
+
         ctx.strokeStyle = currentSkyTheme === 'thunderstorm' ? 'rgba(200, 225, 255, 0.6)' : 'rgba(180, 210, 255, 0.45)';
         ctx.lineWidth = 1.2;
 
@@ -1908,7 +1921,7 @@
 
 
     function setSkyTheme(themeKey, isManual) {
-      if (!WEATHER_THEMES[themeKey]) themeKey = 'rain';
+      if (!WEATHER_THEMES[themeKey]) themeKey = 'none';
       currentSkyTheme = themeKey;
       localStorage.setItem('ishq_sky_theme', themeKey);
 
@@ -1916,12 +1929,18 @@
         isAutoSync = false;
         localStorage.setItem('ishq_weather_autosync', 'false');
         if (autoSyncToggle) autoSyncToggle.checked = false;
-        showToast('Sky Atmosphere: ' + WEATHER_THEMES[themeKey].name + ' ' + WEATHER_THEMES[themeKey].icon);
+        if (themeKey === 'none') {
+          showToast('Atmosphere: Classic Normal Background 🚫');
+        } else {
+          showToast('Sky Atmosphere: ' + WEATHER_THEMES[themeKey].name + ' ' + WEATHER_THEMES[themeKey].icon);
+        }
       }
 
       // Update body theme class
       document.body.className = document.body.className.replace(/\bsky-\w+\b/g, '').trim();
-      document.body.classList.add('sky-' + themeKey);
+      if (themeKey !== 'none') {
+        document.body.classList.add('sky-' + themeKey);
+      }
 
       // Highlight active button in modal
       document.querySelectorAll('.sky-theme-btn').forEach(function (btn) {
@@ -1930,6 +1949,7 @@
 
       initParticles();
     }
+
 
     function openModal() {
       if (!modal) return;
