@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="midnight">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>ISHQ Studio — Radio & Playlist Theme Manager</title>
+  
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230a0a0c'/><text x='32' y='44' font-size='28' text-anchor='middle' fill='%23f5eedc' font-family='serif'>⚙️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Admin PIN Protection Gate Overlay -->
+  <div class="admin-auth-overlay" id="adminAuthOverlay">
+    <div class="auth-card">
+      <div class="auth-badge">🔒 SECURE STUDIO GATE</div>
+      <h2>Admin Authentication</h2>
+      <p class="auth-desc">This panel is restricted to the station administrator. Please enter the master PIN to manage radio stations & custom frequencies.</p>
+      <form id="adminAuthForm" class="auth-form" onsubmit="return false;">
+        <input type="password" id="adminPinInput" class="auth-input" placeholder="Enter Admin PIN (Default: 2026)" maxlength="16" autofocus autocomplete="current-password">
+        <button type="submit" id="adminUnlockBtn" class="btn btn-primary btn-auth">Unlock Studio</button>
+      </form>
+      <a href="index.html" class="auth-back-link">← Return to Public Radio Player</a>
+    </div>
+  </div>
+
+  <!-- Background Ambient Aura -->
+  <div class="admin-ambient"></div>
+
+
+  <div class="admin-shell">
+    
+    <!-- Top Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <a href="index.html" class="back-radio-btn" title="Go back to live radio player">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Radio
+        </a>
+        <div class="studio-brand">
+          <span class="studio-logo">इश्क़</span>
+          <div class="studio-titles">
+            <h1>ISHQ STUDIO</h1>
+            <span class="studio-sub">Station & Dynamic Theme Manager</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="btn btn-secondary" id="exportJsonBtn" title="Export Station Config to JSON file">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Export
+        </button>
+        <button class="btn btn-secondary" id="importJsonBtn" title="Import Station Config from JSON">
+          <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+          Import
+        </button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none;">
+
+        <button class="btn btn-primary" id="addStationBtn">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Add Station
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      
+      <!-- Quick Stats & Tools Bar -->
+      <section class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-num" id="totalStationsCount">0</span>
+          <span class="stat-label">Active Stations</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="totalTracksCount">0</span>
+          <span class="stat-label">Total Curated Tracks</span>
+        </div>
+        <div class="stat-card help-card">
+          <span class="help-text">✨ <strong>Dynamic Theme Feature:</strong> Every station carries its own custom background, glow aura, and Hindi/Urdu calligraphy words. When a user switches to a station, the website transforms automatically!</span>
+        </div>
+      </section>
+
+      <!-- Station List Section -->
+      <section class="stations-section">
+        <div class="section-title-row">
+          <h2>Radio Stations & Playlist Frequencies</h2>
+          <button class="btn btn-text" id="resetDefaultsBtn">Reset to Default Stations</button>
+        </div>
+
+        <div class="stations-grid" id="stationsGrid">
+          <!-- Dynamically populated station cards -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Station Editor / Creator Modal -->
+    <div class="modal-overlay" id="stationModal">
+      <div class="modal-card">
+        
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h3 id="modalTitle">Create New Station</h3>
+            <span class="modal-sub">Configure playlist tracks & custom aesthetic theme</span>
+          </div>
+          <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          
+          <!-- Left: Form Inputs -->
+          <div class="modal-form-col">
+            
+            <input type="hidden" id="stationIdInput">
+
+            <div class="form-group">
+              <label for="stationNameInput">Station Full Name *</label>
+              <input type="text" id="stationNameInput" placeholder="e.g. रात की ग़ज़लें / Late Night Ghazals" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="stationShortInput">Short Badge Label *</label>
+                <input type="text" id="stationShortInput" placeholder="e.g. ग़ज़लें" required>
+              </div>
+
+              <div class="form-group">
+                <label for="stationIconInput">Icon / Emoji *</label>
+                <input type="text" id="stationIconInput" placeholder="📻 / 🌙 / ☕ / 🕊️" maxlength="4" value="📻">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="stationDescInput">Description / Mood Subtitle</label>
+              <input type="text" id="stationDescInput" placeholder="e.g. Soulful acoustic chords and quiet midnight thoughts">
+            </div>
+
+            <div class="form-group">
+              <label>YouTube Playlist or Video Source *</label>
+              <div class="tab-pill-toggle">
+                <button type="button" class="pill-toggle active" id="modePlaylistTab">Playlist Link / ID</button>
+                <button type="button" class="pill-toggle" id="modeCustomTracksTab">Custom Video IDs</button>
+              </div>
+              
+              <div id="playlistUrlGroup" class="source-group">
+                <input type="text" id="playlistUrlInput" placeholder="Paste YouTube Playlist URL (e.g. https://youtube.com/playlist?list=PL...)">
+                <span class="input-hint">Public or unlisted YouTube playlist link</span>
+              </div>
+
+              <div id="customTracksGroup" class="source-group" style="display:none;">
+                <textarea id="customTracksInput" rows="3" placeholder="Paste comma-separated YouTube Video IDs (e.g. 4n4u3sZ9f_g, jfKfPfyJRdk, W0DM5lcj6mw)"></textarea>
+                <span class="input-hint">100% reliable direct YouTube video IDs</span>
+              </div>
+            </div>
+
+            <!-- Theme Customizer Section -->
+            <div class="theme-customizer-box">
+              <div class="tc-header">
+                <h4>🎨 Station Aesthetic Theme Palette</h4>
+                <span class="tc-sub">The entire website will adopt these colors for this station</span>
+              </div>
+
+              <!-- Preset Theme Swatches -->
+              <div class="preset-swatches">
+                <span class="swatch-label">Quick Themes:</span>
+                <button type="button" class="swatch-btn" data-bg="#070709" data-fg="#f5eedc" data-accent="#d4a373" title="Velvet Gold" style="background:#d4a373;"></button>
+                <button type="button" class="swatch-btn" data-bg="#060a0f" data-fg="#e6f3fa" data-accent="#38bdf8" title="Cyan Breeze" style="background:#38bdf8;"></button>
+                <button type="button" class="swatch-btn" data-bg="#08060d" data-fg="#faebf9" data-accent="#c084fc" title="Royal Amethyst" style="background:#c084fc;"></button>
+                <button type="button" class="swatch-btn" data-bg="#0d0705" data-fg="#fff2eb" data-accent="#fb923c" title="Sunset Amber" style="background:#fb923c;"></button>
+                <button type="button" class="swatch-btn" data-bg="#050a07" data-fg="#eaf6ee" data-accent="#2ed573" title="Emerald Jade" style="background:#2ed573;"></button>
+                <button type="button" class="swatch-btn" data-bg="#0c0408" data-fg="#fbeae8" data-accent="#ff4757" title="Crimson Rose" style="background:#ff4757;"></button>
+              </div>
+
+              <div class="color-pickers-row">
+                <div class="color-field">
+                  <label for="themeBgInput">Background</label>
+                  <div class="color-picker-wrap">
+                    <input type="color" id="themeBgInput" value="#070709">
+                    <input type="text" id="themeBgHex" value="#070709">
+                  </div>
+                </div>
+
+                <div class="color-field">
+                  <label for="themeAccentInput">Accent Glow</label>
+                  <div class="color-picker-wrap">
+                    <input type="color" id="themeAccentInput" value="#d4a373">
+                    <input type="text" id="themeAccentHex" value="#d4a373">
+                  </div>
+                </div>
+
+                <div class="color-field">
+                  <label for="themeFgInput">Text & Main</label>
+                  <div class="color-picker-wrap">
+                    <input type="color" id="themeFgInput" value="#f5eedc">
+                    <input type="text" id="themeFgHex" value="#f5eedc">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 10px;">
+                <label for="themeGlyphsInput">Background Calligraphy Glyphs (Comma-separated)</label>
+                <input type="text" id="themeGlyphsInput" placeholder="e.g. इश्क़, सुकून, रूह, चाहत, तन्हाई, साज़" value="इश्क़, सुकून, रूह, आफ़रीन, धड़कन, शायरी">
+                <span class="input-hint">Words that float gracefully in the background atmosphere</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right: Real-time Live Theme Preview -->
+          <div class="modal-preview-col">
+            <div class="preview-card-header">Live Station Preview</div>
+            
+            <div class="theme-live-preview" id="themeLivePreview">
+              <div class="preview-ambient-glow" id="prevGlow"></div>
+              
+              <!-- Floating preview glyphs -->
+              <div class="preview-glyphs" id="prevGlyphs">
+                <span class="pg-1">इश्क़</span>
+                <span class="pg-2">सुकून</span>
+                <span class="pg-3">रूह</span>
+              </div>
+
+              <div class="prev-badge" id="prevBadge">📻 ISHQ LO-FI</div>
+
+              <div class="prev-vinyl-wrap">
+                <div class="prev-vinyl-disc" id="prevVinyl">
+                  <div class="prev-vinyl-center" id="prevVinylCenter"></div>
+                </div>
+                <div class="prev-art-box">
+                  <div class="prev-art-img">🎵</div>
+                </div>
+              </div>
+
+              <div class="prev-track-title" id="prevTitle">इश्क़ Lo-Fi & Soul</div>
+              <div class="prev-track-sub" id="prevDesc">Late night acoustic & chill beats</div>
+              
+              <div class="prev-wave-bars" id="prevWave">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveStationBtn">
+            <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+            Save Station & Theme
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

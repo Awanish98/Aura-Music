@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="description" content="Aesthetic, multi-genre music streaming platform with curated frequencies, dynamic genre-adaptive themes, and synchronized lyrics.">
+  <meta name="theme-color" content="#070709">
+  <title>Aura Music — Modern Streaming Platform</title>
+  
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230a0a0c'/><circle cx='32' cy='32' r='14' fill='%23a855f7'/></svg>">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=25.0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="s-ready">
+
+  <!-- Background Dust & Star Particles Canvas -->
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <!-- Ambient Dynamic Colored Glow from Artwork -->
+  <div class="ambient" aria-hidden="true">
+    <img id="ambientArt" alt="" draggable="false">
+    <div class="ambient-glow" id="ambientGlow"></div>
+  </div>
+
+  <!-- Animated Genre-Adaptive Background Glyphs -->
+  <div class="bg-glyphs" id="bgGlyphs" aria-hidden="true">
+    <span class="glyph g1">TIMELESS</span>
+    <span class="glyph g2">COSMOS</span>
+    <span class="glyph g3">INFINITY</span>
+    <span class="glyph g4">VOYAGE</span>
+    <span class="glyph g5">STARDUST</span>
+    <span class="glyph g6">EONS</span>
+    <span class="heart-glyph" id="centerHeartGlyph">TIMELESS</span>
+  </div>
+
+  <!-- Subtle Vignette -->
+  <div class="vignette"></div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Always-Visible Global Floating Back Button (for Video & Explorer Modes) -->
+  <button class="global-floating-back-btn" id="globalFloatingBackBtn" title="Back to Radio Player">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    <span>← Back to Radio</span>
+  </button>
+
+  <!-- Main Application Container -->
+  <div class="shell">
+
+    
+    <!-- Top Navigation / Header -->
+    <header>
+      <div class="header-left">
+        <!-- Station Preset Selector Dropdown -->
+        <div class="station-dropdown-wrap">
+          <button class="station-badge-btn" id="stationSelectBtn" title="Change Playlist Station">
+            <span class="live-dot"></span>
+            <span class="station-name-label" id="currentStationLabel">Time Travel ⏳</span>
+            <svg class="dropdown-chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+
+          <!-- Station Dropdown Menu -->
+          <div class="station-dropdown" id="stationDropdown">
+            <div class="dropdown-header">Select Frequency Station</div>
+            <div class="station-items-list" id="stationItemsList">
+              <!-- Dynamically populated from script.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- YouTube Explorer Framework Link -->
+        <button class="header-tool-btn explorer-nav-btn" id="ytExplorerBtn" title="Search & Stream Any YouTube Music">
+          <svg viewBox="0 0 24 24"><path d="M10 16.5l6-4.5-6-4.5v9zM21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81z"/></svg>
+          <span class="btn-label">EXPLORER</span>
+        </button>
+      </div>
+
+
+      <!-- Dynamic Brand Header -->
+      <div class="wordmark-container">
+        <div class="wordmark" id="brandTitle">TIME TRAVEL</div>
+        <div class="wordmark-sub" id="brandSub">COSMIC VOYAGE // TIMELESS SOUNDS</div>
+      </div>
+
+      <div class="header-right">
+        <!-- Ambience Mixer Toggle -->
+        <button class="header-tool-btn" id="ambientToggleBtn" title="Ambience Mixer (Rain, Vinyl, Fire)">
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+          <span class="btn-label">AMBIENCE</span>
+        </button>
+
+
+        <!-- Sleep Timer Toggle -->
+        <button class="header-tool-btn" id="sleepTimerBtn" title="Set Sleep Timer">
+          <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          <span class="btn-label" id="timerLabel">TIMER</span>
+        </button>
+
+        <!-- Playlist Queue Toggle -->
+        <button class="queue-btn" id="queueToggleBtn" title="View Queue (Q)">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4zm14 0v6l5-3z"/></svg>
+          <span class="song-count" id="counts">— SONGS</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Stage Content Area -->
+    <main>
+
+      <!-- State: Loading / Tuning In -->
+      <div class="state load">
+        <div class="aura-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-glyph" id="loaderGlyph">⏳</div>
+        </div>
+        <div class="state-title">Loading Frequency…</div>
+        <div class="state-subtitle">Connecting to high fidelity stream</div>
+      </div>
+
+      <!-- State: Error Screen -->
+      <div class="state error">
+        <div class="state-glyph" id="errorGlyph">⏳</div>
+        <div class="state-title" id="errmsg">Stream Reconnecting</div>
+        <div class="state-subtitle">Connecting to next track…</div>
+        <button class="pill-btn retry-btn" id="retry">
+          <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          Retry
+        </button>
+      </div>
+
+      <!-- Live Player Stage -->
+      <div class="stage">
+        
+        <!-- Turntable & Vinyl Visualizer Stage -->
+        <div class="turntable-wrap">
+          
+          <!-- Animated Tonearm Needle -->
+          <div class="tonearm-assembly" id="tonearm">
+            <div class="tonearm-base"></div>
+            <div class="tonearm-rod"></div>
+            <div class="tonearm-head"></div>
+          </div>
+
+          <!-- Vinyl Disc -->
+          <div class="vinyl-disc" id="vinylDisc">
+            <div class="vinyl-grooves"></div>
+            <div class="vinyl-center">
+              <div class="vinyl-center-art" id="vinylCenterArt"></div>
+            </div>
+          </div>
+
+          <!-- Album Art Cover Card -->
+          <div class="art-card" id="artCard">
+            <img class="art" id="art" alt="Album Art" src="https://i.ytimg.com/vi/W0DM5lcj6mw/mqdefault.jpg" draggable="false">
+            <div class="art-glare"></div>
+            <div class="art-badge" id="qualityBadge">HQ STEREO</div>
+
+            <!-- Like / Heart Button overlay -->
+            <button class="art-like-btn" id="artLikeBtn" title="Save to Liked Songs (L)">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </button>
+
+            <!-- Discover Similar Mood Button -->
+            <button class="art-similar-btn" id="discoverSimilarBtn" title="✨ Discover Similar Mood Songs">
+              <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Track Typography & Dynamic Poetic Verse (Zero Layout Shift) -->
+        <div class="track-info">
+          <div class="now-title-wrap">
+            <h1 class="now-title" id="title">Tuning in…</h1>
+          </div>
+          <div class="now-artist" id="artist">Aesthetic Stream</div>
+          <div class="shayari-quote" id="shayariQuote" title="Click for new verse">"Travelling across eras through the echoes of sound…"</div>
+          <div class="track-meta" id="meta">— / —</div>
+        </div>
+
+
+        <!-- Symmetrical Audio Waveform Visualizer -->
+        <div class="wave-visualizer" id="waveVisualizer">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Interactive Progress & Time Scrubber -->
+        <div class="progress-container">
+          <span class="time-label" id="timeCurrent">0:00</span>
+          <div class="progress-bar-wrap" id="progressBar">
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+              <div class="progress-handle" id="progressHandle"></div>
+            </div>
+          </div>
+          <span class="time-label" id="timeTotal">0:00</span>
+        </div>
+
+        <!-- Floating Up Next Song Suggestion Glass Pill -->
+        <div class="up-next-pill" id="upNextPill" title="Next recommended song">
+          <span class="un-tag">UP NEXT</span>
+          <img class="un-thumb" id="upNextThumb" src="https://i.ytimg.com/vi/W0DM5lcj6mw/default.jpg" alt="">
+          <div class="un-info">
+            <span class="un-title" id="upNextTitle">Upcoming Track</span>
+            <span class="un-artist" id="upNextArtist">Artist</span>
+          </div>
+          <button class="un-skip-btn" id="upNextPlayBtn" title="Play This Next">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+        </div>
+
+        <!-- Main Glass Controls Bar -->
+        <div class="controls-glass">
+          
+          <!-- Shuffle / Random Button -->
+          <button class="ctrl-btn sub-btn active-btn" id="shuffleBtn" title="Shuffle Mode Active">
+            <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+          </button>
+
+          <!-- Previous Track Button -->
+          <button class="ctrl-btn side-btn" id="prev" aria-label="Previous track" title="Previous Song (Left Arrow)">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+
+          <!-- Main Play / Pause Button -->
+          <button class="ctrl-btn play-btn" id="play" aria-label="Play or Pause" title="Play/Pause (Spacebar)">
+            <div class="play-glow"></div>
+            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+
+          <!-- Next Track Button -->
+          <button class="ctrl-btn side-btn" id="next" aria-label="Next track" title="Next Song (Right Arrow)">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <!-- Volume Flyout Toggle -->
+          <div class="volume-flyout">
+            <button class="ctrl-btn sub-btn" id="volBtn" title="Mute / Unmute (M)">
+              <svg class="vol-icon-high" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              <svg class="vol-icon-muted" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </button>
+            <div class="vol-slider-wrap" id="volSliderWrap">
+              <input type="range" id="volSlider" min="0" max="100" value="100" aria-label="Volume">
+            </div>
+          </div>
+
+          <!-- Watch Full Video Button -->
+          <button class="ctrl-btn sub-btn" id="watchVideoBtn" aria-label="Watch Full Video" title="Watch Full Video (V)">
+            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7l7 4z"/></svg>
+          </button>
+
+          <!-- Fullscreen Button -->
+          <button class="ctrl-btn sub-btn" id="fsbtn" aria-label="Fullscreen" title="Fullscreen (F)">
+            <svg class="icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            <svg class="icon-compress" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+          </button>
+
+        </div>
+
+      </div>
+    </main>
+
+
+
+    <!-- ==================== Dedicated YouTube Music Universe View ==================== -->
+    <section class="explorer-universe-view" id="explorerUniverseView" style="display:none;">
+      <div class="exp-uni-header">
+        <div class="exp-uni-left">
+          <button class="btn-back-radio" id="backToRadioBtn" title="Back to 5 Radio Stations">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            <span>Back to Radio</span>
+          </button>
+          <div class="yt-brand-pill">
+            <svg viewBox="0 0 24 24" class="yt-icon-logo"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+            <span>YOUTUBE MUSIC</span>
+          </div>
+        </div>
+
+        <div class="exp-uni-search-wrap">
+          <svg class="search-glass-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="uniYtSearchInput" placeholder="Search any song, artist, or paste YouTube link (video, playlist, shorts)…">
+          <button class="btn-uni-search" id="uniYtSearchBtn">Search</button>
+        </div>
+
+        <div class="exp-uni-right">
+          <button class="btn-uni-favs" id="uniFavsBtn" title="View Liked Songs">
+            <span>❤️ Liked (<span id="uniFavsCount">0</span>)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Category Chips -->
+      <div class="exp-uni-chips" id="expUniChips">
+        <button class="uni-chip active" data-query="my-vibes">✨ My Vibes (AI)</button>
+        <button class="uni-chip" data-query="Trending">🔥 Trending Hits</button>
+        <button class="uni-chip" data-query="Romance">❤️ Romance & Soul</button>
+        <button class="uni-chip" data-query="EDM">⚡ Festival EDM</button>
+        <button class="uni-chip" data-query="Lo-Fi">☕ Lo-Fi & Chill</button>
+        <button class="uni-chip" data-query="Punjabi">🔥 Punjabi Hits</button>
+        <button class="uni-chip" data-query="Coke Studio">🕊️ Coke Studio</button>
+        <button class="uni-chip" data-query="90s">📼 90s Classics</button>
+        <button class="uni-chip" data-query="Arijit Singh">🎤 Arijit Singh</button>
+        <button class="uni-chip" data-query="Diljit Dosanjh">👑 Diljit Dosanjh</button>
+      </div>
+
+      <!-- YouTube Spotlight / Active Player Banner -->
+      <div class="exp-now-playing-banner" id="expNowPlayingBanner" style="display:none;">
+        <div class="exp-banner-left">
+          <img id="expBannerThumb" src="" alt="" loading="lazy">
+          <div class="exp-banner-info">
+            <div class="exp-banner-tag">🔴 NOW STREAMING ON YOUTUBE</div>
+            <div class="exp-banner-title" id="expBannerTitle">Select a track to stream</div>
+            <div class="exp-banner-artist" id="expBannerArtist">YouTube Music</div>
+          </div>
+        </div>
+        <div class="exp-banner-actions">
+          <button class="btn-exp-fav" id="expBannerVideoBtn" title="Watch Full HD Video (🎬)">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            <span>Watch Video</span>
+          </button>
+          <button class="btn-exp-fav" id="expBannerFavBtn" title="Add to Favorites (❤️)">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span id="expBannerFavLabel">Add to Fav</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid of YouTube Music Cards -->
+      <div class="exp-uni-grid" id="expUniGrid">
+        <!-- Dynamically rendered YouTube Cards -->
+      </div>
+    </section>
+
+    <!-- ==================== Full HD Video Cinema Theater Modal ==================== -->
+    <div class="cinema-modal-overlay" id="cinemaVideoModal">
+      <div class="cinema-backdrop" id="cinemaBackdrop"></div>
+      <div class="cinema-card">
+        <div class="cinema-header">
+          <div class="cinema-header-left">
+            <button class="btn-cinema-back" id="cinemaBackBtn" title="Back to Music (Esc / V)">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              <span>Back to Music</span>
+            </button>
+            <div class="cinema-info">
+              <div class="cinema-tag">🎬 FULL HD VIDEO THEATER</div>
+              <div class="cinema-title" id="cinemaTrackTitle">Now Playing Full Video</div>
+              <div class="cinema-artist" id="cinemaTrackArtist">Aura Music</div>
+            </div>
+          </div>
+          <div class="cinema-actions">
+            <span class="cinema-hint-pill">Press ESC / V to Exit</span>
+            <button class="cinema-close-btn" id="closeCinemaBtn" title="Exit Cinema Mode (Esc / V)">&times;</button>
+          </div>
+        </div>
+        <div class="cinema-video-stage" id="cinemaVideoStage">
+          <!-- Live YouTube Player docks here in Cinema Mode! -->
+        </div>
+        <div class="cinema-footer-bar">
+          <button class="btn-cinema-floating-back" id="cinemaBottomBackBtn">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            <span>Return to Audio / Radio Mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <!-- Ambient Sound Mixer Flyout Panel -->
+    <div class="ambient-panel" id="ambientPanel">
+      <div class="panel-header">
+        <div class="panel-title">Ambient Soundscapes</div>
+        <button class="panel-close-btn" id="closeAmbientBtn">&times;</button>
+      </div>
+      
+      <div class="ambient-controls">
+        <div class="amb-row">
+          <div class="amb-info">
+            <span class="amb-icon">🌧️</span>
+            <span class="amb-name">Rainfall</span>
+          </div>
+          <input type="range" class="amb-slider" id="rainVol" min="0" max="100" value="0">
+        </div>
+
+        <div class="amb-row">
+          <div class="amb-info">
+            <span class="amb-icon">🌊</span>
+            <span class="amb-name">Ocean Waves</span>
+          </div>
+          <input type="range" class="amb-slider" id="waveVol" min="0" max="100" value="0">
+        </div>
+
+        <div class="amb-row">
+          <div class="amb-info">
+            <span class="amb-icon">📻</span>
+            <span class="amb-name">Vinyl Crackle</span>
+          </div>
+          <input type="range" class="amb-slider" id="crackleVol" min="0" max="100" value="0">
+        </div>
+
+        <div class="amb-row">
+          <div class="amb-info">
+            <span class="amb-icon">🔥</span>
+            <span class="amb-name">Campfire Ember</span>
+          </div>
+          <input type="range" class="amb-slider" id="fireVol" min="0" max="100" value="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleep Timer Modal -->
+    <div class="timer-panel" id="timerPanel">
+      <div class="panel-header">
+        <div class="panel-title">Sleep Timer</div>
+        <button class="panel-close-btn" id="closeTimerBtn">&times;</button>
+      </div>
+      <div class="timer-options">
+        <button class="timer-opt" data-mins="15">15 Mins</button>
+        <button class="timer-opt" data-mins="30">30 Mins</button>
+        <button class="timer-opt" data-mins="45">45 Mins</button>
+        <button class="timer-opt" data-mins="60">60 Mins</button>
+        <button class="timer-opt cancel-timer" data-mins="0">Turn Off</button>
+      </div>
+    </div>
+
+    <!-- Playlist Queue Slide-out Panel with Tabs & Search -->
+    <div class="queue-panel" id="queuePanel">
+      <div class="queue-header">
+        <div class="queue-tabs">
+          <button class="tab-btn active" id="queueTabBtn">Queue (<span id="queueTabCount">0</span>)</button>
+          <button class="tab-btn" id="recTabBtn">✨ My Vibes (<span id="recTabCount">0</span>)</button>
+          <button class="tab-btn" id="favTabBtn">Liked (<span id="favTabCount">0</span>)</button>
+        </div>
+        <button class="close-queue-btn" id="closeQueueBtn">&times;</button>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="queue-search-wrap">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="queueSearchInput" placeholder="Search songs or artists…">
+      </div>
+
+      <!-- Tab 1: Active Queue List -->
+      <div class="queue-list" id="queueList">
+        <div class="queue-empty">Loading station tracks…</div>
+      </div>
+
+      <!-- Tab 2: AI Vibe Agent & Smart Recommendations -->
+      <div class="queue-list" id="recList" style="display:none;">
+        <div class="ai-vibe-deck">
+          <div class="ai-vibe-header">
+            <div class="ai-vibe-badge">
+              <span class="pulse-ai-dot"></span>
+              <span>AI VIBE LEARNER</span>
+            </div>
+            <button class="btn-refresh-vibe" id="refreshVibeBtn" title="Re-Analyze Your Taste">⚡ Re-Tune</button>
+          </div>
+          <div class="ai-vibe-status" id="aiVibeStatus">Analyzing your current musical taste…</div>
+          <div class="ai-vibe-tags" id="aiVibeTags">
+            <span class="vibe-tag">#Romance</span>
+            <span class="vibe-tag">#LoFi</span>
+            <span class="vibe-tag">#Soul</span>
+          </div>
+          <button class="btn-play-my-vibes" id="playMyVibesStationBtn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span>Play "My Vibes" Station</span>
+          </button>
+        </div>
+        <div class="vibe-recommendations-list" id="vibeRecItems">
+          <!-- Dynamically populated AI Recommendations -->
+        </div>
+      </div>
+
+      <!-- Tab 3: Liked Songs -->
+      <div class="queue-list" id="favList" style="display:none;">
+        <div class="queue-empty">No liked songs yet. Click the ❤️ icon on any song!</div>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="shortcuts-modal" id="shortcutsModal">
+      <div class="shortcuts-card">
+        <div class="panel-header">
+          <div class="panel-title">Keyboard Shortcuts</div>
+          <button class="panel-close-btn" id="closeShortcutsBtn">&times;</button>
+        </div>
+        <div class="shortcuts-grid">
+          <div class="sc-row"><kbd>Space</kbd><span>Play / Pause</span></div>
+          <div class="sc-row"><kbd>→</kbd><span>Next Song</span></div>
+          <div class="sc-row"><kbd>←</kbd><span>Previous Song</span></div>
+          <div class="sc-row"><kbd>L</kbd><span>Like / Favorite Song</span></div>
+
+          <div class="sc-row"><kbd>Q</kbd><span>Playlist Queue</span></div>
+          <div class="sc-row"><kbd>E</kbd><span>YouTube Explorer</span></div>
+          <div class="sc-row"><kbd>M</kbd><span>Mute / Unmute</span></div>
+          <div class="sc-row"><kbd>F</kbd><span>Fullscreen</span></div>
+          <div class="sc-row"><kbd>?</kbd><span>Shortcuts Help</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tap To Play Autoplay Overlay -->
+    <div class="autoplay-overlay" id="autoplayOverlay">
+      <div class="autoplay-content">
+        <div class="pulse-play-ring">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="autoplay-text">Tap anywhere to Play</div>
+      </div>
+    </div>
+
+    <!-- Footer Status info -->
+    <footer>
+      <div class="footer-left">
+        <span class="live-radio-badge">● HI-RES 320K</span>
+        <span class="lossless-badge">MASTER FLAC</span>
+      </div>
+      <div class="footer-center" id="footerBrand">
+        AURA HIGH-FIDELITY &middot; AUDIOPHILE STREAM
+      </div>
+      <div class="footer-right">
+        <button class="footer-help-btn" id="shortcutsHelpBtn" title="Keyboard Shortcuts (?)">Shortcuts (?)</button>
+        &middot; Curated by <span class="author-name">JORDAN</span>
+      </div>
+
+    </footer>
+  </div>
+
+  <!-- Off-screen YouTube Player container -->
+  <div id="player"></div>
+
+  <script src="script.js?v=25.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
