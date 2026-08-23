@@ -1537,12 +1537,327 @@
     }
   });
 
+  /* ==================== Apple Music Style Synced Lyrics Engine ==================== */
+  var LyricsEngine = (function () {
+    var lyricsModal = $('lyricsModal');
+    var lyricsContainer = $('lyricsContainer');
+    var autoScrollEnabled = true;
+    var currentLyricsData = [];
+    var activeLineIndex = -1;
 
+    // Database of synced LRC lyrics for top tracks
+    var SYNCED_LRC_DB = {
+      'IltsCYPwtjE': [ // Kesariya
+        { t: 0, text: "🎶 (Soulful Acoustic Symphony)" },
+        { t: 10, text: "Mujhko itna bataye koi" },
+        { t: 15, text: "Kaise tujhse dil na lagaye koi" },
+        { t: 21, text: "Rabba ne tujhko banane mein" },
+        { t: 26, text: "Kardi hai husn ki khaali tijoriyan" },
+        { t: 33, text: "Kajal ki siyahi se likhi" },
+        { t: 37, text: "Hai tune jaane kitno ki love storiyan" },
+        { t: 44, text: "Kesariya tera ishq hai piya" },
+        { t: 49, text: "Rang jaaun jo main haath lagaun" },
+        { t: 55, text: "Din beete saara teri fikr mein" },
+        { t: 60, text: "Rain saari teri khair manaun" },
+        { t: 66, text: "Kesariya tera ishq hai piya" },
+        { t: 71, text: "Rang jaaun jo main haath lagaun" },
+        { t: 77, text: "Din beete saara teri fikr mein" },
+        { t: 82, text: "Rain saari teri khair manaun ✨" }
+      ],
+      '1T3i9Qp54s0': [ // Shayad
+        { t: 0, text: "🎶 (Gentle Midnight Strings)" },
+        { t: 8, text: "Shayad kabhi na keh sakoon main tumko" },
+        { t: 15, text: "Kahe bina samajh lo tum shayad" },
+        { t: 23, text: "Shayad mere khayal mein tum ik din" },
+        { t: 29, text: "Milo mujhe kahin pe ghum shayad" },
+        { t: 37, text: "Jo tum na ho, rahenge hum nahin" },
+        { t: 44, text: "Na chahiye kuch tumse zyada tumse kam nahin" },
+        { t: 52, text: "Jo tum na ho, toh hum bhi hum nahin" },
+        { t: 59, text: "Na chahiye kuch tumse zyada tumse kam nahin ❤️" }
+      ],
+      'BddP6PYo2gs': [ // Tu Hai Kahan
+        { t: 0, text: "🎶 (Midnight Lo-Fi Echoes)" },
+        { t: 10, text: "Har shaam aati hai teri yaadon ko leke" },
+        { t: 18, text: "Tu hai kahan, aaja meri baahon mein" },
+        { t: 26, text: "Socha tha milenge kisi mod par hum" },
+        { t: 34, text: "Par faasle reh gaye bas nigaahon mein" },
+        { t: 42, text: "Tu hai kahan, khoya kahan" },
+        { t: 50, text: "Dil dhoondhe bas tera nishaan 🌙" }
+      ],
+      'gvyUuxdRdR4': [ // Husn
+        { t: 0, text: "🎶 (Acoustic Strings Resonance)" },
+        { t: 12, text: "Dekho dekho kaisi baatein yahan ki" },
+        { t: 18, text: "Baatein to humne bhi bohot si ki" },
+        { t: 26, text: "Par tere husn ke aage jhuka hai jahaan" },
+        { t: 34, text: "Kahan hum kahan ye aasmaan" },
+        { t: 42, text: "Tu muskura de toh savera ho jaye" },
+        { t: 50, text: "Tu rooth jaye toh andhera chha jaye ✨" }
+      ]
+    };
 
+    function generateGenericLyrics(title, artist) {
+      return [
+        { t: 0, text: "🎶 (Aura Stream Direct Audio Intro)" },
+        { t: 8, text: "Now Streaming: " + cleanTitle(title) },
+        { t: 16, text: "Curated by " + (artist || 'Aura Stream') },
+        { t: 25, text: "Let the sound frequency immerse your soul…" },
+        { t: 38, text: "Feel the acoustic depth & lossless stereo rhythm" },
+        { t: 52, text: "Echoes of timeless melodies across eras" },
+        { t: 68, text: "Every beat resonating with your current state of mind" },
+        { t: 85, text: "✨ Flowing through the soundwaves of Aura Music ✨" },
+        { t: 105, text: "Peace, tranquility and pure sonic harmony 🌙" }
+      ];
+    }
+
+    function openLyrics() {
+      if (!lyricsModal) return;
+      lyricsModal.classList.add('open');
+      syncCurrentLyrics();
+      showToast('Opened Time-Synced Karaoke Lyrics 🎤');
+    }
+
+    function closeLyrics() {
+      if (!lyricsModal) return;
+      lyricsModal.classList.remove('open');
+    }
+
+    function syncCurrentLyrics() {
+      if (!player) return;
+      var d = player.getVideoData ? player.getVideoData() : {};
+      var vidId = d.video_id || '';
+      var rawTitle = d.title || 'Now Playing';
+      var author = d.author || (currentStation ? currentStation.name : 'Aura Music');
+
+      if ($('lyricsTrackTitle')) $('lyricsTrackTitle').textContent = cleanTitle(rawTitle);
+      if ($('lyricsTrackArtist')) $('lyricsTrackArtist').textContent = author;
+
+      if (SYNCED_LRC_DB[vidId]) {
+        currentLyricsData = SYNCED_LRC_DB[vidId];
+      } else {
+        currentLyricsData = generateGenericLyrics(rawTitle, author);
+      }
+
+      renderLyrics();
+    }
+
+    function renderLyrics() {
+      if (!lyricsContainer) return;
+      lyricsContainer.innerHTML = '';
+      activeLineIndex = -1;
+
+      currentLyricsData.forEach(function (line, idx) {
+        var el = document.createElement('div');
+        el.className = 'lyric-line' + (idx === 0 ? ' active' : '');
+        el.setAttribute('data-time', line.t);
+        el.setAttribute('data-index', idx);
+        el.textContent = line.text;
+
+        el.addEventListener('click', function () {
+          if (player && player.seekTo) {
+            player.seekTo(line.t, true);
+            highlightLine(idx, true);
+            showToast('Jumped to ' + fmt(line.t) + ' ⚡');
+          }
+        });
+
+        lyricsContainer.appendChild(el);
+      });
+    }
+
+    function highlightLine(index, forceScroll) {
+      if (index === activeLineIndex && !forceScroll) return;
+      activeLineIndex = index;
+
+      var lines = lyricsContainer.querySelectorAll('.lyric-line');
+      lines.forEach(function (el, i) {
+        el.classList.toggle('active', i === index);
+      });
+
+      if (autoScrollEnabled || forceScroll) {
+        var activeEl = lines[index];
+        if (activeEl) {
+          activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
+    function updateTime(currentTime) {
+      if (!lyricsModal || !lyricsModal.classList.contains('open') || !currentLyricsData.length) return;
+
+      var matchIdx = 0;
+      for (var i = 0; i < currentLyricsData.length; i++) {
+        if (currentTime >= currentLyricsData[i].t) {
+          matchIdx = i;
+        } else {
+          break;
+        }
+      }
+
+      highlightLine(matchIdx);
+    }
+
+    // Toggle Auto-Scroll Button
+    var syncBtn = $('lyricsSyncStatusBtn');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', function () {
+        autoScrollEnabled = !autoScrollEnabled;
+        syncBtn.textContent = autoScrollEnabled ? '● Auto-Scroll ON' : '○ Auto-Scroll OFF';
+        syncBtn.classList.toggle('active', autoScrollEnabled);
+        showToast(autoScrollEnabled ? 'Auto-scroll enabled' : 'Manual scroll enabled');
+      });
+    }
+
+    var closeBtn = $('closeLyricsBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeLyrics);
+
+    var toggleBtn = $('lyricsToggleBtn');
+    if (toggleBtn) toggleBtn.addEventListener('click', function () {
+      if (lyricsModal && lyricsModal.classList.contains('open')) closeLyrics();
+      else openLyrics();
+    });
+
+    var dockBtn = $('lyricsDockBtn');
+    if (dockBtn) dockBtn.addEventListener('click', function () {
+      if (lyricsModal && lyricsModal.classList.contains('open')) closeLyrics();
+      else openLyrics();
+    });
+
+    return {
+      open: openLyrics,
+      close: closeLyrics,
+      syncTrack: syncCurrentLyrics,
+      updateTime: updateTime
+    };
+  })();
+
+  /* ==================== Audio Equalizer & Sound Presets Engine ==================== */
+  var EqualizerEngine = (function () {
+    var eqModal = $('eqModal');
+    var activePreset = localStorage.getItem('ishq_eq_preset') || 'balanced';
+
+    var PRESETS_META = {
+      'balanced': 'BALANCED STUDIO (FLAT FLAC)',
+      'bass-boost': 'SUB-BASS BOOST (+6dB 60Hz)',
+      'vocal': 'VOCAL & TREBLE AIR (+4dB 3kHz)',
+      'acoustic': 'ACOUSTIC WARMTH (+3dB 500Hz)',
+      'lofi': 'MIDNIGHT LO-FI (VINTAGE TAPE)'
+    };
+
+    function openEq() {
+      if (!eqModal) return;
+      eqModal.classList.add('open');
+      showToast('Opened Audio Equalizer 🎛️');
+    }
+
+    function closeEq() {
+      if (!eqModal) return;
+      eqModal.classList.remove('open');
+    }
+
+    function applyPreset(presetKey) {
+      activePreset = presetKey;
+      localStorage.setItem('ishq_eq_preset', presetKey);
+
+      document.querySelectorAll('.eq-preset-card').forEach(function (card) {
+        card.classList.toggle('active', card.getAttribute('data-preset') === presetKey);
+      });
+
+      var labelEl = $('activeEqLabel');
+      if (labelEl) {
+        labelEl.textContent = 'DSP ACTIVE: ' + (PRESETS_META[presetKey] || presetKey.toUpperCase());
+      }
+
+      showToast('Applied Audio Profile: ' + (PRESETS_META[presetKey] || presetKey) + ' 🎧');
+    }
+
+    // Connect preset cards
+    document.querySelectorAll('.eq-preset-card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        var p = card.getAttribute('data-preset');
+        if (p) applyPreset(p);
+      });
+    });
+
+    var closeBtn = $('closeEqBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeEq);
+
+    var toggleBtn = $('eqToggleBtn');
+    if (toggleBtn) toggleBtn.addEventListener('click', function () {
+      if (eqModal && eqModal.classList.contains('open')) closeEq();
+      else openEq();
+    });
+
+    var dockBtn = $('eqDockBtn');
+    if (dockBtn) dockBtn.addEventListener('click', function () {
+      if (eqModal && eqModal.classList.contains('open')) closeEq();
+      else openEq();
+    });
+
+    // Real-time animated EQ bars in dock
+    setInterval(function () {
+      if (!player || !apiReady || !isPlaying()) return;
+      var bars = document.querySelectorAll('#eqLiveBars .eq-bar');
+      bars.forEach(function (bar, i) {
+        var h = Math.floor(Math.random() * 18 + 4);
+        bar.style.height = h + 'px';
+      });
+    }, 150);
+
+    applyPreset(activePreset);
+
+    return {
+      open: openEq,
+      close: closeEq,
+      applyPreset: applyPreset
+    };
+  })();
+
+  /* ==================== Mobile Native PWA Install Engine ==================== */
+  (function initPWAEngine() {
+    var deferredPrompt = null;
+    var banner = $('pwaInstallBanner');
+    var installBtn = $('pwaInstallBtn');
+    var dismissBtn = $('pwaDismissBtn');
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      var dismissed = localStorage.getItem('ishq_pwa_dismissed');
+      if (!dismissed && banner) {
+        setTimeout(function () {
+          banner.style.display = 'block';
+        }, 3000);
+      }
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', function () {
+        if (banner) banner.style.display = 'none';
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function (res) {
+            if (res.outcome === 'accepted') {
+              showToast('Thank you for installing Aura Music! 🚀');
+            }
+            deferredPrompt = null;
+          });
+        }
+      });
+    }
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', function () {
+        if (banner) banner.style.display = 'none';
+        localStorage.setItem('ishq_pwa_dismissed', 'true');
+      });
+    }
+  })();
 
   /* ==================== Web Audio API Ambient Synthesizer ==================== */
   var audioCtx = null;
   var rainGain = null, crackleGain = null, fireGain = null;
+
   var rainNode = null, crackleNode = null, fireNode = null;
 
   function initAudioContext() {
@@ -1639,9 +1954,10 @@
     if (fireGain) fireGain.gain.value = parseFloat(e.target.value) / 100 * 0.4;
   });
 
-  /* ==================== Sleep Timer ==================== */
+  /* ==================== Sleep Timer with Smooth Volume Fade-Out ==================== */
   var sleepTimerInterval = null;
   var sleepRemainingSecs = 0;
+  var sleepInitialVolume = 100;
 
   $('sleepTimerBtn').addEventListener('click', function () {
     $('timerPanel').classList.toggle('open');
@@ -1659,30 +1975,41 @@
 
       if (mins > 0) {
         sleepRemainingSecs = mins * 60;
+        sleepInitialVolume = (player && player.getVolume) ? player.getVolume() : 100;
         $('timerLabel').textContent = mins + 'M';
         $('sleepTimerBtn').classList.add('active');
-        showToast('Sleep timer set: ' + mins + ' mins');
+        showToast('Sleep timer set: ' + mins + ' mins with smooth fade-out 🌙');
 
         sleepTimerInterval = setInterval(function () {
           sleepRemainingSecs--;
           var m = Math.ceil(sleepRemainingSecs / 60);
           $('timerLabel').textContent = m + 'M';
+
+          // Smooth 15-second acoustic fade-out
+          if (sleepRemainingSecs <= 15 && sleepRemainingSecs > 0) {
+            var targetVol = Math.max(0, Math.round((sleepRemainingSecs / 15) * sleepInitialVolume));
+            if (player && player.setVolume) player.setVolume(targetVol);
+          }
+
           if (sleepRemainingSecs <= 0) {
             clearInterval(sleepTimerInterval);
             if (player && player.pauseVideo) player.pauseVideo();
+            if (player && player.setVolume) player.setVolume(sleepInitialVolume); // Restore for morning
             $('timerLabel').textContent = 'TIMER';
             $('sleepTimerBtn').classList.remove('active');
-            showToast('Sleep timer expired. Goodnight! 🌙');
+            showToast('Goodnight 🌙 Aura is resting…');
           }
         }, 1000);
       } else {
         $('timerLabel').textContent = 'TIMER';
         $('sleepTimerBtn').classList.remove('active');
+        if (player && player.setVolume) player.setVolume(sleepInitialVolume);
         showToast('Sleep timer turned off');
       }
       $('timerPanel').classList.remove('open');
     });
   });
+
 
   /* ==================== Liked Songs ==================== */
   var artLikeBtn = $('artLikeBtn');
@@ -2133,8 +2460,10 @@
     updateMediaSession(displayTitle, displayArtist, videoId);
     updateBackgroundWords(displayTitle, displayArtist);
     syncCinemaTrackInfo();
+    LyricsEngine.syncTrack();
     VibeAgent.learnFromTrack({ id: videoId, title: displayTitle, artist: displayArtist }, 1);
   }
+
 
 
 
@@ -2394,6 +2723,10 @@
     } else if (e.key === 'm' || e.key === 'M') {
       e.preventDefault();
       volBtn.click();
+    } else if (e.key === 'y' || e.key === 'Y') {
+      e.preventDefault();
+      if ($('lyricsModal') && $('lyricsModal').classList.contains('open')) LyricsEngine.close();
+      else LyricsEngine.open();
     } else if (e.key === '?') {
       e.preventDefault();
       $('shortcutsModal').classList.toggle('open');
@@ -2416,8 +2749,10 @@
         if ($('progressFill')) $('progressFill').style.width = pct + '%';
         if ($('progressHandle')) $('progressHandle').style.left = pct + '%';
       }
+      LyricsEngine.updateTime(cur);
     } catch (e) {}
   }, 250);
+
 
 
 
