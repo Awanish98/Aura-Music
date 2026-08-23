@@ -1537,7 +1537,457 @@
     }
   });
 
+  /* ==================== Living Atmosphere & Dynamic Weather Engine (SkyEngine) ==================== */
+  var SkyEngine = (function () {
+    var canvas = $('weatherCanvas');
+    var ctx = canvas ? canvas.getContext('2d') : null;
+    var flashEl = $('lightningFlash');
+    var modal = $('skyControlModal');
+    var autoSyncToggle = $('weatherAutoSyncToggle');
+
+    var currentSkyTheme = localStorage.getItem('ishq_sky_theme') || 'rain';
+    var isAutoSync = localStorage.getItem('ishq_weather_autosync') !== 'false';
+    var weatherData = null;
+    var userLocation = 'Greater Noida, IN';
+
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    var particles = [];
+    var ripples = [];
+    var animFrame = null;
+    var lastLightningTime = 0;
+
+    var WEATHER_THEMES = {
+      'rain': { icon: '🌧️', name: 'Monsoon Rain', ambientHint: 'Gentle raindrops & puddles' },
+      'thunderstorm': { icon: '⛈️', name: 'Thunderstorm', ambientHint: 'Heavy storm & lightning flashes' },
+      'sunny': { icon: '☀️', name: 'Solar Day', ambientHint: 'Golden sunbeams & warmth' },
+      'night': { icon: '🌌', name: 'Starry Night', ambientHint: 'Twinkling stars & shooting meteors' },
+      'windy': { icon: '🍃', name: 'Autumn Wind', ambientHint: 'Swaying breeze & drifting leaves' },
+      'snow': { icon: '❄️', name: 'Snowfall', ambientHint: 'Soft crystalline snowfall' },
+      'sunset': { icon: '🌅', name: 'Sunset Hour', ambientHint: 'Twilight glow & floating embers' },
+      'fog': { icon: '🌫️', name: 'Lo-Fi Fog', ambientHint: 'Misty haze & mellow depth' }
+    };
+
+    function resize() {
+      if (!canvas) return;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      initParticles();
+    }
+
+    function initParticles() {
+      particles = [];
+      ripples = [];
+
+      if (currentSkyTheme === 'rain' || currentSkyTheme === 'thunderstorm') {
+        var count = currentSkyTheme === 'thunderstorm' ? 180 : 120;
+        for (var i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            l: Math.random() * 18 + 10,
+            vy: Math.random() * 8 + 12,
+            vx: Math.random() * 2 - 2.5,
+            opacity: Math.random() * 0.4 + 0.3
+          });
+        }
+      } else if (currentSkyTheme === 'windy') {
+        for (var j = 0; j < 35; j++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 8 + 6,
+            vx: Math.random() * 3 + 2,
+            vy: Math.random() * 1.5 + 0.5,
+            rot: Math.random() * Math.PI * 2,
+            vRot: (Math.random() - 0.5) * 0.08,
+            color: Math.random() > 0.4 ? 'rgba(255, 140, 100, ' : 'rgba(255, 192, 203, ',
+            alpha: Math.random() * 0.6 + 0.3
+          });
+        }
+      } else if (currentSkyTheme === 'snow') {
+        for (var k = 0; k < 80; k++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: Math.random() * 3 + 1,
+            vy: Math.random() * 1.5 + 0.8,
+            vxBase: (Math.random() - 0.5) * 0.5,
+            swaySpeed: Math.random() * 0.02 + 0.01,
+            swayOffset: Math.random() * Math.PI * 2,
+            alpha: Math.random() * 0.7 + 0.2
+          });
+        }
+      } else if (currentSkyTheme === 'night') {
+        for (var s = 0; s < 100; s++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height * 0.8,
+            r: Math.random() * 1.6 + 0.5,
+            twinkleSpeed: Math.random() * 0.03 + 0.01,
+            twinklePhase: Math.random() * Math.PI * 2,
+            baseAlpha: Math.random() * 0.6 + 0.2
+          });
+        }
+      } else if (currentSkyTheme === 'sunny') {
+        for (var su = 0; su < 40; su++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: Math.random() * 2.5 + 1,
+            vy: -(Math.random() * 0.8 + 0.3),
+            vx: (Math.random() - 0.5) * 0.4,
+            alpha: Math.random() * 0.5 + 0.2
+          });
+        }
+      } else if (currentSkyTheme === 'sunset') {
+        for (var se = 0; se < 45; se++) {
+          particles.push({
+            x: Math.random() * width,
+            y: height + Math.random() * 50,
+            r: Math.random() * 2.2 + 0.8,
+            vy: -(Math.random() * 1.8 + 0.6),
+            vx: (Math.random() - 0.5) * 0.8,
+            alpha: Math.random() * 0.8 + 0.2,
+            color: Math.random() > 0.5 ? 'rgba(255, 120, 50, ' : 'rgba(255, 200, 80, '
+          });
+        }
+      } else if (currentSkyTheme === 'fog') {
+        for (var f = 0; f < 8; f++) {
+          particles.push({
+            x: Math.random() * width,
+            y: height * 0.4 + Math.random() * height * 0.6,
+            r: Math.random() * 150 + 120,
+            vx: Math.random() * 0.4 + 0.1,
+            alpha: Math.random() * 0.06 + 0.03
+          });
+        }
+      }
+    }
+
+    function triggerLightning() {
+      if (!flashEl || currentSkyTheme !== 'thunderstorm') return;
+      flashEl.classList.add('flash');
+      setTimeout(function () {
+        flashEl.classList.remove('flash');
+        setTimeout(function () {
+          flashEl.classList.add('flash');
+          setTimeout(function () { flashEl.classList.remove('flash'); }, 60);
+        }, 80);
+      }, 70);
+    }
+
+    function renderParticles(time) {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, width, height);
+
+      if (currentSkyTheme === 'rain' || currentSkyTheme === 'thunderstorm') {
+        ctx.strokeStyle = currentSkyTheme === 'thunderstorm' ? 'rgba(200, 225, 255, 0.6)' : 'rgba(180, 210, 255, 0.45)';
+        ctx.lineWidth = 1.2;
+
+        particles.forEach(function (p) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + p.vx * 1.5, p.y + p.l);
+          ctx.stroke();
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.y >= height - 30) {
+            if (Math.random() > 0.7 && ripples.length < 25) {
+              ripples.push({ x: p.x, y: height - Math.random() * 25, r: 1, maxR: Math.random() * 8 + 4, a: 0.6 });
+            }
+            p.y = -20;
+            p.x = Math.random() * width;
+          }
+        });
+
+        // Draw and update splash ripples
+        for (var rIdx = ripples.length - 1; rIdx >= 0; rIdx--) {
+          var rip = ripples[rIdx];
+          ctx.beginPath();
+          ctx.ellipse(rip.x, rip.y, rip.r * 2, rip.r * 0.7, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(200, 225, 255, ' + rip.a + ')';
+          ctx.stroke();
+          rip.r += 0.4;
+          rip.a -= 0.025;
+          if (rip.a <= 0 || rip.r >= rip.maxR) {
+            ripples.splice(rIdx, 1);
+          }
+        }
+
+        // Random lightning strike in thunderstorm
+        if (currentSkyTheme === 'thunderstorm') {
+          if (!lastLightningTime) lastLightningTime = time;
+          if (time - lastLightningTime > 6000 + Math.random() * 8000) {
+            triggerLightning();
+            lastLightningTime = time;
+          }
+        }
+      } else if (currentSkyTheme === 'windy') {
+        particles.forEach(function (p) {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color + p.alpha + ')';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          p.x += p.vx;
+          p.y += p.vy + Math.sin(time * 0.002 + p.x * 0.01) * 0.6;
+          p.rot += p.vRot;
+
+          if (p.x > width + 20) p.x = -20;
+          if (p.y > height + 20) p.y = -20;
+        });
+      } else if (currentSkyTheme === 'snow') {
+        ctx.fillStyle = 'rgba(240, 248, 255, 0.8)';
+        particles.forEach(function (p) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.y += p.vy;
+          p.x += p.vxBase + Math.sin(time * p.swaySpeed + p.swayOffset) * 0.8;
+
+          if (p.y > height + 10) {
+            p.y = -10;
+            p.x = Math.random() * width;
+          }
+        });
+      } else if (currentSkyTheme === 'night') {
+        particles.forEach(function (p) {
+          var twinkle = Math.sin(time * p.twinkleSpeed + p.twinklePhase);
+          var alpha = Math.max(0.1, p.baseAlpha + twinkle * 0.35);
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      } else if (currentSkyTheme === 'sunny') {
+        particles.forEach(function (p) {
+          ctx.fillStyle = 'rgba(255, 220, 140, ' + p.alpha + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.y += p.vy;
+          p.x += p.vx;
+          if (p.y < -10) {
+            p.y = height + 10;
+            p.x = Math.random() * width;
+          }
+        });
+      } else if (currentSkyTheme === 'sunset') {
+        particles.forEach(function (p) {
+          ctx.fillStyle = p.color + p.alpha + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.y += p.vy;
+          p.x += p.vx;
+          p.alpha -= 0.002;
+          if (p.y < -10 || p.alpha <= 0) {
+            p.y = height + Math.random() * 30;
+            p.x = Math.random() * width;
+            p.alpha = Math.random() * 0.8 + 0.2;
+          }
+        });
+      } else if (currentSkyTheme === 'fog') {
+        particles.forEach(function (p) {
+          var grad = ctx.createRadialGradient(p.x, p.y, 10, p.x, p.y, p.r);
+          grad.addColorStop(0, 'rgba(220, 230, 245, ' + p.alpha + ')');
+          grad.addColorStop(1, 'rgba(220, 230, 245, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.x += p.vx;
+          if (p.x - p.r > width) p.x = -p.r;
+        });
+      }
+
+      animFrame = requestAnimationFrame(renderParticles);
+    }
+
+    /* ==================== Clock & Date Engine ==================== */
+    function updateClock() {
+      var now = new Date();
+      var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+      var dateStr = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+
+      var clockEl = $('weatherTimeDate');
+      if (clockEl) {
+        clockEl.textContent = timeStr + ' · ' + dateStr;
+      }
+    }
+
+    /* ==================== Open-Meteo & Location Weather Fetcher ==================== */
+    function fetchLiveWeather() {
+      fetch('https://get.geojs.io/v1/ip/geo.json')
+        .then(function (r) { return r.json(); })
+        .then(function (geo) {
+          var lat = geo.latitude || 28.49;
+          var lon = geo.longitude || 77.53;
+          var city = geo.city || 'My City';
+          var country = geo.country_code || 'IN';
+          userLocation = city + ', ' + country;
+
+          if ($('skyLocationSub')) $('skyLocationSub').textContent = '📍 ' + userLocation;
+
+          var weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m';
+          return fetch(weatherUrl);
+        })
+        .then(function (wr) { return wr.json(); })
+        .then(function (wdata) {
+          if (wdata && wdata.current) {
+            weatherData = wdata.current;
+            applyLiveWeatherData(weatherData);
+          }
+        })
+        .catch(function (err) {
+          // Fallback to local time heuristics
+          var hr = new Date().getHours();
+          var isDay = hr >= 6 && hr < 18 ? 1 : 0;
+          applyLiveWeatherData({ temperature_2m: 26, relative_humidity_2m: 80, is_day: isDay, weather_code: 0, wind_speed_10m: 6 });
+        });
+    }
+
+    function applyLiveWeatherData(cur) {
+      var temp = Math.round(cur.temperature_2m);
+      var code = cur.weather_code;
+      var isDay = cur.is_day;
+      var wind = Math.round(cur.wind_speed_10m);
+      var hum = cur.relative_humidity_2m;
+
+      var theme = 'night';
+      var condLabel = 'Clear Night';
+      var icon = '🌌';
+
+      if (code >= 95) {
+        theme = 'thunderstorm'; condLabel = 'Thunderstorm'; icon = '⛈️';
+      } else if (code >= 51 && code <= 82) {
+        theme = 'rain'; condLabel = 'Monsoon Rain'; icon = '🌧️';
+      } else if (code >= 71 && code <= 86) {
+        theme = 'snow'; condLabel = 'Snowfall'; icon = '❄️';
+      } else if (code === 45 || code === 48) {
+        theme = 'fog'; condLabel = 'Misty Fog'; icon = '🌫️';
+      } else if (wind > 22) {
+        theme = 'windy'; condLabel = 'Breezy Wind'; icon = '🍃';
+      } else if (isDay) {
+        var hr = new Date().getHours();
+        if (hr >= 17 && hr <= 19) {
+          theme = 'sunset'; condLabel = 'Sunset Golden Hour'; icon = '🌅';
+        } else {
+          theme = 'sunny'; condLabel = code <= 1 ? 'Sunny Sky' : 'Partly Cloudy'; icon = '☀️';
+        }
+      } else {
+        theme = 'night'; condLabel = 'Starry Night'; icon = '🌌';
+      }
+
+      if ($('weatherIconBadge')) $('weatherIconBadge').textContent = icon;
+      if ($('weatherTempCond')) $('weatherTempCond').textContent = temp + '°C · ' + condLabel;
+      if ($('skyBigIcon')) $('skyBigIcon').textContent = icon;
+      if ($('skyBigTemp')) $('skyBigTemp').textContent = temp + '°C';
+      if ($('skyCondText')) $('skyCondText').textContent = condLabel + ' in ' + userLocation;
+      if ($('skyHumidityVal')) $('skyHumidityVal').textContent = hum + '%';
+      if ($('skyWindVal')) $('skyWindVal').textContent = wind + ' km/h';
+      if ($('skyPhaseVal')) $('skyPhaseVal').textContent = isDay ? 'Daytime ☀️' : 'Nighttime 🌙';
+
+      if (isAutoSync) {
+        setSkyTheme(theme, false);
+      }
+    }
+
+    function setSkyTheme(themeKey, isManual) {
+      if (!WEATHER_THEMES[themeKey]) themeKey = 'rain';
+      currentSkyTheme = themeKey;
+      localStorage.setItem('ishq_sky_theme', themeKey);
+
+      if (isManual) {
+        isAutoSync = false;
+        localStorage.setItem('ishq_weather_autosync', 'false');
+        if (autoSyncToggle) autoSyncToggle.checked = false;
+        showToast('Sky Atmosphere: ' + WEATHER_THEMES[themeKey].name + ' ' + WEATHER_THEMES[themeKey].icon);
+      }
+
+      // Update body theme class
+      document.body.className = document.body.className.replace(/\bsky-\w+\b/g, '').trim();
+      document.body.classList.add('sky-' + themeKey);
+
+      // Highlight active button in modal
+      document.querySelectorAll('.sky-theme-btn').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-sky') === themeKey);
+      });
+
+      initParticles();
+    }
+
+    function openModal() {
+      if (!modal) return;
+      modal.classList.add('open');
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('open');
+    }
+
+    // Wiring listeners
+    var pillBtn = $('weatherPillBtn');
+    if (pillBtn) pillBtn.addEventListener('click', openModal);
+
+    var closeBtn = $('closeSkyBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    if (autoSyncToggle) {
+      autoSyncToggle.checked = isAutoSync;
+      autoSyncToggle.addEventListener('change', function () {
+        isAutoSync = autoSyncToggle.checked;
+        localStorage.setItem('ishq_weather_autosync', isAutoSync ? 'true' : 'false');
+        if (isAutoSync && weatherData) {
+          applyLiveWeatherData(weatherData);
+          showToast('Real-world sky auto-sync activated 🌤️');
+        } else {
+          showToast('Manual atmosphere override enabled');
+        }
+      });
+    }
+
+    document.querySelectorAll('.sky-theme-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = btn.getAttribute('data-sky');
+        if (t) setSkyTheme(t, true);
+      });
+    });
+
+    window.addEventListener('resize', resize);
+
+    // Start Clock loop & live weather
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    resize();
+    renderParticles(0);
+    fetchLiveWeather();
+    setInterval(fetchLiveWeather, 600000); // 10 minutes
+
+    return {
+      setTheme: setSkyTheme,
+      open: openModal,
+      close: closeModal
+    };
+  })();
+
   /* ==================== Mobile Native PWA Install Engine ==================== */
+
 
   (function initPWAEngine() {
     var deferredPrompt = null;

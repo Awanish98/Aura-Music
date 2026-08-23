@@ -3109,3 +3109,329 @@ body.in-explorer-mode.playing #player {
   cursor: pointer;
 }
 
+/* ==================== Living Atmosphere & Dynamic Weather Engine ==================== */
+.weather-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.9;
+  transition: opacity 1s ease;
+}
+
+.lightning-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.95), rgba(200, 220, 255, 0.8) 60%, rgba(10, 15, 30, 0.4) 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.06s ease-out;
+}
+
+.lightning-flash.flash {
+  opacity: 0.85;
+}
+
+/* Header Live Weather & Date-Clock Pill */
+.header-weather-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.25s var(--ease-smooth);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.header-weather-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px var(--accent-glow);
+}
+
+.weather-icon-badge {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+  animation: floatWeather 3s infinite ease-in-out;
+}
+
+@keyframes floatWeather {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.weather-info-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.weather-temp-cond {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.weather-time-date {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: 'Space Grotesk', monospace, sans-serif;
+}
+
+.weather-sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+  animation: syncPulse 2s infinite ease-in-out;
+}
+
+/* ==================== Atmosphere Modal & Controls ==================== */
+.sky-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999990;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(4, 4, 10, 0.88);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+}
+
+.sky-modal-overlay.open {
+  display: flex;
+  animation: skyFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes skyFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.sky-card {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(16, 14, 28, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 26px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95), 0 0 50px var(--accent-glow);
+}
+
+.sky-metrics-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sky-metrics-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sky-big-icon {
+  font-size: 42px;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+}
+
+.sky-big-temp {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.sky-cond-text {
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-weight: 500;
+}
+
+.sky-metrics-right {
+  display: flex;
+  gap: 14px;
+}
+
+.sky-metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.sky-metric-item strong {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.sky-sync-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 18px;
+}
+
+.sky-sync-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sky-sync-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sky-sync-desc {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Switch Toggle UI */
+.switch-wrap {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch-wrap input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: .3s;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+input:checked + .switch-slider {
+  background-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+  background-color: #050508;
+}
+
+.sky-themes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sky-themes-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fg-dim);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sky-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.sky-theme-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sky-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.sky-theme-btn.active {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.sky-btn-icon {
+  font-size: 22px;
+}
+
+.sky-btn-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .sky-themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .header-weather-pill {
+    padding: 4px 10px;
+    gap: 6px;
+  }
+  .weather-time-date {
+    display: none;
+  }
+}

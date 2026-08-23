@@ -13,7 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=27.0">
+  <link rel="stylesheet" href="style.css?v=28.0">
+
 
 
 
@@ -40,6 +41,11 @@
 
   <!-- Background Dust & Star Particles Canvas -->
   <canvas id="particles" aria-hidden="true"></canvas>
+
+  <!-- Live Weather Atmosphere Living Canvas -->
+  <canvas id="weatherCanvas" class="weather-canvas" aria-hidden="true"></canvas>
+  <div class="lightning-flash" id="lightningFlash"></div>
+
 
   <!-- Ambient Dynamic Colored Glow from Artwork -->
   <div class="ambient" aria-hidden="true">
@@ -109,11 +115,22 @@
       </div>
 
       <div class="header-right">
+        <!-- Live Real-Time Date, Clock & Weather Atmosphere Pill -->
+        <button class="header-weather-pill" id="weatherPillBtn" title="Atmospheric Sky & Weather Controls">
+          <span class="weather-icon-badge" id="weatherIconBadge">🌧️</span>
+          <div class="weather-info-text">
+            <span class="weather-temp-cond" id="weatherTempCond">--°C · Loading…</span>
+            <span class="weather-time-date" id="weatherTimeDate">--:-- · Live Clock</span>
+          </div>
+          <span class="weather-sync-dot" title="Live Auto-Sync Active"></span>
+        </button>
+
         <!-- Ambience Mixer Toggle -->
         <button class="header-tool-btn" id="ambientToggleBtn" title="Ambience Mixer (Rain, Vinyl, Fire)">
           <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
           <span class="btn-label">AMBIENCE</span>
         </button>
+
 
         <!-- Sleep Timer Toggle -->
         <button class="header-tool-btn" id="sleepTimerBtn" title="Set Sleep Timer">
@@ -532,6 +549,87 @@
       </div>
     </div>
 
+    <!-- ==================== Living Atmosphere & Sky Weather Controls Modal ==================== -->
+    <div class="sky-modal-overlay" id="skyControlModal">
+      <div class="sky-card">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Living Atmosphere & Sky Engine</div>
+            <div class="panel-sub" id="skyLocationSub" style="font-size:11px; color:var(--muted);">📍 Detecting your local horizon…</div>
+          </div>
+          <button class="panel-close-btn" id="closeSkyBtn">&times;</button>
+        </div>
+
+        <!-- Live City Weather Metrics Banner -->
+        <div class="sky-metrics-card" id="skyMetricsCard">
+          <div class="sky-metrics-left">
+            <span class="sky-big-icon" id="skyBigIcon">🌧️</span>
+            <div>
+              <div class="sky-big-temp" id="skyBigTemp">--°C</div>
+              <div class="sky-cond-text" id="skyCondText">Connecting to satellite stream…</div>
+            </div>
+          </div>
+          <div class="sky-metrics-right">
+            <div class="sky-metric-item"><span>Humidity</span><strong id="skyHumidityVal">--%</strong></div>
+            <div class="sky-metric-item"><span>Wind</span><strong id="skyWindVal">-- km/h</strong></div>
+            <div class="sky-metric-item"><span>Phase</span><strong id="skyPhaseVal">Night</strong></div>
+          </div>
+        </div>
+
+        <!-- Auto-Sync Switch -->
+        <div class="sky-sync-row">
+          <div class="sky-sync-info">
+            <span class="sky-sync-title">Auto-Sync with Real World Sky</span>
+            <span class="sky-sync-desc">Theme and particles change automatically with your outside weather</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="weatherAutoSyncToggle" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <!-- Manual Atmosphere / Weather Mood Selection -->
+        <div class="sky-themes-section">
+          <div class="sky-themes-label">Or Select Atmosphere Mood:</div>
+          <div class="sky-themes-grid" id="skyThemesGrid">
+            <button class="sky-theme-btn active" data-sky="rain">
+              <span class="sky-btn-icon">🌧️</span>
+              <span class="sky-btn-name">Monsoon Rain</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="thunderstorm">
+              <span class="sky-btn-icon">⛈️</span>
+              <span class="sky-btn-name">Thunderstorm</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="sunny">
+              <span class="sky-btn-icon">☀️</span>
+              <span class="sky-btn-name">Solar Day</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="night">
+              <span class="sky-btn-icon">🌌</span>
+              <span class="sky-btn-name">Starry Night</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="windy">
+              <span class="sky-btn-icon">🍃</span>
+              <span class="sky-btn-name">Autumn Wind</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="snow">
+              <span class="sky-btn-icon">❄️</span>
+              <span class="sky-btn-name">Snowfall</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="sunset">
+              <span class="sky-btn-icon">🌅</span>
+              <span class="sky-btn-name">Sunset Hour</span>
+            </button>
+            <button class="sky-theme-btn" data-sky="fog">
+              <span class="sky-btn-icon">🌫️</span>
+              <span class="sky-btn-name">Lo-Fi Fog</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Tap To Play Autoplay Overlay -->
     <div class="autoplay-overlay" id="autoplayOverlay">
       <div class="autoplay-content">
@@ -578,7 +676,8 @@
   <!-- Off-screen YouTube Player container -->
   <div id="player"></div>
 
-  <script src="script.js?v=27.0"></script>
+  <script src="script.js?v=28.0"></script>
+
 
 
 
