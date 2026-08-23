@@ -1821,11 +1821,10 @@
     function updateClock() {
       var now = new Date();
       var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-      var dateStr = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 
       var clockEl = $('weatherTimeDate');
       if (clockEl) {
-        clockEl.textContent = timeStr + ' · ' + dateStr;
+        clockEl.textContent = timeStr;
       }
     }
 
@@ -1856,7 +1855,7 @@
           // Fallback to local time heuristics
           var hr = new Date().getHours();
           var isDay = hr >= 6 && hr < 18 ? 1 : 0;
-          applyLiveWeatherData({ temperature_2m: 26, relative_humidity_2m: 80, is_day: isDay, weather_code: 0, wind_speed_10m: 6 });
+          applyLiveWeatherData({ temperature_2m: 25, relative_humidity_2m: 80, is_day: isDay, weather_code: 53, wind_speed_10m: 6 });
         });
     }
 
@@ -1867,33 +1866,33 @@
       var wind = Math.round(cur.wind_speed_10m);
       var hum = cur.relative_humidity_2m;
 
-      var theme = 'night';
-      var condLabel = 'Clear Night';
-      var icon = '🌌';
+      var theme = 'rain';
+      var condLabel = 'Rain';
+      var icon = '🌧️';
 
       if (code >= 95) {
-        theme = 'thunderstorm'; condLabel = 'Thunderstorm'; icon = '⛈️';
+        theme = 'thunderstorm'; condLabel = 'Storm'; icon = '⛈️';
       } else if (code >= 51 && code <= 82) {
-        theme = 'rain'; condLabel = 'Monsoon Rain'; icon = '🌧️';
+        theme = 'rain'; condLabel = 'Rain'; icon = '🌧️';
       } else if (code >= 71 && code <= 86) {
-        theme = 'snow'; condLabel = 'Snowfall'; icon = '❄️';
+        theme = 'snow'; condLabel = 'Snow'; icon = '❄️';
       } else if (code === 45 || code === 48) {
-        theme = 'fog'; condLabel = 'Misty Fog'; icon = '🌫️';
+        theme = 'fog'; condLabel = 'Fog'; icon = '🌫️';
       } else if (wind > 22) {
-        theme = 'windy'; condLabel = 'Breezy Wind'; icon = '🍃';
+        theme = 'windy'; condLabel = 'Wind'; icon = '🍃';
       } else if (isDay) {
         var hr = new Date().getHours();
         if (hr >= 17 && hr <= 19) {
-          theme = 'sunset'; condLabel = 'Sunset Golden Hour'; icon = '🌅';
+          theme = 'sunset'; condLabel = 'Sunset'; icon = '🌅';
         } else {
-          theme = 'sunny'; condLabel = code <= 1 ? 'Sunny Sky' : 'Partly Cloudy'; icon = '☀️';
+          theme = 'sunny'; condLabel = code <= 1 ? 'Sunny' : 'Clear'; icon = '☀️';
         }
       } else {
-        theme = 'night'; condLabel = 'Starry Night'; icon = '🌌';
+        theme = 'night'; condLabel = 'Night'; icon = '🌌';
       }
 
       if ($('weatherIconBadge')) $('weatherIconBadge').textContent = icon;
-      if ($('weatherTempCond')) $('weatherTempCond').textContent = temp + '°C · ' + condLabel;
+      if ($('weatherTempCond')) $('weatherTempCond').textContent = temp + '°C ' + condLabel;
       if ($('skyBigIcon')) $('skyBigIcon').textContent = icon;
       if ($('skyBigTemp')) $('skyBigTemp').textContent = temp + '°C';
       if ($('skyCondText')) $('skyCondText').textContent = condLabel + ' in ' + userLocation;
@@ -1905,6 +1904,7 @@
         setSkyTheme(theme, false);
       }
     }
+
 
     function setSkyTheme(themeKey, isManual) {
       if (!WEATHER_THEMES[themeKey]) themeKey = 'rain';

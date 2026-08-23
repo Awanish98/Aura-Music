@@ -13,7 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=28.0">
+  <link rel="stylesheet" href="style.css?v=29.0">
+
 
 
 
@@ -105,8 +106,16 @@
           <svg viewBox="0 0 24 24"><path d="M10 16.5l6-4.5-6-4.5v9zM21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81z"/></svg>
           <span class="btn-label">EXPLORER</span>
         </button>
-      </div>
 
+        <!-- Live Real-Time Date, Clock & Weather Atmosphere Pill -->
+        <button class="header-tool-btn header-weather-pill" id="weatherPillBtn" title="Atmospheric Sky & Weather Controls">
+          <span class="weather-icon-badge" id="weatherIconBadge">🌧️</span>
+          <span class="weather-temp-cond" id="weatherTempCond">--°C</span>
+          <span class="weather-sep">·</span>
+          <span class="weather-time-date" id="weatherTimeDate">--:--</span>
+          <span class="weather-sync-dot" title="Live Auto-Sync Active"></span>
+        </button>
+      </div>
 
       <!-- Dynamic Brand Header -->
       <div class="wordmark-container">
@@ -115,22 +124,11 @@
       </div>
 
       <div class="header-right">
-        <!-- Live Real-Time Date, Clock & Weather Atmosphere Pill -->
-        <button class="header-weather-pill" id="weatherPillBtn" title="Atmospheric Sky & Weather Controls">
-          <span class="weather-icon-badge" id="weatherIconBadge">🌧️</span>
-          <div class="weather-info-text">
-            <span class="weather-temp-cond" id="weatherTempCond">--°C · Loading…</span>
-            <span class="weather-time-date" id="weatherTimeDate">--:-- · Live Clock</span>
-          </div>
-          <span class="weather-sync-dot" title="Live Auto-Sync Active"></span>
-        </button>
-
         <!-- Ambience Mixer Toggle -->
         <button class="header-tool-btn" id="ambientToggleBtn" title="Ambience Mixer (Rain, Vinyl, Fire)">
           <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
           <span class="btn-label">AMBIENCE</span>
         </button>
-
 
         <!-- Sleep Timer Toggle -->
         <button class="header-tool-btn" id="sleepTimerBtn" title="Set Sleep Timer">
@@ -144,6 +142,7 @@
           <span class="song-count" id="counts">— SONGS</span>
         </button>
       </div>
+
 
 
     </header>
@@ -676,7 +675,8 @@
   <!-- Off-screen YouTube Player container -->
   <div id="player"></div>
 
-  <script src="script.js?v=28.0"></script>
+  <script src="script.js?v=29.0"></script>
+
 
 
 
