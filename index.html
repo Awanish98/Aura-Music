@@ -13,7 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=26.0">
+  <link rel="stylesheet" href="style.css?v=27.0">
+
 
 
 
@@ -108,18 +109,6 @@
       </div>
 
       <div class="header-right">
-        <!-- Lyrics View Toggle -->
-        <button class="header-tool-btn" id="lyricsToggleBtn" title="View Time-Synced Karaoke Lyrics (L)">
-          <svg viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm6 8c0 3.07-2.31 5.6-5.25 5.93V20h3v2H8.25v-2h3v-4.07C8.31 15.6 6 13.07 6 10H4c0 4.08 3.05 7.44 7 7.93V20H8v2h8v-2h-3v-2.07c3.95-.49 7-3.85 7-7.93h-2z"/></svg>
-          <span class="btn-label">LYRICS</span>
-        </button>
-
-        <!-- Equalizer & DSP Toggle -->
-        <button class="header-tool-btn" id="eqToggleBtn" title="Audio Equalizer & Sound Presets">
-          <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-          <span class="btn-label">EQUALIZER</span>
-        </button>
-
         <!-- Ambience Mixer Toggle -->
         <button class="header-tool-btn" id="ambientToggleBtn" title="Ambience Mixer (Rain, Vinyl, Fire)">
           <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
@@ -138,6 +127,7 @@
           <span class="song-count" id="counts">— SONGS</span>
         </button>
       </div>
+
 
     </header>
 
@@ -287,21 +277,12 @@
             <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7l7 4z"/></svg>
           </button>
 
-          <!-- Lyrics Dock Button -->
-          <button class="ctrl-btn sub-btn" id="lyricsDockBtn" aria-label="Synced Lyrics" title="Time-Synced Lyrics (L)">
-            <svg viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm6 8c0 3.07-2.31 5.6-5.25 5.93V20h3v2H8.25v-2h3v-4.07C8.31 15.6 6 13.07 6 10H4c0 4.08 3.05 7.44 7 7.93V20H8v2h8v-2h-3v-2.07c3.95-.49 7-3.85 7-7.93h-2z"/></svg>
-          </button>
-
-          <!-- Equalizer Dock Button -->
-          <button class="ctrl-btn sub-btn" id="eqDockBtn" aria-label="Audio Equalizer" title="Equalizer Presets">
-            <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-          </button>
-
           <!-- Fullscreen Button -->
           <button class="ctrl-btn sub-btn" id="fsbtn" aria-label="Fullscreen" title="Fullscreen (F)">
             <svg class="icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             <svg class="icon-compress" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
           </button>
+
 
 
         </div>
@@ -539,7 +520,6 @@
           <div class="sc-row"><kbd>→</kbd><span>Next Song</span></div>
           <div class="sc-row"><kbd>←</kbd><span>Previous Song</span></div>
           <div class="sc-row"><kbd>L</kbd><span>Like / Favorite Song</span></div>
-          <div class="sc-row"><kbd>Y</kbd><span>Time-Synced Lyrics</span></div>
           <div class="sc-row"><kbd>V</kbd><span>Cinema Video Theater</span></div>
           <div class="sc-row"><kbd>Q</kbd><span>Playlist Queue</span></div>
           <div class="sc-row"><kbd>E</kbd><span>YouTube Explorer</span></div>
@@ -547,6 +527,7 @@
           <div class="sc-row"><kbd>F</kbd><span>Fullscreen</span></div>
           <div class="sc-row"><kbd>?</kbd><span>Shortcuts Help</span></div>
         </div>
+
 
       </div>
     </div>
@@ -578,86 +559,6 @@
     </footer>
   </div>
 
-  <!-- ==================== Apple Music Style Time-Synced Live Lyrics Modal ==================== -->
-  <div class="lyrics-modal-overlay" id="lyricsModal">
-    <div class="lyrics-card">
-      <div class="lyrics-header">
-        <div class="lyrics-track-info">
-          <div class="lyrics-badge-wrap">
-            <span class="live-sync-dot"></span>
-            <span class="lyrics-badge">TIME-SYNCED KARAOKE LYRICS</span>
-          </div>
-          <div class="lyrics-track-title" id="lyricsTrackTitle">Now Playing</div>
-          <div class="lyrics-track-artist" id="lyricsTrackArtist">Aura Stream</div>
-        </div>
-        <div class="lyrics-header-actions">
-          <button class="btn-lyrics-sync" id="lyricsSyncStatusBtn" title="Auto-Sync Enabled">● Auto-Scroll ON</button>
-          <button class="lyrics-close-btn" id="closeLyricsBtn" title="Close Lyrics">&times;</button>
-        </div>
-      </div>
-      <div class="lyrics-stage-wrap" id="lyricsStageWrap">
-        <div class="lyrics-container" id="lyricsContainer">
-          <div class="lyrics-loading">Connecting to synchronized lyrics stream… 🎤</div>
-        </div>
-      </div>
-      <div class="lyrics-footer">
-        <span>💡 Tap any line to immediately jump to that part of the song</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== Audio Equalizer & Sound Enhancement Presets Modal ==================== -->
-  <div class="eq-modal-overlay" id="eqModal">
-    <div class="eq-card">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title">Audio Equalizer & DSP Presets</div>
-          <div class="panel-sub" style="font-size:11px; color:var(--muted);">Select acoustic DSP profile for your headphones / speakers</div>
-        </div>
-        <button class="panel-close-btn" id="closeEqBtn">&times;</button>
-      </div>
-
-      <div class="eq-presets-grid" id="eqPresetsGrid">
-        <button class="eq-preset-card active" data-preset="balanced">
-          <div class="eq-icon">🎧</div>
-          <div class="eq-preset-name">Balanced Studio</div>
-          <div class="eq-preset-desc">Original High-Fidelity Master</div>
-        </button>
-        <button class="eq-preset-card" data-preset="bass-boost">
-          <div class="eq-icon">🔥</div>
-          <div class="eq-preset-name">Sub-Bass Boost</div>
-          <div class="eq-preset-desc">Punchy low-end club power</div>
-        </button>
-        <button class="eq-preset-card" data-preset="vocal">
-          <div class="eq-icon">🎤</div>
-          <div class="eq-preset-name">Vocal & Treble Air</div>
-          <div class="eq-preset-desc">Crystal-clear lyrics & acoustic tone</div>
-        </button>
-        <button class="eq-preset-card" data-preset="acoustic">
-          <div class="eq-icon">🎻</div>
-          <div class="eq-preset-name">Acoustic Warmth</div>
-          <div class="eq-preset-desc">Rich guitars, piano & unplugged soul</div>
-        </button>
-        <button class="eq-preset-card" data-preset="lofi">
-          <div class="eq-icon">🌙</div>
-          <div class="eq-preset-name">Midnight Lo-Fi</div>
-          <div class="eq-preset-desc">Vintage warmth & relaxed highs</div>
-        </button>
-      </div>
-
-      <!-- Real-time Equalizer Wave Visualizer Bars -->
-      <div class="eq-visualizer-dock">
-        <div class="eq-bars-row" id="eqLiveBars">
-          <span class="eq-bar b1"></span><span class="eq-bar b2"></span><span class="eq-bar b3"></span>
-          <span class="eq-bar b4"></span><span class="eq-bar b5"></span><span class="eq-bar b6"></span>
-          <span class="eq-bar b7"></span><span class="eq-bar b8"></span><span class="eq-bar b9"></span>
-          <span class="eq-bar b10"></span><span class="eq-bar b11"></span><span class="eq-bar b12"></span>
-        </div>
-        <span class="eq-dock-label" id="activeEqLabel">DSP ACTIVE: BALANCED STUDIO</span>
-      </div>
-    </div>
-  </div>
-
   <!-- ==================== Mobile Native PWA Custom Install Banner ==================== -->
   <div class="pwa-install-banner" id="pwaInstallBanner" style="display:none;">
     <div class="pwa-banner-content">
@@ -673,10 +574,12 @@
     </div>
   </div>
 
+
   <!-- Off-screen YouTube Player container -->
   <div id="player"></div>
 
-  <script src="script.js?v=26.0"></script>
+  <script src="script.js?v=27.0"></script>
+
 
 
 
