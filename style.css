@@ -513,11 +513,13 @@ body.playing .live-dot {
 }
 
 .station-name-label {
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
   font-weight: 700;
   text-transform: uppercase;
+  white-space: nowrap;
 }
+
 
 .dropdown-chevron {
   width: 14px;
@@ -2879,10 +2881,12 @@ footer {
   letter-spacing: 0.18em;
   color: var(--muted);
   text-transform: uppercase;
+  padding-top: 6px;
 }
 
 .footer-left {
-  display: flex;
+  justify-self: start;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
@@ -2890,7 +2894,7 @@ footer {
 .live-radio-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
   border: 1px solid rgba(123, 237, 159, 0.4);
   background: rgba(123, 237, 159, 0.08);
@@ -2904,7 +2908,7 @@ footer {
 .lossless-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
   border: 1px solid rgba(212, 175, 55, 0.4);
   background: rgba(212, 175, 55, 0.08);
@@ -2916,6 +2920,7 @@ footer {
 }
 
 .footer-center {
+  justify-self: center;
   text-align: center;
   color: #71717f;
   font-weight: 600;
@@ -2926,10 +2931,11 @@ footer {
   justify-self: end;
   font-size: 9px;
   color: #71717f;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
+
 
 .footer-admin-link {
   color: var(--accent);
