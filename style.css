@@ -77,16 +77,15 @@ html, body {
   transition: opacity 0.8s ease, transform 0.8s ease;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  filter: blur(4px);
-  text-shadow: 0 0 15px var(--accent-glow);
+  text-shadow: 0 0 35px var(--accent-glow);
 }
 
-.bg-glyphs .g1 { top: 6%;   left: 4%;   font-size: 10vw; --o: .014; animation-duration: 65s, 9s;   animation-delay: 0s, -2s; }
-.bg-glyphs .g2 { top: 12%;  right: 0%;  font-size: 12vw; --o: .012; animation-duration: 55s, 13s;  animation-delay: -18s, -6s; }
-.bg-glyphs .g3 { bottom: 6%; left: 8%;  font-size: 9.5vw; --o: .014; animation-duration: 75s, 10s; animation-delay: -32s, -1s; }
-.bg-glyphs .g4 { bottom: -2%; right: 10%; font-size: 13vw; --o: .010; animation-duration: 60s, 15s; animation-delay: -10s, -9s; }
-.bg-glyphs .g5 { top: 42%;  left: 62%;  font-size: 8.5vw; --o: .012; animation-duration: 50s, 8s;  animation-delay: -42s, -4s; }
-.bg-glyphs .g6 { top: -4%;  left: 45%;  font-size: 8.5vw; --o: .010; animation-duration: 80s, 12s; animation-delay: -55s, -7s; }
+.bg-glyphs .g1 { top: 6%;   left: 4%;   font-size: 10vw; --o: .038; animation-duration: 65s, 9s;   animation-delay: 0s, -2s; }
+.bg-glyphs .g2 { top: 12%;  right: 0%;  font-size: 12vw; --o: .028; animation-duration: 55s, 13s;  animation-delay: -18s, -6s; }
+.bg-glyphs .g3 { bottom: 6%; left: 8%;  font-size: 9.5vw; --o: .032; animation-duration: 75s, 10s; animation-delay: -32s, -1s; }
+.bg-glyphs .g4 { bottom: -2%; right: 10%; font-size: 13vw; --o: .025; animation-duration: 60s, 15s; animation-delay: -10s, -9s; }
+.bg-glyphs .g5 { top: 42%;  left: 62%;  font-size: 8.5vw; --o: .030; animation-duration: 50s, 8s;  animation-delay: -42s, -4s; }
+.bg-glyphs .g6 { top: -4%;  left: 45%;  font-size: 8.5vw; --o: .022; animation-duration: 80s, 12s; animation-delay: -55s, -7s; }
 
 .bg-glyphs .heart-glyph {
   position: absolute;
@@ -95,17 +94,18 @@ html, body {
   transform: translate3d(-50%, -50%, 0);
   font-family: var(--theme-font, 'Cinzel', sans-serif);
   font-weight: 900;
-  font-size: 24vw;
+  font-size: 26vw;
   color: #f7efe2;
   line-height: 1;
-  --o: .012;
-  filter: blur(6px);
+  --o: .026;
   will-change: transform, opacity;
   animation: breathe 22s ease-in-out infinite, shimmer 14s ease-in-out infinite;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
+  text-shadow: 0 0 45px var(--accent-glow);
 }
+
 
 
 @keyframes drift {
