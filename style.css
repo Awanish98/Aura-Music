@@ -174,6 +174,14 @@ body.mode-time-travel .controls-glass {
   border: 1px solid rgba(168, 85, 247, 0.25);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.15);
 }
+body.mode-time-travel .wordmark {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  letter-spacing: 0.24em;
+  background: linear-gradient(180deg, #ffffff 0%, #ecdcfc 40%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
+}
 body.mode-time-travel .now-title {
   font-family: 'Cinzel', serif;
   letter-spacing: 0.06em;
@@ -190,6 +198,15 @@ body.mode-time-travel .wave-visualizer span {
 body.mode-ishq {
   --theme-font: 'Tiro Devanagari Hindi', 'Rozha One', serif;
   background: radial-gradient(ellipse at 50% 35%, #241707 0%, #0d0803 65%, #030201 100%);
+}
+body.mode-ishq .wordmark {
+  font-family: 'Rozha One', 'Tiro Devanagari Hindi', 'Playfair Display', serif;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+  background: linear-gradient(180deg, #ffffff 0%, #fef08a 40%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.65));
 }
 body.mode-ishq .art-card {
   border-radius: 50%;
@@ -231,6 +248,16 @@ body.mode-demanding {
   --theme-font: 'Cinzel', sans-serif;
   background: radial-gradient(ellipse at 50% 35%, #2a0510 0%, #0e0105 65%, #030001 100%);
 }
+body.mode-demanding .wordmark {
+  font-family: 'Syne', 'Cinzel', sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  background: linear-gradient(180deg, #ffffff 0%, #ff85a1 40%, #ff2a5f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 42, 95, 0.7));
+}
 body.mode-demanding .art-card {
   border-radius: 50%;
   border: 2px solid rgba(255, 42, 95, 0.6);
@@ -271,6 +298,17 @@ body.mode-90s {
   --theme-font: 'Playfair Display', serif;
   background: radial-gradient(ellipse at 50% 35%, #061c24 0%, #020c10 65%, #010406 100%);
 }
+body.mode-90s .wordmark {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: linear-gradient(180deg, #ffffff 0%, #a5f3fc 40%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.65));
+}
 body.mode-90s .art-card {
   border-radius: 50%;
   border: 2px solid rgba(6, 182, 212, 0.5);
@@ -299,12 +337,23 @@ body.mode-edm {
   --theme-font: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
   background: radial-gradient(ellipse at 50% 35%, #052215 0%, #02100a 65%, #000402 100%);
 }
+body.mode-edm .wordmark {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  background: linear-gradient(180deg, #ffffff 0%, #a7f3d0 40%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(16, 185, 129, 0.7));
+}
 body.mode-edm .art-card {
   border-radius: 50%;
   border: 2px solid #10b981;
   box-shadow: 0 0 55px rgba(16, 185, 129, 0.5), inset 0 0 20px rgba(16, 185, 129, 0.25);
   animation: laserPulse 5s linear infinite alternate;
 }
+
 
 @keyframes laserPulse {
   0%   { box-shadow: 0 0 40px rgba(16, 185, 129, 0.35), inset 0 0 15px rgba(16, 185, 129, 0.15); }
@@ -702,32 +751,35 @@ body.playing .live-dot {
 }
 
 .wordmark {
-  font-family: var(--theme-font, 'Cinzel', serif);
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-family: var(--theme-font, 'Cinzel Decorative', 'Cinzel', serif);
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
   line-height: 1.1;
   color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #d4c8e8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f3eeff 40%, #c4b0e8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px var(--accent-glow));
-  transition: all 0.4s ease;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 25px var(--accent-glow));
+  transition: all 0.4s var(--ease-smooth);
   text-transform: uppercase;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .wordmark-sub {
-  font-family: 'Cinzel', serif;
-  font-size: 8.5px;
-  letter-spacing: 0.22em;
-  font-weight: 600;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  font-weight: 700;
   color: var(--muted);
   margin-top: 4px;
   text-transform: uppercase;
-  opacity: 0.85;
+  opacity: 0.9;
   white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
 }
+
 
 /* Header Right */
 .header-right {
@@ -2618,6 +2670,17 @@ body.mode-my-vibes {
   --font-display: 'Space Grotesk', sans-serif;
   --font-hindi: 'Plus Jakarta Sans', sans-serif;
 }
+body.mode-my-vibes .wordmark {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  background: linear-gradient(180deg, #ffffff 0%, #fbcfe8 40%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(236, 72, 153, 0.7));
+}
+
 
 /* AI Vibe Deck & Learner Intelligence */
 .ai-vibe-deck {
