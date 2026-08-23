@@ -636,7 +636,8 @@
     // Update Brand Title & Sub-heading
     if ($('brandTitle')) $('brandTitle').textContent = st.brand || st.name;
     if ($('brandSub')) $('brandSub').textContent = st.brandSub || (st.desc || '').toUpperCase();
-    if ($('currentStationLabel')) $('currentStationLabel').textContent = st.short;
+    if ($('currentStationLabel')) $('currentStationLabel').textContent = 'STATIONS';
+
     if ($('loaderGlyph')) $('loaderGlyph').textContent = st.icon || '📻';
     if ($('errorGlyph')) $('errorGlyph').textContent = st.icon || '📻';
     if ($('counts')) $('counts').textContent = st.songCount || '4,000+ SONGS';
