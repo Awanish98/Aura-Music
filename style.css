@@ -25,6 +25,27 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 html, body {
@@ -42,6 +63,7 @@ html, body {
   background: var(--accent-glow);
   color: #fff;
 }
+
 
 /* ==================== Canvas Particle Stars ==================== */
 #particles {
@@ -1390,22 +1412,30 @@ body.is-muted .vol-icon-muted { display: block; }
 
 #volSlider {
   -webkit-appearance: none;
-  width: 60px;
+  width: 65px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   outline: none;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 #volSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--fg);
+  background: #ffffff;
+  box-shadow: 0 0 10px var(--accent-glow);
   cursor: pointer;
+  transition: transform 0.15s ease;
 }
+
+#volSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
 
 
 /* ==================== Dedicated YouTube Music Universe ==================== */
@@ -2195,21 +2225,41 @@ body.in-cinema-mode #player iframe {
 
 /* ==================== Ambient Mixer & Timer Panels ==================== */
 
-.ambient-panel, .timer-panel {
+.ambient-panel {
   position: fixed;
   top: 62px;
-  right: 24px;
+  left: 24px;
+  right: auto;
   width: 290px;
-  background: rgba(12, 10, 24, 0.9);
+  background: rgba(12, 10, 24, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 18px;
   z-index: 90;
   display: none;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255,255,255,0.12);
-  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.15), 0 0 30px var(--accent-glow);
+  backdrop-filter: blur(28px) saturate(180%);
+  animation: panelSlideDown 0.25s var(--ease-smooth);
+}
+
+.timer-panel {
+  position: fixed;
+  top: 62px;
+  right: 24px;
+  left: auto;
+  width: 290px;
+  background: rgba(12, 10, 24, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  padding: 18px;
+  z-index: 90;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.15), 0 0 30px var(--accent-glow);
+  backdrop-filter: blur(28px) saturate(180%);
   animation: panelSlideDown 0.25s var(--ease-smooth);
 }
 
@@ -2219,6 +2269,7 @@ body.in-cinema-mode #player iframe {
 }
 
 .ambient-panel.open, .timer-panel.open { display: flex; }
+
 
 .panel-header {
   display: flex;
@@ -2914,30 +2965,35 @@ footer {
 .live-radio-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 8px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(123, 237, 159, 0.4);
+  border: 1px solid rgba(123, 237, 159, 0.45);
   background: rgba(123, 237, 159, 0.08);
   color: #7bed9f;
   font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  box-shadow: 0 0 10px rgba(123, 237, 159, 0.2);
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 12px rgba(123, 237, 159, 0.25);
+  backdrop-filter: blur(8px);
 }
 
 .lossless-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 8px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  background: rgba(212, 175, 55, 0.08);
-  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.04) 100%);
+  color: #f1c40f;
   font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+  backdrop-filter: blur(8px);
 }
+
 
 .footer-center {
   position: absolute;
