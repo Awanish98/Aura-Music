@@ -191,10 +191,22 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.1') caches.delete(name);
+        if (name !== 'aura-music-v101.2') caches.delete(name);
       });
     });
   }
+
+  /* ==================== Global Security & Sanitization ==================== */
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  if (typeof window !== 'undefined') window.escapeHtml = escapeHtml;
 
   var stations = DEFAULT_STATIONS.slice();
   var currentStation = stations[0];
@@ -904,10 +916,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     // Warm up voices for AI DJ
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
+      try { window.speechSynthesis.getVoices(); } catch (e) {}
     }
-    
-    initVisualizer();
   });
 
   /* ==================== Toast Notifications ==================== */
@@ -3045,7 +3055,10 @@
       var url = 'https://lrclib.net/api/get?track_name=' + encodeURIComponent(cleanT) + '&artist_name=' + encodeURIComponent(cleanA);
       
       fetch(url)
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          if (!res.ok) throw new Error('No direct lyrics match');
+          return res.json();
+        })
         .then(function (data) {
           if (data && data.syncedLyrics) {
             cacheAndHandle(cacheKey, data.syncedLyrics);
@@ -3061,8 +3074,15 @@
     }
 
     function searchFallback(query, cacheKey) {
+      if (!query || query.trim() === '') {
+        renderFallbackQuote();
+        return;
+      }
       fetch('https://lrclib.net/api/search?q=' + encodeURIComponent(query))
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Search failed');
+          return res.json();
+        })
         .then(function (results) {
           if (Array.isArray(results) && results.length > 0) {
             var best = results.find(function (r) { return r.syncedLyrics; }) || results[0];
@@ -4359,11 +4379,15 @@
 
       var bubble = document.createElement('div');
       bubble.className = 'home-chat-bubble-popup';
+      var authorName = escapeHtml(msg.isMe ? 'You' : (msg.sender || 'Friend'));
+      var avatarIcon = escapeHtml(msg.avatar || '🎧');
+      var safeText = escapeHtml(msg.text || '');
+
       bubble.innerHTML = 
-        '<span class="bubble-avatar">' + (msg.avatar || '🎧') + '</span>' +
+        '<span class="bubble-avatar">' + avatarIcon + '</span>' +
         '<div class="bubble-content">' +
-          '<div class="bubble-author">' + (msg.isMe ? 'You' : (msg.sender || 'Friend')) + '</div>' +
-          '<div class="bubble-text">' + escapeHtml(msg.text) + '</div>' +
+          '<div class="bubble-author">' + authorName + '</div>' +
+          '<div class="bubble-text">' + safeText + '</div>' +
         '</div>';
 
       bubble.addEventListener('click', function () {
@@ -4389,16 +4413,19 @@
         var msgEl = document.createElement('div');
         msgEl.className = 'jam-chat-msg' + (msg.isMe ? ' is-me' : '');
         
-        var timeStr = msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        var timeStr = escapeHtml(msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        var authorName = escapeHtml(msg.isMe ? 'You' : (msg.sender || 'Friend'));
+        var avatarIcon = escapeHtml(msg.avatar || '🎧');
+        var safeText = escapeHtml(msg.text || '');
         
         msgEl.innerHTML = 
-          '<div class="jam-chat-msg-avatar">' + (msg.avatar || '🎧') + '</div>' +
+          '<div class="jam-chat-msg-avatar">' + avatarIcon + '</div>' +
           '<div class="jam-chat-msg-body">' +
             '<div class="jam-chat-msg-meta">' +
-              '<span class="jam-chat-msg-author">' + (msg.isMe ? 'You' : (msg.sender || 'Friend')) + '</span>' +
+              '<span class="jam-chat-msg-author">' + authorName + '</span>' +
               '<span class="jam-chat-msg-time">' + timeStr + '</span>' +
             '</div>' +
-            '<div class="jam-chat-msg-text">' + escapeHtml(msg.text) + '</div>' +
+            '<div class="jam-chat-msg-text">' + safeText + '</div>' +
           '</div>';
 
         container.appendChild(msgEl);
@@ -4975,7 +5002,7 @@
         if (displayNameEl) displayNameEl.textContent = profile.name;
         if (accountBadgeEl) {
           accountBadgeEl.innerHTML = profile.type === 'google' 
-            ? '<span style="color:#4285F4;font-weight:700;">Google Account</span> · ' + (profile.email || 'Verified')
+            ? '<span style="color:#4285F4;font-weight:700;">Google Account</span> · ' + (escapeHtml(profile.email) || 'Verified')
             : '<span style="color:#10b981;font-weight:700;">Guest Member</span> · Local Sync';
         }
         if (modalTitle) modalTitle.textContent = 'Aura Profile';
@@ -5340,31 +5367,30 @@
       triggerAiDj(displayTitle, displayArtist, currentStation);
     }
 
+    var fallbackArtUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80';
     var artImg = $('art');
     var ambientImg = $('ambientArt');
     var thumbMq = 'https://i.ytimg.com/vi/' + videoId + '/mqdefault.jpg';
     var thumbHq = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
-    var thumbMax = 'https://i.ytimg.com/vi/' + videoId + '/maxresdefault.jpg';
 
-    if (artImg && artImg.src !== thumbMq) {
-      artImg.src = thumbMq;
-      artImg.onload = function () {
-        ArtworkMeshEngine.extractColors(artImg);
+    if (artImg) {
+      artImg.onerror = function () {
+        artImg.src = fallbackArtUrl;
       };
+      if (artImg.src !== thumbMq) {
+        artImg.src = thumbMq;
+        artImg.onload = function () {
+          try { ArtworkMeshEngine.extractColors(artImg); } catch (e) {}
+        };
+      }
     }
     if (ambientImg) {
-      var probe = new Image();
-      probe.crossOrigin = 'Anonymous';
-      probe.onload = function () {
-        if (probe.naturalWidth > 120) ambientImg.src = thumbMax;
-        else ambientImg.src = thumbHq;
-        ArtworkMeshEngine.extractColors(probe);
+      ambientImg.onerror = function () {
+        ambientImg.src = fallbackArtUrl;
       };
-      probe.onerror = function () {
+      if (ambientImg.src !== thumbHq) {
         ambientImg.src = thumbHq;
-        if (artImg) ArtworkMeshEngine.extractColors(artImg);
-      };
-      probe.src = thumbMax;
+      }
     }
 
     document.body.classList.add('has-art');
@@ -6594,7 +6620,7 @@
       grid.innerHTML = '';
 
       if (!ranked.length) {
-        grid.innerHTML = '<div class="queue-empty" style="grid-column:1/-1; padding:40px; text-align:center; font-size:14px; color:rgba(255,255,255,0.7);">No moods matching "' + query + '". Try "edm", "pop", "chai", "90s" or "romance"! 🔍</div>';
+        grid.innerHTML = '<div class="queue-empty" style="grid-column:1/-1; padding:40px; text-align:center; font-size:14px; color:rgba(255,255,255,0.7);">No moods matching "' + escapeHtml(query) + '". Try "edm", "pop", "chai", "90s" or "romance"! 🔍</div>';
         return;
       }
 

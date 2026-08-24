@@ -8586,3 +8586,61 @@ input:focus-visible {
   border-color: #f59e0b;
   box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
 }
+
+/* ==================== Responsive Mobile & Tablet Ergonomics ==================== */
+@media (max-width: 600px) {
+  .glyph-matrix-container {
+    width: 95vw;
+    padding: 14px 12px;
+    gap: 12px;
+    border-radius: 24px;
+  }
+
+  .glyph-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .glyph-brand-titles .glyph-title {
+    font-size: 9.5px;
+  }
+
+  .glyph-mode-pill {
+    padding: 4px 8px;
+    font-size: 8px;
+  }
+
+  .nothing-phone-body {
+    width: min(290px, 82vw);
+    height: min(340px, 44vh);
+    border-radius: 32px;
+  }
+
+  .glyph-mode-chips {
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .glyph-chip {
+    padding: 7px 11px;
+    font-size: 8.5px;
+    min-height: 38px;
+  }
+}
+
+@media (max-width: 380px) {
+  .glyph-matrix-container {
+    width: 98vw;
+    padding: 10px 8px;
+  }
+
+  .nothing-phone-body {
+    width: 260px;
+    height: 300px;
+  }
+
+  .glyph-chip {
+    padding: 5px 8px;
+    font-size: 7.5px;
+  }
+}

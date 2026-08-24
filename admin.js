@@ -76,6 +76,16 @@
     if ($('totalTracksCount')) $('totalTracksCount').textContent = '5 Playlists (1,000+ Songs)';
   }
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   /* ==================== Render Station Cards ==================== */
   function renderStationsList() {
     var grid = $('stationsGrid');
@@ -98,29 +108,35 @@
       card.style.setProperty('--station-glow', glow);
 
       var glyphsHtml = glyphs.slice(0, 4).map(function (g) {
-        return '<span class="glyph-tag">' + g + '</span>';
+        return '<span class="glyph-tag">' + escapeHtml(g) + '</span>';
       }).join('');
+
+      var safeName = escapeHtml(st.name || '');
+      var safeShort = escapeHtml(st.short || '');
+      var safeIcon = escapeHtml(st.icon || '📻');
+      var safeDesc = escapeHtml(st.desc || 'YouTube Music Playlist');
+      var safePlaylistId = escapeHtml(st.playlistId || 'Custom');
 
       card.innerHTML = 
         '<div class="card-ambient-tint"></div>' +
         '<div class="card-header-row">' +
           '<div class="card-icon-title">' +
-            '<div class="card-icon">' + (st.icon || '📻') + '</div>' +
+            '<div class="card-icon">' + safeIcon + '</div>' +
             '<div>' +
-              '<div class="card-title">' + st.name + '</div>' +
-              '<div class="card-short">' + st.short + '</div>' +
+              '<div class="card-title">' + safeName + '</div>' +
+              '<div class="card-short">' + safeShort + '</div>' +
             '</div>' +
           '</div>' +
-          '<div class="card-theme-pill" style="background:' + accent + ';" title="Theme Color"></div>' +
+          '<div class="card-theme-pill" style="background:' + escapeHtml(accent) + ';" title="Theme Color"></div>' +
         '</div>' +
-        '<div class="card-desc">' + (st.desc || 'YouTube Music Playlist') + '</div>' +
+        '<div class="card-desc">' + safeDesc + '</div>' +
         '<div class="card-glyphs-preview">' + glyphsHtml + '</div>' +
         '<div class="card-meta-row">' +
-          '<span>📺 YouTube Playlist: ' + (st.playlistId || 'Custom') + '</span>' +
+          '<span>📺 YouTube Playlist: ' + safePlaylistId + '</span>' +
           '<div class="card-actions">' +
-            '<button class="action-btn btn-play" data-action="play" data-id="' + st.id + '" title="Open in Radio Player">▶ Play</button>' +
-            '<button class="action-btn btn-edit" data-action="edit" data-id="' + st.id + '" title="Edit Station & Theme">Edit</button>' +
-            '<button class="action-btn btn-delete" data-action="delete" data-id="' + st.id + '" title="Delete Station">Delete</button>' +
+            '<button class="action-btn btn-play" data-action="play" data-id="' + escapeHtml(st.id) + '" title="Open in Radio Player">▶ Play</button>' +
+            '<button class="action-btn btn-edit" data-action="edit" data-id="' + escapeHtml(st.id) + '" title="Edit Station & Theme">Edit</button>' +
+            '<button class="action-btn btn-delete" data-action="delete" data-id="' + escapeHtml(st.id) + '" title="Delete Station">Delete</button>' +
           '</div>' +
         '</div>';
 
