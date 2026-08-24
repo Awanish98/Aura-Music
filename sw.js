@@ -1,4 +1,30 @@
-var CACHE_NAME = 'ishq-radio-v9.0';
+var CACHE_NAME = 'aura-music-v98.0';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Network first strategy - always fetch latest, fallback to cache if offline
 self.addEventListener('install', function (e) {

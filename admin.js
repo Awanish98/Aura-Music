@@ -1,6 +1,6 @@
 (function () {
   var DB_VERSION_KEY = 'ishq_db_version';
-  var CURRENT_DB_VERSION = 'v4.0';
+  var CURRENT_DB_VERSION = 'v10.0';
   var STORAGE_KEY = 'ishq_custom_stations';
 
   var stations = [];

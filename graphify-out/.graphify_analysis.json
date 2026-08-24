@@ -1,0 +1,339 @@
+{
+  "communities": {
+    "0": [
+      "script_applypreset",
+      "script_backtooptions",
+      "script_createreverbimpulse",
+      "script_createvinylnoisebuffer",
+      "script_ensureaudiocontext",
+      "script_fsicon",
+      "script_init",
+      "script_loadapi",
+      "script_loadprofile",
+      "script_open",
+      "script_opentab",
+      "script_reset",
+      "script_setupdspchain",
+      "script_showgoogleform",
+      "script_toggle",
+      "script_updatefilters",
+      "script_updateselection",
+      "script_updatespatialui",
+      "script_updateui"
+    ],
+    "1": [
+      "script_addtoqueue",
+      "script_enterexploreruniverse",
+      "script_generaterecommendations",
+      "script_handleuniversesearch",
+      "script_playsingletrack",
+      "script_renderlikedlist",
+      "script_rendersessionqueue",
+      "script_renderuniversecards",
+      "script_renderuniversecards_triggerstream",
+      "script_syncuniversenowplayingbanner",
+      "script_togglelikecurrent",
+      "script_togglemode",
+      "script_toggleuniverselike",
+      "script_updatebackgroundwords",
+      "script_updatebtnstates",
+      "script_updateuniversefavscount"
+    ],
+    "2": [
+      "admin",
+      "admin_closemodal",
+      "admin_deletestation",
+      "admin_hextorgba",
+      "admin_initauth",
+      "admin_loadstations",
+      "admin_opencreatemodal",
+      "admin_openeditmodal",
+      "admin_renderstationslist",
+      "admin_savestations",
+      "admin_setsourcemode",
+      "admin_setthemefields",
+      "admin_showtoast",
+      "admin_updatelivepreview",
+      "admin_updatestats"
+    ],
+    "3": [
+      "script",
+      "script_exitexploreruniverse",
+      "script_extractcolorsfromimage",
+      "script_formatalarmtime",
+      "script_initaudiocontext",
+      "script_render",
+      "script_renderlyricline",
+      "script_renderparticles",
+      "script_setalarm",
+      "script_showautoplayprompt",
+      "script_togglefullscreen",
+      "script_triggerlightning",
+      "script_updateclock",
+      "script_updateplaystate",
+      "script_updatetrack"
+    ],
+    "4": [
+      "script_canceltimer",
+      "script_checkalarm",
+      "script_clearalarm",
+      "script_close",
+      "script_closecinemamode",
+      "script_confirmgooglesignin",
+      "script_leave",
+      "script_logout",
+      "script_saveprofile",
+      "script_showtoast",
+      "script_signinguest",
+      "script_starttimer",
+      "script_tick",
+      "script_triggersunrisealarm",
+      "script_updatetimerlabel"
+    ],
+    "5": [
+      "script_claimaudiomaster",
+      "script_fmt",
+      "script_hideautoplayprompt",
+      "script_loadstationplayback",
+      "script_onerr",
+      "script_onstate",
+      "script_opencinemamode",
+      "script_show",
+      "script_skip",
+      "script_synccinematrackinfo",
+      "script_update",
+      "script_updatelikestatus",
+      "script_updatemediasession"
+    ],
+    "6": [
+      "script_addtomyvibes",
+      "script_autocuratenextvibes",
+      "script_cleantitle",
+      "script_generateviberecommendations",
+      "script_getmyvibeslist",
+      "script_getprofile",
+      "script_learnfromtrack",
+      "script_playmyvibesstation",
+      "script_removefrommyvibes",
+      "script_rendervibeui",
+      "script_savemyvibeslist",
+      "script_scoresong"
+    ],
+    "7": [
+      "script_cacheandhandle",
+      "script_fetchlyrics",
+      "script_handlelyricsresult",
+      "script_handleplainlyricsresult",
+      "script_parselrc",
+      "script_renderfallbackstate",
+      "script_renderlinesui",
+      "script_sanitizequery",
+      "script_searchfallback"
+    ],
+    "8": [
+      "script_broadcaststate",
+      "script_generatecode",
+      "script_handleincomingsync",
+      "script_isplaying",
+      "script_joinroom",
+      "script_starthost",
+      "script_toggleplay",
+      "script_updatepeersui"
+    ],
+    "9": [
+      "script_applyliveweatherdata",
+      "script_createparticle",
+      "script_fetchliveweather",
+      "script_initelements",
+      "script_initparticles",
+      "script_resize",
+      "script_setskytheme"
+    ],
+    "10": [
+      "script_applystationtheme",
+      "script_initstationdropdown",
+      "script_loadstationsdata",
+      "script_switchstation",
+      "script_synccurrentstation"
+    ],
+    "11": [
+      "script_buildcommands",
+      "script_closemodal",
+      "script_openmodal",
+      "script_renderresults"
+    ],
+    "12": [
+      "script_checkcrossfade",
+      "script_executecrossfade",
+      "script_getactiveplayer",
+      "script_getstandbyplayer"
+    ],
+    "13": [
+      "script_initdraggable",
+      "script_initdraggable_onmousemove",
+      "script_initdraggable_onmouseup"
+    ],
+    "14": [
+      "script_ontimeupdate",
+      "script_updateactiveline",
+      "script_updateonelinelyric"
+    ],
+    "15": [
+      "sw"
+    ]
+  },
+  "cohesion": {
+    "0": 0.15789473684210525,
+    "1": 0.175,
+    "2": 0.29523809523809524,
+    "3": 0.1523809523809524,
+    "4": 0.2,
+    "5": 0.21794871794871795,
+    "6": 0.3484848484848485,
+    "7": 0.3055555555555556,
+    "8": 0.25,
+    "9": 0.2857142857142857,
+    "10": 0.6,
+    "11": 0.5,
+    "12": 0.6666666666666666,
+    "13": 1.0,
+    "14": 0.6666666666666666,
+    "15": 1.0
+  },
+  "gods": [
+    {
+      "id": "script_init",
+      "label": "init()",
+      "degree": 35
+    },
+    {
+      "id": "script_showtoast",
+      "label": "showToast()",
+      "degree": 32
+    },
+    {
+      "id": "script_toggle",
+      "label": "toggle()",
+      "degree": 16
+    },
+    {
+      "id": "script_update",
+      "label": "update()",
+      "degree": 14
+    },
+    {
+      "id": "script_playsingletrack",
+      "label": "playSingleTrack()",
+      "degree": 13
+    },
+    {
+      "id": "script_playmyvibesstation",
+      "label": "playMyVibesStation()",
+      "degree": 10
+    },
+    {
+      "id": "script_rendervibeui",
+      "label": "renderVibeUI()",
+      "degree": 10
+    },
+    {
+      "id": "script_applypreset",
+      "label": "applyPreset()",
+      "degree": 9
+    },
+    {
+      "id": "script_switchstation",
+      "label": "switchStation()",
+      "degree": 8
+    },
+    {
+      "id": "script_skip",
+      "label": "skip()",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "init()",
+      "target": "checkAlarm()",
+      "source_files": [
+        "script.js",
+        "script.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "note": "Bridges community 0 → community 4"
+    },
+    {
+      "source": "init()",
+      "target": "onErr()",
+      "source_files": [
+        "script.js",
+        "script.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "note": "Bridges community 0 → community 5"
+    },
+    {
+      "source": "init()",
+      "target": "startHost()",
+      "source_files": [
+        "script.js",
+        "script.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "note": "Bridges community 0 → community 8"
+    },
+    {
+      "source": "playSingleTrack()",
+      "target": "update()",
+      "source_files": [
+        "script.js",
+        "script.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "note": "Bridges community 1 → community 5"
+    },
+    {
+      "source": "playMyVibesStation()",
+      "target": "update()",
+      "source_files": [
+        "script.js",
+        "script.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "note": "Bridges community 5 → community 6"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `init()` connect `init` to `playSingleTrack`, `script.js`, `showToast`, `update`, `startHost`, `switchStation`, `initDraggable`?",
+      "why": "High betweenness centrality (0.026) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `initDraggable()` connect `initDraggable` to `init`, `script.js`?",
+      "why": "High betweenness centrality (0.024) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `showToast()` connect `showToast` to `init`, `playSingleTrack`, `script.js`, `update`, `playMyVibesStation`, `startHost`, `setSkyTheme`, `switchStation`, `openModal`?",
+      "why": "High betweenness centrality (0.023) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 13 inferred relationships involving `init()` (e.g. with `backToOptions()` and `checkAlarm()`) actually correct?",
+      "why": "`init()` has 13 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 4 inferred relationships involving `update()` (e.g. with `loadStationPlayback()` and `playMyVibesStation()`) actually correct?",
+      "why": "`update()` has 4 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}
