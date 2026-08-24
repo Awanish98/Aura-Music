@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.0') caches.delete(name);
+        if (name !== 'aura-music-v101.1') caches.delete(name);
       });
     });
   }
@@ -6966,6 +6966,77 @@
     return engine;
   })();
 
+  /* ==================== 14.5. NOTHING (R) TACTILE HAPTIC ENGINE ==================== */
+  var HapticEngine = (function () {
+    var unlocked = false;
+    var enabled = true;
+    var audioCtx = null;
+
+    function unlock() {
+      if (unlocked) return;
+      unlocked = true;
+      try {
+        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          navigator.vibrate(1);
+        }
+      } catch (e) {}
+    }
+
+    if (typeof window !== 'undefined') {
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(function (evt) {
+        window.addEventListener(evt, unlock, { once: true, passive: true });
+      });
+    }
+
+    function trigger(pattern) {
+      if (!enabled) return;
+      unlock();
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate(pattern || 25);
+        } catch (e) {}
+      }
+    }
+
+    function tap() {
+      trigger(22);
+    }
+
+    function beat() {
+      trigger([32, 16, 26]);
+    }
+
+    function drop() {
+      trigger([45, 20, 45, 20, 75]);
+    }
+
+    function test() {
+      trigger([50, 30, 50, 30, 80]);
+    }
+
+    function toggle() {
+      enabled = !enabled;
+      if (enabled) test();
+      return enabled;
+    }
+
+    function isEnabled() {
+      return enabled;
+    }
+
+    return {
+      unlock: unlock,
+      trigger: trigger,
+      tap: tap,
+      beat: beat,
+      drop: drop,
+      test: test,
+      toggle: toggle,
+      isEnabled: isEnabled
+    };
+  })();
+  if (typeof window !== 'undefined') window.HapticEngine = HapticEngine;
+
   /* ==================== 15. NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER ==================== */
   var GlyphMatrixEngine = (function () {
     var modal = null;
@@ -6973,7 +7044,6 @@
     var ctx = null;
     var currentMode = 'lyrics';
     var currentColor = 'red';
-    var hapticEnabled = true;
     var animFrame = null;
     var scrollOffset = 0;
     var lastBeatTime = 0;
@@ -7034,12 +7104,28 @@
       var colorBtn = $('glyphColorToggleBtn');
       var hapticBtn = $('glyphHapticBtn');
 
-      if (triggerHeader) triggerHeader.addEventListener('click', openModal);
-      if (triggerSidebar) triggerSidebar.addEventListener('click', openModal);
-      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (triggerHeader) {
+        triggerHeader.addEventListener('click', function () {
+          HapticEngine.tap();
+          openModal();
+        });
+      }
+      if (triggerSidebar) {
+        triggerSidebar.addEventListener('click', function () {
+          HapticEngine.tap();
+          openModal();
+        });
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+          HapticEngine.tap();
+          closeModal();
+        });
+      }
 
       if (colorBtn) {
         colorBtn.addEventListener('click', function () {
+          HapticEngine.tap();
           if (currentColor === 'red') currentColor = 'white';
           else if (currentColor === 'white') currentColor = 'amber';
           else currentColor = 'red';
@@ -7049,15 +7135,16 @@
 
       if (hapticBtn) {
         hapticBtn.addEventListener('click', function () {
-          hapticEnabled = !hapticEnabled;
-          hapticBtn.classList.toggle('active', hapticEnabled);
-          showToast(hapticEnabled ? '⚡ Glyph Haptics ON' : 'Glyph Haptics OFF');
+          var active = HapticEngine.toggle();
+          hapticBtn.classList.toggle('active', active);
+          showToast(active ? '⚡ Haptics Active (Nothing Pulse)' : 'Glyph Haptics Disabled');
         });
       }
 
       var chips = document.querySelectorAll('.glyph-chip');
       chips.forEach(function (chip) {
         chip.addEventListener('click', function () {
+          HapticEngine.tap();
           chips.forEach(function (c) { c.classList.remove('active'); });
           chip.classList.add('active');
           currentMode = chip.getAttribute('data-glyph-mode') || 'lyrics';
@@ -7074,6 +7161,7 @@
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (e.key === 'd' || e.key === 'D') {
           e.preventDefault();
+          HapticEngine.tap();
           if (modal && modal.classList.contains('open')) closeModal();
           else openModal();
         }
@@ -7100,6 +7188,7 @@
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
       scrollOffset = 0;
+      HapticEngine.unlock();
       startRenderLoop();
     }
 
@@ -7129,12 +7218,14 @@
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           var dotColor = currentColor === 'white' ? '#ffffff' : (currentColor === 'amber' ? '#f59e0b' : '#ff0033');
-          var dimColor = 'rgba(255, 255, 255, 0.05)';
+          var dimColor = 'rgba(255, 255, 255, 0.04)';
 
           if (currentMode === 'lyrics') {
             drawDotLyrics(dotColor, dimColor);
           } else if (currentMode === 'spectrum') {
             drawDotSpectrum(dotColor, dimColor);
+          } else if (currentMode === 'oscilloscope') {
+            drawDotOscilloscope(dotColor, dimColor);
           } else if (currentMode === 'clock') {
             drawDotClock(dotColor, dimColor);
           } else {
@@ -7212,6 +7303,28 @@
       }
     }
 
+    function drawDotOscilloscope(activeColor, dimColor) {
+      var dotSize = 4;
+      var gap = 4;
+      var now = Date.now() * 0.004;
+      var midY = canvas.height / 2;
+
+      for (var x = 8; x < canvas.width - 8; x += dotSize + gap) {
+        var waveY = Math.sin(now + x * 0.035) * Math.cos(now * 0.5 + x * 0.01) * 38;
+        var targetY = midY + waveY;
+
+        for (var y = 8; y < canvas.height - 8; y += dotSize + gap) {
+          var dist = Math.abs(y - targetY);
+          var isLit = dist < 7;
+
+          ctx.fillStyle = isLit ? activeColor : dimColor;
+          ctx.beginPath();
+          ctx.arc(x + dotSize / 2, y + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
     function drawDotClock(activeColor, dimColor) {
       var d = new Date();
       var hh = String(d.getHours()).padStart(2, '0');
@@ -7268,20 +7381,20 @@
       var isBassBeat = (now % 600) < 140;
 
       var cam = $('glyphCameraRing');
+      var topDiag = $('glyphTopDiag');
       var coil = $('glyphCenterCoil');
       var bar = $('glyphBottomBar');
       var dot = $('glyphBottomDot');
 
       if (cam) cam.classList.toggle('strobe-on', isBassBeat);
+      if (topDiag) topDiag.classList.toggle('strobe-on', isBassBeat);
       if (coil) coil.classList.toggle('strobe-on', isBassBeat);
       if (bar) bar.classList.toggle('strobe-on', isBassBeat);
       if (dot) dot.classList.toggle('strobe-on', isBassBeat);
 
-      if (isBassBeat && hapticEnabled && (now - lastBeatTime > 400)) {
+      if (isBassBeat && (now - lastBeatTime > 420)) {
         lastBeatTime = now;
-        if ('vibrate' in navigator) {
-          try { navigator.vibrate(25); } catch (e) {}
-        }
+        HapticEngine.beat();
       }
     }
 
@@ -7365,6 +7478,7 @@
   }
 
   function togglePlay() {
+    try { HapticEngine.tap(); } catch (e) {}
     if (!apiReady || !player) {
       init();
       return;
