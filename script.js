@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v98.0') caches.delete(name);
+        if (name !== 'aura-music-v99.0') caches.delete(name);
       });
     });
   }
@@ -2089,8 +2089,8 @@
         return;
       }
 
-      // Throttle to 30 FPS for 0% laptop GPU load
-      if (time - lastSkyTime < 32) {
+      var throttleInterval = window.innerWidth <= 768 ? 50 : 32; // 20 FPS on mobile, 30 FPS on desktop
+      if (time - lastSkyTime < throttleInterval) {
         animFrame = requestAnimationFrame(renderParticles);
         return;
       }
@@ -2742,12 +2742,12 @@
     resize();
 
     function render(now) {
-      if (!ctx || document.hidden) {
+      if (!ctx || document.hidden || window.innerWidth <= 768) {
         requestAnimationFrame(render);
         return;
       }
 
-      // Throttle to 30 FPS for 0% GPU load
+      // Throttle to 30 FPS for desktop GPU efficiency
       if (now - lastTime < 32) {
         requestAnimationFrame(render);
         return;
@@ -4571,15 +4571,25 @@
     function broadcastState() {
       if (!isHost || !connections.length) return;
       var cur = player && player.getCurrentTime ? player.getCurrentTime() : 0;
-      var st = currentStation ? currentStation.id : 'time-travel';
+      var st = currentStationKey || (currentStation ? currentStation.id : 'time-travel');
       var trackIdx = -1;
       try {
         if (player && player.getPlaylistIndex) trackIdx = player.getPlaylistIndex();
       } catch (e) {}
 
+      var curVid = '';
+      try {
+        if (player && player.getVideoData) {
+          var vd = player.getVideoData();
+          if (vd && vd.video_id) curVid = vd.video_id;
+        }
+      } catch (e) {}
+      if (!curVid && window.__currentTrackVideoId) curVid = window.__currentTrackVideoId;
+
       var payload = {
         type: 'sync',
         station: st,
+        videoId: curVid,
         trackIdx: trackIdx,
         time: cur,
         playing: isPlaying(),
@@ -4615,22 +4625,48 @@
         return;
       }
 
-      // 3. Audio/Playback State Sync
+      // 3. Audio & Playback Synchronization across all devices (Mobile & Desktop)
       if (data.type === 'sync') {
-        // Station sync
-        if (data.station && currentStation && data.station !== currentStation.id) {
-          switchStation(data.station);
+        claimAudioMaster();
+
+        // 3a. Mood Station vs Standard Station Sync
+        if (data.station && data.station !== currentStationKey) {
+          if (data.station.indexOf('mood-') === 0 && window.MoodUniverseEngine) {
+            var moodId = data.station.replace('mood-', '');
+            var targetMood = window.MoodUniverseEngine.stations.find(function (m) { return m.id === moodId; });
+            if (targetMood) {
+              window.MoodUniverseEngine.playMoodStation(targetMood);
+            }
+          } else if (typeof switchStation === 'function') {
+            switchStation(data.station);
+          }
         }
 
-        // Track Index sync
-        if (typeof data.trackIdx === 'number' && data.trackIdx >= 0 && player && player.getPlaylistIndex && player.playVideoAt) {
+        // 3b. Video ID & Playlist Sync
+        if (data.videoId && player) {
+          var currentVid = '';
+          try {
+            if (player.getVideoData) {
+              var vd = player.getVideoData();
+              if (vd && vd.video_id) currentVid = vd.video_id;
+            }
+          } catch (e) {}
+          if (currentVid !== data.videoId) {
+            if (player.loadVideoById) {
+              player.loadVideoById({
+                videoId: data.videoId,
+                startSeconds: typeof data.time === 'number' ? data.time : 0
+              });
+            }
+          }
+        } else if (typeof data.trackIdx === 'number' && data.trackIdx >= 0 && player && player.getPlaylistIndex && player.playVideoAt) {
           var myIdx = player.getPlaylistIndex();
           if (myIdx !== -1 && myIdx !== data.trackIdx) {
             player.playVideoAt(data.trackIdx);
           }
         }
 
-        // Time seek sync
+        // 3c. Precision Time Sync (within 2s drift threshold)
         if (player && player.seekTo && typeof data.time === 'number') {
           var cur = player.getCurrentTime ? player.getCurrentTime() : 0;
           var diff = Math.abs(cur - data.time);
@@ -4639,9 +4675,13 @@
           }
         }
 
-        // Play / Pause sync
-        if (data.playing && !isPlaying()) {
-          play();
+        // 3d. Play / Pause & Volume Unmute Sync
+        if (data.playing) {
+          if (player && player.unMute) player.unMute();
+          if (player && player.setVolume) player.setVolume(100);
+          if (!isPlaying()) {
+            play();
+          }
         } else if (!data.playing && isPlaying()) {
           pause();
         }

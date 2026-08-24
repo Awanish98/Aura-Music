@@ -3875,13 +3875,15 @@ html, body {
     gap: clamp(4px, 1.8vw, 10px);
     padding: 6px 12px;
     border-radius: 999px;
-    background: rgba(10, 10, 18, 0.9);
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65), 0 0 20px var(--accent-glow, rgba(168, 85, 247, 0.2));
+    background: rgba(14, 10, 24, 0.94);
+    backdrop-filter: blur(8px) saturate(1.4);
+    -webkit-backdrop-filter: blur(8px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-glow, rgba(168, 85, 247, 0.2));
     width: auto;
     max-width: 96vw;
+    will-change: transform;
+    transform: translateZ(0);
   }
 
   /* Unhide dock wings on touch screens so buttons are always 100% accessible */
