@@ -7911,5 +7911,363 @@ input:focus-visible {
   }
 }
 
+/* ==========================================================================
+   NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER 4.0
+   Authentic Nothing Phone 4a Pro / Nothing OS LED Interface
+   ========================================================================== */
+.glyph-matrix-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  user-select: none;
+}
 
+.glyph-matrix-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
 
+.glyph-matrix-container {
+  width: 100%;
+  height: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  box-sizing: border-box;
+  color: #ffffff;
+  font-family: 'Space Grotesk', monospace;
+  position: relative;
+}
+
+/* Nothing OS Top Header */
+.glyph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glyph-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glyph-dot-rec {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff0033;
+  box-shadow: 0 0 10px #ff0033;
+  animation: pulseGlyphRec 1.4s infinite alternate;
+}
+
+@keyframes pulseGlyphRec {
+  0% { opacity: 0.3; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+.glyph-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #e5e5e5;
+  text-transform: uppercase;
+}
+
+.glyph-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glyph-mode-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 9px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.glyph-mode-pill:hover,
+.glyph-mode-pill.active {
+  background: rgba(255, 0, 51, 0.18);
+  border-color: #ff0033;
+  color: #ff334b;
+}
+
+.glyph-color-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff0033;
+  box-shadow: 0 0 6px #ff0033;
+}
+
+.glyph-close-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.glyph-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+}
+
+/* Nothing Stage & Phone Hardware Simulator */
+.glyph-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+  width: 100%;
+}
+
+.nothing-phone-body {
+  width: clamp(260px, 75vw, 360px);
+  height: clamp(340px, 50vh, 440px);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 36px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, rgba(20, 20, 25, 0.4) 0%, rgba(5, 5, 8, 0.95) 100%);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+/* Authentic Nothing Phone LED Glyph Strips */
+.glyph-strip {
+  position: absolute;
+  border-color: #ff0033;
+  color: #ff0033;
+  opacity: 0.85;
+  transition: opacity 0.08s ease, filter 0.08s ease, transform 0.08s ease;
+}
+
+.glyph-strip.strobe-on {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 16px currentColor) drop-shadow(0 0 30px currentColor) !important;
+  transform: scale(1.02);
+}
+
+.glyph-camera-ring {
+  top: 24px;
+  left: 24px;
+  width: 64px;
+  height: 64px;
+  border: 3px solid #ff0033;
+  border-radius: 50%;
+  border-right-color: transparent;
+  transform: rotate(-30deg);
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.4);
+}
+
+.glyph-center-coil {
+  width: clamp(180px, 50vw, 240px);
+  height: clamp(180px, 50vw, 240px);
+  border: 3px solid #ff0033;
+  border-radius: 50%;
+  border-top-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(255, 0, 51, 0.4);
+  position: relative;
+}
+
+.glyph-dot-canvas-wrap {
+  width: 90%;
+  height: 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#glyphDotCanvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.glyph-bottom-group {
+  position: absolute;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.glyph-bottom-bar {
+  position: static;
+  width: 4px;
+  height: 28px;
+  background: #ff0033;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+}
+
+.glyph-bottom-dot {
+  position: static;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff0033;
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.6);
+}
+
+/* Live Lyrics Text Readout */
+.glyph-lyrics-readout {
+  text-align: center;
+  width: 100%;
+  max-width: 90vw;
+}
+
+.glyph-lyrics-line {
+  font-size: clamp(14px, 4vw, 18px);
+  font-weight: 800;
+  color: #ff334b;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(255, 0, 51, 0.6);
+  min-height: 24px;
+  transition: color 0.3s ease;
+}
+
+.glyph-track-meta {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* Footer Chips */
+.glyph-footer-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+.glyph-mode-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.glyph-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ccc;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 8.5px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.glyph-chip:hover,
+.glyph-chip.active {
+  background: #ff0033;
+  color: #ffffff;
+  border-color: #ff0033;
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.5);
+}
+
+.glyph-device-tag {
+  font-size: 7.5px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+}
+
+/* White Glyph Theme */
+.glyph-matrix-modal.theme-white .glyph-strip {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+.glyph-matrix-modal.theme-white .glyph-dot-rec,
+.glyph-matrix-modal.theme-white .glyph-bottom-bar,
+.glyph-matrix-modal.theme-white .glyph-bottom-dot,
+.glyph-matrix-modal.theme-white .glyph-color-indicator {
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff;
+}
+.glyph-matrix-modal.theme-white .glyph-lyrics-line {
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+}
+.glyph-matrix-modal.theme-white .glyph-chip.active {
+  background: #ffffff;
+  color: #000;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+/* Amber Theme */
+.glyph-matrix-modal.theme-amber .glyph-strip {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+.glyph-matrix-modal.theme-amber .glyph-dot-rec,
+.glyph-matrix-modal.theme-amber .glyph-bottom-bar,
+.glyph-matrix-modal.theme-amber .glyph-bottom-dot,
+.glyph-matrix-modal.theme-amber .glyph-color-indicator {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+.glyph-matrix-modal.theme-amber .glyph-lyrics-line {
+  color: #fbbf24;
+  text-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
+}
+.glyph-matrix-modal.theme-amber .glyph-chip.active {
+  background: #f59e0b;
+  color: #000;
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}

@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v100.0') caches.delete(name);
+        if (name !== 'aura-music-v101.0') caches.delete(name);
       });
     });
   }
@@ -3152,11 +3152,14 @@
         el.classList.toggle('active', i === index);
       });
 
-      // ⚡ One-Line Live Synchronized Lyrics Bar + LRCGOD Ambient Background
+      // ⚡ One-Line Live Synchronized Lyrics Bar + LRCGOD Ambient Background + Nothing Glyph Dot Matrix
       if (currentLyrics && currentLyrics[index]) {
         var lineText = currentLyrics[index].text;
         updateOneLineLyric(lineText, true);
         LrcGodEngine.spawn(lineText);
+        if (typeof GlyphMatrixEngine !== 'undefined' && GlyphMatrixEngine.setLyricsText) {
+          GlyphMatrixEngine.setLyricsText(lineText);
+        }
       }
 
       if ((isAutoScroll || forceScroll) && allLines[index] && scrollContainer && modal && modal.classList.contains('open')) {
@@ -6963,6 +6966,334 @@
     return engine;
   })();
 
+  /* ==================== 15. NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER ==================== */
+  var GlyphMatrixEngine = (function () {
+    var modal = null;
+    var canvas = null;
+    var ctx = null;
+    var currentMode = 'lyrics';
+    var currentColor = 'red';
+    var hapticEnabled = true;
+    var animFrame = null;
+    var scrollOffset = 0;
+    var lastBeatTime = 0;
+    var currentLyricsText = 'NOTHING DOT PLAY // READY';
+
+    var DOT_FONT = {
+      'A': [0x0E, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11],
+      'B': [0x1E, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E],
+      'C': [0x0E, 0x11, 0x10, 0x10, 0x10, 0x11, 0x0E],
+      'D': [0x1C, 0x12, 0x11, 0x11, 0x11, 0x12, 0x1C],
+      'E': [0x1F, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x1F],
+      'F': [0x1F, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x10],
+      'G': [0x0E, 0x11, 0x10, 0x17, 0x11, 0x11, 0x0F],
+      'H': [0x11, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11],
+      'I': [0x0E, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0E],
+      'J': [0x07, 0x02, 0x02, 0x02, 0x02, 0x12, 0x0C],
+      'K': [0x11, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11],
+      'L': [0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F],
+      'M': [0x11, 0x1B, 0x15, 0x11, 0x11, 0x11, 0x11],
+      'N': [0x11, 0x19, 0x15, 0x13, 0x11, 0x11, 0x11],
+      'O': [0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E],
+      'P': [0x1E, 0x11, 0x11, 0x1E, 0x10, 0x10, 0x10],
+      'Q': [0x0E, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0D],
+      'R': [0x1E, 0x11, 0x11, 0x1E, 0x14, 0x12, 0x11],
+      'S': [0x0F, 0x10, 0x10, 0x0E, 0x01, 0x01, 0x1E],
+      'T': [0x1F, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04],
+      'U': [0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E],
+      'V': [0x11, 0x11, 0x11, 0x11, 0x11, 0x0A, 0x04],
+      'W': [0x11, 0x11, 0x11, 0x15, 0x15, 0x1B, 0x11],
+      'X': [0x11, 0x11, 0x0A, 0x04, 0x0A, 0x11, 0x11],
+      'Y': [0x11, 0x11, 0x0A, 0x04, 0x04, 0x04, 0x04],
+      'Z': [0x1F, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1F],
+      '0': [0x0E, 0x13, 0x15, 0x19, 0x11, 0x11, 0x0E],
+      '1': [0x04, 0x0C, 0x04, 0x04, 0x04, 0x04, 0x0E],
+      '2': [0x0E, 0x11, 0x01, 0x06, 0x08, 0x10, 0x1F],
+      '3': [0x1E, 0x01, 0x01, 0x0E, 0x01, 0x01, 0x1E],
+      '4': [0x02, 0x06, 0x0A, 0x12, 0x1F, 0x02, 0x02],
+      '5': [0x1F, 0x10, 0x1E, 0x01, 0x01, 0x11, 0x0E],
+      '6': [0x06, 0x08, 0x10, 0x1E, 0x11, 0x11, 0x0E],
+      '7': [0x1F, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08],
+      '8': [0x0E, 0x11, 0x11, 0x0E, 0x11, 0x11, 0x0E],
+      '9': [0x0E, 0x11, 0x11, 0x0F, 0x01, 0x02, 0x0C],
+      ' ': [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+      '-': [0x00, 0x00, 0x00, 0x1F, 0x00, 0x00, 0x00],
+      '.': [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04],
+      ':': [0x00, 0x04, 0x00, 0x00, 0x04, 0x00, 0x00],
+      '/': [0x01, 0x02, 0x04, 0x08, 0x10, 0x00, 0x00]
+    };
+
+    function init() {
+      modal = $('glyphMatrixModal');
+      canvas = $('glyphDotCanvas');
+      if (canvas) ctx = canvas.getContext('2d');
+
+      var triggerHeader = $('glyphDotBtn');
+      var triggerSidebar = $('sidebarGlyphBtn');
+      var closeBtn = $('closeGlyphBtn');
+      var colorBtn = $('glyphColorToggleBtn');
+      var hapticBtn = $('glyphHapticBtn');
+
+      if (triggerHeader) triggerHeader.addEventListener('click', openModal);
+      if (triggerSidebar) triggerSidebar.addEventListener('click', openModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+      if (colorBtn) {
+        colorBtn.addEventListener('click', function () {
+          if (currentColor === 'red') currentColor = 'white';
+          else if (currentColor === 'white') currentColor = 'amber';
+          else currentColor = 'red';
+          applyColorTheme();
+        });
+      }
+
+      if (hapticBtn) {
+        hapticBtn.addEventListener('click', function () {
+          hapticEnabled = !hapticEnabled;
+          hapticBtn.classList.toggle('active', hapticEnabled);
+          showToast(hapticEnabled ? '⚡ Glyph Haptics ON' : 'Glyph Haptics OFF');
+        });
+      }
+
+      var chips = document.querySelectorAll('.glyph-chip');
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          chips.forEach(function (c) { c.classList.remove('active'); });
+          chip.classList.add('active');
+          currentMode = chip.getAttribute('data-glyph-mode') || 'lyrics';
+          scrollOffset = 0;
+        });
+      });
+
+      // Shortcut 'D' for Dot Matrix Glyph
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
+          closeModal();
+          return;
+        }
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          if (modal && modal.classList.contains('open')) closeModal();
+          else openModal();
+        }
+      });
+    }
+
+    function applyColorTheme() {
+      if (!modal) return;
+      modal.classList.remove('theme-white', 'theme-amber');
+      var lbl = $('glyphColorLabel');
+      if (currentColor === 'white') {
+        modal.classList.add('theme-white');
+        if (lbl) lbl.textContent = 'WHITE GLYPH';
+      } else if (currentColor === 'amber') {
+        modal.classList.add('theme-amber');
+        if (lbl) lbl.textContent = 'AMBER LED';
+      } else {
+        if (lbl) lbl.textContent = 'RED LED';
+      }
+    }
+
+    function openModal() {
+      if (!modal) return;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      scrollOffset = 0;
+      startRenderLoop();
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      if (animFrame) cancelAnimationFrame(animFrame);
+    }
+
+    function setLyricsText(text) {
+      if (!text || text.trim() === '') return;
+      currentLyricsText = text.toUpperCase();
+      var readout = $('glyphLyricsLine');
+      if (readout) readout.textContent = currentLyricsText;
+      var meta = $('glyphTrackMeta');
+      if (meta && currentStation) meta.textContent = (currentStation.name || '').toUpperCase() + ' // GLYPH AUDIO SYNC';
+    }
+
+    function startRenderLoop() {
+      if (animFrame) cancelAnimationFrame(animFrame);
+
+      function draw() {
+        if (!modal || !modal.classList.contains('open')) return;
+
+        if (ctx && canvas) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          var dotColor = currentColor === 'white' ? '#ffffff' : (currentColor === 'amber' ? '#f59e0b' : '#ff0033');
+          var dimColor = 'rgba(255, 255, 255, 0.05)';
+
+          if (currentMode === 'lyrics') {
+            drawDotLyrics(dotColor, dimColor);
+          } else if (currentMode === 'spectrum') {
+            drawDotSpectrum(dotColor, dimColor);
+          } else if (currentMode === 'clock') {
+            drawDotClock(dotColor, dimColor);
+          } else {
+            drawDotStrobe(dotColor, dimColor);
+          }
+        }
+
+        // Pulse Nothing Glyph hardware arcs on bass hits
+        strobeGlyphHardware();
+
+        animFrame = requestAnimationFrame(draw);
+      }
+      animFrame = requestAnimationFrame(draw);
+    }
+
+    function drawDotLyrics(activeColor, dimColor) {
+      var text = currentLyricsText + '   ***   ' + currentLyricsText;
+      var dotSize = 4;
+      var gap = 2;
+      var charSpacing = 3;
+      var startY = 12;
+
+      scrollOffset += 1.8;
+
+      var totalTextWidth = text.length * (5 * (dotSize + gap) + charSpacing * (dotSize + gap));
+      if (scrollOffset > totalTextWidth / 2) scrollOffset = 0;
+
+      var curX = 10 - scrollOffset;
+
+      for (var c = 0; c < text.length; c++) {
+        var ch = text[c];
+        var bitmap = DOT_FONT[ch] || DOT_FONT[' '];
+
+        for (var row = 0; row < 7; row++) {
+          var rowBits = bitmap[row] || 0;
+          for (var col = 0; col < 5; col++) {
+            var isLit = (rowBits & (1 << (4 - col))) !== 0;
+            var px = curX + col * (dotSize + gap);
+            var py = startY + row * (dotSize + gap);
+
+            if (px >= 0 && px <= canvas.width) {
+              ctx.fillStyle = isLit ? activeColor : dimColor;
+              ctx.beginPath();
+              ctx.arc(px + dotSize / 2, py + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+        curX += 5 * (dotSize + gap) + charSpacing * (dotSize + gap);
+      }
+    }
+
+    function drawDotSpectrum(activeColor, dimColor) {
+      var numBars = 24;
+      var barWidth = 14;
+      var gap = 6;
+      var maxRows = 12;
+      var dotSize = 4;
+
+      var now = Date.now() * 0.005;
+      for (var b = 0; b < numBars; b++) {
+        var intensity = Math.sin(now + b * 0.5) * 0.5 + 0.5;
+        var litRows = Math.floor(intensity * maxRows);
+
+        var bx = 16 + b * (barWidth + gap);
+        for (var r = 0; r < maxRows; r++) {
+          var by = canvas.height - 10 - r * (dotSize + gap);
+          var isLit = (maxRows - r) <= litRows;
+
+          ctx.fillStyle = isLit ? activeColor : dimColor;
+          ctx.beginPath();
+          ctx.arc(bx + dotSize / 2, by + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawDotClock(activeColor, dimColor) {
+      var d = new Date();
+      var hh = String(d.getHours()).padStart(2, '0');
+      var mm = String(d.getMinutes()).padStart(2, '0');
+      var ss = String(d.getSeconds()).padStart(2, '0');
+      var clockText = hh + ':' + mm + ':' + ss;
+
+      var dotSize = 5;
+      var gap = 3;
+      var charSpacing = 4;
+      var curX = 60;
+      var startY = 30;
+
+      for (var c = 0; c < clockText.length; c++) {
+        var ch = clockText[c];
+        var bitmap = DOT_FONT[ch] || DOT_FONT[' '];
+
+        for (var row = 0; row < 7; row++) {
+          var rowBits = bitmap[row] || 0;
+          for (var col = 0; col < 5; col++) {
+            var isLit = (rowBits & (1 << (4 - col))) !== 0;
+            var px = curX + col * (dotSize + gap);
+            var py = startY + row * (dotSize + gap);
+
+            ctx.fillStyle = isLit ? activeColor : dimColor;
+            ctx.beginPath();
+            ctx.arc(px + dotSize / 2, py + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        curX += 5 * (dotSize + gap) + charSpacing * (dotSize + gap);
+      }
+    }
+
+    function drawDotStrobe(activeColor, dimColor) {
+      var isBeat = (Date.now() % 500) < 120;
+      var dotSize = 4;
+      var gap = 3;
+
+      for (var x = 10; x < canvas.width - 10; x += dotSize + gap) {
+        for (var y = 10; y < canvas.height - 10; y += dotSize + gap) {
+          var lit = isBeat && (Math.random() > 0.4);
+          ctx.fillStyle = lit ? activeColor : dimColor;
+          ctx.beginPath();
+          ctx.arc(x + dotSize / 2, y + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function strobeGlyphHardware() {
+      if (!isPlaying()) return;
+      var now = Date.now();
+      var isBassBeat = (now % 600) < 140;
+
+      var cam = $('glyphCameraRing');
+      var coil = $('glyphCenterCoil');
+      var bar = $('glyphBottomBar');
+      var dot = $('glyphBottomDot');
+
+      if (cam) cam.classList.toggle('strobe-on', isBassBeat);
+      if (coil) coil.classList.toggle('strobe-on', isBassBeat);
+      if (bar) bar.classList.toggle('strobe-on', isBassBeat);
+      if (dot) dot.classList.toggle('strobe-on', isBassBeat);
+
+      if (isBassBeat && hapticEnabled && (now - lastBeatTime > 400)) {
+        lastBeatTime = now;
+        if ('vibrate' in navigator) {
+          try { navigator.vibrate(25); } catch (e) {}
+        }
+      }
+    }
+
+    return {
+      init: init,
+      open: openModal,
+      close: closeModal,
+      setLyricsText: setLyricsText
+    };
+  })();
+  if (typeof window !== 'undefined') window.GlyphMatrixEngine = GlyphMatrixEngine;
+
   function init() {
     try { loadStationsData(false); } catch (e) { console.error('Stations load error:', e); }
     try { renderLikedList(); } catch (e) { console.error('Liked list error:', e); }
@@ -6974,6 +7305,7 @@
     try { ExtrasEngine.init(); } catch (e) { console.error('Extras init error:', e); }
     try { AuthEngine.init(); } catch (e) { console.error('Auth init error:', e); }
     try { MoodUniverseEngine.init(); } catch (e) { console.error('Mood universe init error:', e); }
+    try { GlyphMatrixEngine.init(); } catch (e) { console.error('Glyph matrix init error:', e); }
 
     setTimeout(function () {
       show('s-ready');

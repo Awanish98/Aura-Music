@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=100.0">
+  <link rel="stylesheet" href="style.css?v=101.0">
 
 
 
@@ -225,6 +225,12 @@
       </div>
 
       <div class="header-right">
+        <!-- Nothing Phone Glyph Dot Matrix Player Trigger -->
+        <button class="header-tool-btn glyph-dot-btn" id="glyphDotBtn" title="Nothing Phone Glyph Dot Matrix Lyrics & Visualizer (D)" style="display: inline-flex; align-items: center; gap: 4px; height: 28px; background: rgba(255, 0, 51, 0.12); border: 1px solid rgba(255, 0, 51, 0.4); padding: 0 9px; border-radius: 999px; cursor: pointer; color: #ff334b; font-weight: 800; font-family: 'Space Grotesk', monospace; font-size: 8px; letter-spacing: 0.1em; transition: all 0.2s;">
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: #ff0033; box-shadow: 0 0 6px #ff0033;"></span>
+          <span>DOT PLAY</span>
+        </button>
+
         <!-- Live Real-Time Date, Clock & Weather Atmosphere Pill -->
         <button class="header-tool-btn header-weather-pill" id="weatherPillBtn" title="Atmospheric Sky & Weather Controls">
           <span class="weather-icon-badge" id="weatherIconBadge">🌤️</span>
@@ -321,6 +327,18 @@
             <span class="sidebar-btn-label" id="extrasLabel">Aura Extras</span>
             <span class="sidebar-btn-sub">EQ · Sleep timer · Jam room</span>
           </div>
+        </button>
+
+        <!-- Nothing Glyph Dot Play & Visualizer -->
+        <button class="sidebar-menu-btn" id="sidebarGlyphBtn" title="Nothing Phone Glyph Dot Matrix Lyrics & Visualizer">
+          <div class="sidebar-btn-icon" style="color:#ff0033; background:rgba(255,0,51,0.12); border-color:rgba(255,0,51,0.3);">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+          </div>
+          <div class="sidebar-btn-text">
+            <span class="sidebar-btn-label" style="color:#ff334b;">Glyph Dot Play</span>
+            <span class="sidebar-btn-sub">Nothing Matrix · Lyrics · Strobe</span>
+          </div>
+          <span class="jam-sidebar-badge" style="background:#ff0033; color:#fff;">NOTHING (R)</span>
         </button>
 
         <div class="sidebar-divider"></div>
@@ -1010,6 +1028,75 @@
   </div>
 
 
+  <!-- ==================== NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER ==================== -->
+  <div class="glyph-matrix-modal" id="glyphMatrixModal">
+    <div class="glyph-matrix-container">
+      
+      <!-- Nothing OS Header -->
+      <div class="glyph-header">
+        <div class="glyph-brand">
+          <span class="glyph-dot-rec"></span>
+          <span class="glyph-title">NOTHING (R) // GLYPH DOT PLAY 4.0</span>
+        </div>
+        <div class="glyph-actions">
+          <button class="glyph-mode-pill" id="glyphColorToggleBtn" title="Switch Glyph Color">
+            <span class="glyph-color-indicator" id="glyphColorIndicator"></span>
+            <span id="glyphColorLabel">RED LED</span>
+          </button>
+          <button class="glyph-mode-pill active" id="glyphHapticBtn" title="Toggle Bass Haptic Pulse">
+            <span>⚡ HAPTIC PULSE</span>
+          </button>
+          <button class="glyph-close-btn" id="closeGlyphBtn" title="Exit Glyph Matrix (Esc)">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Dot Matrix Display & Glyph Back Simulator -->
+      <div class="glyph-stage">
+        
+        <!-- Authentic Nothing Phone Back Glyph Arc Outline & LED Strips -->
+        <div class="nothing-phone-body">
+          
+          <!-- Top-Left Camera Glyph Arc -->
+          <div class="glyph-strip glyph-camera-ring" id="glyphCameraRing"></div>
+          
+          <!-- Center Wireless Coil Glyph Circle & Diagonals -->
+          <div class="glyph-strip glyph-center-coil" id="glyphCenterCoil">
+            <!-- 64x16 Dot Matrix LED Lyrics Display Canvas -->
+            <div class="glyph-dot-canvas-wrap">
+              <canvas id="glyphDotCanvas" width="480" height="140"></canvas>
+            </div>
+          </div>
+
+          <!-- Bottom Exclamation Glyph Bar & Dot -->
+          <div class="glyph-bottom-group">
+            <div class="glyph-strip glyph-bottom-bar" id="glyphBottomBar"></div>
+            <div class="glyph-strip glyph-bottom-dot" id="glyphBottomDot"></div>
+          </div>
+        </div>
+
+        <!-- Live Streaming Lyrics Text on Dot Screen -->
+        <div class="glyph-lyrics-readout">
+          <div class="glyph-lyrics-line" id="glyphLyricsLine">NOTHING DOT PLAY // READY</div>
+          <div class="glyph-track-meta" id="glyphTrackMeta">WAITING FOR AUDIO FREQUENCY</div>
+        </div>
+
+      </div>
+
+      <!-- Glyph Mode Switcher Toolbar -->
+      <div class="glyph-footer-bar">
+        <div class="glyph-mode-chips" id="glyphModeChips">
+          <button class="glyph-chip active" data-glyph-mode="lyrics">📜 DOT LYRICS</button>
+          <button class="glyph-chip" data-glyph-mode="spectrum">📊 SPECTRUM</button>
+          <button class="glyph-chip" data-glyph-mode="strobe">⚡ BEAT STROBE</button>
+          <button class="glyph-chip" data-glyph-mode="clock">⏱️ TIME MATRIX</button>
+        </div>
+        <div class="glyph-device-tag">NOTHING PHONE 4A PRO // GLYPH INTERFACE DEV KIT</div>
+      </div>
+
+    </div>
+  </div>
+
+
   <!-- ==================== Spotlight Global Command Palette (Ctrl + K) ==================== -->
   <div class="command-palette-modal" id="commandPaletteModal">
     <div class="command-palette-card">
@@ -1558,7 +1645,7 @@
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=100.0"></script>
+  <script src="script.js?v=101.0"></script>
 
 
 
