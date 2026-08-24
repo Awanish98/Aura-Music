@@ -2,5 +2,7 @@ node_modules/
 *.log
 scratch/
 .system_generated/
+graphify-out/
+*.png
 .DS_Store
 Thumbs.db
