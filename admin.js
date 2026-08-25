@@ -443,14 +443,18 @@
     if (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var val = (pinInput ? pinInput.value : '').trim();
-        if (val.toLowerCase() === 'jessica') {
+        var val = (pinInput ? pinInput.value : '').trim().toLowerCase();
+        if (val === 'jessica') {
           sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
           if (overlay) overlay.classList.add('unlocked');
           showToast('Welcome back, Admin! 🔓');
           loadStations();
         } else {
-          showToast('Incorrect Password! Access Denied ❌');
+          if (val === '2026') {
+            showToast('2026 is obsolete! Master password is: jessica ❌');
+          } else {
+            showToast('Incorrect Password! Access Denied ❌');
+          }
           if (pinInput) {
             pinInput.value = '';
             pinInput.focus();
