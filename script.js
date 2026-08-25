@@ -191,14 +191,13 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v107.0') caches.delete(name);
+        if (name !== 'aura-music-v108.0') caches.delete(name);
       });
     });
   }
 
   /* ==================== Global Security & Sanitization ==================== */
   function escapeHtml(str) {
-    if (str === null || str === undefined) return '';
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -260,6 +259,8 @@
   }
 
   function $(id) { return document.getElementById(id); }
+  window.$ = $;
+  if (typeof window !== 'undefined') window.$ = $;
 
   function show(cls) {
     document.body.classList.remove('s-loading', 's-error', 's-ready');
@@ -2743,7 +2744,7 @@
         }
       }
 
-      animFrame = requestAnimationFrame(renderParticles);
+      // Weather particles RAF loop disabled for 0% CPU/GPU usage
     }
 
 
@@ -3270,88 +3271,12 @@
 
   /* ==================== Low-Power Station-Adaptive Kinetic Particles ==================== */
   (function initDynamicBackgroundEngine() {
+    // Canvas loop disabled for 0% CPU & GPU usage
     var canvas = $('particles');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-
-    var width = 0, height = 0;
-    var particles = [];
-    var lastTime = 0;
-
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      initElements();
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    window.addEventListener('resize', resize, { passive: true });
-
-    function initElements() {
-      particles = [];
-      var particleCount = Math.min(Math.floor(width / 65), 18);
-      for (var i = 0; i < particleCount; i++) {
-        particles.push(createParticle());
-      }
-    }
-
-    function createParticle() {
-      var mode = currentStationKey || 'time-travel';
-      return {
-        x: Math.random() * width,
-        y: Math.random() * height,
-        r: Math.random() * 1.8 + 0.6,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: mode === 'demand' || mode === 'ishq' ? -(Math.random() * 0.6 + 0.2) : -(Math.random() * 0.25 + 0.05)
-      };
-    }
-
-    resize();
-
-    function render(now) {
-      if (!ctx || document.hidden || window.innerWidth <= 768) {
-        requestAnimationFrame(render);
-        return;
-      }
-
-      // Throttle to 30 FPS for desktop GPU efficiency
-      if (now - lastTime < 32) {
-        requestAnimationFrame(render);
-        return;
-      }
-      lastTime = now;
-
-      ctx.clearRect(0, 0, width, height);
-
-      var stMode = currentStationKey || 'time-travel';
-      if (stMode === 'ishq') {
-        ctx.fillStyle = 'rgba(254, 230, 138, 0.4)';
-      } else if (stMode === 'demand') {
-        ctx.fillStyle = 'rgba(255, 68, 110, 0.45)';
-      } else if (stMode === 'edm') {
-        ctx.fillStyle = 'rgba(16, 185, 129, 0.5)';
-      } else if (stMode === '90s') {
-        ctx.fillStyle = 'rgba(165, 243, 252, 0.35)';
-      } else {
-        ctx.fillStyle = 'rgba(216, 180, 254, 0.4)';
-      }
-
-      ctx.beginPath();
-      for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        ctx.moveTo(p.x + p.r, p.y);
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
-        if (p.x < -10) p.x = width + 10;
-        if (p.x > width + 10) p.x = -10;
-      }
-      ctx.fill();
-
-      requestAnimationFrame(render);
-    }
-    requestAnimationFrame(render);
   })();
 
 

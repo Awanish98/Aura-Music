@@ -8969,3 +8969,71 @@ body.in-explorer-mode .shell {
     font-size: 10px;
   }
 }
+
+
+/* ==================== ULTIMATE 60FPS PERFORMANCE & ZERO-GPU OVERRIDES ==================== */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Eliminate expensive backdrop-filters across all elements */
+.controls-glass,
+.dock-core,
+.dock-wing,
+.art-card,
+.up-next-pill,
+.live-lyric-bar,
+.station-pill,
+.station-dropdown,
+.bento-card,
+.mood-action-btn,
+.mood-chip,
+.exp-uni-header,
+.exp-now-playing-banner,
+.shortcuts-card,
+.sky-card,
+.glass-modal-card,
+.premium-sidebar-menu,
+.hero-surprise-btn,
+.mood-universe-btn,
+.header-tool-btn,
+.ctrl-btn {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Replace blur with crisp, high-contrast dark OLED glass backgrounds */
+.controls-glass {
+  background: rgba(14, 11, 20, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dock-core {
+  background: rgba(22, 18, 32, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.dock-wing {
+  background: rgba(16, 13, 24, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.ambient-canvas,
+.sky-canvas {
+  display: none !important;
+}
+
+/* Prevent layout re-paints & jitter */
+.shell,
+.app,
+.center-core {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.turntable-wrap {
+  transform: none !important;
+  perspective: none !important;
+}
