@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v138.0') caches.delete(name);
+        if (name !== 'aura-music-v139.0') caches.delete(name);
       });
     });
   }
@@ -2975,6 +2975,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
     var closeBtn = $('closeSkyBtn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    var lyricsBackBtn = $('lyricsBackBtn');
+    if (lyricsBackBtn) lyricsBackBtn.addEventListener('click', closeModal);
+    var lyricsFloatingBackBtn = $('lyricsFloatingBackBtn');
+    if (lyricsFloatingBackBtn) lyricsFloatingBackBtn.addEventListener('click', closeModal);
 
     if (autoSyncToggle) {
       autoSyncToggle.checked = isAutoSync;
