@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v106.0') caches.delete(name);
+        if (name !== 'aura-music-v107.0') caches.delete(name);
       });
     });
   }
@@ -6941,15 +6941,16 @@
 
     // Dynamic AI Mood Synthesizer: Generates emergent personalized mood stations on the fly!
     var dynamicMoodCount = 0;
-    function synthesizeMoreMoods(count) {
-      count = count || 12;
-      var templates = [
+        function synthesizeMoreMoods(count) {
+      count = count || 8;
+      var newStations = [
         {
-          name: 'Cyberpunk Neon Drift',
+          id: 'cyber-drift-' + Date.now(),
+          name: 'Cyber Neon Drift',
           icon: '🔰',
-          category: 'drive',
+          category: 'energy',
           energy: '⚡ Turbo Bass',
-          desc: 'High speed night driving with heavy 808s, drifting synths & Tokyo neon pulses',
+          desc: 'High speed night driving with heavy 808s & Tokyo neon synth pulses',
           tags: ['#Cyberpunk', '#Drift', '#Phonk', '#Speed'],
           accent: '#06b6d4',
           accentGlow: 'rgba(6, 182, 212, 0.5)',
@@ -6961,6 +6962,7 @@
           seedTracks: ['4NRXx6U8ABQ', 'dZ0fwJojhrs', '60ItHLz5WEA', 'vX2cDW8up28']
         },
         {
+          id: 'indipop-90s-' + Date.now(),
           name: '90s Indipop Nostalgia',
           icon: '🎸',
           category: 'retro',
@@ -6977,6 +6979,7 @@
           seedTracks: ['0NV1KdWRHck', '1T3i9Qp54s0', 'YxWlaYCA8MU', '8k_4mZ3h8vA']
         },
         {
+          id: 'raindrop-lofi-' + Date.now(),
           name: 'Raindrop Lo-Fi Heartbreak',
           icon: '🌧️',
           category: 'romance',
@@ -6990,10 +6993,11 @@
           glyphs: ['BARISH', 'YAADEIN', 'DIL', 'AASU', 'SLOWED', 'ECHO'],
           genres: ['romance', 'chill', 'lofi', 'soul'],
           size: 'tall',
-          seedTracks: ['Ax0G_P2dSBw', 'p7i88HqK_4k', 'T94PHkuydcw', 'b5f25X2Gvfg', '1T3i9Qp54s0']
+          seedTracks: ['Ax0G_P2dSBw', 'p7i88HqK_4k', 'T94PHkuydcw', 'b5f25X2Gvfg']
         },
         {
-          name: 'Royal Sufi Qawwali Ecstasy',
+          id: 'royal-sufi-' + Date.now(),
+          name: 'Royal Sufi Qawwali',
           icon: '🪕',
           category: 'sufi',
           energy: '✨ Transcendent',
@@ -7006,93 +7010,19 @@
           glyphs: ['कलंदर', 'इबादत', 'रूह', 'कव्वाली', 'सुकून', 'नूर'],
           genres: ['sufi', 'spiritual', 'soul', 'ghazal'],
           size: 'wide',
-          seedTracks: ['b9p_HjFq78c', 'cl0a3i2wFcc', '1u_kH0N7k8w', 'BBAyRZZ9cG4', '6vY9o8J3r_4']
-        },
-        {
-          name: 'Desi Hip-Hop & Gully Fire',
-          icon: '🎙️',
-          category: 'punjabi',
-          energy: '🔥 Street Hype',
-          desc: 'Raw street lyricism, heavy boom-bap drums & hard-hitting desi flow',
-          tags: ['#GullyRap', '#DesiHipHop', '#Fire', '#Divine'],
-          accent: '#ef4444',
-          accentGlow: 'rgba(239, 68, 68, 0.5)',
-          gradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.08) 100%)',
-          quote: '"अपना टाइम आ गया! Hard-hitting streets, real voices."',
-          glyphs: ['GULLY', 'FLOW', 'STREET', 'BEAT', 'BARS', 'MIC'],
-          genres: ['punjabi', 'hiphop', 'energy'],
-          size: 'normal',
-          seedTracks: ['6MgsHSAcI98', 'k4yXQkG2s1E', 'dZ0fwJojhrs', 'ALZHF5UqnU4']
-        },
-        {
-          name: 'Stargazing Zero-Gravity Ambient',
-          icon: '🌌',
-          category: 'focus',
-          energy: '🧘 Deep Zen',
-          desc: 'Floating in zero gravity with warm analog drones & celestial pad textures',
-          tags: ['#Stargazing', '#Cosmos', '#Ambient', '#Zen'],
-          accent: '#8b5cf6',
-          accentGlow: 'rgba(139, 92, 246, 0.5)',
-          gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(109, 40, 217, 0.08) 100%)',
-          quote: '"Drifting peacefully into the cosmic void beyond all worries."',
-          glyphs: ['STAR', 'GALAXY', 'SPACE', 'ZEN', 'CALM', 'FLOAT'],
-          genres: ['focus', 'ambient', 'chill'],
-          size: 'tall',
-          seedTracks: ['60ItHLz5WEA', 'T94PHkuydcw', '1u_kH0N7k8w', 'b9p_HjFq78c']
-        },
-        {
-          name: 'Sunset Terrace Golden Hour',
-          icon: '🌅',
-          category: 'chill',
-          energy: '☕ Warm Breeze',
-          desc: 'Rooftop golden sunsets, smooth acoustic guitar strings & evening calm',
-          tags: ['#GoldenHour', '#Sunset', '#Acoustic', '#Warmth'],
-          accent: '#ea580c',
-          accentGlow: 'rgba(234, 88, 12, 0.5)',
-          gradient: 'linear-gradient(135deg, rgba(234, 88, 12, 0.25) 0%, rgba(194, 65, 12, 0.08) 100%)',
-          quote: '"The sky turns orange and purple as the world sighs in peace…"',
-          glyphs: ['SUNSET', 'GOLDEN', 'TERRACE', 'STRINGS', 'WARMTH', 'CHILL'],
-          genres: ['chill', 'acoustic', 'indie', 'pop'],
-          size: 'hero',
-          seedTracks: ['YxWlaYCA8MU', '1T3i9Qp54s0', '3vK3rZ3n2L0', 'mH_ELM-1j18']
-        },
-        {
-          name: 'Slap House & Future Bass',
-          icon: '🔊',
-          category: 'energy',
-          energy: '⚡ Extreme Drop',
-          desc: 'Punchy metallic slap basslines, vocal chops & adrenaline festival energy',
-          tags: ['#SlapHouse', '#FutureBass', '#Drops', '#Festival'],
-          accent: '#ec4899',
-          accentGlow: 'rgba(236, 72, 153, 0.5)',
-          gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(219, 39, 119, 0.08) 100%)',
-          quote: '"Heavy bass compression and earth-shaking festival drops."',
-          glyphs: ['BASS', 'DROP', 'SLAP', 'CLUB', 'FUTURE', 'HOUSE'],
-          genres: ['energy', 'edm', 'dance'],
-          size: 'normal',
-          seedTracks: ['gCYcHz2167o', 'JRfuAukYTKg', 'IcrbM1l_BoI', 'ALZHF5UqnU4']
+          seedTracks: ['b9p_HjFq78c', 'cl0a3i2wFcc', '1u_kH0N7k8w', 'BBAyRZZ9cG4']
         }
       ];
 
-      var added = 0;
-      templates.forEach(function (tmpl) {
-        dynamicMoodCount++;
-        var newId = tmpl.category + '-synth-' + dynamicMoodCount;
-        if (!MOOD_STATIONS.some(function (m) { return m.id === newId || m.name === tmpl.name; })) {
-          var copy = Object.assign({}, tmpl, { id: newId });
-          MOOD_STATIONS.push(copy);
-          added++;
-        }
+      newStations.forEach(function (st) {
+        MOOD_STATIONS.push(st);
       });
 
-      // Update badge
-      var badgeEl = document.querySelector('.mood-count-badge');
-      if (badgeEl) badgeEl.textContent = MOOD_STATIONS.length + ' STATIONS';
-      var headerBadge = document.querySelector('.mood-ai-badge');
-      if (headerBadge) headerBadge.textContent = MOOD_STATIONS.length + '+ AI';
+      var badge = $('moodTotalCountBadge');
+      if (badge) badge.textContent = MOOD_STATIONS.length + '+ STATIONS';
 
       renderGrid(searchInput ? searchInput.value : '', currentActiveCategory);
-      showToast('✨ AI Synthesized ' + added + ' New Dynamic Mood Stations! Total: ' + MOOD_STATIONS.length);
+      showToast('✨ AI Synthesized ' + newStations.length + ' Brand New Mood Stations!');
     }
 
     function renderGrid(query, category) {
@@ -7262,55 +7192,7 @@
         STATION_TRACKS[customStation.id] = tracks;
       }
 
-      var activeP = player || window.__p || (typeof DualAudioEngine !== 'undefined' && DualAudioEngine.getActivePlayer && DualAudioEngine.getActivePlayer());
-      if (!activeP || !apiReady) {
-        
-  /* ==================== Cache Buster & Hard Reset Engine ==================== */
-  function purgeAuraCacheAndReset(interactive) {
-    if (interactive) showToast('⚡ Purging all caches & reloading authentic playlists…');
-    
-    try {
-      localStorage.removeItem('ishq_custom_stations');
-      localStorage.removeItem('ishq_db_version');
-      localStorage.removeItem('ishq_station_key');
-      localStorage.removeItem('ishq_liked_songs');
-      localStorage.removeItem('aura_liked_songs');
-      sessionStorage.clear();
-    } catch (e) {}
-
-    if ('caches' in window) {
-      caches.keys().then(function (names) {
-        return Promise.all(names.map(function (n) { return caches.delete(n); }));
-      }).then(function () {
-        if (navigator.serviceWorker) {
-          navigator.serviceWorker.getRegistrations().then(function (regs) {
-            regs.forEach(function (r) { r.unregister(); });
-            setTimeout(function () {
-              window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
-            }, 300);
-          });
-        } else {
-          window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
-        }
-      }).catch(function () {
-        window.location.reload(true);
-      });
-    } else {
-      window.location.reload(true);
-    }
-  }
-  window.purgeAuraCacheAndReset = purgeAuraCacheAndReset;
-
-  // URL Query param auto-purge trigger: ?reset=1 or ?clear=1
-  if (window.location.search.includes('reset=1') || window.location.search.includes('clear=1') || window.location.search.includes('purge=1')) {
-    purgeAuraCacheAndReset(false);
-  }
-
-  init();
-        activeP = player || window.__p || (typeof DualAudioEngine !== 'undefined' && DualAudioEngine.getActivePlayer && DualAudioEngine.getActivePlayer());
-      }
-
-      // 100% Guaranteed Audio Playback execution
+            var activeP = player || window.__p;
       if (activeP) {
         try {
           if (activeP.unMute) activeP.unMute();
@@ -8017,3 +7899,62 @@
   init();
 })();
 
+
+
+  /* ==================== Cache Buster & Hard Reset Engine ==================== */
+  function purgeAuraCacheAndReset(interactive) {
+    if (interactive) showToast('⚡ Purging all caches & reloading authentic playlists…');
+    try {
+      localStorage.removeItem('ishq_custom_stations');
+      localStorage.removeItem('ishq_db_version');
+      localStorage.removeItem('ishq_station_key');
+      localStorage.removeItem('ishq_liked_songs');
+      localStorage.removeItem('aura_liked_songs');
+      sessionStorage.clear();
+    } catch (e) {}
+
+    if ('caches' in window) {
+      caches.keys().then(function (names) {
+        return Promise.all(names.map(function (n) { return caches.delete(n); }));
+      }).then(function () {
+        if (navigator.serviceWorker) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+            setTimeout(function () {
+              window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
+            }, 300);
+          });
+        } else {
+          window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
+        }
+      }).catch(function () {
+        window.location.reload(true);
+      });
+    } else {
+      window.location.reload(true);
+    }
+  }
+  window.purgeAuraCacheAndReset = purgeAuraCacheAndReset;
+
+  if (window.location.search.includes('reset=1') || window.location.search.includes('clear=1') || window.location.search.includes('purge=1')) {
+    purgeAuraCacheAndReset(false);
+  }
+
+
+  // Hero Section Surprise Me Button listener
+  var heroSurpriseBtn = $('heroSurpriseBtn');
+  if (heroSurpriseBtn) {
+    heroSurpriseBtn.addEventListener('click', function () {
+      try { HapticEngine.tap(); } catch (e) {}
+      if (typeof MoodUniverseEngine !== 'undefined' && MoodUniverseEngine.stations && MoodUniverseEngine.stations.length) {
+        var unplayed = MoodUniverseEngine.stations.slice().sort(function () { return 0.5 - Math.random(); });
+        var picked = unplayed[0];
+        if (picked) {
+          showToast('AI Picked: ' + picked.icon + ' ' + picked.name + ' 🎲');
+          MoodUniverseEngine.playMoodStation(picked);
+        }
+      } else {
+        skip('next');
+      }
+    });
+  }
