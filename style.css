@@ -8143,6 +8143,18 @@ body.in-cinema-mode #playerA iframe {
   box-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.5)) !important;
 }
 
+.dock-surprise-btn.surprise-active {
+  animation: diceRollSpin 0.7s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.9), 0 0 45px rgba(139, 92, 246, 0.7) !important;
+}
+
+@keyframes diceRollSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  40% { transform: rotate(180deg) scale(1.25); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
 /* 3. Perfect Progress Scrubber */
 .progress-container {
   display: flex !important;

@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v119.0') caches.delete(name);
+        if (name !== 'aura-music-v120.0') caches.delete(name);
       });
     });
   }
@@ -7697,6 +7697,60 @@
   }
 
   
+
+  /* ==================== Surprise Me Engine ==================== */
+  function triggerSurpriseMe() {
+    try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
+    var btn = $('dockSurpriseBtn');
+    if (btn) {
+      btn.classList.add('surprise-active');
+      setTimeout(function () { btn.classList.remove('surprise-active'); }, 700);
+    }
+
+    var moodPool = (typeof MoodUniverseEngine !== 'undefined' && MoodUniverseEngine.stations && MoodUniverseEngine.stations.length)
+      ? MoodUniverseEngine.stations
+      : (typeof MOOD_STATIONS !== 'undefined' && MOOD_STATIONS.length ? MOOD_STATIONS : null);
+
+    if (moodPool && moodPool.length) {
+      var randomMood = moodPool[Math.floor(Math.random() * moodPool.length)];
+      if (typeof MoodUniverseEngine !== 'undefined' && MoodUniverseEngine.playMoodStation) {
+        MoodUniverseEngine.playMoodStation(randomMood);
+      } else if (typeof playMoodStation === 'function') {
+        playMoodStation(randomMood);
+      }
+      showToast('🎲 Surprise: ' + (randomMood.icon || '✨') + ' ' + randomMood.name + ' Frequency!');
+    } else {
+      if (currentTrackQueue && currentTrackQueue.length > 0) {
+        currentTrackIndex = Math.floor(Math.random() * currentTrackQueue.length);
+        var vid = currentTrackQueue[currentTrackIndex];
+        if (player && player.loadVideoById) {
+          player.loadVideoById(vid);
+          showToast('🎲 Surprise Song Discovered! 🎶');
+        }
+      }
+    }
+  }
+  window.triggerSurpriseMe = triggerSurpriseMe;
+
+  var dockSurpriseBtn = $('dockSurpriseBtn');
+  if (dockSurpriseBtn) {
+    dockSurpriseBtn.addEventListener('click', triggerSurpriseMe);
+  }
+
+  var shuffleBtn = $('shuffleBtn');
+  if (shuffleBtn) {
+    shuffleBtn.addEventListener('click', function () {
+      try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
+      if (currentTrackQueue && currentTrackQueue.length > 0) {
+        currentTrackQueue.sort(function () { return 0.5 - Math.random(); });
+        currentTrackIndex = 0;
+        window.currentTrackQueue = currentTrackQueue;
+        window.currentTrackIndex = 0;
+        skip('next');
+        showToast('🔀 Endless Queue Shuffled!');
+      }
+    });
+  }
 
   var _playBtn = $('play');
   if (_playBtn) _playBtn.addEventListener('click', togglePlay);
