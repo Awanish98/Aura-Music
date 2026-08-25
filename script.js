@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v117.0') caches.delete(name);
+        if (name !== 'aura-music-v118.0') caches.delete(name);
       });
     });
   }
@@ -934,6 +934,56 @@
     }, 2500);
   }
 
+  /* ==================== Dynamic Station Brand Auto-Fit Engine ==================== */
+  function fitBrandTitle(text) {
+    var bTitle = $('brandTitle');
+    if (!bTitle) return;
+    var rawText = (text || bTitle.textContent || '').trim();
+    var len = rawText.length;
+
+    var desktopSize = 'clamp(32px, 3.6vw, 50px)';
+    var desktopSpacing = '0.14em';
+    var mobileSize = 'clamp(22px, 6.2vw, 30px)';
+    var mobileSpacing = '0.11em';
+
+    if (len <= 7) {
+      // Very short names (e.g. ISHQ, DEMAND, 90'S, EDM) -> HUGE, MAJESTIC, CINEMATIC
+      desktopSize = 'clamp(40px, 4.6vw, 64px)';
+      desktopSpacing = '0.18em';
+      mobileSize = 'clamp(28px, 8.2vw, 40px)';
+      mobileSpacing = '0.14em';
+    } else if (len <= 14) {
+      // Medium short names (e.g. TIME TRAVEL, MY VIBES, POP HITS)
+      desktopSize = 'clamp(34px, 3.8vw, 54px)';
+      desktopSpacing = '0.15em';
+      mobileSize = 'clamp(24px, 7.0vw, 32px)';
+      mobileSpacing = '0.12em';
+    } else if (len <= 21) {
+      // Medium names (e.g. YOUTUBE EXPLORER, BOLLYWOOD ROMANCE, BROKEN HEART) -> BIG & BOLD!
+      desktopSize = 'clamp(28px, 3.1vw, 44px)';
+      desktopSpacing = '0.12em';
+      mobileSize = 'clamp(20px, 5.5vw, 26px)';
+      mobileSpacing = '0.09em';
+    } else if (len <= 30) {
+      // Long names (e.g. DARK OBSESSION & PASSION, ROYAL WEDDING ROMANCE)
+      desktopSize = 'clamp(24px, 2.5vw, 34px)';
+      desktopSpacing = '0.09em';
+      mobileSize = 'clamp(17px, 4.5vw, 22px)';
+      mobileSpacing = '0.07em';
+    } else {
+      // Extra long names
+      desktopSize = 'clamp(20px, 2.0vw, 28px)';
+      desktopSpacing = '0.07em';
+      mobileSize = 'clamp(15px, 3.8vw, 18px)';
+      mobileSpacing = '0.05em';
+    }
+
+    bTitle.style.setProperty('--dynamic-brand-size', desktopSize);
+    bTitle.style.setProperty('--dynamic-brand-spacing', desktopSpacing);
+    bTitle.style.setProperty('--dynamic-brand-size-mobile', mobileSize);
+    bTitle.style.setProperty('--dynamic-brand-spacing-mobile', mobileSpacing);
+  }
+
   /* ==================== Dynamic Genre-Adaptive Theme Engine ==================== */
   function applyStationTheme(st) {
     if (!st || !st.theme) return;
@@ -959,7 +1009,9 @@
     if (bTitle) {
       bTitle.style.animation = 'none';
       void bTitle.offsetWidth; // trigger reflow
-      bTitle.textContent = st.brand || st.name;
+      var titleStr = st.brand || st.name;
+      bTitle.textContent = titleStr;
+      fitBrandTitle(titleStr);
       bTitle.style.animation = 'jitterRevealTitle 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards';
     }
     
@@ -7185,7 +7237,7 @@
       if ($('artist')) $('artist').textContent = initArtist;
       if ($('art')) $('art').src = 'https://i.ytimg.com/vi/' + tracks[0] + '/mqdefault.jpg';
       if ($('ambientArt')) $('ambientArt').src = 'https://i.ytimg.com/vi/' + tracks[0] + '/hqdefault.jpg';
-      if ($('brandTitle')) $('brandTitle').textContent = customStation.brand;
+      if ($('brandTitle')) { $('brandTitle').textContent = customStation.brand; fitBrandTitle(customStation.brand); }
       if ($('brandSub')) $('brandSub').textContent = customStation.brandSub;
       if ($('currentStationLabel')) $('currentStationLabel').textContent = customStation.short;
       document.body.classList.add('playing');
