@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v103.0') caches.delete(name);
+        if (name !== 'aura-music-v103.1') caches.delete(name);
       });
     });
   }
@@ -1732,26 +1732,59 @@
 
   /* ==================== Track Skipper ==================== */
   function skip(dir) {
-    if (!apiReady || !player) return;
+    try { HapticEngine.tap(); } catch (e) {}
     claimAudioMaster();
+    desired = true;
+    document.body.classList.add('playing');
+    hideAutoplayPrompt();
+
     if (skipDebounce) return;
     skipDebounce = true;
     setTimeout(function () { skipDebounce = false; }, 300);
 
     try {
-      if (player.nextVideo && dir === 'next') {
-        player.nextVideo();
-        showToast('Skipping to Next Song ⏭️');
-      } else if (player.previousVideo && dir === 'prev') {
-        player.previousVideo();
-        showToast('Previous Song ⏮️');
-      } else {
-        if (currentTrackQueue.length > 0) {
-          if (dir === 'next') currentTrackIndex = (currentTrackIndex + 1) % currentTrackQueue.length;
-          else currentTrackIndex = (currentTrackIndex - 1 + currentTrackQueue.length) % currentTrackQueue.length;
-          var nextId = currentTrackQueue[currentTrackIndex];
-          if (player.loadVideoById) player.loadVideoById(nextId);
+      // 1. Ensure currentTrackQueue has tracks from active station
+      if (!currentTrackQueue || currentTrackQueue.length === 0) {
+        var key = currentStationKey || 'ishq';
+        if (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[key] && STATION_TRACKS[key].length) {
+          currentTrackQueue = STATION_TRACKS[key].slice();
         }
+      }
+
+      if (currentTrackQueue && currentTrackQueue.length > 0) {
+        if (dir === 'next') {
+          currentTrackIndex = (currentTrackIndex + 1) % currentTrackQueue.length;
+          showToast('Next Song ⏭️');
+        } else {
+          currentTrackIndex = (currentTrackIndex - 1 + currentTrackQueue.length) % currentTrackQueue.length;
+          showToast('Previous Song ⏮️');
+        }
+
+        var nextVid = currentTrackQueue[currentTrackIndex];
+        if (player) {
+          if (player.loadVideoById) {
+            player.loadVideoById(nextVid);
+          } else if (player.playVideoAt) {
+            player.playVideoAt(currentTrackIndex);
+          }
+          setTimeout(function () {
+            try { if (player.playVideo) player.playVideo(); } catch (e) {}
+            update();
+          }, 250);
+        }
+        return;
+      }
+
+      // 2. Fallback native YouTube playlist skip
+      if (player) {
+        if (dir === 'next' && player.nextVideo) {
+          player.nextVideo();
+          showToast('Next Song ⏭️');
+        } else if (dir === 'prev' && player.previousVideo) {
+          player.previousVideo();
+          showToast('Previous Song ⏮️');
+        }
+        setTimeout(update, 500);
       }
     } catch (e) {
       console.warn("Skip error:", e);
