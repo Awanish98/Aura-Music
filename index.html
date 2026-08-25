@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=104.0">
+  <link rel="stylesheet" href="style.css?v=105.0">
 
 
 
@@ -311,19 +311,7 @@
         </button>
 
         <!-- Aura Extras (EQ, Sleep, Jam) -->
-        <button class="sidebar-menu-btn" id="extrasBtn" title="Aura Extras">
-          <div class="sidebar-btn-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-          </div>
-          <div class="sidebar-btn-text">
-            <span class="sidebar-btn-label" id="extrasLabel">Aura Extras</span>
-            <span class="sidebar-btn-sub">EQ · Sleep timer · Jam room</span>
-          </div>
-        </button>
-
         <!-- Nothing Glyph Dot Play & Visualizer -->
-        <button class="sidebar-menu-btn" id="sidebarGlyphBtn" class="sidebar-item-btn"><span class="sb-icon">🌌</span><span class="sb-text">Audio Visualizer</span></button>
-
         <div class="sidebar-divider"></div>
 
         <!-- AI DJ toggle -->
@@ -1073,131 +1061,120 @@
   </div>
 
 
-  <!-- ==================== Unified Aura Extras & Audiophile Suite Modal ==================== -->
+    <!-- ==================== JAM ROOM // LISTEN TOGETHER ==================== -->
   <div class="glass-feature-modal" id="extrasModal">
-    <div class="glass-modal-card extras-modal-card">
+    <div class="glass-modal-card extras-modal-card jam-modal-clean">
       <div class="glass-modal-header">
         <div class="glass-modal-title-group">
-          <span class="glass-badge">✨ AURA EXTRAS &amp; AUDIOPHILE SUITE</span>
-          <h3>Extras &amp; Master Tools</h3>
-          <p>3D Spatial Audio, Sleep Timer &amp; Alarm, Floating Mini-Player, and Jam Room</p>
+          <span class="glass-badge" style="background: rgba(236, 72, 153, 0.15); color: #ec4899; border-color: rgba(236, 72, 153, 0.35);">👥 JAM ROOM // LIVE P2P SYNC</span>
+          <h3>Listen Together &amp; Jam</h3>
+          <p>Sync radio playback in real-time with friends with zero latency</p>
         </div>
         <button class="glass-modal-close" id="closeExtrasBtn">&times;</button>
       </div>
 
-      <!-- Navigation Tabs for the 4 features -->
-      <div class="extras-tabs-nav" id="extrasTabsNav">
-        <button class="extras-tab-btn active" data-tab="tab-spatial">
-          <span class="extras-tab-icon">🎧</span>
-          <span>3D Audio &amp; EQ</span>
-        </button>
-        <button class="extras-tab-btn" data-tab="tab-timer">
-          <span class="extras-tab-icon">🌙</span>
-          <span>Sleep &amp; Alarm</span>
-        </button>
-        <button class="extras-tab-btn" data-tab="tab-mini">
-          <span class="extras-tab-icon">📱</span>
-          <span>Mini Player</span>
-        </button>
-        <button class="extras-tab-btn" data-tab="tab-jam">
-          <span class="extras-tab-icon">👥</span>
-          <span>Jam Room</span>
-        </button>
-      </div>
-
-      <!-- Tab Content Area -->
-      <div class="extras-tab-content-wrap">
+      <!-- Jam Room Content Area -->
+      <div class="extras-tab-content-wrap" style="padding-top: 10px;">
         
-        <!-- Tab 1: 3D Spatial Audio & EQ -->
-        <div class="extras-tab-pane active" id="tab-spatial">
-          <div class="spatial-soundstage-panel">
-            <div class="spatial-header">
-              <div class="spatial-title-wrap">
-                <span class="spatial-icon">🌐</span>
-                <div>
-                  <div class="spatial-name">Binaural 3D Spatial Soundstage</div>
-                  <div class="spatial-desc">Expands acoustic stereo imaging into 360° dimensional space</div>
-                </div>
-              </div>
-              <button class="spatial-toggle-btn active" id="spatialAudioToggle">
-                <span class="toggle-dot"></span>
-                <span id="spatialToggleLabel">3D ON</span>
-              </button>
+        <!-- Jam Room View: Disconnected / Start -->
+        <div class="jam-setup-view" id="jamSetupView">
+          <div class="jam-host-card">
+            <div class="jam-card-icon">👑</div>
+            <h4>Host a New Jam Room</h4>
+            <p>Generate a secure room code and invite friends to listen together</p>
+            <button class="jam-action-btn host-btn" id="startJamHostBtn">Start Jam Room (Host)</button>
+          </div>
+
+          <div class="jam-divider"><span>OR</span></div>
+
+          <div class="jam-join-card">
+            <div class="jam-card-icon">🎧</div>
+            <h4>Join a Friend's Room</h4>
+            <p>Enter the 6-character room code to sync audio instantly</p>
+            <div class="jam-join-input-wrap">
+              <input type="text" id="jamRoomCodeInput" placeholder="e.g. ISHQ88" maxlength="8" autocomplete="off" spellcheck="false">
+              <button class="jam-action-btn join-btn" id="joinJamBtn">Join</button>
             </div>
-            <div class="spatial-slider-row">
-              <label>Spatial Stereo Width (<span id="spatialWidthVal">140%</span>)</label>
-              <input type="range" id="spatialWidthSlider" min="0" max="200" value="140">
+          </div>
+        </div>
+
+        <!-- Jam Room View: Active Connected State -->
+        <div class="jam-active-view" id="jamActiveView" style="display:none;">
+          <div class="jam-live-header">
+            <div class="jam-live-badge"><span class="jam-pulse-dot"></span> LIVE SYNC ACTIVE</div>
+            <div class="jam-room-code-display">
+              Room Code: <strong id="activeJamCodeText">ISHQ88</strong>
+              <button class="jam-copy-btn" id="copyJamLinkBtn" title="Copy Invite Link">📋 Copy Link</button>
             </div>
           </div>
 
-          <!-- Master Presets Grid -->
-          <div class="eq-presets-section">
-            <div class="section-label">Acoustic Staging Presets</div>
-            <div class="eq-presets-grid" id="eqPresetsGrid">
-              <button class="eq-preset-btn active" data-preset="studio">
-                <span class="preset-icon">💎</span>
-                <span class="preset-name">Studio Pure</span>
-              </button>
-              <button class="eq-preset-btn" data-preset="car-drive">
-                <span class="preset-icon">🚗</span>
-                <span class="preset-name">Late Night Car</span>
-              </button>
-              <button class="eq-preset-btn" data-preset="vinyl">
-                <span class="preset-icon">🕯️</span>
-                <span class="preset-name">Vintage Vinyl</span>
-              </button>
-              <button class="eq-preset-btn" data-preset="cathedral">
-                <span class="preset-icon">🏛️</span>
-                <span class="preset-name">Cathedral 3D</span>
-              </button>
-              <button class="eq-preset-btn" data-preset="bass-8d">
-                <span class="preset-icon">⚡</span>
-                <span class="preset-name">8D Bass Boost</span>
-              </button>
+          <!-- Connected Friends List -->
+          <div class="jam-connected-list">
+            <div class="jam-member-item host-item">
+              <span class="jam-avatar">👑</span>
+              <div class="jam-member-meta">
+                <div class="jam-member-name" id="jamHostName">You (Host)</div>
+                <div class="jam-member-role">Broadcasting Station &amp; Timestamps</div>
+              </div>
+              <span class="jam-sync-status">IN SYNC (0ms)</span>
+            </div>
+            <div id="jamPeersList"></div>
+          </div>
+
+          <!-- Live Reaction Bar -->
+          <div class="jam-reaction-section">
+            <div class="jam-reaction-title">
+              <span>Live Reactions</span>
+              <span class="jam-reaction-hint">Tap to burst emojis to everyone</span>
+            </div>
+            <div class="jam-reaction-bar" id="jamReactionBar">
+              <button class="jam-reaction-btn" data-emoji="🔥" title="Fire">🔥</button>
+              <button class="jam-reaction-btn" data-emoji="❤️" title="Love">❤️</button>
+              <button class="jam-reaction-btn" data-emoji="✨" title="Sparkle">✨</button>
+              <button class="jam-reaction-btn" data-emoji="💃" title="Dance">💃</button>
+              <button class="jam-reaction-btn" data-emoji="🎧" title="Vibe">🎧</button>
+              <button class="jam-reaction-btn" data-emoji="⚡" title="Electric">⚡</button>
+              <button class="jam-reaction-btn" data-emoji="🚀" title="Hype">🚀</button>
+              <button class="jam-reaction-btn" data-emoji="🤯" title="Mindblown">🤯</button>
             </div>
           </div>
 
-          <!-- 5-Band Equalizer Sliders -->
-          <div class="eq-sliders-section">
-            <div class="section-label">5-Band Parametric Equalizer</div>
-            <div class="eq-sliders-container">
-              <div class="eq-band">
-                <div class="eq-gain-val" id="eqVal60">0 dB</div>
-                <div class="eq-v-slider-wrap">
-                  <input type="range" class="eq-slider" id="eq60" min="-12" max="12" value="0" step="0.5">
-                </div>
-                <div class="eq-freq-label">60 Hz<br><small>Sub-Bass</small></div>
-              </div>
-              <div class="eq-band">
-                <div class="eq-gain-val" id="eqVal250">0 dB</div>
-                <div class="eq-v-slider-wrap">
-                  <input type="range" class="eq-slider" id="eq250" min="-12" max="12" value="0" step="0.5">
-                </div>
-                <div class="eq-freq-label">250 Hz<br><small>Warmth</small></div>
-              </div>
-              <div class="eq-band">
-                <div class="eq-gain-val" id="eqVal1k">0 dB</div>
-                <div class="eq-v-slider-wrap">
-                  <input type="range" class="eq-slider" id="eq1k" min="-12" max="12" value="0" step="0.5">
-                </div>
-                <div class="eq-freq-label">1.0 kHz<br><small>Vocal</small></div>
-              </div>
-              <div class="eq-band">
-                <div class="eq-gain-val" id="eqVal4k">0 dB</div>
-                <div class="eq-v-slider-wrap">
-                  <input type="range" class="eq-slider" id="eq4k" min="-12" max="12" value="0" step="0.5">
-                </div>
-                <div class="eq-freq-label">4.0 kHz<br><small>Presence</small></div>
-              </div>
-              <div class="eq-band">
-                <div class="eq-gain-val" id="eqVal12k">0 dB</div>
-                <div class="eq-v-slider-wrap">
-                  <input type="range" class="eq-slider" id="eq12k" min="-12" max="12" value="0" step="0.5">
-                </div>
-                <div class="eq-freq-label">12.0 kHz<br><small>Air</small></div>
-              </div>
+          <!-- Live Chat Box -->
+          <div class="jam-chat-container">
+            <div class="jam-chat-header">
+              <span>💬 Live Room Chat</span>
+              <span class="jam-chat-count" id="jamChatMsgCount">0 msgs</span>
+            </div>
+
+            <!-- Messages Stream -->
+            <div class="jam-chat-messages" id="jamChatMessages">
+              <div class="jam-chat-system-msg">Room created! Share invite link or code with friends to jam together.</div>
+            </div>
+
+            <!-- Quick Vibe Presets -->
+            <div class="jam-quick-vibes" id="jamQuickVibes">
+              <button class="jam-vibe-pill" data-msg="Vibe is unreal! ✨">Vibe is unreal! ✨</button>
+              <button class="jam-vibe-pill" data-msg="Turn it up! 🔥">Turn it up! 🔥</button>
+              <button class="jam-vibe-pill" data-msg="This track hits different 📻">This track hits different 📻</button>
+              <button class="jam-vibe-pill" data-msg="Drop the bass! ⚡">Drop the bass! ⚡</button>
+            </div>
+
+            <!-- Chat Input Row -->
+            <div class="jam-chat-input-row">
+              <input type="text" id="jamChatInput" placeholder="Type a message to room..." maxlength="200" autocomplete="off">
+              <button class="jam-chat-send-btn" id="jamChatSendBtn">Send</button>
             </div>
           </div>
+
+          <!-- Leave / End Room Row -->
+          <div class="jam-leave-row">
+            <button class="jam-leave-btn" id="leaveJamBtn">Leave Jam Room</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
           <div class="glass-modal-footer">
             <button class="glass-btn-secondary" id="resetEqBtn">Reset to Flat</button>
@@ -1594,7 +1571,7 @@
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=104.0"></script>
+  <script src="script.js?v=105.0"></script>
 
 
 
