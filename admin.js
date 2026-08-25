@@ -426,7 +426,7 @@
   });
 
   /* ==================== Admin PIN Authentication Gate ==================== */
-  var ADMIN_PIN = '2026';
+  var ADMIN_PIN = 'jessica';
   var AUTH_SESSION_KEY = 'ishq_admin_authenticated';
 
   function initAuth() {
@@ -444,13 +444,13 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var val = (pinInput ? pinInput.value : '').trim();
-        if (val === ADMIN_PIN || val === 'admin2026') {
+        if (val.toLowerCase() === 'jessica') {
           sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
           if (overlay) overlay.classList.add('unlocked');
           showToast('Welcome back, Admin! 🔓');
           loadStations();
         } else {
-          showToast('Incorrect PIN! Access Denied ❌');
+          showToast('Incorrect Password! Access Denied ❌');
           if (pinInput) {
             pinInput.value = '';
             pinInput.focus();
