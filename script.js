@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v125.2') caches.delete(name);
+        if (name !== 'aura-music-v126.0') caches.delete(name);
       });
     });
   }
@@ -2155,14 +2155,23 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     var glyphsContainer = $('bgGlyphs');
     if (!glyphsContainer) return;
 
-    var cleanT = cleanTitle(title);
-    var tokens = (cleanT + ' ' + (artist || ''))
-      .replace(/[♪(),.!?:;\"'—–\-\[\]\d\/\\]/g, ' ')
+    var cleanT = cleanTitle(title || '');
+    var cleanA = (artist || '').replace(/[\[\]\(\)]/g, ' ');
+    
+    // Split into clean, single uppercase words (length 3 to 10 chars)
+    var rawTokens = (cleanT + ' ' + cleanA)
+      .replace(/[♪(),.!?:;"'—–\-\[\]\d\/\\+&]/g, ' ')
       .split(/\s+/)
       .map(function (w) { return w.trim().toUpperCase(); })
-      .filter(function (w) { return w.length >= 4; });
+      .filter(function (w) { return w.length >= 3 && w.length <= 12 && /^[A-Zऀ-ॿ]+$/.test(w); });
 
-    var defaults = ['TIMELESS', 'INFINITY', 'ECHOES', 'CELESTIAL', 'SYMPHONY', 'HORIZON', 'AURA'];
+    // Deduplicate tokens
+    var uniqueTokens = [];
+    rawTokens.forEach(function(t) {
+      if (uniqueTokens.indexOf(t) === -1) uniqueTokens.push(t);
+    });
+
+    var defaults = ['AURA', 'IMMERSION', 'SYMPHONY', 'CELESTIAL', 'INFINITY', 'FREQUENCY', 'VELVET'];
     if (currentStationKey === 'ishq') {
       defaults = ['इश्क़', 'रूहानी', 'सुकून', 'मोहब्बत', 'धड़कन', 'आफ़रीन', 'चाहत'];
     } else if (currentStationKey === 'demand') {
@@ -2170,26 +2179,33 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     } else if (currentStationKey === '90s') {
       defaults = ['NOSTALGIA', 'CLASSIC', 'MELODY', 'EVERGREEN', 'RETRO', 'GOLDEN', 'VINTAGE'];
     } else if (currentStationKey === 'edm') {
-      defaults = ['EUPHORIA', 'MATRIX', 'BASS', 'SYNTH', 'DROP', 'ELECTRIC', 'FREQUENCY'];
+      defaults = ['EUPHORIA', 'MATRIX', 'BASS', 'SYNTH', 'DROP', 'ELECTRIC', 'PULSE'];
     }
 
-    var words = tokens.slice(0, 7);
-    for (var i = 0; i < defaults.length && words.length < 7; i++) {
+    var words = uniqueTokens.slice(0, 6);
+    for (var i = 0; i < defaults.length && words.length < 6; i++) {
       if (words.indexOf(defaults[i]) === -1) words.push(defaults[i]);
+    }
+
+    var centerWord = words[0] || 'TIMELESS';
+    if (uniqueTokens.length > 1) {
+      centerWord = uniqueTokens[0];
+    } else if (currentStation && currentStation.name) {
+      centerWord = currentStation.name.split(' ')[0].toUpperCase();
     }
 
     glyphsContainer.style.opacity = '0';
     setTimeout(function () {
       glyphsContainer.innerHTML =
-        '<span class="glyph g1">' + (words[0] || 'VIBES') + '</span>' +
-        '<span class="glyph g2">' + (words[1] || 'MUSIC') + '</span>' +
-        '<span class="glyph g3">' + (words[2] || 'SOUND') + '</span>' +
-        '<span class="glyph g4">' + (words[3] || 'AURA') + '</span>' +
+        '<span class="glyph g1">' + (words[0] || 'AURA') + '</span>' +
+        '<span class="glyph g2">' + (words[1] || 'SOUND') + '</span>' +
+        '<span class="glyph g3">' + (words[2] || 'ECHO') + '</span>' +
+        '<span class="glyph g4">' + (words[3] || 'VIBE') + '</span>' +
         '<span class="glyph g5">' + (words[4] || 'WAVE') + '</span>' +
-        '<span class="glyph g6">' + (words[5] || 'ECHO') + '</span>' +
-        '<span class="heart-glyph" id="centerHeartGlyph">' + (words[0] || 'TIMELESS') + '</span>';
+        '<span class="glyph g6">' + (words[5] || 'PULSE') + '</span>' +
+        '<span class="heart-glyph" id="centerHeartGlyph">' + centerWord + '</span>';
       glyphsContainer.style.opacity = '1';
-    }, 400);
+    }, 300);
   }
 
 
@@ -7638,21 +7654,22 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       // Assemble Massive Multi-Track Queue (50+ songs minimum per mood)
       var tracks = (mood.seedTracks && mood.seedTracks.length) ? mood.seedTracks.slice() : [];
 
-      // ARTIST STATION EXCLUSIVE - only play real fetched tracks for this artist
-      if (mood.category === 'artist') {
-        var _artistTracks = (typeof ARTIST_TRACKS_CATALOG !== 'undefined' && ARTIST_TRACKS_CATALOG[mood.id]) ? ARTIST_TRACKS_CATALOG[mood.id] : [];
-        _artistTracks.forEach(function(vid) { if (vid && tracks.indexOf(vid) === -1) tracks.push(vid); });
+      // ARTIST STATION EXCLUSIVE — Assemble queue from real artist catalog
+      if (mood.category === 'artist' && typeof ARTIST_TRACKS_CATALOG !== 'undefined') {
+        var _artistList = ARTIST_TRACKS_CATALOG[mood.id] || [];
+        if (_artistList && _artistList.length) {
+          tracks = _artistList.slice();
+        } else if (mood.seedTracks && mood.seedTracks.length) {
+          tracks = mood.seedTracks.slice();
+        }
+        // Shuffle artist tracks
         tracks.sort(function() { return 0.5 - Math.random(); });
-        console.log('\uD83C\uDFA4 Artist Station:', mood.name, tracks.length, 'real tracks');
-        currentTrackQueue = tracks.slice();
-        currentTrackIndex = 0;
-        playSingleTrack(currentTrackQueue[0]);
-        syncPlayerUI();
-        return;
+        console.log('🎤 Artist Station (real catalog):', mood.name, '—', tracks.length, 'tracks');
       }
 
 
-      // 1. Gather all matching tracks from VibeAgent catalog
+      if (mood.category !== 'artist') {
+        // 1. Gather all matching tracks from VibeAgent catalog
       if (typeof VibeAgent !== 'undefined' && VibeAgent.catalog) {
         VibeAgent.catalog.forEach(function (s) {
           if (!s || !s.id) return;
@@ -7714,6 +7731,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
             });
           }
         });
+      }
       }
 
       // Shuffle tracks for unique endless journey every time
