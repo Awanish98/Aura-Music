@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.3') caches.delete(name);
+        if (name !== 'aura-music-v101.4') caches.delete(name);
       });
     });
   }
@@ -1139,17 +1139,78 @@
   var stationSwitchTimer = null;
 
   var STATION_TRACKS = {
-    'time-travel': ['60ItHLz5WEA', 'cl0a3i2wFcc', 'ALZHF5UqnU4', 'Umqb9KENgmk', 'k4yXQkG2s1E'],
-    'ishq': ['Umqb9KENgmk', 'cl0a3i2wFcc', '60ItHLz5WEA', 'k4yXQkG2s1E'],
-    'demanding': ['k4yXQkG2s1E', 'cl0a3i2wFcc', 'Umqb9KENgmk', '60ItHLz5WEA'],
-    '90s': ['YxWlaYCA8MU', 'Umqb9KENgmk', 'cl0a3i2wFcc', '60ItHLz5WEA'],
-    'edm': ['60ItHLz5WEA', 'ALZHF5UqnU4', 'k4yXQkG2s1E', 'cl0a3i2wFcc']
+    'time-travel': [
+      '4NRXx6U8ABQ', // The Weeknd - Blinding Lights
+      'lp-EO5I60KA', // The Weeknd, Daft Punk - Starboy
+      'JGwWNGJdvx8', // Ed Sheeran - Shape of You
+      '7wtfhZwyrcc', // Imagine Dragons - Believer
+      'hT_nvWreIhg', // OneRepublic - Counting Stars
+      'IcrbM1l_BoI', // Avicii - Wake Me Up
+      '60ItHLz5WEA', // Alan Walker - Faded
+      'JRfuAukYTKg', // David Guetta, Sia - Titanium
+      '2Vv-BfVoq4g', // Ed Sheeran - Perfect
+      'fRh_vgS2dFE', // Justin Bieber - Sorry
+      'OPf0YbXqDm0', // Mark Ronson, Bruno Mars - Uptown Funk
+      'V-_O7nl0Ii0', // CKay - Love Nwantiti
+      '8k_4mZ3h8vA', // Sonu Nigam - Kal Ho Naa Ho
+      'cl0a3i2wFcc'  // Ali Sethi, Shae Gill - Pasoori
+    ],
+    'ishq': [
+      'IltsCYPwtjE', // Arijit Singh - Kesariya
+      'BddP6PYo2gs', // Arijit Singh - Apna Bana Le
+      'L_LUpnjgPso', // Arijit Singh - Tum Hi Ho
+      'KUpwupYj_tY', // Arijit Singh - O Maahi
+      'b5f25X2Gvfg', // Vishal Mishra - Pehle Bhi Main
+      'BBAyRZZ9cG4', // Arijit Singh - Satranga
+      'p7i88HqK_4k', // Alka Yagnik, Arijit Singh - Agar Tum Saath Ho
+      '9-aktgL_K6k', // Arijit Singh - Shayad
+      'kJQP7kiw5Fk', // Jubin Nautiyal - Raataan Lambiyan
+      'gvyUuxdRdR4', // Kaifi Khalil - Kahani Suno 2.0
+      '1T3i9Qp54s0', // Jasleen Royal, Arijit Singh - Heeriye
+      'YxWlaYCA8MU', // Anuv Jain - Baarishein
+      '3vK3rZ3n2L0', // Anuv Jain - Husn
+      'mH_ELM-1j18', // Anuv Jain - Jo Tum Mere Ho
+      'l8h_Ww99pT4', // Anuv Jain - Alag Aasmaan
+      'T94PHkuydcw', // AUR - Tu Hai Kahan
+      'Ax0G_P2dSBw', // Arijit Singh - Channa Mereya
+      '2v61_q1gR_A'  // Arijit Singh - Tujhe Kitna Chahne Lage
+    ],
+    'demanding': [
+      'k4yXQkG2s1E', // Diljit Dosanjh - G.O.A.T.
+      'dZ0fwJojhrs', // Karan Aujla - Wavy
+      '6MgsHSAcI98', // Karan Aujla - Winning Speech
+      'qLCLvxTN9UA', // Diljit Dosanjh - Lover
+      '2hK0cZg5tQY', // Karan Aujla, Ikky - Softly
+      'V1Pl8CzNzCw', // Badshah - Tareefan
+      'hEJnMQG562U', // Jasmine Sandlas - Illegal Weapon 2.0
+      'vX2cDW8up28', // Imran Khan - Amplifier
+      'Umqb9KENgmk', // B Praak - Saari Duniya Jalaa Denge
+      'tVLC3Phn4yU', // Arijit Singh, Shilpa Rao, Anirudh - Chaleya
+      '7wtfhZwyrcc', // Imagine Dragons - Believer
+      'OPf0YbXqDm0'  // Bruno Mars - Uptown Funk
+    ],
+    '90s': [
+      '0NV1KdWRHck', // Kumar Sanu, Alka Yagnik - Chura Ke Dil Mera
+      'D7a3m1W0hT0', // Kumar Sanu, Lata Mangeshkar - Tujhe Dekha Toh
+      'sAZvj4M6i6k', // Udit Narayan - Pehla Nasha
+      'm93sJ4a6y_Y', // Alka Yagnik - Tip Tip Barsa Paani
+      '8k_4mZ3h8vA', // Sonu Nigam - Kal Ho Naa Ho
+      'b9p_HjFq78c', // A.R. Rahman - Kun Faya Kun
+      '1u_kH0N7k8w', // A.R. Rahman - Khwaja Mere Khwaja
+      '6vY9o8J3r_4', // Javed Ali, Kailash Kher - Arziyan
+      '4b_W8k9a3M0'  // Rahat Fateh Ali Khan - O Re Piya
+    ],
+    'edm': [
+      'gCYcHz2167o', // Martin Garrix - Animals
+      'IcrbM1l_BoI', // Avicii - Wake Me Up
+      '60ItHLz5WEA', // Alan Walker - Faded
+      'ALZHF5UqnU4', // Marshmello - Alone
+      'JRfuAukYTKg', // David Guetta, Sia - Titanium
+      'ebXbLfLACGM', // Calvin Harris - Summer
+      '4NRXx6U8ABQ', // The Weeknd - Blinding Lights
+      'lp-EO5I60KA'  // The Weeknd - Starboy
+    ]
   };
-
-
-
-
-
 
   var currentTrackIndex = 0;
   var currentTrackQueue = [];
@@ -1172,29 +1233,31 @@
       if (st.id !== currentStationKey) return;
 
       try {
-        if (st.playlistId && player.loadPlaylist) {
+        var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id]) 
+          ? STATION_TRACKS[st.id].slice() 
+          : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0'];
+
+        currentTrackQueue = list.slice();
+        currentTrackIndex = 0;
+        activePlaylistId = 'station_' + st.id;
+
+        if (player.loadPlaylist) {
           if (desired) {
-            player.loadPlaylist({ list: st.playlistId, listType: 'playlist', index: 0 });
-          } else {
-            player.cuePlaylist({ list: st.playlistId, listType: 'playlist', index: 0 });
+            player.loadPlaylist(list, 0, 0);
+          } else if (player.cuePlaylist) {
+            player.cuePlaylist(list, 0, 0);
           }
-          setTimeout(function() {
-            if (player.setShuffle) player.setShuffle(true);
+          setTimeout(function () {
             if (player.setLoop) player.setLoop(true);
-          }, 1000);
-          activePlaylistId = st.playlistId;
+            if (player.setShuffle) player.setShuffle(false);
+          }, 600);
         } else {
-          var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id]) ? STATION_TRACKS[st.id] : ['7wtfhZwyrcc', 'IltsCYPwtjE', '1T3i9Qp54s0'];
-          currentTrackQueue = list.slice();
-          currentTrackIndex = 0;
           var targetVid = list[0];
-          
           if (desired && player.loadVideoById) {
             player.loadVideoById(targetVid);
           } else if (player.cueVideoById) {
             player.cueVideoById(targetVid);
           }
-          activePlaylistId = 'station_' + st.id;
         }
       } catch (e) {
         console.error("Playback load error", e);
@@ -1202,8 +1265,8 @@
 
       show('s-ready');
       VibeAgent.renderVibeUI();
-      setTimeout(update, 200);
-      setTimeout(update, 800);
+      setTimeout(update, 300);
+      setTimeout(update, 900);
     }, 50);
   }
 
@@ -1227,20 +1290,10 @@
         }
       }
 
-      // If a native YouTube playlist is loaded, use native skip methods
-      if (currentStation && currentStation.playlistId) {
-        if (dir === 'next') {
-          player.nextVideo();
-          showToast('Skipping to Next Song ⏭️');
-        } else {
-          player.previousVideo();
-          showToast('Previous Song ⏮️');
-        }
-        return;
-      }
+      var list = (currentTrackQueue && currentTrackQueue.length) 
+        ? currentTrackQueue 
+        : ((typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[currentStationKey]) ? STATION_TRACKS[currentStationKey] : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0']);
 
-      // Fallback for hardcoded arrays
-      var list = (currentTrackQueue && currentTrackQueue.length) ? currentTrackQueue : ((typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[currentStationKey]) ? STATION_TRACKS[currentStationKey] : ['7wtfhZwyrcc', 'IltsCYPwtjE', '1T3i9Qp54s0']);
       if (dir === 'next') {
         currentTrackIndex = (currentTrackIndex + 1) % list.length;
         var nextVid = list[currentTrackIndex];
@@ -5629,9 +5682,7 @@
       update();
     } else if (e.data === YT.PlayerState.ENDED) {
       SleepTimerEngine.onTrackEnded();
-      if (!currentStation || !currentStation.playlistId) {
-        skip('next');
-      }
+      skip('next');
     }
   }
 
@@ -5646,10 +5697,12 @@
       errCount = 0;
       showToast('Tuning to clean frequency… 🎧');
       try {
-        var fallbackList = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[currentStationKey]) ? STATION_TRACKS[currentStationKey] : ['7wtfhZwyrcc', 'IltsCYPwtjE', '1T3i9Qp54s0'];
-        if (player && player.loadPlaylist) {
-          player.loadPlaylist(fallbackList, 0, 0);
-        } else if (player && player.loadVideoById) {
+        var fallbackList = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[currentStationKey]) 
+          ? STATION_TRACKS[currentStationKey] 
+          : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0'];
+        currentTrackQueue = fallbackList.slice();
+        currentTrackIndex = 0;
+        if (player && player.loadVideoById) {
           player.loadVideoById(fallbackList[0]);
         }
       } catch (err) {}
