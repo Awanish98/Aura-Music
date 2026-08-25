@@ -1,4 +1,8 @@
 ﻿(function () {
+// ARTIST_TRACKS_CATALOG — injected by apply_artist_catalog.js (2026-08-25T22:15:40.711Z)
+var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU","MJyKN-8UncM","RLzC55ai0eo","llLmk_eYHwE","xCHsyht5eac","tucWbkH5WX0","cpDyLJkhg0I","k3ijQJjUbTs","GX9x62kFsVU","I9tX-lFUTrw","MRtRcTfszjY","qfdShSZZxlg","FJ55SHCzt88","xitd9mEZIHk","ZmcBC9-wAXM","AgX2II9si7w","lgTHGZF3BQw","ccw-bhwtLTw","Grr0FlC8SQA"],"artist-shreya-ghoshal":["xvT1jH8B9AM","slM5s55Jz0k","CtgD91Ev4NU","asG7cwxi1sA","qWnzMwT6SKo","8Mj-MjMFDxc","TQR70KKYMmQ","inEu2qQuGZ8","w4ClQO0FFQg","Zvp-VBmoPmI","XU3eFkY1BTI","GtNrQy90Ih4","9Bmh6vaQt0s","v3TRtMH6er4","9ScGk-YzK3g","9vqtlgPkzJE","W_1taX0Pvh4","4UkJ-AziPu0","oB_U0hnMqZw","2ibPLYwVM38"],"artist-ap-dhillon":["mZQH8CPQ-wo","slM5s55Jz0k","CbvjhmFVMvA","ZUR5E18dvrA","p2EdDiiVHh4","vX2cDW8LUWk","N8dexd1PqEw","lcw4TDMBjZA","cqP8I5aaud8","nqUN530Rgtw","VNs_cCtdbPc","ma_dtgS_W_w","-wFTG_f-W4c","uLYTr0ZpSKc","2FhgKp_lfJQ","LlJxnlFDRz4","Vd7F5VHz5BI","xARHpBzxFNI","UwRo4iZZb0I","sdhsp6NaB-A"],"artist-badshah":["mePu74AKLDc","AOWrGJcNdoE","sY45iA7PFS8","Y__aIPk_x3M","mCKbvedLakE","ksY3wb4vtlA","CeFQO9MQNqs","Zrt77f7nTqY","Mi-Q1KM9Xtk","dUaCEs3HfdI","68Sw7GFl2y8","ciLGHX_mq48","JRKk7gxcpMc","Jyst8oIHOAY","9v5-9ovoTGE","2UwxHhkK-3c","EYsYY_SfX0A","lAUf0q711Ew","Ci0WbaUH3no","GaBEcipbuGE"],"artist-taylor-swift":["ko70cExuzZM","tCXGJQYZ9JA","RsEZmictANA","h8DLofLM7No","b7QlX3yR2xs","b1kbLwvqugk","5UMCrq-bBCg","lVkKLf4DCn8","e-ORhEE9VVg","1FVF-9KQiPo","-BjZmE2gtdo","AqAJLh9wuZ0","-CmadmM5cOk","XzOvgu3GPwY","wIft-t-MQuE","WqbJT_vC0rs","QcIy9NiNbmo","IdneKLhsWOQ","dfnCAmr569k","q3zqJs7JUCQ"],"artist-the-weeknd":["Mx92lTYxrJQ","dMoFcvfd5t4","Wh8DT09QCHI","4NRXx6U8ABQ","JZjAg6fK-BQ","2kjolTLZ_Mg","JPIhUaONiLU","1DpH-icPpl0","2fDzCWNS3ig","HxilwT1sKSo","vt0i6nuqNEo","1XqIWr_WqM4","bn8gP5N8hqM","rhTl_OyehF8","u9n7Cw-4_HQ","16jA-6hiSUo","ZGDGdRIxvd0","2_ScGcuXZqc","34Na4j8AVgA","kBsycvSU6r8"],"artist-diljit-dosanjh":["cl0a3i2wFcc","kwhfmFhQ_fc","CGhGAVH2GqY","WVq1siHnPxI","jADTdg-o8i0","-mgGnx1p3b8","WDOVxqsD3fs","XsbcM-lFpR0","g-Ij0idc_dk","mH_LFkWxpI0","9wTEmuv6SvU","UpN1swlT1eU","dCmp56tSSmA","ZQkUYmaVwgs","YwtvQ23_-34","hNgI9E_-v24","6_RjqNWs5PY","6nxrllqnP2Q","vl-INBHLdQg","QCEk-IvmaHc"],"artist-atif-aslam":["P8PWN1OmZOA","ZGw4akYqcVw","ZNpibYapJ4k","K7o9fUEP3GU","rs5gAjNytAo","B-J_PuEhyOM","uCMYzolEbO0","SxTYjptEzZs","Wh-AgS7PKdM","Q-SRyoGMVAE","MnR5YqU-0GI","FLKxnL7KwHw","zuvla6ABKbs","GmbOGB91CYg","yIrU21hoHys","jFmi69lb8sQ","Jv2Z9KJgYjU","rkWJyMhIWLo","Sh3rF46yoKU","2vRdzTzR4tI"],"artist-kishore-kumar":["rBqmGVp_XKw","yIzCBU0_LyY","CeO-2xTCDTU","ebw1zHtleFY","l3Q_zHd3kCA","rmuxljx4_m8","S0WPSYFm7iE","hHv5xFzxBWk","Fm7AuSHG9mU","Sl9o_b3kQCI","AMuRRXCuy-4","rqSk9EaKuuM","c_my5B15ENU","I_7bOY_t-GY","z2D07xPpzDk","bwWprAAOyy8","cvQWzlNIjt8","fuY2BGi2hAM","sPiOMuvzSI8","wu2tPGh5PN0"],"artist-sidhu-moosewala":["GgmFC8y8q3k","lJZ8wWCnwow","tpFljbJxZiw","6xoB4ZiKKn0","seEO3--Sy3c","-CJ3_0vyzNs","8ZHMFtQ6Z7E","7DPcBQ1sjX4","M8vDwlHigJA","iU7cDCmEiUw","uKAPYLvDJFQ","c8UUWkUJu6E","GFUJ5mG_4NI","huh62ms0Hd4","MyYAglA_Cdk","n8M1PvCyKwA","7uVIzQYdbGk","Eu-CJl1bsIU","1mzP0yIdHuY","9VGJdP5HtZc"],"artist-arman-malik":["J3JKPL2UQTQ","OYKFJxUxiYk","VhnHsoFm2nY","sfczxZvp2c4","6aOAskg67Vw","Pzy6SYUFd08","OqZRzQrFPz4","rWUlDAHk1mM","JvjWj2bJMpU","hF-kSNhXVlQ","GsdYjCLcpN4","lvJrFoglKL0","f1qz8vn3XbY","KNAMgkibaAA","7BZYeZOGe6w","xlvvjl5kAQw","5Up8XW-K-Ik","_yOYV-j_3jU","nKGECvWPGvI","EpEraRui1pc"],"artist-kk":["Tl4KpUpOOwo","r0c1f6XxRQg","U2QNhsAgIIE","Gg6NMU4ivXM","6IZTssBAXjo","mWBvudKcByg","-FP2Cmc7zj4","-8C_2BBVWk8","xzUVPN68Ym4","VWbnpjhLVAU","0lladZqixyk","DCs6vOe4Cpw","r9HT2npCMu4","qCSEPdY38BE","MT7Oe-v95gs","P_Q3-Xo3GAE","fVeJ6sJERR4","6esVbMI1nUs","BTIt38YyUxY","NUqlCJTYu6I"],"artist-drake":["SD4yRDY9mek","JffHTWti1es","xpVfcZ0ZcFM","QW29Ly55Kvs","JFm7YDVlqnI","bpD-JVy2zV4","Iu9xmEaHwpU","GGOyFnrZRt0","YhUqxWR4mnE","8ekJMC8OtGU","vX9msKu75qs","ipOSrQNrp1U","AnZcWgXZOKM","7EUVJaKJtBY","Xty2gi5cMa8","sOreUnGoIMg","eDuRoPIOBjE","uxpDa-c-4Mc","xWggTb45brM","l0U7SxXHkPY"],"artist-lata-mangeshkar":["aS_NfWJzPN8","ozh7bO6wATk","jTcbNZnzXQA","DEnc-W62K8o","y1aASL9E1Jw","BV0-rrdPJKw","MjVRG2VV1kA","wI50w-uttTA","-W3hN8dgAy4","NNujbqRyJuM","9w5iETwBs2o","lnZDyHcb9Gc","TFr6G5zveS8","gI7hyn18Xn8","9FrnI0owFvU","PRXM6b-uYp0","3opqnyG7QzI","NbqCWwlNKrA","_lgACMqCpus","iZUcBGRoLqo"],"artist-rahat-fateh-ali-khan":["DpmbOSGliko","0w62ddeVwGE","71_ORVGqFoM","6-n_szx2XRE","lrkaKvhRnEI","ZT4Jp3ZwYmQ","iv7lcUkFVSc","EJX8iCVuN-4","QW_5uoG2q90","38E3wZOBJ78","kTXilT_KbUM","kw4tT7SCmaY","q8gilwzNQEA","6hjJZv_68vI","pHu4PLhuKgQ","oBIx6tsc1Mk","xhVZ3KCMTfY","HqjPEwhiWcE","VgbGdfCyx48","iCe_el15SIw"],"artist-nucleya":["L1yVXl_Bwxs","l12_JIQ2TqA","38sxoUr6imE","S6AqAu1M_3Y","hau4eBQuGmo","Adjgcp-SvD0","slNebO7Yips","k_jqs-mzqpo","z6H7QX0fQrE","-KN93JPAk9A","UvkfucnFIVM","WaCj4ypsjXA","dSnlGDSy_fQ","fW8xbPER-yQ","kmjeMrjOjFA"],"artist-neha-kakkar":["uBaqgt5V0mU","L9CfCjedhPE","xtgC88yFXeM","Mi_NZVns1Ow","g8Zd_8vAsmc","VAZxSoKb65o","NNJzHK7PGm8","GGZW9sLl1bg","g4HDfqEWf6Y","3bFOs6Xbjho","ckkrXYU-pi0","un2HVdq4dfw","1wnueB7Wrz0","mp5nanjOul8","pEO2a7QzXqQ","UBOHA9a5NIQ","N2-HsIYd0Go","NP6r1YKmo7g","lX3vT_Gm_HE","FmphinKI_nI"],"artist-arjun-kanungo":["L3HabXRXfmw","qMfvbKBvOtI","PHULePbksEU","eWjGh61Gacg","I__sgfKQK40","gMd1gggQdL8","rVg5Hc4Yzho","23-3FDx4GKY","9KC5k-1LPFg","lnCRYGpUFnA","UdQ5v2ZV6QE","7PqPsQ9rjdE","lOsywhsG9d4","tqBTGJ3FXRE","qxvL7fi75ks"],"artist-punjabi-mc":["9wG4C42JhN4","vB0V3iCSzQw","DTSW39pyMqA","c-FKlE3_kHo","knGCfzm4jWs","hjWf8A0YNSE","iOgR7hi90Ac","oLTe_ZXIEdE","aNwWdF8qq-M","8nGFWWJLHio","NCiUygW9MzE","8e1S7Y5KAFM","-bFVpn1uMfo","cajMxG9Y-Dk","pLhNdJNwGC8","mGbkArS9Eyo","ng1b6PGimnM","cyUnbQ2IK_w","dZ0fwJojhrs","TCx1yMegJ4A"],"artist-ed-sheeran":["2Vv-BfVoq4g","lp-EO5I60KA","JGwWNGJdvx8","orJSJGHjBLI","JgDNFQ2RaLQ","Il0S8BoucSA","mj0XInqZMHY","87gWaABqGYs","K0ibBPhiaG0","y83x7MgzWOA","MI9ZpIKgyf0","FOjdXSrtUxA","O_0Wn73AnC8","ryJgDL9jzKk","Cf1hKtrA9lg","23g5HBOg3Ic","nSDgHBxUbVQ","iD2rhdFRehU","u6wOyMUs74I","k6ZoE4RrcDs"],"artist-billie-eilish":["S2dRcipMCpw","V9PVRfjEBTI","DyDfgMOUjCI","5GJWxDKyk3A","V1Pl8CzNzCw","-PZsSWwc9xA","EgBJmlPo8Xw","pbMwTqkKSps","huGd4efgdPA","BY_XwvKogC8","RUQl6YcMalg","HUHC9tYz8ik","OORBa32WFcM","MB3VkzPdgLA","gBRi6aZJGj4","viimfQi_pUw","coLerbRvgsQ","G_BhUxx-cwk","cW8VLC9nnTo","fzeWc3zh01g"],"artist-vishal-shekhar":["p062GuAhsRs","t10sQb0Zmjs","qFkNATtc3mc","8fYPCU7FSGk","jZyAB2KFDls","b8--JS9lRnI","dodDteh-m3Q","yFZvQ1Uv358","-m9IGI5EgyM","Jdf7puMEAqQ","HoCwa6gnmM0","Z3m0eWcP8n8","huxhqphtDrM","d4_szl5EEww","lpoUDudB35c"],"artist-imagine-dragons":["7wtfhZwyrcc","mWRsgZuwf_8","fKopy74weus","TO-_3tck2tg","gOsM-DYAEhY","I-QfPUz1es8","vOXZkm9p_zY","v08qmr8m_-w","ktvTqknDobU","k3zimSRKqNw","sENM2wA_FTg","D9G1VOjN_84","R4AbzwYOmNE","0I647GU3Jsc","NeUfmyu5t8Q","Te3_VlimRw0","Y2NkuFIlLEo","F5tSoaJ93ac","w5tWYmIOWGk","p5TGgp8t440"],"artist-a-r-rahman":["IGti1RTS1wc","Y_dGio-KbT4","_mwqXnTEHSc","dfNdRsNSFx4","Y6WV7v4zuNM","gpVA5mx73UE","9V9TAQZzBKQ","uVcRWDoj30I","xwwAVRyNmgQ","CSCnZdSLoA4","uinBpHT-AxM","S1aQhVUy_9g","jDn2bn7_YSM","5CttV9rxhic","OizkdfoOArY","ugFirDxbdho","AGsn2ycFRqI","7nIZ5hLru80","_9geEbZIAJM","MD9CORbY8lc"],"artist-yo-yo-honey-singh":["NbyHNASFi6U","TvngY4unjn4","NrXdauEv9HY","b5N-qIMbJz4","MfY9YO3u7GM","TwFBtV13KQQ","JF42RpxAEko","a-PAcmi5Kas","r7voxxo9rj8","dHsV56I1GwE","q1wK0r51ARs","13uzQU0mfnM","-Al-S1uishM","uaCYeQ9FtSI","gAt_hSIIUMU","XO8wew38VM8","AmrRPNwrGQU","EWRBHho2b_E","Tkgad9gngOQ","x8F5dz8kv1w"]};
+// ARTIST_TRACKS_CATALOG END
+
   var DB_VERSION_KEY = 'ishq_db_version';
   var CURRENT_DB_VERSION = 'v106.0';
   var STORAGE_KEY = 'ishq_custom_stations';
@@ -191,7 +195,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v125.0') caches.delete(name);
+        if (name !== 'aura-music-v125.1') caches.delete(name);
       });
     });
   }
@@ -6943,7 +6947,7 @@
         glyphs: ['ARIJIT', 'SOUL', 'HEART', 'DARD', 'AWAAZ', 'FEELS'],
         genres: ['romance', 'soul', 'bollywood'],
         size: 'hero',
-        seedTracks: ['Umqb9KENgmk', 'SdT6M3Z8KTs', 'mH_ELM-1j18', 'JhtP7NnXMtA', 'gvyUuxdRdR4', 'b5f25X2Gvfg', 'BddP6PYo2gs', 'L_LUpnjgPso', 'KUpwupYj_tY', '1T3i9Qp54s0', 'IltsCYPwtjE', 'tVLC3Phn4yU', 'p7i88HqK_4k', 'Ax0G_P2dSBw', 'hLQl3WQQoQ0']
+        seedTracks: ["nDjloeIB3Pc","O5gwxm3NxFU","MJyKN-8UncM","RLzC55ai0eo","llLmk_eYHwE","xCHsyht5eac","tucWbkH5WX0","cpDyLJkhg0I","k3ijQJjUbTs","GX9x62kFsVU","I9tX-lFUTrw","MRtRcTfszjY","qfdShSZZxlg","FJ55SHCzt88","xitd9mEZIHk"]
       },
       {
         id: 'artist-shreya-ghoshal',
@@ -6960,7 +6964,7 @@
         glyphs: ['SHREYA', 'MELODY', 'QUEEN', 'VOICE', 'GOLDEN', 'NOTES'],
         genres: ['romance', 'soul', 'bollywood'],
         size: 'tall',
-        seedTracks: ['BBAyRZZ9cG4', 'YQHsXMglC9A', 'kJQP7kiw5Fk', 'BddP6PYo2gs', 'wQ-UNBFmRWU', 'hLQl3WQQoQ0', 'KUpwupYj_tY', 'b5f25X2Gvfg', 'L_LUpnjgPso']
+        seedTracks: ["xvT1jH8B9AM","slM5s55Jz0k","CtgD91Ev4NU","asG7cwxi1sA","qWnzMwT6SKo","8Mj-MjMFDxc","TQR70KKYMmQ","inEu2qQuGZ8","w4ClQO0FFQg","Zvp-VBmoPmI","XU3eFkY1BTI","GtNrQy90Ih4","9Bmh6vaQt0s","v3TRtMH6er4","9ScGk-YzK3g"]
       },
       {
         id: 'artist-ap-dhillon',
@@ -6977,7 +6981,7 @@
         glyphs: ['AP', 'DHILLON', 'BROWN', 'MUNDE', 'DESI', 'DRIP'],
         genres: ['punjabi', 'pop', 'global'],
         size: 'wide',
-        seedTracks: ['dJvAQbTrJtM', 'Vkq9fS3NMTM', '5NG2-TeBOWA', 'rIzEIiPDNlI', 'XSwreBpMjKE', 'vANl-eM9FnU', 'g0_sPn8-Teo', '8GjbJOHhJhI', 'I0lmj9j2r0M']
+        seedTracks: ["mZQH8CPQ-wo","slM5s55Jz0k","CbvjhmFVMvA","ZUR5E18dvrA","p2EdDiiVHh4","vX2cDW8LUWk","N8dexd1PqEw","lcw4TDMBjZA","cqP8I5aaud8","nqUN530Rgtw","VNs_cCtdbPc","ma_dtgS_W_w","-wFTG_f-W4c","uLYTr0ZpSKc","2FhgKp_lfJQ"]
       },
       {
         id: 'artist-badshah',
@@ -6994,7 +6998,7 @@
         glyphs: ['BADSHAH', 'KING', 'BANGER', 'HIP', 'HOP', 'PARTY'],
         genres: ['energy', 'punjabi', 'pop'],
         size: 'normal',
-        seedTracks: ['qpgCP8VMQWU', 'YVbAKAjgW9Q', 'V3P7cHqRMIk', '7lKiKQQKpvA', 'VBCK8s_3Wz4', 'rcJa74R9C0E']
+        seedTracks: ["mePu74AKLDc","AOWrGJcNdoE","sY45iA7PFS8","Y__aIPk_x3M","mCKbvedLakE","ksY3wb4vtlA","CeFQO9MQNqs","Zrt77f7nTqY","Mi-Q1KM9Xtk","dUaCEs3HfdI","68Sw7GFl2y8","ciLGHX_mq48","JRKk7gxcpMc","Jyst8oIHOAY","9v5-9ovoTGE"]
       },
       {
         id: 'artist-taylor-swift',
@@ -7011,7 +7015,7 @@
         glyphs: ['TAYLOR', 'FEARLESS', 'ERAS', 'FOLKLORE', 'SWIFTIE', 'LOVE'],
         genres: ['pop', 'global', 'chill'],
         size: 'hero',
-        seedTracks: ['nfWlot6h_JM', 'e-ORhEE9VVg', 'WA4iX5D9Z64', '-BjZmE2gtdo', 'IconW_PIiMg', 'q3zqJs7JUCQ', 'lp-EBW_Mfes', 'tolm7amtJBw']
+        seedTracks: ["ko70cExuzZM","tCXGJQYZ9JA","RsEZmictANA","h8DLofLM7No","b7QlX3yR2xs","b1kbLwvqugk","5UMCrq-bBCg","lVkKLf4DCn8","e-ORhEE9VVg","1FVF-9KQiPo","-BjZmE2gtdo","AqAJLh9wuZ0","-CmadmM5cOk","XzOvgu3GPwY","wIft-t-MQuE"]
       },
       {
         id: 'artist-the-weeknd',
@@ -7028,7 +7032,7 @@
         glyphs: ['WEEKND', 'DARK', 'STARBOY', 'NIGHT', 'AFTER', 'HOURS'],
         genres: ['pop', 'global', 'energy'],
         size: 'tall',
-        seedTracks: ['fHI8X4OXluQ', 'XXYlFuWiqLg', '4NRXx6U8BFQ', 'ygTZZpVkmKg', 'KEI4qSrkPAs']
+        seedTracks: ["Mx92lTYxrJQ","dMoFcvfd5t4","Wh8DT09QCHI","4NRXx6U8ABQ","JZjAg6fK-BQ","2kjolTLZ_Mg","JPIhUaONiLU","1DpH-icPpl0","2fDzCWNS3ig","HxilwT1sKSo","vt0i6nuqNEo","1XqIWr_WqM4","bn8gP5N8hqM","rhTl_OyehF8","u9n7Cw-4_HQ"]
       },
       {
         id: 'artist-diljit-dosanjh',
@@ -7045,7 +7049,7 @@
         glyphs: ['DILJIT', 'GOAT', 'LOVER', 'PUNJAB', 'PUTTAR', 'FIRE'],
         genres: ['punjabi', 'pop'],
         size: 'wide',
-        seedTracks: ['DKPVHvXe8oM', 'D1bBiZLxJCc', '6oJcFg0e0kI', 'JBIGnQ5t4iE', 'K8A_oMJRiP0', 'f60fEjilOHE', 'MkmF5cCuRhU']
+        seedTracks: ["cl0a3i2wFcc","kwhfmFhQ_fc","CGhGAVH2GqY","WVq1siHnPxI","jADTdg-o8i0","-mgGnx1p3b8","WDOVxqsD3fs","XsbcM-lFpR0","g-Ij0idc_dk","mH_LFkWxpI0","9wTEmuv6SvU","UpN1swlT1eU","dCmp56tSSmA","ZQkUYmaVwgs","YwtvQ23_-34"]
       },
       {
         id: 'artist-atif-aslam',
@@ -7062,7 +7066,7 @@
         glyphs: ['ATIF', 'AADAT', 'DARD', 'SOUL', 'AWAAZ', 'RAAT'],
         genres: ['romance', 'soul', 'bollywood'],
         size: 'normal',
-        seedTracks: ['BF7y1AJTQtM', '3DqQopSfMqQ', '6uRijJLhFLI', 'YxWlaYCA8MU', '2Vv-BfVoq4g', 'hLQl3WQQoQ0']
+        seedTracks: ["P8PWN1OmZOA","ZGw4akYqcVw","ZNpibYapJ4k","K7o9fUEP3GU","rs5gAjNytAo","B-J_PuEhyOM","uCMYzolEbO0","SxTYjptEzZs","Wh-AgS7PKdM","Q-SRyoGMVAE","MnR5YqU-0GI","FLKxnL7KwHw","zuvla6ABKbs","GmbOGB91CYg","yIrU21hoHys"]
       },
       {
         id: 'artist-kishore-kumar',
@@ -7079,7 +7083,7 @@
         glyphs: ['KISHORE', 'CLASSIC', 'GOLDEN', 'ERA', 'LEGEND', 'AWAAZ'],
         genres: ['retro', 'bollywood', 'romance'],
         size: 'normal',
-        seedTracks: ['2Vv-BfVoq4g', 'mH_ELM-1j18', 'YxWlaYCA8MU', '1T3i9Qp54s0', 'p7i88HqK_4k']
+        seedTracks: ["rBqmGVp_XKw","yIzCBU0_LyY","CeO-2xTCDTU","ebw1zHtleFY","l3Q_zHd3kCA","rmuxljx4_m8","S0WPSYFm7iE","hHv5xFzxBWk","Fm7AuSHG9mU","Sl9o_b3kQCI","AMuRRXCuy-4","rqSk9EaKuuM","c_my5B15ENU","I_7bOY_t-GY","z2D07xPpzDk"]
       },
       {
         id: 'artist-sidhu-moosewala',
@@ -7096,7 +7100,7 @@
         glyphs: ['295', 'SYL', 'MOOSA', 'LEGEND', 'JATT', 'REAL'],
         genres: ['punjabi', 'energy'],
         size: 'wide',
-        seedTracks: ['5WPTUNlCHOQ', 'ElR_4Z3dvZo', 'vNL_2Qh5f70', 'a-0Xt7doaW8', 'LzuvOEe5A5Y']
+        seedTracks: ["GgmFC8y8q3k","lJZ8wWCnwow","tpFljbJxZiw","6xoB4ZiKKn0","seEO3--Sy3c","-CJ3_0vyzNs","8ZHMFtQ6Z7E","7DPcBQ1sjX4","M8vDwlHigJA","iU7cDCmEiUw","uKAPYLvDJFQ","c8UUWkUJu6E","GFUJ5mG_4NI","huh62ms0Hd4","MyYAglA_Cdk"]
       },
       {
         id: 'artist-arman-malik',
@@ -7113,7 +7117,7 @@
         glyphs: ['ARMAAN', 'HERO', 'YOUNG', 'SOUL', 'FRESH', 'BOLLY'],
         genres: ['romance', 'pop', 'bollywood'],
         size: 'normal',
-        seedTracks: ['tVLC3Phn4yU', 'BddP6PYo2gs', 'L_LUpnjgPso', 'IltsCYPwtjE', 'KUpwupYj_tY']
+        seedTracks: ["J3JKPL2UQTQ","OYKFJxUxiYk","VhnHsoFm2nY","sfczxZvp2c4","6aOAskg67Vw","Pzy6SYUFd08","OqZRzQrFPz4","rWUlDAHk1mM","JvjWj2bJMpU","hF-kSNhXVlQ","GsdYjCLcpN4","lvJrFoglKL0","f1qz8vn3XbY","KNAMgkibaAA","7BZYeZOGe6w"]
       },
       {
         id: 'artist-kk',
@@ -7130,7 +7134,7 @@
         glyphs: ['KK', 'PAL', 'YAARON', 'IMMORTAL', 'VOICE', 'FOREVER'],
         genres: ['romance', 'soul', 'bollywood'],
         size: 'tall',
-        seedTracks: ['Ax0G_P2dSBw', 'hLQl3WQQoQ0', 'b5f25X2Gvfg', 'gvyUuxdRdR4', 'BddP6PYo2gs']
+        seedTracks: ["Tl4KpUpOOwo","r0c1f6XxRQg","U2QNhsAgIIE","Gg6NMU4ivXM","6IZTssBAXjo","mWBvudKcByg","-FP2Cmc7zj4","-8C_2BBVWk8","xzUVPN68Ym4","VWbnpjhLVAU","0lladZqixyk","DCs6vOe4Cpw","r9HT2npCMu4","qCSEPdY38BE","MT7Oe-v95gs"]
       },
       {
         id: 'artist-drake',
@@ -7147,7 +7151,7 @@
         glyphs: ['DRAKE', 'OVO', '6GOD', 'TORONTO', 'PLAN', 'WAVE'],
         genres: ['pop', 'global', 'energy'],
         size: 'normal',
-        seedTracks: ['xpVfcZ0ZcFM', '4Abxo9OtBe0', 'uxpDa-c-4Mc', 'CvBfHwUxHIk', 'tEdM9HMtFBM']
+        seedTracks: ["SD4yRDY9mek","JffHTWti1es","xpVfcZ0ZcFM","QW29Ly55Kvs","JFm7YDVlqnI","bpD-JVy2zV4","Iu9xmEaHwpU","GGOyFnrZRt0","YhUqxWR4mnE","8ekJMC8OtGU","vX9msKu75qs","ipOSrQNrp1U","AnZcWgXZOKM","7EUVJaKJtBY","Xty2gi5cMa8"]
       },
       {
         id: 'artist-lata-mangeshkar',
@@ -7164,7 +7168,7 @@
         glyphs: ['LATA', 'DIDI', 'DIVINE', 'CLASSIC', 'INDIA', 'ETERNAL'],
         genres: ['retro', 'romance', 'bollywood'],
         size: 'wide',
-        seedTracks: ['YxWlaYCA8MU', '2Vv-BfVoq4g', 'mH_ELM-1j18', '1T3i9Qp54s0', 'BBAyRZZ9cG4']
+        seedTracks: ["aS_NfWJzPN8","ozh7bO6wATk","jTcbNZnzXQA","DEnc-W62K8o","y1aASL9E1Jw","BV0-rrdPJKw","MjVRG2VV1kA","wI50w-uttTA","-W3hN8dgAy4","NNujbqRyJuM","9w5iETwBs2o","lnZDyHcb9Gc","TFr6G5zveS8","gI7hyn18Xn8","9FrnI0owFvU"]
       },
       {
         id: 'artist-rahat-fateh-ali-khan',
@@ -7181,7 +7185,7 @@
         glyphs: ['RAHAT', 'AFREEN', 'SUFI', 'SOUL', 'QAWWALI', 'DIVINE'],
         genres: ['sufi', 'soul', 'romance'],
         size: 'normal',
-        seedTracks: ['b9p_HjFq78c', 'cl0a3i2wFcc', '1u_kH0N7k8w', 'BBAyRZZ9cG4', 'hLQl3WQQoQ0']
+        seedTracks: ["DpmbOSGliko","0w62ddeVwGE","71_ORVGqFoM","6-n_szx2XRE","lrkaKvhRnEI","ZT4Jp3ZwYmQ","iv7lcUkFVSc","EJX8iCVuN-4","QW_5uoG2q90","38E3wZOBJ78","kTXilT_KbUM","kw4tT7SCmaY","q8gilwzNQEA","6hjJZv_68vI","pHu4PLhuKgQ"]
       },
       {
         id: 'artist-nucleya',
@@ -7198,7 +7202,7 @@
         glyphs: ['NUCLEYA', 'BASS', 'DESI', 'EDM', 'DROP', 'BOOM'],
         genres: ['energy', 'edm', 'global'],
         size: 'normal',
-        seedTracks: ['YxWlaYCA8MU', 'mH_ELM-1j18', '1T3i9Qp54s0', 'p7i88HqK_4k']
+        seedTracks: ["L1yVXl_Bwxs","l12_JIQ2TqA","38sxoUr6imE","S6AqAu1M_3Y","hau4eBQuGmo","Adjgcp-SvD0","slNebO7Yips","k_jqs-mzqpo","z6H7QX0fQrE","-KN93JPAk9A","UvkfucnFIVM","WaCj4ypsjXA","dSnlGDSy_fQ","fW8xbPER-yQ","kmjeMrjOjFA"]
       },
       {
         id: 'artist-neha-kakkar',
@@ -7215,7 +7219,7 @@
         glyphs: ['NEHA', 'DILBAR', 'QUEEN', 'PARTY', 'HITS', 'DANCE'],
         genres: ['pop', 'bollywood', 'energy'],
         size: 'normal',
-        seedTracks: ['BddP6PYo2gs', 'KUpwupYj_tY', 'tVLC3Phn4yU', 'L_LUpnjgPso', 'IltsCYPwtjE']
+        seedTracks: ["uBaqgt5V0mU","L9CfCjedhPE","xtgC88yFXeM","Mi_NZVns1Ow","g8Zd_8vAsmc","VAZxSoKb65o","NNJzHK7PGm8","GGZW9sLl1bg","g4HDfqEWf6Y","3bFOs6Xbjho","ckkrXYU-pi0","un2HVdq4dfw","1wnueB7Wrz0","mp5nanjOul8","pEO2a7QzXqQ"]
       },
       {
         id: 'artist-arjun-kanungo',
@@ -7232,7 +7236,7 @@
         glyphs: ['ARJUN', 'INDIE', 'CHILL', 'POP', 'BAAKI', 'SAB'],
         genres: ['chill', 'pop', 'romance'],
         size: 'normal',
-        seedTracks: ['YxWlaYCA8MU', 'mH_ELM-1j18', 'KUpwupYj_tY', 'b5f25X2Gvfg']
+        seedTracks: ["L3HabXRXfmw","qMfvbKBvOtI","PHULePbksEU","eWjGh61Gacg","I__sgfKQK40","gMd1gggQdL8","rVg5Hc4Yzho","23-3FDx4GKY","9KC5k-1LPFg","lnCRYGpUFnA","UdQ5v2ZV6QE","7PqPsQ9rjdE","lOsywhsG9d4","tqBTGJ3FXRE","qxvL7fi75ks"]
       },
       {
         id: 'artist-punjabi-mc',
@@ -7249,7 +7253,7 @@
         glyphs: ['GURU', 'SUIT', 'GABRU', 'PARTY', 'PUNJABI', 'POP'],
         genres: ['punjabi', 'pop', 'energy'],
         size: 'normal',
-        seedTracks: ['tVLC3Phn4yU', 'L_LUpnjgPso', 'IltsCYPwtjE', 'BddP6PYo2gs']
+        seedTracks: ["9wG4C42JhN4","vB0V3iCSzQw","DTSW39pyMqA","c-FKlE3_kHo","knGCfzm4jWs","hjWf8A0YNSE","iOgR7hi90Ac","oLTe_ZXIEdE","aNwWdF8qq-M","8nGFWWJLHio","NCiUygW9MzE","8e1S7Y5KAFM","-bFVpn1uMfo","cajMxG9Y-Dk","pLhNdJNwGC8"]
       },
       {
         id: 'artist-ed-sheeran',
@@ -7266,7 +7270,7 @@
         glyphs: ['ED', 'SHEERAN', 'SHAPE', 'PERFECT', 'LOVE', 'GUITAR'],
         genres: ['pop', 'global', 'chill'],
         size: 'normal',
-        seedTracks: ['JGwWNGJdvx8', 'lp-EBW_Mfes', 'q3zqJs7JUCQ', 'tolm7amtJBw', 'nfWlot6h_JM']
+        seedTracks: ["2Vv-BfVoq4g","lp-EO5I60KA","JGwWNGJdvx8","orJSJGHjBLI","JgDNFQ2RaLQ","Il0S8BoucSA","mj0XInqZMHY","87gWaABqGYs","K0ibBPhiaG0","y83x7MgzWOA","MI9ZpIKgyf0","FOjdXSrtUxA","O_0Wn73AnC8","ryJgDL9jzKk","Cf1hKtrA9lg"]
       },
       {
         id: 'artist-billie-eilish',
@@ -7283,7 +7287,7 @@
         glyphs: ['BILLIE', 'EILISH', 'BAD', 'GUY', 'DARK', 'ALT'],
         genres: ['pop', 'global', 'chill'],
         size: 'tall',
-        seedTracks: ['DyDfgMOUjCI', 'H5v3kku4y6Q', 'F4-SxcCO3r8', 'Ah0Ys50CqO8']
+        seedTracks: ["S2dRcipMCpw","V9PVRfjEBTI","DyDfgMOUjCI","5GJWxDKyk3A","V1Pl8CzNzCw","-PZsSWwc9xA","EgBJmlPo8Xw","pbMwTqkKSps","huGd4efgdPA","BY_XwvKogC8","RUQl6YcMalg","HUHC9tYz8ik","OORBa32WFcM","MB3VkzPdgLA","gBRi6aZJGj4"]
       },
       {
         id: 'artist-vishal-shekhar',
@@ -7300,7 +7304,7 @@
         glyphs: ['VISHAL', 'SHEKHAR', 'SCORE', 'FILM', 'BOLLY', 'HITS'],
         genres: ['bollywood', 'romance', 'energy'],
         size: 'normal',
-        seedTracks: ['BddP6PYo2gs', 'tVLC3Phn4yU', 'L_LUpnjgPso', 'IltsCYPwtjE', 'KUpwupYj_tY']
+        seedTracks: ["p062GuAhsRs","t10sQb0Zmjs","qFkNATtc3mc","8fYPCU7FSGk","jZyAB2KFDls","b8--JS9lRnI","dodDteh-m3Q","yFZvQ1Uv358","-m9IGI5EgyM","Jdf7puMEAqQ","HoCwa6gnmM0","Z3m0eWcP8n8","huxhqphtDrM","d4_szl5EEww","lpoUDudB35c"]
       },
       {
         id: 'artist-imagine-dragons',
@@ -7317,7 +7321,7 @@
         glyphs: ['BELIEVER', 'THUNDER', 'DEMONS', 'DRAGON', 'ENEMY', 'FIRE'],
         genres: ['pop', 'global', 'energy'],
         size: 'wide',
-        seedTracks: ['ktvTqknDobU', 'W7roPdLX9Gs', 'mWRsgZuwf_8', 'IGVZKVKP_Vo', 'f-OFP-IE7PU']
+        seedTracks: ["7wtfhZwyrcc","mWRsgZuwf_8","fKopy74weus","TO-_3tck2tg","gOsM-DYAEhY","I-QfPUz1es8","vOXZkm9p_zY","v08qmr8m_-w","ktvTqknDobU","k3zimSRKqNw","sENM2wA_FTg","D9G1VOjN_84","R4AbzwYOmNE","0I647GU3Jsc","NeUfmyu5t8Q"]
       },
       {
         id: 'artist-a-r-rahman',
@@ -7334,7 +7338,7 @@
         glyphs: ['RAHMAN', 'JAI', 'HO', 'OSCAR', 'ROJA', 'MOZART'],
         genres: ['bollywood', 'soul', 'global'],
         size: 'normal',
-        seedTracks: ['kJQP7kiw5Fk', 'YQHsXMglC9A', 'BBAyRZZ9cG4', 'L_LUpnjgPso', 'KUpwupYj_tY']
+        seedTracks: ["IGti1RTS1wc","Y_dGio-KbT4","_mwqXnTEHSc","dfNdRsNSFx4","Y6WV7v4zuNM","gpVA5mx73UE","9V9TAQZzBKQ","uVcRWDoj30I","xwwAVRyNmgQ","CSCnZdSLoA4","uinBpHT-AxM","S1aQhVUy_9g","jDn2bn7_YSM","5CttV9rxhic","OizkdfoOArY"]
       },
       {
         id: 'artist-yo-yo-honey-singh',
@@ -7351,7 +7355,7 @@
         glyphs: ['HONEY', 'SINGH', 'PARTY', 'DESI', 'KING', 'OG'],
         genres: ['punjabi', 'energy', 'pop'],
         size: 'normal',
-        seedTracks: ['tVLC3Phn4yU', 'BddP6PYo2gs', 'IltsCYPwtjE', 'L_LUpnjgPso']
+        seedTracks: ["NbyHNASFi6U","TvngY4unjn4","NrXdauEv9HY","b5N-qIMbJz4","MfY9YO3u7GM","TwFBtV13KQQ","JF42RpxAEko","a-PAcmi5Kas","r7voxxo9rj8","dHsV56I1GwE","q1wK0r51ARs","13uzQU0mfnM","-Al-S1uishM","uaCYeQ9FtSI","gAt_hSIIUMU"]
       }
     ];
 
@@ -7589,6 +7593,28 @@
       claimAudioMaster();
       hideAutoplayPrompt();
       document.body.classList.add('playing');
+
+      
+      // ARTIST STATION EXCLUSIVE MODE — use only real artist tracks from catalog
+      if (mood.category === 'artist' && typeof ARTIST_TRACKS_CATALOG !== 'undefined') {
+        var artistCatalogTracks = ARTIST_TRACKS_CATALOG[mood.id] || [];
+        if (artistCatalogTracks.length > 0) {
+          // Start with seed tracks, then fill from catalog (no general pool mixing)
+          tracks = mood.seedTracks ? mood.seedTracks.slice() : [];
+          artistCatalogTracks.forEach(function(vid) {
+            if (vid && tracks.indexOf(vid) === -1) tracks.push(vid);
+          });
+          tracks.sort(function() { return 0.5 - Math.random(); });
+          console.log('🎤 Artist Station (exclusive):', mood.name, '—', tracks.length, 'tracks');
+          currentTrackQueue = tracks.slice();
+          currentTrackIndex = 0;
+          if (currentTrackQueue.length > 0) {
+            playSingleTrack(currentTrackQueue[currentTrackIndex]);
+            syncPlayerUI();
+          }
+          return; // Skip general pool logic below
+        }
+      }
 
       // Synthesize dynamic station object
       var customStation = {
