@@ -8871,3 +8871,49 @@ input:focus-visible {
     padding-bottom: 4px;
   }
 }
+
+
+/* ==================== Full-Screen YouTube Music Universe View ==================== */
+.explorer-universe-view {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at 50% 10%, rgba(26, 12, 30, 0.98) 0%, rgba(6, 5, 10, 0.99) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 32px 40px;
+  animation: uniFadeIn 0.25s ease-out;
+}
+
+.global-floating-back-btn {
+  display: none !important;
+}
+
+body.in-explorer-mode header,
+body.in-explorer-mode main,
+body.in-explorer-mode .shell {
+  display: none !important;
+}
+
+/* Remove 3D card tilt & heavy blurs for zero lag */
+.turntable-wrap {
+  perspective: none !important;
+}
+
+.art-card {
+  transform: none !important;
+  transition: transform 0.2s ease !important;
+}
+
+.art-card:hover {
+  transform: scale(1.02) !important;
+}
+
+.art-glare {
+  display: none !important;
+}
