@@ -1371,53 +1371,98 @@ body.playing .vinyl-disc {
 }
 
 
-/* Symmetrical Audiophile Spectrum Visualizer */
+/* ==================== Symmetrical Audiophile Long Spectrum Visualizer ==================== */
 .wave-visualizer {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 18px;
+  height: 24px;
+  width: 100%;
+  max-width: 320px;
+  margin: 8px auto 6px;
+  padding: 0 4px;
 }
 
 .wave-visualizer span {
-  width: 3px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.22);
+  flex: 1;
+  max-width: 4px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  transform: scaleY(0.2);
-  transform-origin: bottom center;
-  transition: background 0.3s ease;
+  transform: scaleY(0.15);
+  transform-origin: center center;
+  transition: transform 0.25s ease, background 0.3s ease, box-shadow 0.3s ease;
   contain: strict;
+  will-change: transform;
 }
 
 body.playing .wave-visualizer span {
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
-  animation: wavePulse 1.2s infinite ease-in-out alternate;
+  background: var(--accent, #a855f7);
+  box-shadow: 0 0 8px var(--accent-glow, rgba(168, 85, 247, 0.5));
+  animation: eqRhythmPulse 1.1s infinite ease-in-out alternate;
 }
 
+/* Symmetrical 28-Bar Harmonic Rhythmic Delays & Durations */
 body.playing .wave-visualizer span:nth-child(1),
-body.playing .wave-visualizer span:nth-child(12) { animation-duration: 0.8s; animation-delay: 0.1s; }
+body.playing .wave-visualizer span:nth-child(28) { animation-duration: 0.85s; animation-delay: 0.05s; }
+
 body.playing .wave-visualizer span:nth-child(2),
-body.playing .wave-visualizer span:nth-child(11) { animation-duration: 1.1s; animation-delay: 0.3s; }
+body.playing .wave-visualizer span:nth-child(27) { animation-duration: 1.15s; animation-delay: 0.22s; }
+
 body.playing .wave-visualizer span:nth-child(3),
-body.playing .wave-visualizer span:nth-child(10) { animation-duration: 0.9s; animation-delay: 0.0s; }
+body.playing .wave-visualizer span:nth-child(26) { animation-duration: 0.95s; animation-delay: 0.12s; }
+
 body.playing .wave-visualizer span:nth-child(4),
-body.playing .wave-visualizer span:nth-child(9)  { animation-duration: 1.3s; animation-delay: 0.4s; }
+body.playing .wave-visualizer span:nth-child(25) { animation-duration: 1.35s; animation-delay: 0.40s; }
+
 body.playing .wave-visualizer span:nth-child(5),
-body.playing .wave-visualizer span:nth-child(8)  { animation-duration: 1.0s; animation-delay: 0.2s; }
+body.playing .wave-visualizer span:nth-child(24) { animation-duration: 0.75s; animation-delay: 0.18s; }
+
 body.playing .wave-visualizer span:nth-child(6),
-body.playing .wave-visualizer span:nth-child(7)  { animation-duration: 0.7s; animation-delay: 0.5s; }
+body.playing .wave-visualizer span:nth-child(23) { animation-duration: 1.05s; animation-delay: 0.32s; }
 
-@keyframes wavePulse {
-  0%   { transform: scaleY(0.18); opacity: 0.6; }
-  100% { transform: scaleY(1.0); opacity: 1; }
-}
+body.playing .wave-visualizer span:nth-child(7),
+body.playing .wave-visualizer span:nth-child(22) { animation-duration: 1.25s; animation-delay: 0.08s; }
 
+body.playing .wave-visualizer span:nth-child(8),
+body.playing .wave-visualizer span:nth-child(21) { animation-duration: 0.88s; animation-delay: 0.28s; }
 
-/* Progress Scrubber - Audiophile Minimalist Track */
-.progress-container {
+body.playing .wave-visualizer span:nth-child(9),
+body.playing .wave-visualizer span:nth-child(20) { animation-duration: 1.40s; animation-delay: 0.15s; }
+
+body.playing .wave-visualizer span:nth-child(10),
+body.playing .wave-visualizer span:nth-child(19) { animation-duration: 0.92s; animation-delay: 0.45s; }
+
+body.playing .wave-visualizer span:nth-child(11),
+body.playing .wave-visualizer span:nth-child(18) { animation-duration: 1.10s; animation-delay: 0.02s; }
+
+body.playing .wave-visualizer span:nth-child(12),
+body.playing .wave-visualizer span:nth-child(17) { animation-duration: 0.78s; animation-delay: 0.35s; }
+
+body.playing .wave-visualizer span:nth-child(13),
+body.playing .wave-visualizer span:nth-child(16) { animation-duration: 1.30s; animation-delay: 0.20s; }
+
+body.playing .wave-visualizer span:nth-child(14),
+body.playing .wave-visualizer span:nth-child(15) { animation-duration: 0.98s; animation-delay: 0.10s; }
+
+@keyframes eqRhythmPulse {
+  0% {
+    transform: scaleY(0.18);
+    opacity: 0.55;
+  }
+  35% {
+    transform: scaleY(0.75);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scaleY(0.42);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scaleY(1.0);
+    opacity: 1;
+  }
   display: flex;
   align-items: center;
   gap: 12px;

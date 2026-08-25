@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v109.0') caches.delete(name);
+        if (name !== 'aura-music-v110.0') caches.delete(name);
       });
     });
   }
