@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=112.0">
+  <link rel="stylesheet" href="style.css?v=113.0">
 
 
 
@@ -363,31 +363,11 @@
 
       <!-- Live Player Stage -->
       <div class="stage">
-        
-        <!-- Turntable & Vinyl Visualizer Stage -->
+        <!-- Luxury Modern Album Art Cover Stage -->
         <div class="turntable-wrap">
-          
-          <!-- Animated Tonearm Needle -->
-          <div class="tonearm-assembly" id="tonearm">
-            <div class="tonearm-base"></div>
-            <div class="tonearm-rod"></div>
-            <div class="tonearm-head"></div>
-          </div>
-
-          <!-- Vinyl Disc -->
-          <div class="vinyl-aura-ring" id="vinylAuraRing"></div>
-          <div class="vinyl-disc" id="vinylDisc">
-            <div class="vinyl-grooves"></div>
-            <div class="vinyl-center">
-              <div class="vinyl-center-art" id="vinylCenterArt"></div>
-            </div>
-          </div>
-
-          <!-- Album Art Cover Card -->
           <div class="art-card" id="artCard">
-            <img class="art" id="art" alt="Album Art" src="https://i.ytimg.com/vi/W0DM5lcj6mw/mqdefault.jpg" draggable="false">
+            <img class="art" id="art" alt="Album Art" src="https://i.ytimg.com/vi/W0DM5lcj6mw/hqdefault.jpg" draggable="false">
             <div class="art-glare"></div>
-            <div class="art-badge" id="qualityBadge">HQ STEREO</div>
 
             <!-- Like / Heart Button overlay -->
             <button class="art-like-btn" id="artLikeBtn" title="Save to Liked Songs (L)">
@@ -470,7 +450,10 @@
                 <input type="range" id="volSlider" min="0" max="100" value="100" aria-label="Volume">
               </div>
             </div>
-            <button class="ctrl-btn sub-btn" id="eqDockBtn" aria-label="3D Spatial Audio & Equalizer" title="3D Spatial Audio & Equalizer (E)">
+            <button class="ctrl-btn sub-btn dock-surprise-btn" id="dockSurpriseBtn" aria-label="Surprise Me" title="🎲 Surprise Me - Instant AI Mood & Track Discovery">
+                <span style="font-size:16px;">🎲</span>
+              </button>
+              <button class="ctrl-btn sub-btn" id="eqDockBtn" aria-label="3D Spatial Audio & Equalizer" title="3D Spatial Audio & Equalizer (E)">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <!-- 3D Spatial Audio 360 Soundstage Icon -->
                 <path d="M12 2C6.48 2 2 6.48 2 12c0 2.45.88 4.7 2.34 6.45l1.45-1.45C4.6 15.54 4 13.85 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8c0 1.85-.6 3.54-1.79 5l1.45 1.45C21.12 16.7 22 14.45 22 12c0-5.52-4.48-10-10-10zm0 4c-3.31 0-6 2.69-6 6 0 1.55.59 2.96 1.55 4.02l1.43-1.43C8.37 13.88 8 12.99 8 12c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .99-.37 1.88-.98 2.59l1.43 1.43C17.41 14.96 18 13.55 18 12c0-3.31-2.69-6-6-6zm0 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
@@ -1565,7 +1548,7 @@
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=112.0"></script>
+  <script src="script.js?v=113.0"></script>
 
 
 

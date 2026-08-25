@@ -9180,3 +9180,180 @@ body.in-cinema-mode #playerA iframe {
     border-radius: 12px !important;
   }
 }
+
+
+/* ==================== ULTRA-PREMIUM LUXURY UI & DOCK OVERRIDES ==================== */
+
+/* 1. Gorgeous Modern Squircle Album Art */
+.art-card {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 220px !important;
+  height: 220px !important;
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85), 0 0 45px var(--accent-glow, rgba(168, 85, 247, 0.4)) !important;
+  background: #0d0c14 !important;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease !important;
+  margin: 0 auto !important;
+}
+
+.art-card:hover {
+  transform: translateY(-4px) scale(1.025) !important;
+  box-shadow: 0 32px 75px rgba(0, 0, 0, 0.95), 0 0 55px var(--accent-glow, rgba(168, 85, 247, 0.6)) !important;
+}
+
+.art {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: inherit !important;
+  display: block !important;
+}
+
+/* Hide awkward fake vinyl half-discs */
+.vinyl-aura-ring,
+.vinyl-disc,
+.turntable-arm {
+  display: none !important;
+}
+
+/* 2. Unified Seamless Floating Glass Dock (Zero Box Dividers/Lines) */
+.controls-glass {
+  background: rgba(14, 11, 22, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px var(--accent-glow, rgba(168, 85, 247, 0.3)) !important;
+  padding: 6px 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.dock-core,
+.dock-wing,
+.dock-wing-left,
+.dock-wing-right {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ctrl-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  transition: all 0.2s ease !important;
+}
+
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  transform: scale(1.08) !important;
+}
+
+.ctrl-btn.play-btn {
+  width: 52px !important;
+  height: 52px !important;
+  background: #ffffff !important;
+  color: #08070d !important;
+  box-shadow: 0 0 24px var(--accent-glow, rgba(168, 85, 247, 0.6)), 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.ctrl-btn.play-btn:hover {
+  background: #ffffff !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 35px var(--accent-glow, rgba(168, 85, 247, 0.9)), 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dock-surprise-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.dock-surprise-btn:hover {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%) !important;
+  border-color: var(--accent, #a855f7) !important;
+  box-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.5)) !important;
+}
+
+/* 3. Perfect Progress Scrubber */
+.progress-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  width: 100% !important;
+  max-width: 460px !important;
+  margin: 10px auto 6px !important;
+  padding: 0 6px !important;
+}
+
+.progress-bar-wrap {
+  flex: 1 !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.progress-track {
+  position: relative !important;
+  width: 100% !important;
+  height: 5px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+  transition: height 0.2s ease !important;
+}
+
+.progress-bar-wrap:hover .progress-track {
+  height: 7px !important;
+}
+
+.progress-fill {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, var(--accent, #a855f7) 0%, #ffffff 100%) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 10px var(--accent-glow, rgba(168, 85, 247, 0.5)) !important;
+}
+
+.progress-handle {
+  position: absolute !important;
+  top: 50% !important;
+  left: 0% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 13px !important;
+  height: 13px !important;
+  background: #ffffff !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px var(--accent-glow, rgba(168, 85, 247, 0.8)) !important;
+  pointer-events: none !important;
+}
+
+/* 4. Disable Black Screen Video Modal Layer */
+.cinema-modal-overlay {
+  display: none !important;
+}
+
+body.in-cinema-mode .cinema-modal-overlay {
+  display: flex !important;
+  background: rgba(4, 3, 8, 0.95) !important;
+}

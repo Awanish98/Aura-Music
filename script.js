@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v112.0') caches.delete(name);
+        if (name !== 'aura-music-v113.0') caches.delete(name);
       });
     });
   }
@@ -5786,7 +5786,7 @@
     var fallbackArtUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80';
     var artImg = $('art');
     var ambientImg = $('ambientArt');
-    var thumbMq = 'https://i.ytimg.com/vi/' + videoId + '/mqdefault.jpg';
+    var thumbMq = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
     var thumbHq = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
 
     if (artImg) {
