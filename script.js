@@ -1,6 +1,6 @@
 (function () {
   var DB_VERSION_KEY = 'ishq_db_version';
-  var CURRENT_DB_VERSION = 'v10.0';
+  var CURRENT_DB_VERSION = 'v10.1';
   var STORAGE_KEY = 'ishq_custom_stations';
 
 
@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.5') caches.delete(name);
+        if (name !== 'aura-music-v101.6') caches.delete(name);
       });
     });
   }
@@ -1114,14 +1114,17 @@
     var st = stations.find(function (s) { return s.id === stKey; });
     if (!st) return;
 
-    // Prevent duplicate switch to same station
-    if (currentStationKey === stKey && activePlaylistId === st.playlistId) {
+    // Prevent duplicate switch to same station only if already actively playing that station
+    if (currentStationKey === stKey && activePlaylistId === (st.playlistId || st.id) && isPlaying()) {
       stationDropdown.classList.remove('open');
       return;
     }
 
     currentStationKey = stKey;
     currentStation = st;
+    desired = true;
+    document.body.classList.add('playing');
+    hideAutoplayPrompt();
     localStorage.setItem('ishq_station_key', stKey);
 
     document.querySelectorAll('.station-item').forEach(function (it) {
@@ -1235,6 +1238,12 @@
       try {
         activePlaylistId = st.playlistId || st.id;
 
+        // Immediate UI feedback with station branding
+        var titleEl = $('title');
+        if (titleEl && !titleEl.textContent.trim()) titleEl.textContent = st.name;
+        var artistEl = $('artist');
+        if (artistEl && !artistEl.textContent.trim()) artistEl.textContent = st.desc || st.brandSub || st.name;
+
         // If the station is one of the 5 user master playlists, load the authentic YouTube playlist directly
         if (st.playlistId && st.id !== 'my-vibes' && player.loadPlaylist) {
           if (desired) {
@@ -1244,6 +1253,9 @@
               index: 0,
               startSeconds: 0
             });
+            setTimeout(function () {
+              try { if (player && player.playVideo) player.playVideo(); } catch (e) {}
+            }, 300);
           } else if (player.cuePlaylist) {
             player.cuePlaylist({
               list: st.playlistId,
@@ -1254,8 +1266,8 @@
           }
           setTimeout(function () {
             if (player.setLoop) player.setLoop(true);
-            if (player.setShuffle) player.setShuffle(true);
-          }, 800);
+            if (player.setShuffle) player.setShuffle(false);
+          }, 600);
         } else {
           // Custom / fallback track list (e.g. My Vibes / Moods)
           var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id]) 
@@ -1268,6 +1280,9 @@
           if (player.loadPlaylist) {
             if (desired) {
               player.loadPlaylist(list, 0, 0);
+              setTimeout(function () {
+                try { if (player && player.playVideo) player.playVideo(); } catch (e) {}
+              }, 300);
             } else if (player.cuePlaylist) {
               player.cuePlaylist(list, 0, 0);
             }
@@ -1290,8 +1305,6 @@
 
       show('s-ready');
       VibeAgent.renderVibeUI();
-      setTimeout(update, 300);
-      setTimeout(update, 900);
     }, 50);
   }
 
