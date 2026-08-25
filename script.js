@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.2') caches.delete(name);
+        if (name !== 'aura-music-v101.3') caches.delete(name);
       });
     });
   }
@@ -1095,17 +1095,19 @@
   var stationSelectBtn = $('stationSelectBtn');
   var stationDropdown = $('stationDropdown');
 
-  stationSelectBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    stationDropdown.classList.toggle('open');
-  });
+  if (stationSelectBtn && stationDropdown) {
+    stationSelectBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      stationDropdown.classList.toggle('open');
+    });
 
-  stationDropdown.addEventListener('click', function (e) {
-    e.stopPropagation();
-  });
+    stationDropdown.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
 
   document.addEventListener('click', function () {
-    stationDropdown.classList.remove('open');
+    if (stationDropdown) stationDropdown.classList.remove('open');
   });
 
   function switchStation(stKey) {
@@ -1519,7 +1521,21 @@
 
 
   /* ==================== Dynamic Background Word Animator ==================== */
+  var _lastBgWordsTitle = '';
+  var _bgWordsDebounceTimer = null;
+
   function updateBackgroundWords(title, artist) {
+    // Debounce — skip if same title or called within 800ms (lyric lines fire this every few seconds)
+    var key = (title || '') + '|' + (artist || '');
+    if (key === _lastBgWordsTitle) return;
+    if (_bgWordsDebounceTimer) clearTimeout(_bgWordsDebounceTimer);
+    _bgWordsDebounceTimer = setTimeout(function () {
+      _lastBgWordsTitle = key;
+      _doUpdateBackgroundWords(title, artist);
+    }, 200);
+  }
+
+  function _doUpdateBackgroundWords(title, artist) {
     var glyphsContainer = $('bgGlyphs');
     if (!glyphsContainer) return;
 
@@ -2094,12 +2110,25 @@
     var lastSkyTime = 0;
 
     function renderParticles(time) {
+      // Kill RAF on mobile entirely (saves battery + CPU)
+      if (window.innerWidth <= 768) {
+        if (ctx && canvas) ctx.clearRect(0, 0, width, height);
+        // Do NOT continue RAF loop on mobile
+        return;
+      }
       if (!ctx || !canvas || document.hidden) {
         animFrame = requestAnimationFrame(renderParticles);
         return;
       }
 
-      var throttleInterval = window.innerWidth <= 768 ? 50 : 32; // 20 FPS on mobile, 30 FPS on desktop
+      // Stop completely when no weather theme active
+      if (currentSkyTheme === 'none') {
+        ctx.clearRect(0, 0, width, height);
+        animFrame = requestAnimationFrame(renderParticles);
+        return;
+      }
+
+      var throttleInterval = 40; // 25 FPS on desktop
       if (time - lastSkyTime < throttleInterval) {
         animFrame = requestAnimationFrame(renderParticles);
         return;
@@ -2107,11 +2136,6 @@
       lastSkyTime = time;
 
       ctx.clearRect(0, 0, width, height);
-
-      if (currentSkyTheme === 'none') {
-        animFrame = requestAnimationFrame(renderParticles);
-        return;
-      }
 
       if (currentSkyTheme === 'rain' || currentSkyTheme === 'thunderstorm') {
         ctx.strokeStyle = currentSkyTheme === 'thunderstorm' ? 'rgba(200, 225, 255, 0.45)' : 'rgba(180, 210, 255, 0.32)';
@@ -2637,34 +2661,47 @@
   }
 
   // Queue Tabs Toggle
-  $('queueTabBtn').addEventListener('click', function () {
-    $('queueTabBtn').classList.add('active');
-    $('recTabBtn').classList.remove('active');
-    $('favTabBtn').classList.remove('active');
-    $('queueList').style.display = 'flex';
-    $('recList').style.display = 'none';
-    $('favList').style.display = 'none';
-  });
+  var _queueTabBtn = $('queueTabBtn');
+  var _recTabBtn = $('recTabBtn');
+  var _favTabBtn = $('favTabBtn');
+  var _queueList = $('queueList');
+  var _recList = $('recList');
+  var _favList = $('favList');
 
-  $('recTabBtn').addEventListener('click', function () {
-    $('recTabBtn').classList.add('active');
-    $('queueTabBtn').classList.remove('active');
-    $('favTabBtn').classList.remove('active');
-    $('queueList').style.display = 'none';
-    $('recList').style.display = 'flex';
-    $('favList').style.display = 'none';
-    VibeAgent.renderVibeUI();
-  });
+  if (_queueTabBtn) {
+    _queueTabBtn.addEventListener('click', function () {
+      if (_queueTabBtn) _queueTabBtn.classList.add('active');
+      if (_recTabBtn) _recTabBtn.classList.remove('active');
+      if (_favTabBtn) _favTabBtn.classList.remove('active');
+      if (_queueList) _queueList.style.display = 'flex';
+      if (_recList) _recList.style.display = 'none';
+      if (_favList) _favList.style.display = 'none';
+    });
+  }
 
-  $('favTabBtn').addEventListener('click', function () {
-    $('favTabBtn').classList.add('active');
-    $('queueTabBtn').classList.remove('active');
-    $('recTabBtn').classList.remove('active');
-    $('queueList').style.display = 'none';
-    $('recList').style.display = 'none';
-    $('favList').style.display = 'flex';
-    renderLikedList();
-  });
+  if (_recTabBtn) {
+    _recTabBtn.addEventListener('click', function () {
+      if (_recTabBtn) _recTabBtn.classList.add('active');
+      if (_queueTabBtn) _queueTabBtn.classList.remove('active');
+      if (_favTabBtn) _favTabBtn.classList.remove('active');
+      if (_queueList) _queueList.style.display = 'none';
+      if (_recList) _recList.style.display = 'flex';
+      if (_favList) _favList.style.display = 'none';
+      VibeAgent.renderVibeUI();
+    });
+  }
+
+  if (_favTabBtn) {
+    _favTabBtn.addEventListener('click', function () {
+      if (_favTabBtn) _favTabBtn.classList.add('active');
+      if (_queueTabBtn) _queueTabBtn.classList.remove('active');
+      if (_recTabBtn) _recTabBtn.classList.remove('active');
+      if (_queueList) _queueList.style.display = 'none';
+      if (_recList) _recList.style.display = 'none';
+      if (_favList) _favList.style.display = 'flex';
+      renderLikedList();
+    });
+  }
 
   var refreshVibeBtn = $('refreshVibeBtn');
   if (refreshVibeBtn) {
@@ -2679,7 +2716,8 @@
   if (playMyVibesStationBtn) {
     playMyVibesStationBtn.addEventListener('click', function () {
       VibeAgent.playMyVibesStation();
-      $('queuePanel').classList.remove('open');
+      var qp = $('queuePanel');
+      if (qp) qp.classList.remove('open');
     });
   }
 
@@ -2697,21 +2735,31 @@
 
 
   // Search Filter in Queue
-  $('queueSearchInput').addEventListener('input', function (e) {
-    var q = e.target.value.toLowerCase().trim();
-    document.querySelectorAll('#queueList .queue-item').forEach(function (el) {
-      var text = el.textContent.toLowerCase();
-      el.style.display = text.indexOf(q) !== -1 ? 'flex' : 'none';
+  var _queueSearchInput = $('queueSearchInput');
+  if (_queueSearchInput) {
+    _queueSearchInput.addEventListener('input', function (e) {
+      var q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('#queueList .queue-item').forEach(function (el) {
+        var text = el.textContent.toLowerCase();
+        el.style.display = text.indexOf(q) !== -1 ? 'flex' : 'none';
+      });
     });
-  });
+  }
 
   /* ==================== Keyboard Shortcuts Modal ==================== */
-  $('shortcutsHelpBtn').addEventListener('click', function () {
-    $('shortcutsModal').classList.add('open');
-  });
-  $('closeShortcutsBtn').addEventListener('click', function () {
-    $('shortcutsModal').classList.remove('open');
-  });
+  var _shortcutsHelpBtn = $('shortcutsHelpBtn');
+  var _shortcutsModal = $('shortcutsModal');
+  var _closeShortcutsBtn = $('closeShortcutsBtn');
+  if (_shortcutsHelpBtn && _shortcutsModal) {
+    _shortcutsHelpBtn.addEventListener('click', function () {
+      _shortcutsModal.classList.add('open');
+    });
+  }
+  if (_closeShortcutsBtn && _shortcutsModal) {
+    _closeShortcutsBtn.addEventListener('click', function () {
+      _shortcutsModal.classList.remove('open');
+    });
+  }
 
   /* ==================== Low-Power Station-Adaptive Kinetic Particles ==================== */
   (function initDynamicBackgroundEngine() {
@@ -5245,7 +5293,7 @@
           clearInterval(interval);
           onReady();
         }
-      }, 50);
+      }, 200);
 
       setTimeout(function () {
         clearInterval(interval);
@@ -5405,12 +5453,16 @@
 
     document.title = displayTitle ? displayTitle + ' — Aura Music' : 'Aura Music Platform';
 
-    // Add to session queue history
+    // Add to session queue history (render only when queue panel is open)
     var exists = sessionHistory.some(function (t) { return t.id === videoId; });
     if (!exists) {
       sessionHistory.unshift({ id: videoId, title: displayTitle, artist: displayArtist });
+      // Only re-render queue if panel is currently visible
+      var qPanel = $('queuePanel');
+      if (qPanel && qPanel.classList.contains('open')) {
+        renderSessionQueue();
+      }
     }
-    renderSessionQueue();
 
     updateLikeStatus(videoId);
     updateMediaSession(displayTitle, displayArtist, videoId);
@@ -7585,13 +7637,18 @@
     });
   }
 
-  $('play').addEventListener('click', togglePlay);
-  $('prev').addEventListener('click', function () { skip('prev'); });
-  $('next').addEventListener('click', function () { skip('next'); });
-  $('fsbtn').addEventListener('click', toggleFullscreen);
+  var _playBtn = $('play');
+  if (_playBtn) _playBtn.addEventListener('click', togglePlay);
+  var _prevBtn = $('prev');
+  if (_prevBtn) _prevBtn.addEventListener('click', function () { skip('prev'); });
+  var _nextBtn = $('next');
+  if (_nextBtn) _nextBtn.addEventListener('click', function () { skip('next'); });
+  var _fsbtn = $('fsbtn');
+  if (_fsbtn) _fsbtn.addEventListener('click', toggleFullscreen);
   document.addEventListener('fullscreenchange', fsIcon);
   document.addEventListener('webkitfullscreenchange', fsIcon);
-  $('retry').addEventListener('click', function () { init(); });
+  var _retryBtn = $('retry');
+  if (_retryBtn) _retryBtn.addEventListener('click', function () { init(); });
 
   var artEl = $('art');
   if (artEl) artEl.addEventListener('click', togglePlay);
@@ -7741,11 +7798,12 @@
       toggleFullscreen();
     } else if (e.key === 'q' || e.key === 'Q') {
       e.preventDefault();
-      $('queuePanel').classList.toggle('open');
-      generateRecommendations();
+      var _qp = $('queuePanel');
+      if (_qp) { _qp.classList.toggle('open'); generateRecommendations(); }
     } else if (e.key === '?') {
       e.preventDefault();
-      $('shortcutsModal').classList.toggle('open');
+      var _sm = $('shortcutsModal');
+      if (_sm) _sm.classList.toggle('open');
     } else if (e.key === 'Escape') {
       LyricsEngine.close();
       CommandPalette.close();
@@ -7778,23 +7836,35 @@
   }
 
   // High-Frequency Real-time Progress & Karaoke Sync Loop (250ms)
+  // Cache DOM refs once to avoid repeated getElementById lookups
+  var _timeCurrent = $('timeCurrent');
+  var _timeTotal = $('timeTotal');
+  var _progressFill = $('progressFill');
+  var _progressHandle = $('progressHandle');
+  var _jamBroadcastCounter = 0;
+
   setInterval(function () {
-    if (!player || !apiReady || !isPlaying()) return;
+    if (!player || !apiReady || !isPlaying() || document.hidden) return;
     try {
       var cur = player.getCurrentTime ? player.getCurrentTime() : 0;
       var dur = player.getDuration ? player.getDuration() : 0;
-      if ($('timeCurrent')) $('timeCurrent').textContent = fmt(cur);
-      if ($('timeTotal')) {
-        $('timeTotal').textContent = showRemainingTime ? ('-' + fmt(Math.max(0, dur - cur))) : fmt(dur);
+      if (_timeCurrent) _timeCurrent.textContent = fmt(cur);
+      if (_timeTotal) {
+        _timeTotal.textContent = showRemainingTime ? ('-' + fmt(Math.max(0, dur - cur))) : fmt(dur);
       }
       if (dur > 0) {
         var pct = (cur / dur) * 100;
-        if ($('progressFill')) $('progressFill').style.width = pct + '%';
-        if ($('progressHandle')) $('progressHandle').style.left = pct + '%';
+        if (_progressFill) _progressFill.style.width = pct + '%';
+        if (_progressHandle) _progressHandle.style.left = pct + '%';
       }
       LyricsEngine.onTimeUpdate(cur);
       DualAudioEngine.checkCrossfade(cur, dur);
-      JamRoomEngine.broadcastState();
+      // Only broadcast Jam state every 2.5 seconds AND only when a room is active
+      _jamBroadcastCounter++;
+      if (_jamBroadcastCounter >= 10 && JamRoomEngine.hasActiveRoom()) {
+        _jamBroadcastCounter = 0;
+        JamRoomEngine.broadcastState();
+      }
     } catch (e) {}
   }, 250);
 

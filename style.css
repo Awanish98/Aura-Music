@@ -8644,3 +8644,97 @@ input:focus-visible {
     font-size: 7.5px;
   }
 }
+
+/* ====================================================================
+   MOBILE GPU PERFORMANCE OVERHAUL (v101.3)
+   Reduces backdrop-filter blur (major GPU drain on mobile Chrome)
+   Adds compositor layer hints for animated elements
+   ==================================================================== */
+@media (max-width: 768px) {
+  /* Promote animated elements to GPU compositor layers */
+  .art-card,
+  .turntable-container,
+  .turntable-wrap,
+  .vinyl-disc,
+  .ctrl-btn,
+  .modal-card,
+  .premium-sidebar-menu,
+  .queue-panel,
+  .lyrics-card {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Reduce ALL backdrop-filter blur to 6px on mobile
+     Heavy blur (20-45px) = GPU overdraw = major lag on mobile Chrome */
+  .shell,
+  .player-glass,
+  .controls-glass,
+  .header-weather-pill,
+  .station-badge-btn,
+  .mood-universe-btn,
+  .queue-btn,
+  .menu-btn,
+  .live-lyric-bar,
+  .dock-pill,
+  .ctrl-btn,
+  .queue-panel,
+  .modal-card,
+  .premium-sidebar-menu,
+  .extras-modal-card,
+  .lyrics-card,
+  .command-palette-card,
+  .mood-universe-modal,
+  .sleep-timer-modal,
+  .glyph-matrix-modal,
+  .auth-modal-card,
+  .shorts-modal-card,
+  .cmd-results,
+  .station-dropdown,
+  .queue-search-wrap,
+  .jam-modal-card,
+  .ambient-modal-card,
+  .cinema-bar,
+  .dynamic-island,
+  .dynamic-island-pill,
+  .home-jam-reactions-dock,
+  [style*="backdrop-filter"] {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  /* Disable CSS animation on elements that are off-screen */
+  .vinyl-disc {
+    /* Use simpler spin — remove saturate filter on mobile */
+    filter: none !important;
+  }
+
+  /* Prevent layout thrash from floating animations */
+  .floating-reaction-emoji {
+    will-change: transform, opacity;
+  }
+
+  /* Disable turntable arm animation on mobile (CPU-heavy) */
+  .tonearm-container {
+    animation: none !important;
+    transition: transform 0.3s ease !important;
+  }
+
+  /* Reduce bg particle canvas opacity to 0 on mobile (already disabled in JS) */
+  #particles {
+    display: none !important;
+  }
+
+  /* Weather sky canvas: reduce opacity so even if it renders, it's invisible */
+  #skyCanvas {
+    display: none !important;
+  }
+
+  /* Progress bar: use GPU-accelerated width via transform instead of width */
+  .progress-fill {
+    transform-origin: left center;
+    will-change: width;
+  }
+}
