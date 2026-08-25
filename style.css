@@ -8201,14 +8201,15 @@ body.in-cinema-mode #playerA iframe {
 .progress-handle {
   position: absolute !important;
   top: 50% !important;
-  left: 0% !important;
   transform: translate(-50%, -50%) !important;
-  width: 13px !important;
-  height: 13px !important;
+  width: 14px !important;
+  height: 14px !important;
   background: #ffffff !important;
   border-radius: 50% !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px var(--accent-glow, rgba(168, 85, 247, 0.8)) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 14px var(--accent-glow, rgba(168, 85, 247, 0.9)) !important;
   pointer-events: none !important;
+  transition: transform 0.15s ease !important;
+  z-index: 5 !important;
 }
 
 /* 4. Disable Black Screen Video Modal Layer */
