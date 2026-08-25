@@ -7379,3 +7379,113 @@ body.fs-on .controls-glass {
   padding: 10px 18px;
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.85), 0 0 40px var(--accent-glow, rgba(168, 85, 247, 0.4));
 }
+
+
+/* ==================== Main Shell Footer Status Bar ==================== */
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 12px;
+  margin-top: 6px;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg-dim, rgba(255, 255, 255, 0.45));
+  z-index: 10;
+  pointer-events: auto;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.live-radio-badge {
+  color: #34d399;
+  font-weight: 700;
+  font-size: 9px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.10em;
+  white-space: nowrap;
+}
+
+.lossless-badge {
+  color: var(--accent, #a855f7);
+  font-weight: 700;
+  font-size: 9px;
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.10em;
+  white-space: nowrap;
+}
+
+.footer-center {
+  flex: 1;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.footer-help-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.footer-help-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.author-name {
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 12px var(--accent-glow, rgba(168, 85, 247, 0.5));
+}
+
+@media (max-width: 680px) {
+  .footer-center {
+    display: none;
+  }
+  footer {
+    padding: 4px 6px;
+  }
+}
