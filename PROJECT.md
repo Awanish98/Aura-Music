@@ -24,13 +24,13 @@ Aura Music is a premium web audio streaming Progressive Web App (PWA) with the f
 ## Feature Inventory
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| F1 | Surprise Me Discovery & Event Hardening | Wire `#dockSurpriseBtn`, prune dead `#heroSurpriseBtn`, guard 9 event listeners, wrap `JSON.parse` | M1 | Survey 1, Request R1 |
-| F2 | DOM Structural Repair | Purge premature tag closure and duplicate modal fragments (lines 1152-1325) in `index.html` | M1 | Survey 1, Request R4 |
-| F3 | Dead Code & CSS Pruning | Remove 152 dead CSS selectors and 4 unused JS functions | M1 | Survey 1, Request R4 |
-| F4 | Cache Version Synchronization | Bump version to `v123.0` across `sw.js`, `index.html` (x2), and `script.js` | M1 / M4 | Survey 1, Request R4 |
-| F5 | Playback Speed Persistence | Ensure `player.setPlaybackRate` is re-applied on track change in `onState(PLAYING)` | M2 | Survey 2, Request R2 |
-| F6 | Explorer Queue Continuity | Populate continuous queue for single-track plays in `playSingleTrack()` | M2 | Survey 2, Request R2 |
-| F7 | Smooth Scrubber Drag & Seek Precision | Add Pointer Events (`pointerdown/move/up`) and 400ms seek-cooldown against interval overwrite | M2 | Survey 2, Request R2 |
+| F1 | Surprise Me Discovery & Event Hardening | Wire `#dockSurpriseBtn`, prune dead `#heroSurpriseBtn`, guard 9 event listeners, wrap `JSON.parse` | M1 (DONE) | Survey 1, Request R1 |
+| F2 | DOM Structural Repair | Purge premature tag closure and duplicate modal fragments in `index.html` | M1 (DONE) | Survey 1, Request R4 |
+| F3 | Dead Code & CSS Pruning | Remove 152 dead CSS selectors and 4 unused JS functions | M1 (DONE) | Survey 1, Request R4 |
+| F4 | Cache Version Synchronization | Synchronized to `v123.0` across `sw.js`, `index.html` (x2), and `script.js` | M1 (DONE) / M4 | Survey 1, Request R4 |
+| F5 | Playback Speed Persistence | Re-applied in `onState(PLAYING)` and `loadStationPlayback` for persistent 1.0x/1.25x/0.85x speed | M2 (DONE) | Survey 2, Request R2 |
+| F6 | Explorer Queue Continuity | Dynamic 51-track discovery queue assembled in `playSingleTrack()` | M2 (DONE) | Survey 2, Request R2 |
+| F7 | Smooth Scrubber Drag & Seek Precision | Pointer Events (`pointerdown/move/up`), 400ms cooldown, consolidated CSS | M2 (DONE) | Survey 2, Request R2 |
 | F8 | Cinematic Background Glyphs | Implement luxury kinetic drift keyframes (38s-54s), 3-tier blur, and `clamp()` typography | M3 | Survey 3, Request R2 |
 | F9 | Weather Particle Canvas & Lightning | Restore recursive RAF, remove mobile kill-switch, add fog rendering, style lightning flash, export `setSkyTheme` | M3 | Survey 3, Request R3 |
 | F10 | Mobile Dock & Header Layout (360px-420px) | Prevent horizontal overflow on small viewports, ensure ≥40px touch targets, resolve header collision | M4 | Survey 3, Request R3 |
@@ -40,9 +40,9 @@ Aura Music is a premium web audio streaming Progressive Web App (PWA) with the f
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Static Integrity & DOM Repair | F1 (Event hardening, Surprise Me), F2 (DOM repair), F3 (Dead code pruning), F4 (Initial cache sync) | none | PLANNED |
-| M2 | Audio Engine & Scrubber Polish | F5 (Speed persistence), F6 (Queue continuity), F7 (Scrubber drag & smooth seek) | M1 | PLANNED |
-| M3 | Visual Atmospheric Engines | F8 (Cinematic background glyphs), F9 (Weather canvas & lightning) | M1 | PLANNED |
+| M1 | Static Integrity & DOM Repair | F1 (Event hardening, Surprise Me), F2 (DOM repair), F3 (Dead code pruning), F4 (Initial cache sync) | none | DONE |
+| M2 | Audio Engine & Scrubber Polish | F5 (Speed persistence), F6 (Queue continuity), F7 (Scrubber drag & smooth seek) | M1 | DONE |
+| M3 | Visual Atmospheric Engines | F8 (Cinematic background glyphs), F9 (Weather canvas & lightning) | M1 | IN_PROGRESS |
 | M4 | Mobile UX & Modal Accessibility | F10 (Mobile dock & header layout), F11 (Modal dismiss handlers), F4 (Final cache sync) | M2, M3 | PLANNED |
 | M5 | E2E Testing & Final Acceptance | F12 (Tiers 1-4 test execution, live validation, adversarial hardening) | M4 | PLANNED |
 

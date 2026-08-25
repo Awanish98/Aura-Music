@@ -100,6 +100,25 @@ html, body {
   transform: translate3d(0,0,0);
 }
 
+/* ==================== Living Lightning Flash Overlay ==================== */
+#lightningFlash,
+.lightning-flash {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.85) 0%, rgba(200, 225, 255, 0.4) 50%, rgba(150, 180, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.06s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+#lightningFlash.flash,
+.lightning-flash.flash {
+  opacity: 0.85;
+}
+
 /* ==================== Animated Genre-Adaptive Background Glyphs ==================== */
 .bg-glyphs {
   position: fixed;
@@ -123,14 +142,62 @@ html, body {
   transition: opacity 0.6s ease;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  will-change: transform;
 }
 
-.bg-glyphs .g1 { top: 6%;   left: 4%;   font-size: 10vw; --o: .038; }
-.bg-glyphs .g2 { top: 12%;  right: 0%;  font-size: 12vw; --o: .028; }
-.bg-glyphs .g3 { bottom: 6%; left: 8%;  font-size: 9.5vw; --o: .032; }
-.bg-glyphs .g4 { bottom: -2%; right: 10%; font-size: 13vw; --o: .025; }
-.bg-glyphs .g5 { top: 42%;  left: 62%;  font-size: 8.5vw; --o: .030; }
-.bg-glyphs .g6 { top: -4%;  left: 45%;  font-size: 8.5vw; --o: .022; }
+.bg-glyphs .g1 {
+  top: 6%;
+  left: 4%;
+  font-size: clamp(2.5rem, 10vw, 8rem);
+  --o: .038;
+  filter: blur(0.5px);
+  animation: glyphDrift1 42s ease-in-out infinite alternate;
+}
+
+.bg-glyphs .g2 {
+  top: 12%;
+  right: 0%;
+  font-size: clamp(3rem, 12vw, 9.5rem);
+  --o: .028;
+  filter: blur(1.5px);
+  animation: glyphDrift2 48s ease-in-out infinite alternate;
+}
+
+.bg-glyphs .g3 {
+  bottom: 6%;
+  left: 8%;
+  font-size: clamp(2.2rem, 9.5vw, 7.5rem);
+  --o: .032;
+  filter: blur(2.5px);
+  animation: glyphDrift3 54s ease-in-out infinite alternate;
+}
+
+.bg-glyphs .g4 {
+  bottom: -2%;
+  right: 10%;
+  font-size: clamp(3.2rem, 13vw, 10rem);
+  --o: .025;
+  filter: blur(0.5px);
+  animation: glyphDrift4 38s ease-in-out infinite alternate;
+}
+
+.bg-glyphs .g5 {
+  top: 42%;
+  left: 62%;
+  font-size: clamp(2rem, 8.5vw, 6.5rem);
+  --o: .030;
+  filter: blur(1.8px);
+  animation: glyphDrift5 46s ease-in-out infinite alternate;
+}
+
+.bg-glyphs .g6 {
+  top: -4%;
+  left: 45%;
+  font-size: clamp(2rem, 8.5vw, 6.5rem);
+  --o: .022;
+  filter: blur(2.8px);
+  animation: glyphDrift6 52s ease-in-out infinite alternate;
+}
 
 .bg-glyphs .heart-glyph {
   position: absolute;
@@ -139,7 +206,7 @@ html, body {
   transform: translate3d(-50%, -50%, 0);
   font-family: var(--theme-font, 'Cinzel', sans-serif);
   font-weight: 900;
-  font-size: 26vw;
+  font-size: clamp(5rem, 24vw, 18rem);
   color: #f7efe2;
   line-height: 1;
   opacity: .026;
@@ -147,6 +214,57 @@ html, body {
   text-transform: uppercase;
   text-align: center;
   transition: opacity 0.6s ease;
+  filter: blur(3px);
+  will-change: transform, opacity;
+  animation: glyphHeartPulse 14s ease-in-out infinite;
+}
+
+@keyframes glyphDrift1 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(18px, -24px, 0) rotate(2deg); }
+  100% { transform: translate3d(-14px, 16px, 0) rotate(-1.5deg); }
+}
+
+@keyframes glyphDrift2 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(-22px, 20px, 0) rotate(-2.5deg); }
+  100% { transform: translate3d(16px, -18px, 0) rotate(1.5deg); }
+}
+
+@keyframes glyphDrift3 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(24px, 18px, 0) rotate(3deg); }
+  100% { transform: translate3d(-18px, -22px, 0) rotate(-2deg); }
+}
+
+@keyframes glyphDrift4 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(-20px, -16px, 0) rotate(-2deg); }
+  100% { transform: translate3d(22px, 24px, 0) rotate(2.5deg); }
+}
+
+@keyframes glyphDrift5 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(16px, -20px, 0) rotate(1.8deg); }
+  100% { transform: translate3d(-20px, 14px, 0) rotate(-2.2deg); }
+}
+
+@keyframes glyphDrift6 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(-18px, 22px, 0) rotate(-2.8deg); }
+  100% { transform: translate3d(14px, -16px, 0) rotate(2deg); }
+}
+
+@keyframes glyphHeartPulse {
+  0%, 100% { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 0.024; }
+  50%      { transform: translate3d(-50%, -50%, 0) scale(1.06); opacity: 0.042; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-glyphs .glyph,
+  .bg-glyphs .heart-glyph {
+    animation: none !important;
+  }
 }
 
 /* ==================== 5 DISTINCT IMMERSIVE ENVIRONMENTS ==================== */
@@ -169,11 +287,7 @@ body.mode-time-travel .art-card {
   0%   { box-shadow: 0 0 40px rgba(168, 85, 247, 0.3), inset 0 0 20px rgba(168, 85, 247, 0.15); }
   100% { box-shadow: 0 0 70px rgba(168, 85, 247, 0.5), inset 0 0 35px rgba(168, 85, 247, 0.3); }
 }
-body.mode-time-travel .vinyl-disc {
-  border-radius: 50%;
-  border: 1px solid rgba(168, 85, 247, 0.5);
-  box-shadow: 0 0 60px rgba(168, 85, 247, 0.3);
-}
+
 body.mode-time-travel .controls-glass {
   background: rgba(16, 10, 32, 0.88);
   border: 1px solid rgba(168, 85, 247, 0.25);
@@ -397,12 +511,7 @@ body.mode-edm .now-title {
   letter-spacing: 0.05em;
   text-shadow: 0 0 28px rgba(16, 185, 129, 0.65);
 }
-body.mode-edm .vinyl-disc {
-  border-radius: 8px;
-  border: 2px solid #10b981;
-  background: radial-gradient(circle, #06301d 0%, #011009 100%);
-  box-shadow: 0 0 50px rgba(16, 185, 129, 0.35);
-}
+
 body.mode-edm .controls-glass {
   background: rgba(4, 28, 18, 0.88);
   border: 1px solid rgba(16, 185, 129, 0.38);
@@ -1312,14 +1421,14 @@ body.playing .wave-visualizer span:nth-child(15) { animation-duration: 0.98s; an
 
 /* ==================== Progress Scrubber - Audiophile Minimalist Track ==================== */
 .progress-container {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 14px !important;
-  width: 100% !important;
-  max-width: 460px !important;
-  margin: 8px auto !important;
-  padding: 0 4px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 460px;
+  margin: 10px auto 6px;
+  padding: 0 6px;
 }
 
 .time-label {
@@ -1331,28 +1440,34 @@ body.playing .wave-visualizer span:nth-child(15) { animation-duration: 0.98s; an
   min-width: 36px;
   text-align: center;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .progress-bar-wrap {
   flex: 1;
-  height: 20px;
+  height: 24px;
   display: flex;
   align-items: center;
   cursor: pointer;
+  touch-action: none;
+  position: relative;
+  user-select: none;
 }
 
 .progress-track {
   position: relative;
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
-  transition: height 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
-.progress-bar-wrap:hover .progress-track {
-  height: 6px;
+.progress-bar-wrap:hover .progress-track,
+.progress-bar-wrap.is-dragging .progress-track {
+  height: 7px;
 }
 
 .progress-fill {
@@ -1361,26 +1476,30 @@ body.playing .wave-visualizer span:nth-child(15) { animation-duration: 0.98s; an
   top: 0;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--accent) 0%, #fff 100%);
+  background: linear-gradient(90deg, var(--accent, #a855f7) 0%, #ffffff 100%);
   border-radius: 999px;
-  box-shadow: 0 0 10px var(--accent-glow);
+  box-shadow: 0 0 10px var(--accent-glow, rgba(168, 85, 247, 0.5));
+  pointer-events: none;
 }
 
 .progress-handle {
   position: absolute;
   top: 50%;
   left: 0%;
-  transform: translate3d(-50%, -50%, 0) scale(0);
-  width: 12px;
-  height: 12px;
+  transform: translate(-50%, -50%) scale(0);
+  width: 14px;
+  height: 14px;
   background: #ffffff;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px var(--accent-glow);
-  transition: transform 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 14px var(--accent-glow, rgba(168, 85, 247, 0.9));
+  pointer-events: none;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
 }
 
-.progress-bar-wrap:hover .progress-handle {
-  transform: translate3d(-50%, -50%, 0) scale(1);
+.progress-bar-wrap:hover .progress-handle,
+.progress-bar-wrap.is-dragging .progress-handle {
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* ==================== Up Next Glass Pill ==================== */
@@ -6380,738 +6499,6 @@ input:focus-visible {
   }
 }
 
-/* ==========================================================================
-   NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER 4.0
-   Authentic Nothing Phone 4a Pro / Nothing OS LED Interface
-   ========================================================================== */
-.glyph-matrix-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 2100;
-  background: #000000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  user-select: none;
-}
-
-.glyph-matrix-modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.glyph-matrix-container {
-  width: 100%;
-  height: 100%;
-  max-width: 680px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  box-sizing: border-box;
-  color: #ffffff;
-  font-family: 'Space Grotesk', monospace;
-  position: relative;
-}
-
-/* Nothing OS Top Header */
-.glyph-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glyph-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.glyph-dot-rec {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ff0033;
-  box-shadow: 0 0 10px #ff0033;
-  animation: pulseGlyphRec 1.4s infinite alternate;
-}
-
-@keyframes pulseGlyphRec {
-  0% { opacity: 0.3; transform: scale(0.85); }
-  100% { opacity: 1; transform: scale(1.15); }
-}
-
-.glyph-title {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: #e5e5e5;
-  text-transform: uppercase;
-}
-
-.glyph-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.glyph-mode-pill {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 9px;
-  font-family: inherit;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
-
-.glyph-mode-pill:hover,
-.glyph-mode-pill.active {
-  background: rgba(255, 0, 51, 0.18);
-  border-color: #ff0033;
-  color: #ff334b;
-}
-
-/* ==========================================================================
-   NOTHING (R) GLYPH MATRIX & DOT PLAY 4.0 — ULTRA PREMIUM EDITION
-   Authentic Nothing Phone (4a) Pro / Nothing OS Cyberpunk Interface
-   ========================================================================== */
-.glyph-matrix-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 2200;
-  background: rgba(3, 3, 6, 0.94);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  user-select: none;
-}
-
-.glyph-matrix-modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.glyph-matrix-backdrop-glow {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 0, 51, 0.18) 0%, rgba(255, 0, 51, 0) 70%);
-  filter: blur(60px);
-  pointer-events: none;
-  transition: background 0.4s ease;
-}
-
-.glyph-matrix-container {
-  width: clamp(320px, 92vw, 560px);
-  max-height: 94vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, rgba(22, 22, 30, 0.85) 0%, rgba(8, 8, 12, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 32px;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    0 24px 80px rgba(0, 0, 0, 0.9),
-    0 0 40px rgba(255, 0, 51, 0.15);
-  padding: 18px 20px;
-  gap: 16px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Nothing OS Header */
-.glyph-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 12px;
-  gap: 8px;
-}
-
-.glyph-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.glyph-dot-rec {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ff0033;
-  box-shadow: 0 0 10px #ff0033, 0 0 20px #ff0033;
-  animation: glyphPulseDot 1.4s infinite ease-in-out;
-  flex-shrink: 0;
-}
-
-@keyframes glyphPulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
-}
-
-.glyph-brand-titles {
-  display: flex;
-  flex-direction: column;
-}
-
-.glyph-title {
-  font-family: 'Space Grotesk', 'Courier New', monospace;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  color: #f1f1f5;
-  text-transform: uppercase;
-}
-
-.glyph-subtitle {
-  font-size: 8px;
-  font-family: monospace;
-  letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.glyph-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.glyph-live-bpm {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 8.5px;
-  font-family: monospace;
-  font-weight: 800;
-  color: #ff334b;
-  letter-spacing: 0.08em;
-}
-
-.bpm-pulse-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #ff0033;
-  box-shadow: 0 0 6px #ff0033;
-  animation: bpmBeat 0.5s infinite alternate;
-}
-
-@keyframes bpmBeat {
-  0% { transform: scale(0.8); opacity: 0.4; }
-  100% { transform: scale(1.4); opacity: 1; }
-}
-
-.glyph-mode-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ddd;
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 9px;
-  font-family: 'Space Grotesk', monospace;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glyph-mode-pill:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.glyph-mode-pill:active {
-  transform: scale(0.96);
-}
-
-.glyph-mode-pill.active {
-  background: rgba(255, 0, 51, 0.2);
-  border-color: rgba(255, 0, 51, 0.6);
-  color: #ff334b;
-  box-shadow: 0 0 14px rgba(255, 0, 51, 0.35);
-}
-
-.glyph-color-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ff0033;
-  box-shadow: 0 0 8px #ff0033;
-}
-
-.glyph-close-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.glyph-close-btn:hover {
-  background: rgba(255, 0, 51, 0.25);
-  border-color: #ff0033;
-  transform: rotate(90deg);
-}
-
-/* Nothing Stage & Transparent Phone Hardware Simulator */
-.glyph-stage {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  position: relative;
-  width: 100%;
-}
-
-.nothing-phone-body {
-  width: clamp(270px, 78vw, 360px);
-  height: clamp(330px, 48vh, 420px);
-  border: 2px solid rgba(255, 255, 255, 0.16);
-  border-radius: 40px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(26, 26, 36, 0.6) 0%, rgba(5, 5, 8, 0.98) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
-  box-shadow:
-    inset 0 0 60px rgba(0, 0, 0, 0.95),
-    0 20px 60px rgba(0, 0, 0, 0.85),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-/* Micro-Circuit grid overlay */
-.phone-circuit-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 16px 16px;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* Authentic Nothing Phone LED Glyph Strips */
-.glyph-strip {
-  position: absolute;
-  border-color: #ff0033;
-  color: #ff0033;
-  opacity: 0.8;
-  transition: opacity 0.06s ease, filter 0.06s ease, transform 0.06s ease;
-  will-change: opacity, filter, transform;
-}
-
-.glyph-strip.strobe-on {
-  opacity: 1 !important;
-  filter: drop-shadow(0 0 16px currentColor) drop-shadow(0 0 32px currentColor) !important;
-  transform: scale(1.025);
-}
-
-/* Camera Housing */
-.glyph-camera-housing {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 76px;
-  height: 76px;
-}
-
-.glyph-camera-ring {
-  position: absolute;
-  inset: 0;
-  border: 3.5px solid #ff0033;
-  border-radius: 50%;
-  border-right-color: transparent;
-  transform: rotate(-35deg);
-  box-shadow: 0 0 14px rgba(255, 0, 51, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.camera-lens-reflection {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #2a2a38 0%, #0d0d12 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
-}
-
-.glyph-camera-arc-accent {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 22px;
-  height: 22px;
-  border: 2.5px solid rgba(255, 0, 51, 0.5);
-  border-radius: 50%;
-  border-left-color: transparent;
-  border-bottom-color: transparent;
-}
-
-/* Top-Right Diagonal Strip */
-.glyph-top-diag {
-  top: 24px;
-  right: 22px;
-  width: 3px;
-  height: 48px;
-  background: #ff0033;
-  border-radius: 2px;
-  transform: rotate(18deg);
-  box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
-}
-
-/* Center Wireless Coil */
-.glyph-center-coil {
-  width: clamp(180px, 48vw, 230px);
-  height: clamp(180px, 48vw, 230px);
-  border: 3.5px solid #ff0033;
-  border-radius: 50%;
-  border-top-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 20px rgba(255, 0, 51, 0.45), inset 0 0 20px rgba(255, 0, 51, 0.08);
-  position: relative;
-}
-
-.coil-copper-texture {
-  position: absolute;
-  inset: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.glyph-dot-canvas-wrap {
-  width: 88%;
-  height: 52%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 14px;
-  padding: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-#glyphDotCanvas {
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-
-/* Bottom Exclamation */
-.glyph-bottom-group {
-  position: absolute;
-  bottom: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.glyph-bottom-bar {
-  position: static;
-  width: 4px;
-  height: 28px;
-  background: #ff0033;
-  border-radius: 2px;
-  box-shadow: 0 0 12px rgba(255, 0, 51, 0.6);
-}
-
-.glyph-bottom-dot {
-  position: static;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ff0033;
-  box-shadow: 0 0 12px rgba(255, 0, 51, 0.7);
-}
-
-.phone-back-wordmark {
-  position: absolute;
-  bottom: 12px;
-  left: 24px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 8px;
-  letter-spacing: 0.24em;
-  color: rgba(255, 255, 255, 0.2);
-  text-transform: lowercase;
-}
-
-/* Live Lyrics Text Readout */
-.glyph-lyrics-readout {
-  text-align: center;
-  width: 100%;
-  max-width: 90vw;
-}
-
-.glyph-lyrics-line {
-  font-size: clamp(14px, 3.8vw, 19px);
-  font-weight: 800;
-  font-family: 'Space Grotesk', sans-serif;
-  color: #ff334b;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-shadow: 0 0 16px rgba(255, 0, 51, 0.75);
-  min-height: 26px;
-  transition: color 0.3s ease;
-}
-
-.glyph-track-meta {
-  font-size: 9px;
-  font-family: monospace;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 4px;
-  text-transform: uppercase;
-}
-
-/* Footer Chips */
-.glyph-footer-bar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 12px;
-}
-
-.glyph-mode-chips {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.glyph-chip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #d1d1db;
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 9px;
-  font-family: 'Space Grotesk', monospace;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glyph-chip:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.glyph-chip:active {
-  transform: scale(0.95);
-}
-
-.glyph-chip.active {
-  background: #ff0033;
-  color: #ffffff;
-  border-color: #ff0033;
-  box-shadow: 0 0 16px rgba(255, 0, 51, 0.65);
-}
-
-.glyph-device-tag {
-  font-size: 7.5px;
-  font-family: monospace;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-}
-
-/* White Glyph Theme */
-.glyph-matrix-modal.theme-white .glyph-matrix-backdrop-glow {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-}
-.glyph-matrix-modal.theme-white .glyph-matrix-container {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 24px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 255, 255, 0.2);
-}
-.glyph-matrix-modal.theme-white .glyph-strip {
-  border-color: #ffffff;
-  color: #ffffff;
-}
-.glyph-matrix-modal.theme-white .glyph-dot-rec,
-.glyph-matrix-modal.theme-white .glyph-top-diag,
-.glyph-matrix-modal.theme-white .glyph-bottom-bar,
-.glyph-matrix-modal.theme-white .glyph-bottom-dot,
-.glyph-matrix-modal.theme-white .glyph-color-indicator,
-.glyph-matrix-modal.theme-white .bpm-pulse-dot {
-  background: #ffffff;
-  box-shadow: 0 0 12px #ffffff;
-}
-.glyph-matrix-modal.theme-white .glyph-live-bpm {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-.glyph-matrix-modal.theme-white .glyph-lyrics-line {
-  color: #ffffff;
-  text-shadow: 0 0 16px rgba(255, 255, 255, 0.85);
-}
-.glyph-matrix-modal.theme-white .glyph-mode-pill.active {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: #ffffff;
-  color: #ffffff;
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
-}
-.glyph-matrix-modal.theme-white .glyph-chip.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.7);
-}
-
-/* Amber Theme */
-.glyph-matrix-modal.theme-amber .glyph-matrix-backdrop-glow {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0) 70%);
-}
-.glyph-matrix-modal.theme-amber .glyph-matrix-container {
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2), 0 24px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(245, 158, 11, 0.25);
-}
-.glyph-matrix-modal.theme-amber .glyph-strip {
-  border-color: #f59e0b;
-  color: #f59e0b;
-}
-.glyph-matrix-modal.theme-amber .glyph-dot-rec,
-.glyph-matrix-modal.theme-amber .glyph-top-diag,
-.glyph-matrix-modal.theme-amber .glyph-bottom-bar,
-.glyph-matrix-modal.theme-amber .glyph-bottom-dot,
-.glyph-matrix-modal.theme-amber .glyph-color-indicator,
-.glyph-matrix-modal.theme-amber .bpm-pulse-dot {
-  background: #f59e0b;
-  box-shadow: 0 0 12px #f59e0b;
-}
-.glyph-matrix-modal.theme-amber .glyph-live-bpm {
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.35);
-}
-.glyph-matrix-modal.theme-amber .glyph-lyrics-line {
-  color: #fbbf24;
-  text-shadow: 0 0 16px rgba(245, 158, 11, 0.85);
-}
-.glyph-matrix-modal.theme-amber .glyph-mode-pill.active {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: #f59e0b;
-  color: #fbbf24;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
-}
-.glyph-matrix-modal.theme-amber .glyph-chip.active {
-  background: #f59e0b;
-  color: #000000;
-  border-color: #f59e0b;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
-}
-
-/* ==================== Responsive Mobile & Tablet Ergonomics ==================== */
-@media (max-width: 600px) {
-  .glyph-matrix-container {
-    width: 95vw;
-    padding: 14px 12px;
-    gap: 12px;
-    border-radius: 24px;
-  }
-
-  .glyph-header {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .glyph-brand-titles .glyph-title {
-    font-size: 9.5px;
-  }
-
-  .glyph-mode-pill {
-    padding: 4px 8px;
-    font-size: 8px;
-  }
-
-  .nothing-phone-body {
-    width: min(290px, 82vw);
-    height: min(340px, 44vh);
-    border-radius: 32px;
-  }
-
-  .glyph-mode-chips {
-    gap: 6px;
-    justify-content: center;
-  }
-
-  .glyph-chip {
-    padding: 7px 11px;
-    font-size: 8.5px;
-    min-height: 38px;
-  }
-}
-
-@media (max-width: 380px) {
-  .glyph-matrix-container {
-    width: 98vw;
-    padding: 10px 8px;
-  }
-
-  .nothing-phone-body {
-    width: 260px;
-    height: 300px;
-  }
-
-  .glyph-chip {
-    padding: 5px 8px;
-    font-size: 7.5px;
-  }
-}
 
 /* ====================================================================
    MOBILE GPU PERFORMANCE OVERHAUL (v101.3)
@@ -7123,7 +6510,6 @@ input:focus-visible {
   .art-card,
   .turntable-container,
   .turntable-wrap,
-  .vinyl-disc,
   .ctrl-btn,
   .modal-card,
   .premium-sidebar-menu,
@@ -7156,7 +6542,6 @@ input:focus-visible {
   .command-palette-card,
   .mood-universe-modal,
   .sleep-timer-modal,
-  .glyph-matrix-modal,
   .auth-modal-card,
   .shorts-modal-card,
   .cmd-results,
@@ -7173,30 +6558,13 @@ input:focus-visible {
     -webkit-backdrop-filter: blur(6px) !important;
   }
 
-  /* Disable CSS animation on elements that are off-screen */
-  .vinyl-disc {
-    /* Use simpler spin — remove saturate filter on mobile */
-    filter: none !important;
-  }
-
   /* Prevent layout thrash from floating animations */
   .floating-reaction-emoji {
     will-change: transform, opacity;
   }
 
-  /* Disable turntable arm animation on mobile (CPU-heavy) */
-  .tonearm-container {
-    animation: none !important;
-    transition: transform 0.3s ease !important;
-  }
-
   /* Reduce bg particle canvas opacity to 0 on mobile (already disabled in JS) */
   #particles {
-    display: none !important;
-  }
-
-  /* Weather sky canvas: reduce opacity so even if it renders, it's invisible */
-  #skyCanvas {
     display: none !important;
   }
 
@@ -7207,139 +6575,7 @@ input:focus-visible {
   }
 }
 
-/* ==========================================================================
-   AURA (R) LIVE AUDIO VISUALIZER STUDIO — ULTRA LUXURY EDITION
-   Real-Time Beat, Spectrum, Oscilloscope & Quantum Particle Engine
-   ========================================================================== */
-.visualizer-studio-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 2200;
-  background: rgba(3, 3, 8, 0.95);
-  backdrop-filter: blur(32px) saturate(190%);
-  -webkit-backdrop-filter: blur(32px) saturate(190%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  user-select: none;
-}
 
-.visualizer-studio-modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.visualizer-container {
-  width: min(1080px, 94vw) !important;
-  height: min(680px, 90vh) !important;
-  max-height: 92vh !important;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, rgba(14, 16, 26, 0.92) 0%, rgba(6, 7, 14, 0.98) 100%) !important;
-  border: 1px solid rgba(0, 240, 255, 0.25) !important;
-  border-radius: 28px !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 32px 100px rgba(0, 0, 0, 0.95),
-    0 0 60px rgba(0, 240, 255, 0.15) !important;
-  padding: 20px 24px !important;
-  gap: 16px !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.visualizer-stage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  min-height: 0;
-  width: 100%;
-}
-
-.visualizer-canvas-card {
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(16, 20, 36, 0.8) 0%, rgba(4, 5, 10, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8);
-}
-
-.visualizer-track-overlay {
-  position: absolute;
-  top: 18px;
-  left: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  pointer-events: none;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 8px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-}
-
-.viz-track-badge {
-  font-family: 'Space Grotesk', monospace;
-  font-size: 8px;
-  font-weight: 800;
-  color: #00f0ff;
-  letter-spacing: 0.15em;
-}
-
-/* Theme Variations */
-.visualizer-studio-modal.theme-cyan .visualizer-container {
-  border-color: rgba(0, 240, 255, 0.35) !important;
-  box-shadow: 0 0 60px rgba(0, 240, 255, 0.15) !important;
-}
-.visualizer-studio-modal.theme-amber .visualizer-container {
-  border-color: rgba(245, 158, 11, 0.35) !important;
-  box-shadow: 0 0 60px rgba(245, 158, 11, 0.15) !important;
-}
-.visualizer-studio-modal.theme-emerald .visualizer-container {
-  border-color: rgba(16, 185, 129, 0.35) !important;
-  box-shadow: 0 0 60px rgba(16, 185, 129, 0.15) !important;
-}
-.visualizer-studio-modal.theme-red .visualizer-container {
-  border-color: rgba(255, 0, 51, 0.35) !important;
-  box-shadow: 0 0 60px rgba(255, 0, 51, 0.15) !important;
-}
-.visualizer-studio-modal.theme-white .visualizer-container {
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: 0 0 60px rgba(255, 255, 255, 0.15) !important;
-}
-
-@media (max-width: 768px) {
-  .visualizer-container {
-    width: 96vw !important;
-    height: 88vh !important;
-    padding: 14px !important;
-    border-radius: 20px !important;
-  }
-  .visualizer-track-overlay {
-    top: 10px;
-    left: 10px;
-    padding: 6px 12px;
-  }
-  .glyph-mode-chips {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
-  }
-}
 
 
 /* ==================== Full-Screen YouTube Music Universe View ==================== */
@@ -7359,85 +6595,7 @@ input:focus-visible {
   animation: uniFadeIn 0.25s ease-out;
 }
 
-.global-floating-back-btn {
-  display: none !important;
-}
 
-body.in-explorer-mode header,
-body.in-explorer-mode main,
-body.in-explorer-mode .shell {
-  display: none !important;
-}
-
-/* Remove 3D card tilt & heavy blurs for zero lag */
-.turntable-wrap {
-  perspective: none !important;
-}
-
-.art-card {
-  transform: none !important;
-  transition: transform 0.2s ease !important;
-}
-
-.art-card:hover {
-  transform: scale(1.02) !important;
-}
-
-.art-glare {
-  display: none !important;
-}
-
-
-/* ==================== Hero Section Surprise Me Button ==================== */
-.hero-surprise-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.16) 0%, rgba(139, 92, 246, 0.22) 100%);
-  border: 1px solid rgba(236, 72, 153, 0.4);
-  padding: 0 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  transition: all 0.22s var(--ease-smooth);
-  flex-shrink: 0;
-}
-
-.hero-surprise-btn:hover {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(139, 92, 246, 0.4) 100%);
-  border-color: rgba(236, 72, 153, 0.8);
-  transform: translateY(-1px) scale(1.04);
-  box-shadow: 0 0 16px rgba(236, 72, 153, 0.6);
-}
-
-.hero-surprise-btn:active {
-  transform: scale(0.96);
-}
-
-.hero-dice-icon {
-  font-size: 13px;
-  display: inline-block;
-  transition: transform 0.3s ease;
-}
-
-.hero-surprise-btn:hover .hero-dice-icon {
-  transform: rotate(45deg) scale(1.15);
-}
-
-@media (max-width: 600px) {
-  .hero-surprise-btn {
-    padding: 0 9px;
-    height: 26px;
-    font-size: 10px;
-  }
-}
 
 
 /* ==================== ULTIMATE 60FPS PERFORMANCE & ZERO-GPU OVERRIDES ==================== */
@@ -7464,7 +6622,6 @@ body.in-explorer-mode .shell {
 .sky-card,
 .glass-modal-card,
 .premium-sidebar-menu,
-.hero-surprise-btn,
 .mood-universe-btn,
 .header-tool-btn,
 .ctrl-btn {
@@ -7625,12 +6782,7 @@ body.in-cinema-mode #playerA iframe {
   display: block !important;
 }
 
-/* Hide awkward fake vinyl half-discs */
-.vinyl-aura-ring,
-.vinyl-disc,
-.turntable-arm {
-  display: none !important;
-}
+
 
 /* 2. Unified Seamless Floating Glass Dock (Zero Box Dividers/Lines) */
 .controls-glass {
@@ -7643,6 +6795,43 @@ body.in-cinema-mode #playerA iframe {
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
+  max-width: min(95vw, 560px) !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 480px) {
+  .controls-glass {
+    max-width: calc(100vw - 16px) !important;
+    padding: 4px 8px !important;
+    gap: 4px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .controls-glass::-webkit-scrollbar {
+    display: none !important;
+  }
+  .dock-core,
+  .dock-wing,
+  .dock-wing-left,
+  .dock-wing-right {
+    gap: 4px !important;
+  }
+  .ctrl-btn {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+  }
+  .ctrl-btn.play-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+  .wordmark {
+    font-size: clamp(18px, 4.5vw, 24px) !important;
+  }
 }
 
 .dock-core,
@@ -7714,63 +6903,6 @@ body.in-cinema-mode #playerA iframe {
   0% { transform: rotate(0deg) scale(1); }
   40% { transform: rotate(180deg) scale(1.25); }
   100% { transform: rotate(360deg) scale(1); }
-}
-
-/* 3. Perfect Progress Scrubber */
-.progress-container {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 14px !important;
-  width: 100% !important;
-  max-width: 460px !important;
-  margin: 10px auto 6px !important;
-  padding: 0 6px !important;
-}
-
-.progress-bar-wrap {
-  flex: 1 !important;
-  height: 20px !important;
-  display: flex !important;
-  align-items: center !important;
-  cursor: pointer !important;
-}
-
-.progress-track {
-  position: relative !important;
-  width: 100% !important;
-  height: 5px !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-radius: 999px !important;
-  transition: height 0.2s ease !important;
-}
-
-.progress-bar-wrap:hover .progress-track {
-  height: 7px !important;
-}
-
-.progress-fill {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, var(--accent, #a855f7) 0%, #ffffff 100%) !important;
-  border-radius: 999px !important;
-  box-shadow: 0 0 10px var(--accent-glow, rgba(168, 85, 247, 0.5)) !important;
-}
-
-.progress-handle {
-  position: absolute !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 14px !important;
-  height: 14px !important;
-  background: #ffffff !important;
-  border-radius: 50% !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 14px var(--accent-glow, rgba(168, 85, 247, 0.9)) !important;
-  pointer-events: none !important;
-  transition: transform 0.15s ease !important;
-  z-index: 5 !important;
 }
 
 /* 4. Disable Black Screen Video Modal Layer */

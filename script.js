@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v123.0') caches.delete(name);
+        if (name !== 'aura-music-v124.0') caches.delete(name);
       });
     });
   }
@@ -1724,6 +1724,7 @@
 
   var currentTrackIndex = 0;
   var currentTrackQueue = [];
+  var currentSpeedMode = '1.0'; // '1.0', '1.25', '0.85'
 
   function loadStationPlayback(st) {
     if (!player) return;
@@ -1782,6 +1783,10 @@
           } else if (player.cuePlaylist) {
             player.cuePlaylist(currentTrackQueue, currentTrackIndex, 0);
           }
+        }
+
+        if (player.setPlaybackRate && typeof currentSpeedMode !== 'undefined') {
+          try { player.setPlaybackRate(parseFloat(currentSpeedMode) || 1.0); } catch (e) {}
         }
       } catch (e) {
         console.error("Playback load error", e);
@@ -2039,10 +2044,39 @@
       });
     }
 
+    // Populate continuous playback queue with fallback recommendations and catalog tracks
+    var queuePool = [];
+    if (typeof YOUTUBE_DISCOVERY_CATALOG !== 'undefined' && Array.isArray(YOUTUBE_DISCOVERY_CATALOG)) {
+      YOUTUBE_DISCOVERY_CATALOG.forEach(function (c) {
+        if (c && c.id && c.id !== track.id && queuePool.indexOf(c.id) === -1) {
+          queuePool.push(c.id);
+        }
+      });
+    }
+    if (typeof STATION_TRACKS !== 'undefined') {
+      var stationPool = (STATION_TRACKS['ishq'] || []).concat(STATION_TRACKS['time-travel'] || []);
+      stationPool.forEach(function (sid) {
+        if (sid && sid !== track.id && queuePool.indexOf(sid) === -1) {
+          queuePool.push(sid);
+        }
+      });
+    }
+    queuePool.sort(function () { return 0.5 - Math.random(); });
+    currentTrackQueue = [track.id].concat(queuePool.slice(0, 50));
+    currentTrackIndex = 0;
+    window.currentTrackQueue = currentTrackQueue;
+    window.currentTrackIndex = currentTrackIndex;
+    if (typeof STATION_TRACKS !== 'undefined') {
+      STATION_TRACKS['explorer'] = currentTrackQueue;
+      window.STATION_TRACKS = STATION_TRACKS;
+    }
 
     try {
       if (player.loadVideoById) {
         player.loadVideoById(track.id);
+      }
+      if (player.setPlaybackRate && typeof currentSpeedMode !== 'undefined') {
+        try { player.setPlaybackRate(parseFloat(currentSpeedMode) || 1.0); } catch (err) {}
       }
     } catch (e) {}
 
@@ -2467,6 +2501,12 @@
     });
   }
 
+  if (cinemaVideoModal) {
+    cinemaVideoModal.addEventListener('click', function (e) {
+      if (e.target === cinemaVideoModal) closeCinemaMode();
+    });
+  }
+
   // Keyboard Shortcuts: 'V' for Video Mode, 'Esc' to exit Cinema Mode
 
   document.addEventListener('keydown', function (e) {
@@ -2629,13 +2669,12 @@
     var lastSkyTime = 0;
 
     function renderParticles(time) {
-      // Kill RAF on mobile entirely (saves battery + CPU)
-      if (window.innerWidth <= 768) {
-        if (ctx && canvas) ctx.clearRect(0, 0, width, height);
-        // Do NOT continue RAF loop on mobile
+      if (!ctx || !canvas) {
+        animFrame = requestAnimationFrame(renderParticles);
         return;
       }
-      if (!ctx || !canvas || document.hidden) {
+
+      if (document.hidden) {
         animFrame = requestAnimationFrame(renderParticles);
         return;
       }
@@ -2647,7 +2686,9 @@
         return;
       }
 
-      var throttleInterval = 40; // 25 FPS on desktop
+      // Adaptive mobile throttling: 40ms interval on mobile (~25fps), 33ms on desktop (~30fps)
+      var isMobile = window.innerWidth <= 768;
+      var throttleInterval = isMobile ? 40 : 33;
       if (time - lastSkyTime < throttleInterval) {
         animFrame = requestAnimationFrame(renderParticles);
         return;
@@ -2660,7 +2701,8 @@
         ctx.strokeStyle = currentSkyTheme === 'thunderstorm' ? 'rgba(200, 225, 255, 0.45)' : 'rgba(180, 210, 255, 0.32)';
         ctx.lineWidth = 1.1;
         ctx.beginPath();
-        for (var i = 0; i < particles.length; i++) {
+        var limit = isMobile ? Math.min(particles.length, 25) : particles.length;
+        for (var i = 0; i < limit; i++) {
           var p = particles[i];
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p.x + p.vx * 1.4, p.y + p.l);
@@ -2684,7 +2726,8 @@
       } else if (currentSkyTheme === 'snow') {
         ctx.fillStyle = 'rgba(240, 248, 255, 0.65)';
         ctx.beginPath();
-        for (var sn = 0; sn < particles.length; sn++) {
+        var snowLimit = isMobile ? Math.min(particles.length, 18) : particles.length;
+        for (var sn = 0; sn < snowLimit; sn++) {
           var ps = particles[sn];
           ctx.moveTo(ps.x + ps.r, ps.y);
           ctx.arc(ps.x, ps.y, ps.r, 0, Math.PI * 2);
@@ -2699,7 +2742,8 @@
       } else if (currentSkyTheme === 'night') {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.beginPath();
-        for (var ni = 0; ni < particles.length; ni++) {
+        var nightLimit = isMobile ? Math.min(particles.length, 20) : particles.length;
+        for (var ni = 0; ni < nightLimit; ni++) {
           var pn = particles[ni];
           ctx.moveTo(pn.x + pn.r, pn.y);
           ctx.arc(pn.x, pn.y, pn.r, 0, Math.PI * 2);
@@ -2708,7 +2752,8 @@
       } else if (currentSkyTheme === 'sunny') {
         ctx.fillStyle = 'rgba(255, 220, 140, 0.3)';
         ctx.beginPath();
-        for (var su = 0; su < particles.length; su++) {
+        var sunLimit = isMobile ? Math.min(particles.length, 12) : particles.length;
+        for (var su = 0; su < sunLimit; su++) {
           var psu = particles[su];
           ctx.moveTo(psu.x + psu.r, psu.y);
           ctx.arc(psu.x, psu.y, psu.r, 0, Math.PI * 2);
@@ -2721,7 +2766,8 @@
         }
         ctx.fill();
       } else if (currentSkyTheme === 'sunset') {
-        for (var se = 0; se < particles.length; se++) {
+        var sunsetLimit = isMobile ? Math.min(particles.length, 12) : particles.length;
+        for (var se = 0; se < sunsetLimit; se++) {
           var pse = particles[se];
           ctx.fillStyle = pse.color + pse.alpha + ')';
           ctx.beginPath();
@@ -2737,7 +2783,8 @@
           }
         }
       } else if (currentSkyTheme === 'windy') {
-        for (var w = 0; w < particles.length; w++) {
+        var windLimit = isMobile ? Math.min(particles.length, 10) : particles.length;
+        for (var w = 0; w < windLimit; w++) {
           var pw = particles[w];
           ctx.save();
           ctx.translate(pw.x, pw.y);
@@ -2753,9 +2800,22 @@
           if (pw.x > width + 20) pw.x = -20;
           if (pw.y > height + 20) pw.y = -20;
         }
+      } else if (currentSkyTheme === 'fog') {
+        for (var f = 0; f < particles.length; f++) {
+          var pf = particles[f];
+          ctx.fillStyle = 'rgba(210, 225, 240, ' + pf.alpha + ')';
+          ctx.beginPath();
+          ctx.arc(pf.x, pf.y, pf.r, 0, Math.PI * 2);
+          ctx.fill();
+          pf.x += pf.vx;
+          if (pf.x - pf.r > width) {
+            pf.x = -pf.r;
+            pf.y = height * 0.4 + Math.random() * height * 0.6;
+          }
+        }
       }
 
-      // Weather particles RAF loop disabled for 0% CPU/GPU usage
+      animFrame = requestAnimationFrame(renderParticles);
     }
 
 
@@ -2930,6 +2990,7 @@
 
     return {
       setTheme: setSkyTheme,
+      setSkyTheme: setSkyTheme,
       open: openModal,
       close: closeModal
     };
@@ -3277,6 +3338,11 @@
   if (_closeShortcutsBtn && _shortcutsModal) {
     _closeShortcutsBtn.addEventListener('click', function () {
       _shortcutsModal.classList.remove('open');
+    });
+  }
+  if (_shortcutsModal) {
+    _shortcutsModal.addEventListener('click', function (e) {
+      if (e.target === _shortcutsModal) _shortcutsModal.classList.remove('open');
     });
   }
 
@@ -6024,6 +6090,11 @@
       if (e.target && e.target.setPlaybackQuality) {
         try { e.target.setPlaybackQuality('small'); } catch (err) {}
       }
+      if (e.target && e.target.setPlaybackRate && typeof currentSpeedMode !== 'undefined') {
+        try { e.target.setPlaybackRate(parseFloat(currentSpeedMode) || 1.0); } catch (err) {}
+      } else if (player && player.setPlaybackRate && typeof currentSpeedMode !== 'undefined') {
+        try { player.setPlaybackRate(parseFloat(currentSpeedMode) || 1.0); } catch (err) {}
+      }
     } else if (e.data === YT.PlayerState.PAUSED) {
       document.body.classList.remove('playing');
       DynamicIslandEngine.updatePlayState(false);
@@ -7153,21 +7224,21 @@
       // 2. Map Category to Rich Master Station Pools
       if (typeof STATION_TRACKS !== 'undefined') {
         var poolMap = {
-          'romance': ['ishq', 'time-travel', 'explorer'],
+          'romance': ['ishq', 'time-travel'],
           'energy': ['edm', 'demanding', 'time-travel'],
-          'global': ['time-travel', 'explorer', 'edm'],
-          'chill': ['explorer', 'ishq', 'time-travel'],
+          'global': ['time-travel', 'edm', 'ishq'],
+          'chill': ['ishq', 'time-travel', '90s'],
           'punjabi': ['demanding', 'time-travel', 'edm'],
-          'retro': ['90s', 'time-travel'],
-          'sufi': ['ishq', 'explorer', 'time-travel'],
-          'wellness': ['explorer', 'ishq'],
+          'retro': ['90s', 'time-travel', 'ishq'],
+          'sufi': ['ishq', 'time-travel'],
+          'wellness': ['ishq', 'time-travel'],
           'time': ['time-travel', '90s', 'ishq'],
           'party': ['edm', 'demanding', 'time-travel']
         };
 
         var matchedKeys = poolMap[mood.category] || ['time-travel', 'ishq'];
         matchedKeys.forEach(function (k) {
-          if (STATION_TRACKS[k] && Array.isArray(STATION_TRACKS[k])) {
+          if (k && STATION_TRACKS[k] && Array.isArray(STATION_TRACKS[k])) {
             var poolSlice = STATION_TRACKS[k].slice(0, 30);
             poolSlice.forEach(function (vid) {
               if (vid && tracks.indexOf(vid) === -1) tracks.push(vid);
@@ -7807,9 +7878,72 @@
     });
   }
 
-  // Progress Bar Seek
+  // Progress Bar Seek & Smooth Drag Mechanics (Pointer Events + 400ms Anti-Rubber-Banding Cooldown)
   var progressBar = $('progressBar');
+  var isScrubbing = false;
+  var isSeekingCooldown = false;
+  var seekCooldownTimer = null;
+
+  function setScrubberVisual(percent, targetTime) {
+    if ($('progressFill')) $('progressFill').style.width = (percent * 100) + '%';
+    if ($('progressHandle')) $('progressHandle').style.left = (percent * 100) + '%';
+    if (typeof targetTime === 'number' && $('timeCurrent')) {
+      $('timeCurrent').textContent = fmt(targetTime);
+    }
+  }
+
+  function triggerSeekCooldown() {
+    isSeekingCooldown = true;
+    if (seekCooldownTimer) clearTimeout(seekCooldownTimer);
+    seekCooldownTimer = setTimeout(function () {
+      isSeekingCooldown = false;
+    }, 400);
+  }
+
   if (progressBar) {
+    progressBar.addEventListener('pointerdown', function (e) {
+      if (!player || !apiReady) return;
+      isScrubbing = true;
+      progressBar.classList.add('is-dragging');
+      if (progressBar.setPointerCapture && e.pointerId != null) {
+        try { progressBar.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      var rect = progressBar.getBoundingClientRect();
+      var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      var dur = player.getDuration ? player.getDuration() : 0;
+      setScrubberVisual(percent, dur > 0 ? (dur * percent) : 0);
+    });
+
+    progressBar.addEventListener('pointermove', function (e) {
+      if (!isScrubbing || !player) return;
+      var rect = progressBar.getBoundingClientRect();
+      var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      var dur = player.getDuration ? player.getDuration() : 0;
+      setScrubberVisual(percent, dur > 0 ? (dur * percent) : 0);
+    });
+
+    function finishScrub(e) {
+      if (!isScrubbing) return;
+      isScrubbing = false;
+      progressBar.classList.remove('is-dragging');
+      if (progressBar.releasePointerCapture && e.pointerId != null) {
+        try { progressBar.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+      if (!player || !apiReady) return;
+      claimAudioMaster();
+      var rect = progressBar.getBoundingClientRect();
+      var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      var dur = player.getDuration ? player.getDuration() : 0;
+      if (dur > 0) {
+        player.seekTo(dur * percent, true);
+        setScrubberVisual(percent, dur * percent);
+        triggerSeekCooldown();
+      }
+    }
+
+    progressBar.addEventListener('pointerup', finishScrub);
+    progressBar.addEventListener('pointercancel', finishScrub);
+
     progressBar.addEventListener('click', function (e) {
       if (!player || !apiReady) return;
       claimAudioMaster();
@@ -7820,6 +7954,8 @@
         player.seekTo(dur * percent, true);
         if ($('progressFill')) $('progressFill').style.width = (percent * 100) + '%';
         if ($('progressHandle')) $('progressHandle').style.left = (percent * 100) + '%';
+        if ($('timeCurrent')) $('timeCurrent').textContent = fmt(dur * percent);
+        triggerSeekCooldown();
       }
     });
   }
@@ -7909,6 +8045,14 @@
       CommandPalette.close();
       ExtrasEngine.close();
       AuthEngine.close();
+      SkyEngine.close();
+      var _mu = $('moodUniverseModal'); if (_mu) _mu.classList.remove('open');
+      var _sm = $('shortcutsModal'); if (_sm) _sm.classList.remove('open');
+      var _qp = $('queuePanel'); if (_qp) _qp.classList.remove('open');
+      var _sb = $('premiumSidebarMenu'); if (_sb) _sb.classList.remove('open');
+      var _sbb = $('sidebarBackdrop'); if (_sbb) _sbb.classList.remove('open');
+      if (document.body.classList.contains('in-cinema-mode') && typeof closeCinemaMode === 'function') closeCinemaMode();
+      if (document.body.classList.contains('in-explorer-mode') && typeof exitExplorerUniverse === 'function') exitExplorerUniverse();
     } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
 
       e.preventDefault();
@@ -7944,7 +8088,7 @@
   var _jamBroadcastCounter = 0;
 
   setInterval(function () {
-    if (!player || !apiReady || !isPlaying() || document.hidden) return;
+    if (!player || !apiReady || !isPlaying() || document.hidden || isScrubbing || isSeekingCooldown) return;
     try {
       var cur = player.getCurrentTime ? player.getCurrentTime() : 0;
       var dur = player.getDuration ? player.getDuration() : 0;
