@@ -43,7 +43,7 @@
       "desc": "Smart AI-curated frequency tailored dynamically to your playing taste, moods & likes",
       "icon": "✨",
       "type": "playlist",
-      "playlistId": "PLFf55m7SQo5Q",
+      "playlistId": "my-vibes",
       "playlistUrl": "custom://my-vibes",
       "songCount": "AI ADAPTIVE",
       "theme": {
@@ -70,13 +70,13 @@
       "name": "📻 ISHQ — Pure Soul",
       "short": "ISHQ 📻",
       "brand": "इश्क़",
-      "brandSub": "PURE SOUL // 1,427 ACOUSTIC MELODIES",
+      "brandSub": "PURE SOUL // 4,000+ ACOUSTIC MELODIES",
       "desc": "Heartfelt acoustic, midnight lo-fi & soul-touching Hindi/Urdu melodies",
       "icon": "📻",
       "type": "playlist",
-      "playlistId": "PLFf55m7SQo5Q",
-      "playlistUrl": "https://youtube.com/playlist?list=PLFf55m7SQo5Q",
-      "songCount": "1,427 SONGS",
+      "playlistId": "PLW5UAO4duiCo",
+      "playlistUrl": "https://music.youtube.com/playlist?list=PLW5UAO4duiCo",
+      "songCount": "4,000+ SONGS",
 
       "theme": {
         "bg": "#080706",
@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v101.4') caches.delete(name);
+        if (name !== 'aura-music-v101.5') caches.delete(name);
       });
     });
   }
@@ -1233,30 +1233,55 @@
       if (st.id !== currentStationKey) return;
 
       try {
-        var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id]) 
-          ? STATION_TRACKS[st.id].slice() 
-          : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0'];
+        activePlaylistId = st.playlistId || st.id;
 
-        currentTrackQueue = list.slice();
-        currentTrackIndex = 0;
-        activePlaylistId = 'station_' + st.id;
-
-        if (player.loadPlaylist) {
+        // If the station is one of the 5 user master playlists, load the authentic YouTube playlist directly
+        if (st.playlistId && st.id !== 'my-vibes' && player.loadPlaylist) {
           if (desired) {
-            player.loadPlaylist(list, 0, 0);
+            player.loadPlaylist({
+              list: st.playlistId,
+              listType: 'playlist',
+              index: 0,
+              startSeconds: 0
+            });
           } else if (player.cuePlaylist) {
-            player.cuePlaylist(list, 0, 0);
+            player.cuePlaylist({
+              list: st.playlistId,
+              listType: 'playlist',
+              index: 0,
+              startSeconds: 0
+            });
           }
           setTimeout(function () {
             if (player.setLoop) player.setLoop(true);
-            if (player.setShuffle) player.setShuffle(false);
-          }, 600);
+            if (player.setShuffle) player.setShuffle(true);
+          }, 800);
         } else {
-          var targetVid = list[0];
-          if (desired && player.loadVideoById) {
-            player.loadVideoById(targetVid);
-          } else if (player.cueVideoById) {
-            player.cueVideoById(targetVid);
+          // Custom / fallback track list (e.g. My Vibes / Moods)
+          var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id]) 
+            ? STATION_TRACKS[st.id].slice() 
+            : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0'];
+
+          currentTrackQueue = list.slice();
+          currentTrackIndex = 0;
+
+          if (player.loadPlaylist) {
+            if (desired) {
+              player.loadPlaylist(list, 0, 0);
+            } else if (player.cuePlaylist) {
+              player.cuePlaylist(list, 0, 0);
+            }
+            setTimeout(function () {
+              if (player.setLoop) player.setLoop(true);
+              if (player.setShuffle) player.setShuffle(false);
+            }, 600);
+          } else {
+            var targetVid = list[0];
+            if (desired && player.loadVideoById) {
+              player.loadVideoById(targetVid);
+            } else if (player.cueVideoById) {
+              player.cueVideoById(targetVid);
+            }
           }
         }
       } catch (e) {
@@ -1288,6 +1313,19 @@
             VibeAgent.handleEarlySkip({ id: vData.video_id, title: vData.title, artist: vData.author });
           }
         }
+      }
+
+      // If playing the user's authentic YouTube playlist, use native YouTube player playlist skip
+      if (currentStation && currentStation.playlistId && currentStation.id !== 'my-vibes') {
+        if (dir === 'next') {
+          if (player.nextVideo) player.nextVideo();
+          showToast('Skipping to Next Song ⏭️');
+        } else {
+          if (player.previousVideo) player.previousVideo();
+          showToast('Previous Song ⏮️');
+        }
+        setTimeout(update, 600);
+        return;
       }
 
       var list = (currentTrackQueue && currentTrackQueue.length) 
@@ -5577,6 +5615,7 @@
     }
 
     // 2. Add upcoming tracks from currentTrackQueue or station tracks
+    var isUserPersonalStation = ['time-travel', 'ishq', 'demanding', '90s', 'edm'].indexOf(currentStationKey) !== -1;
     var stationList = (currentTrackQueue && currentTrackQueue.length) 
       ? currentTrackQueue 
       : ((typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[currentStationKey]) 
@@ -5592,17 +5631,13 @@
       }
     });
 
-    // 3. Populate with catalog songs relevant to current station & mood
-    if (VibeAgent && VibeAgent.catalog) {
+    // 3. For AI stations (My Vibes & Moods only), populate additional dynamic catalog recommendations
+    if (!isUserPersonalStation && VibeAgent && VibeAgent.catalog) {
       var currentKeyClean = (currentStationKey || '').replace('mood-', '');
       VibeAgent.catalog.forEach(function (s) {
         if (s.genres && s.genres.some(function (g) { return currentKeyClean.indexOf(g) !== -1; })) {
           addTrackToQueue(s);
         }
-      });
-      // Ensure at least 25+ songs in the queue
-      VibeAgent.catalog.forEach(function (s) {
-        if (allQueueTracks.length < 35) addTrackToQueue(s);
       });
     }
 
