@@ -7491,7 +7491,7 @@ footer {
 }
 
 
-/* ==================== Mobile Clean Header & Dock (v138.0) ==================== */
+/* ==================== Symmetrical Locked-Center Mobile Dock (v140.0) ==================== */
 @media (max-width: 768px) {
   .mood-universe-btn,
   .header-weather-pill {
@@ -7504,16 +7504,25 @@ footer {
   .header-left, .header-right {
     gap: 6px !important;
   }
-  #eqDockBtn,
-  #watchVideoBtn,
-  #lrcGodDockBtn,
-  #fsbtn {
-    display: none !important;
-  }
   .controls-glass {
-    padding: 6px 14px !important;
-    gap: 8px !important;
-    justify-content: center !important;
+    padding: 6px 12px !important;
+    max-width: calc(100vw - 20px) !important;
+    gap: 4px !important;
+  }
+  .ctrl-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+  .ctrl-btn.play-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+  #fsbtn {
+    display: flex !important;
   }
 }
 
@@ -7570,4 +7579,40 @@ footer {
 .lyrics-floating-back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateX(-50%) scale(1.06);
+}
+
+
+/* ==================== Perfectly Symmetrical Adaptive Dock (Locked Center Core) ==================== */
+.controls-glass {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+}
+
+.dock-core {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+  z-index: 2 !important;
+}
+
+.dock-wing-left {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+
+.dock-wing-right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
 }
