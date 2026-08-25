@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v122.0') caches.delete(name);
+        if (name !== 'aura-music-v123.0') caches.delete(name);
       });
     });
   }
@@ -213,7 +213,13 @@
 
   var player = null, apiReady = false, desired = true;
   var sessionHistory = [];
-  var likedSongs = JSON.parse(localStorage.getItem('ishq_liked_songs') || '[]');
+  var likedSongs = [];
+  try {
+    likedSongs = JSON.parse(localStorage.getItem('ishq_liked_songs') || '[]');
+    if (!Array.isArray(likedSongs)) likedSongs = [];
+  } catch (e) {
+    likedSongs = [];
+  }
   var currentLyrics = [];
   var skipDebounce = false;
 
@@ -864,7 +870,7 @@
         item.querySelector('.btn-stream-vibe').addEventListener('click', function (e) {
           e.stopPropagation();
           playSingleTrack(song);
-          $('queuePanel').classList.remove('open');
+          if ($('queuePanel')) $('queuePanel').classList.remove('open');
           showToast('Streaming from My Vibes ✨');
         });
 
@@ -881,7 +887,7 @@
 
         item.addEventListener('click', function () {
           playSingleTrack(song);
-          $('queuePanel').classList.remove('open');
+          if ($('queuePanel')) $('queuePanel').classList.remove('open');
           showToast('Streaming: ' + song.title + ' ✨');
         });
 
@@ -2406,54 +2412,7 @@
     });
   }
 
-
-  // Search in Explorer Universe
-  function handleUniverseSearch() {
-    var query = $('uniYtSearchInput').value.trim();
-    if (!query) return;
-
-    // 1. Direct Playlist URL
-    if (query.indexOf('list=') !== -1) {
-      var plMatch = query.match(/list=([a-zA-Z0-9_-]+)/);
-      if (plMatch && plMatch[1]) {
-        var plId = plMatch[1];
-        if (player && player.loadPlaylist) {
-          claimAudioMaster();
-          player.loadPlaylist({ list: plId, listType: 'playlist', index: 0 });
-          syncUniverseNowPlayingBanner({ id: plId, title: 'YouTube Playlist Stream', artist: 'Custom Playlist' });
-          showToast('Streaming YouTube Playlist! 📻');
-          return;
-        }
-      }
-    }
-
-    // 2. Direct Video URL or Raw ID
-    if (query.indexOf('v=') !== -1 || query.indexOf('youtu.be/') !== -1 || query.indexOf('shorts/') !== -1) {
-      var vMatch = query.match(/(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/);
-      if (vMatch && vMatch[1]) {
-        var vid = vMatch[1];
-        var customTrack = { id: vid, title: 'YouTube Video (' + vid + ')', artist: 'Custom Stream', mood: '✨ Direct' };
-        playSingleTrack(customTrack);
-        syncUniverseNowPlayingBanner(customTrack);
-        showToast('Streaming Direct YouTube Track! 🎶');
-        return;
-      }
-    } else if (/^[a-zA-Z0-9_-]{11}$/.test(query)) {
-      var idTrack = { id: query, title: 'YouTube Video', artist: 'Direct Video', mood: '✨ Direct' };
-      playSingleTrack(idTrack);
-      syncUniverseNowPlayingBanner(idTrack);
-      showToast('Streaming Direct YouTube Track! 🎶');
-      return;
-    }
-
-    // 3. Search catalog with keywords
-    document.querySelectorAll('.uni-chip').forEach(function (c) { c.classList.remove('active'); });
-    renderUniverseCards(query);
-    showToast('YouTube Search Results for: ' + query);
-  }
-
   /* ==================== Full HD Video Cinema Theater Controller ==================== */
-    /* ==================== Full HD Video Cinema Theater Controller ==================== */
   var cinemaVideoModal = $('cinemaVideoModal');
 
   function openCinemaMode() {
@@ -3214,7 +3173,7 @@
         '</div>';
       it.addEventListener('click', function () {
         playSingleTrack(song);
-        $('queuePanel').classList.remove('open');
+        if ($('queuePanel')) $('queuePanel').classList.remove('open');
       });
       favList.appendChild(it);
     });
@@ -4448,7 +4407,14 @@
       var eqDockBtn = $('eqDockBtn');
       if (eqDockBtn) {
         eqDockBtn.addEventListener('click', function () {
-          ExtrasEngine.openTab('tab-spatial');
+          try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
+          ensureAudioContext();
+          isSpatialActive = !isSpatialActive;
+          updateSpatialUI();
+          if (convolverGain && audioCtx) {
+            convolverGain.gain.setTargetAtTime(isSpatialActive ? 0.25 : 0.0, audioCtx.currentTime, 0.1);
+          }
+          showToast(isSpatialActive ? '🌐 3D Spatial 360° Soundstage Active!' : '3D Spatial Audio Disabled');
         });
       }
 
@@ -5354,8 +5320,9 @@
       }
 
       // ==================== Home Screen Live Jam Floating Dock Bindings ====================
-      if ($('homeJamStatusPill')) {
-        $('homeJamStatusPill').addEventListener('click', function () {
+      var homeJamPill = $('homeJamStatusPill');
+      if (homeJamPill) {
+        homeJamPill.addEventListener('click', function () {
           openRoomModal();
         });
       }
@@ -5371,21 +5338,25 @@
         });
       }
 
-      if ($('homeChatToggleBtn')) {
-        $('homeChatToggleBtn').addEventListener('click', function () {
+      var homeChatToggle = $('homeChatToggleBtn');
+      if (homeChatToggle) {
+        homeChatToggle.addEventListener('click', function () {
           var wrap = $('homeQuickChatWrap');
           if (wrap) {
             wrap.classList.toggle('open');
-            if (wrap.classList.contains('open') && $('homeQuickChatInput')) {
-              $('homeQuickChatInput').focus();
+            var quickInput = $('homeQuickChatInput');
+            if (wrap.classList.contains('open') && quickInput) {
+              quickInput.focus();
             }
           }
         });
       }
 
-      if ($('homeQuickChatCloseBtn')) {
-        $('homeQuickChatCloseBtn').addEventListener('click', function () {
-          if ($('homeQuickChatWrap')) $('homeQuickChatWrap').classList.remove('open');
+      var homeQuickChatClose = $('homeQuickChatCloseBtn');
+      if (homeQuickChatClose) {
+        homeQuickChatClose.addEventListener('click', function () {
+          var wrap = $('homeQuickChatWrap');
+          if (wrap) wrap.classList.remove('open');
         });
       }
 
@@ -5394,21 +5365,25 @@
         if (input && input.value.trim()) {
           sendChatMessage(input.value.trim());
           input.value = '';
-          if ($('homeQuickChatWrap')) $('homeQuickChatWrap').classList.remove('open');
+          var wrap = $('homeQuickChatWrap');
+          if (wrap) wrap.classList.remove('open');
         }
       }
 
-      if ($('homeQuickChatSendBtn')) {
-        $('homeQuickChatSendBtn').addEventListener('click', submitHomeQuickChat);
+      var homeQuickChatSend = $('homeQuickChatSendBtn');
+      if (homeQuickChatSend) {
+        homeQuickChatSend.addEventListener('click', submitHomeQuickChat);
       }
 
-      if ($('homeQuickChatInput')) {
-        $('homeQuickChatInput').addEventListener('keydown', function (e) {
+      var homeQuickChatInp = $('homeQuickChatInput');
+      if (homeQuickChatInp) {
+        homeQuickChatInp.addEventListener('keydown', function (e) {
           if (e.key === 'Enter') {
             e.preventDefault();
             submitHomeQuickChat();
           } else if (e.key === 'Escape') {
-            if ($('homeQuickChatWrap')) $('homeQuickChatWrap').classList.remove('open');
+            var wrap = $('homeQuickChatWrap');
+            if (wrap) wrap.classList.remove('open');
           }
         });
       }
@@ -5815,8 +5790,6 @@
     }
   }
 
-  function triggerAiDj() {}
-
   function update() {
     if (!player || !apiReady) return;
     var d = (player.getVideoData && player.getVideoData()) || {};
@@ -6022,7 +5995,7 @@
       item.addEventListener('click', function (e) {
         if (e.target.closest('.queue-action-like')) return;
         playSingleTrack(track);
-        $('queuePanel').classList.remove('open');
+        if ($('queuePanel')) $('queuePanel').classList.remove('open');
       });
 
       var likeBtn = item.querySelector('.queue-action-like');
@@ -7668,27 +7641,38 @@
       } catch(e) {}
     }
     function closeSidebar() {
-      $('premiumSidebarMenu').classList.remove('open');
-      if ($('sidebarBackdrop')) $('sidebarBackdrop').classList.remove('visible');
+      var sidebar = $('premiumSidebarMenu');
+      if (sidebar) sidebar.classList.remove('open');
+      var backdrop = $('sidebarBackdrop');
+      if (backdrop) backdrop.classList.remove('visible');
     }
 
-    $('premiumMenuToggle').addEventListener('click', function(e) {
-      e.stopPropagation();
-      openSidebar();
-    });
-    $('closeSidebarBtn').addEventListener('click', closeSidebar);
-    if ($('sidebarBackdrop')) {
-      $('sidebarBackdrop').addEventListener('click', closeSidebar);
+    var premiumToggle = $('premiumMenuToggle');
+    if (premiumToggle) {
+      premiumToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openSidebar();
+      });
+    }
+    var closeSidebarButton = $('closeSidebarBtn');
+    if (closeSidebarButton) {
+      closeSidebarButton.addEventListener('click', closeSidebar);
+    }
+    var sidebarBdrop = $('sidebarBackdrop');
+    if (sidebarBdrop) {
+      sidebarBdrop.addEventListener('click', closeSidebar);
     }
     // Close sidebar when clicking nav items
     ['extrasBtn', 'ytExplorerBtn', 'ambientToggleBtn', 'sidebarJamBtn'].forEach(function(id) {
-      if ($(id)) {
-        $(id).addEventListener('click', function() { closeSidebar(); });
+      var navEl = $(id);
+      if (navEl) {
+        navEl.addEventListener('click', function() { closeSidebar(); });
       }
     });
     // Sidebar Login button → open Auth modal directly
-    if ($('sidebarLoginBtn')) {
-      $('sidebarLoginBtn').addEventListener('click', function() {
+    var sidebarLogin = $('sidebarLoginBtn');
+    if (sidebarLogin) {
+      sidebarLogin.addEventListener('click', function() {
         closeSidebar();
         setTimeout(function() {
           if (typeof AuthEngine !== 'undefined') AuthEngine.open();
@@ -8004,7 +7988,11 @@
   }, 2500);
 
 
-  window.playMoodStation = playMoodStation;
+  window.playMoodStation = function (m) {
+    if (typeof MoodUniverseEngine !== 'undefined' && MoodUniverseEngine.playMoodStation) {
+      MoodUniverseEngine.playMoodStation(m);
+    }
+  };
   window.skip = skip;
   window.loadStationPlayback = loadStationPlayback;
   window.applyStationTheme = applyStationTheme;
@@ -8048,22 +8036,21 @@
   function cycleSpeedMode() {
     try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
     var btn = $('vibeSpeedBtn');
-    if (!player) return;
 
     if (currentSpeedMode === '1.0') {
       currentSpeedMode = '1.25';
       if (btn) btn.textContent = '1.25x ⚡';
-      if (player.setPlaybackRate) player.setPlaybackRate(1.25);
+      if (player && player.setPlaybackRate) player.setPlaybackRate(1.25);
       showToast('⚡ Nightcore / Speed Up (1.25x) Active!');
     } else if (currentSpeedMode === '1.25') {
       currentSpeedMode = '0.85';
       if (btn) btn.textContent = '0.85x 🌙';
-      if (player.setPlaybackRate) player.setPlaybackRate(0.85);
+      if (player && player.setPlaybackRate) player.setPlaybackRate(0.85);
       showToast('🌙 Slowed + Reverb Chill (0.85x) Active!');
     } else {
       currentSpeedMode = '1.0';
       if (btn) btn.textContent = '1.0x';
-      if (player.setPlaybackRate) player.setPlaybackRate(1.0);
+      if (player && player.setPlaybackRate) player.setPlaybackRate(1.0);
       showToast('✨ Pure Original Speed (1.0x)');
     }
   }
@@ -8155,23 +8142,4 @@
 
   if (window.location.search.includes('reset=1') || window.location.search.includes('clear=1') || window.location.search.includes('purge=1')) {
     purgeAuraCacheAndReset(false);
-  }
-
-
-  // Hero Section Surprise Me Button listener
-  var heroSurpriseBtn = $('heroSurpriseBtn');
-  if (heroSurpriseBtn) {
-    heroSurpriseBtn.addEventListener('click', function () {
-      try { HapticEngine.tap(); } catch (e) {}
-      if (typeof MoodUniverseEngine !== 'undefined' && MoodUniverseEngine.stations && MoodUniverseEngine.stations.length) {
-        var unplayed = MoodUniverseEngine.stations.slice().sort(function () { return 0.5 - Math.random(); });
-        var picked = unplayed[0];
-        if (picked) {
-          showToast('AI Picked: ' + picked.icon + ' ' + picked.name + ' 🎲');
-          MoodUniverseEngine.playMoodStation(picked);
-        }
-      } else {
-        skip('next');
-      }
-    });
   }

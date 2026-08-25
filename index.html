@@ -12,7 +12,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=122.0">
+  <link rel="stylesheet" href="style.css?v=123.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -524,14 +524,6 @@
           <button class="home-quick-chat-close" id="homeQuickChatCloseBtn">✕</button>
         </div>
 
-
-
-
-
-
-
-        </div>
-
       </div>
     </main>
 
@@ -973,41 +965,6 @@
   </div>
 
 
-    
-
-      </div>
-
-      <!-- Mode Switcher Toolbar -->
-      <div class="glyph-footer-bar visualizer-footer-bar">
-        <div class="glyph-mode-chips" id="glyphModeChips">
-          <button class="glyph-chip active" data-glyph-mode="spectrum">📊 NEON SPECTRUM</button>
-          <button class="glyph-chip" data-glyph-mode="wave">🌊 FLUID WAVE</button>
-          <button class="glyph-chip" data-glyph-mode="orb">🔮 QUANTUM ORB</button>
-          <button class="glyph-chip" data-glyph-mode="stardust">🌌 COSMIC STARDUST</button>
-          <button class="glyph-chip" data-glyph-mode="matrix">⚡ CYBER HUD</button>
-        </div>
-        <div class="glyph-device-tag">AURA STUDIO DSP // 64-BAND FFT &bull; MULTI-HARMONIC RHYTHM ENGINE</div>
-      </div>
-
-    </div>
-  </div>
-
-      <!-- Glyph Mode Switcher Toolbar -->
-      <div class="glyph-footer-bar">
-        <div class="glyph-mode-chips" id="glyphModeChips">
-          <button class="glyph-chip active" data-glyph-mode="lyrics">📜 DOT LYRICS</button>
-          <button class="glyph-chip" data-glyph-mode="spectrum">📊 SPECTRUM</button>
-          <button class="glyph-chip" data-glyph-mode="oscilloscope">🌊 WAVE</button>
-          <button class="glyph-chip" data-glyph-mode="strobe">⚡ BEAT STROBE</button>
-          <button class="glyph-chip" data-glyph-mode="clock">⏱️ TIME MATRIX</button>
-        </div>
-        <div class="glyph-device-tag">NOTHING PHONE 4A PRO // GLYPH INTERFACE DEV KIT &bull; HAPTIC DRIVER V4.2</div>
-      </div>
-
-    </div>
-  </div>
-
-
   <!-- ==================== Spotlight Global Command Palette (Ctrl + K) ==================== -->
   <div class="command-palette-modal" id="commandPaletteModal">
     <div class="command-palette-card">
@@ -1133,185 +1090,17 @@
               <button class="jam-vibe-pill" data-msg="Drop the bass! ⚡">Drop the bass! ⚡</button>
             </div>
 
-            <!-- Chat Input Row -->
+            <!-- Input Row -->
             <div class="jam-chat-input-row">
-              <input type="text" id="jamChatInput" placeholder="Type a message to room..." maxlength="200" autocomplete="off">
-              <button class="jam-chat-send-btn" id="jamChatSendBtn">Send</button>
+              <input type="text" id="jamChatInput" placeholder="Say something to friends…" maxlength="120" autocomplete="off">
+              <button class="jam-chat-send-btn" id="sendJamChatBtn" title="Send message">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
             </div>
           </div>
 
-          <!-- Leave / End Room Row -->
-          <div class="jam-leave-row">
-            <button class="jam-leave-btn" id="leaveJamBtn">Leave Jam Room</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-          <div class="glass-modal-footer">
-            <button class="glass-btn-secondary" id="resetEqBtn">Reset to Flat</button>
-            <span class="eq-status-indicator">● Web Audio DSP Engine Active</span>
-          </div>
-        </div>
-
-        <!-- Tab 2: Sleep Timer & Alarm -->
-        <div class="extras-tab-pane" id="tab-timer">
-          <!-- Active Timer Status Banner (if running) -->
-          <div class="timer-active-banner" id="timerActiveBanner" style="display:none;">
-            <div class="timer-active-left">
-              <span class="timer-pulse-icon">⏳</span>
-              <div>
-                <div class="timer-active-time" id="timerActiveCountdown">24:59</div>
-                <div class="timer-active-desc">Audio will fade like a whisper in the final 60 seconds</div>
-              </div>
-            </div>
-            <button class="timer-cancel-btn" id="cancelActiveTimerBtn">Stop Timer</button>
-          </div>
-
-          <!-- Sleep Timer Presets -->
-          <div class="timer-presets-section">
-            <div class="section-label">Set Sleep Timer</div>
-            <div class="timer-presets-grid">
-              <button class="timer-preset-pill" data-minutes="15">15 Minutes</button>
-              <button class="timer-preset-pill" data-minutes="30">30 Minutes</button>
-              <button class="timer-preset-pill" data-minutes="45">45 Minutes</button>
-              <button class="timer-preset-pill" data-minutes="60">60 Minutes</button>
-              <button class="timer-preset-pill" data-minutes="end-track">End of Track</button>
-            </div>
-          </div>
-
-          <!-- Sunrise Alarm Section -->
-          <div class="alarm-section">
-            <div class="section-label">Acoustic Sunrise Alarm</div>
-            <div class="alarm-row">
-              <div class="alarm-info">
-                <span class="alarm-icon">🌅</span>
-                <div>
-                  <div class="alarm-title">Gentle Wake-Up Alarm</div>
-                  <div class="alarm-desc">Gradually fades in soulful morning music over 3 minutes</div>
-                </div>
-              </div>
-              <div class="alarm-inputs">
-                <input type="time" id="alarmTimeInput" class="glass-time-input" value="07:00">
-                <button class="alarm-toggle-btn" id="alarmToggleBtn">Set Alarm</button>
-              </div>
-            </div>
-            <div class="alarm-status-line" id="alarmStatusLine" style="display:none;">
-              <span>⏰ Alarm set for <strong id="alarmSetDisplay">7:00 AM</strong> (Acoustic Sunrise)</span>
-              <button class="alarm-clear-link" id="clearAlarmBtn">Clear</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab 3: Dynamic Island Mini Player -->
-        <div class="extras-tab-pane" id="tab-mini">
-          <div class="mini-launch-panel">
-            <div class="mini-launch-icon">📱</div>
-            <h4>Apple Dynamic Island Floating Player</h4>
-            <p>Detach a sleek, draggable floating glass pill player that stays visible over everything while you browse.</p>
-            <button class="jam-action-btn host-btn" id="launchMiniPlayerBtn">Toggle Floating Mini-Player (M)</button>
-          </div>
-        </div>
-
-        <!-- Tab 4: Listen Together Jam Room -->
-        <div class="extras-tab-pane" id="tab-jam">
-          <!-- Jam Room View: Disconnected / Start -->
-          <div class="jam-setup-view" id="jamSetupView">
-            <div class="jam-host-card">
-              <div class="jam-card-icon">👑</div>
-              <h4>Host a New Jam Room</h4>
-              <p>Generate a secure room code and invite friends to listen together</p>
-              <button class="jam-action-btn host-btn" id="startJamHostBtn">Start Jam Room (Host)</button>
-            </div>
-
-            <div class="jam-divider"><span>OR</span></div>
-
-            <div class="jam-join-card">
-              <div class="jam-card-icon">🎧</div>
-              <h4>Join a Friend's Room</h4>
-              <p>Enter the 6-character room code to sync audio instantly</p>
-              <div class="jam-join-input-wrap">
-                <input type="text" id="jamRoomCodeInput" placeholder="e.g. ISHQ88" maxlength="8" autocomplete="off" spellcheck="false">
-                <button class="jam-action-btn join-btn" id="joinJamBtn">Join</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Jam Room View: Active Connected State -->
-          <div class="jam-active-view" id="jamActiveView" style="display:none;">
-            <div class="jam-live-header">
-              <div class="jam-live-badge"><span class="jam-pulse-dot"></span> LIVE SYNC ACTIVE</div>
-              <div class="jam-room-code-display">
-                Room Code: <strong id="activeJamCodeText">ISHQ88</strong>
-                <button class="jam-copy-btn" id="copyJamLinkBtn" title="Copy Invite Link">📋 Copy Link</button>
-              </div>
-            </div>
-
-            <!-- Connected Friends List -->
-            <div class="jam-connected-list">
-              <div class="jam-member-item host-item">
-                <span class="jam-avatar">👑</span>
-                <div class="jam-member-meta">
-                  <div class="jam-member-name" id="jamHostName">You (Host)</div>
-                  <div class="jam-member-role">Broadcasting Station &amp; Timestamps</div>
-                </div>
-                <span class="jam-sync-status">IN SYNC (0ms)</span>
-              </div>
-              <div id="jamPeersList"></div>
-            </div>
-
-            <!-- Live Reaction Bar -->
-            <div class="jam-reaction-section">
-              <div class="jam-reaction-title">
-                <span>Live Reactions</span>
-                <span class="jam-reaction-hint">Tap to burst emojis to everyone</span>
-              </div>
-              <div class="jam-reaction-bar" id="jamReactionBar">
-                <button class="jam-reaction-btn" data-emoji="🔥" title="Fire">🔥</button>
-                <button class="jam-reaction-btn" data-emoji="❤️" title="Love">❤️</button>
-                <button class="jam-reaction-btn" data-emoji="✨" title="Sparkle">✨</button>
-                <button class="jam-reaction-btn" data-emoji="💃" title="Dance">💃</button>
-                <button class="jam-reaction-btn" data-emoji="🎧" title="Vibe">🎧</button>
-                <button class="jam-reaction-btn" data-emoji="⚡" title="Electric">⚡</button>
-                <button class="jam-reaction-btn" data-emoji="🚀" title="Hype">🚀</button>
-                <button class="jam-reaction-btn" data-emoji="🤯" title="Mindblown">🤯</button>
-              </div>
-            </div>
-
-            <!-- Live Chat Box -->
-            <div class="jam-chat-container">
-              <div class="jam-chat-header">
-                <span>💬 Live Room Chat</span>
-                <span class="jam-chat-count" id="jamChatMsgCount">0 msgs</span>
-              </div>
-
-              <!-- Messages Stream -->
-              <div class="jam-chat-messages" id="jamChatMessages">
-                <div class="jam-chat-system-msg">Room created! Share invite link or code with friends to jam together.</div>
-              </div>
-
-              <!-- Quick Vibe Presets -->
-              <div class="jam-quick-vibes" id="jamQuickVibes">
-                <button class="jam-vibe-pill" data-msg="Vibe is unreal! ✨">Vibe is unreal! ✨</button>
-                <button class="jam-vibe-pill" data-msg="Turn it up! 🔥">Turn it up! 🔥</button>
-                <button class="jam-vibe-pill" data-msg="This track hits different 📻">This track hits different 📻</button>
-                <button class="jam-vibe-pill" data-msg="Drop the bass! ⚡">Drop the bass! ⚡</button>
-              </div>
-
-              <!-- Input Row -->
-              <div class="jam-chat-input-row">
-                <input type="text" id="jamChatInput" placeholder="Say something to friends…" maxlength="120" autocomplete="off">
-                <button class="jam-chat-send-btn" id="sendJamChatBtn" title="Send message">
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="jam-active-footer">
-              <button class="jam-leave-btn" id="leaveJamBtn">Leave Room</button>
-            </div>
+          <div class="jam-active-footer">
+            <button class="jam-leave-btn" id="leaveJamBtn">Leave Room</button>
           </div>
         </div>
 
@@ -1540,69 +1329,10 @@
   </div>
 
 
-
   <div id="player" style="display:none;"></div>
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=122.0"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <script src="script.js?v=123.0"></script>
 </body>
 </html>

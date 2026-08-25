@@ -1,92 +1,61 @@
-# Project: Aura Music 2.0 Web App
+# Project: Aura Music — Comprehensive Enhancement & Quality Assurance
 
 ## Architecture
-Aura Music is a premium Progressive Web Application (PWA) built with vanilla modern HTML5, CSS3, JavaScript ES6+, Web Audio API, Canvas 2D rendering, and Service Worker offline caching.
-- **Frontend Presentation Layer (`index.html`)**: Glassmorphism UI, bottom glass dock, full-screen canvas layers (`#bgCanvas`, `#weatherCanvas`), atmospheric background glyph typography (`#bgGlyphs`), lightning flash overlay (`#lightningFlash`).
-- **Core State & Audio Engine (`script.js`)**:
-  - `MoodUniverseEngine`: Mood stations, mood switching, audio streaming queue, playback controls.
-  - `SkyEngine`: Dynamic sky/weather Canvas 2D particle simulation (Rain, Snow, Fog, Stars, Thunderstorm) and lightning triggers.
-  - `GlyphEngine`: Atmospheric typography rotation, station/mood theme integration, kinetic floating animations.
-  - `DockController`: Bottom dock buttons, Surprise Me action, navigation tabs, responsive controls.
-- **Visual & Layout Styling (`style.css`)**: Dark luxury theme, glowing accents, 390px mobile viewport responsive glass dock, multi-axis keyframe animations, 3-tier depth blur.
-- **Service Worker (`sw.js`)**: Offline caching, asset versioning (`aura-music-v118.0`).
+Aura Music is a premium web audio streaming Progressive Web App (PWA) with the following core architectural layers:
+1. **Presentation & DOM Layer (`index.html`, `style.css`)**:
+   - High-fidelity glassmorphic UI with floating header, background visual layers (atmospheric canvas, kinetic glyphs), main audio player card, visualizer canvas, bottom floating dock, and modal overlays.
+2. **Audio & Playback Engine (`script.js`)**:
+   - `DualAudioEngine` & YouTube IFrame API integration with playback queue management, autoplay fallback, volume/mute control, audio rate pitch manipulation (1.0x, 1.25x, 0.85x), and progress scrubber seek mechanics.
+3. **Atmospheric & Visual Engines (`script.js`, `style.css`)**:
+   - `SkyEngine` for real-time and theme-driven weather/climate canvas particle simulation (rain, snow, fog, stars) and lightning effects.
+   - Dynamic Kinetic Background Glyphs system for luxury ambient typography and theme harmonization.
+4. **Stations & Discovery Pipelines (`script.js`, `stations.json`)**:
+   - 40+ AI Mood Stations, Master Stations, YouTube Explorer, and Instant Surprise Me serendipity engine.
+5. **PWA & Offline Service Layer (`sw.js`)**:
+   - Cache-first strategy for static shell assets with synchronized multi-file cache versioning.
+
+## Code Layout
+- `index.html`: Main single-page application shell, audio harness, modal dialogs, and SVG icons.
+- `script.js`: Complete application logic, audio engines, event handling, animations, and mood universe.
+- `style.css`: Comprehensive glassmorphic styling, responsive layout definitions, typography, animations, and modal overlays.
+- `sw.js`: Service worker caching lifecycle and offline caching rules.
+- `stations.json`: Catalog of curated music stations and track configurations.
 
 ## Feature Inventory
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| F1 | Surprise Me Button Wiring | Wire `#dockSurpriseBtn` to `MoodUniverseEngine.playMoodStation()` or random song queue with zero errors | M1 | ORIGINAL_REQUEST §R1 |
-| F2 | Surprise Me Visual Feedback | Add `.surprise-active` 3D dice-roll rotation and glowing pulse feedback on click | M1 | ORIGINAL_REQUEST §R1 |
-| F3 | Premium Typography & Sizing | Upgrade `#bgGlyphs .glyph` to luxury typography with `clamp(2.5rem, 6vw, 5.5rem)`, uppercase tracking | M2 | ORIGINAL_REQUEST §R2 |
-| F4 | Cinematic Kinetic Drift | Implement 38s-54s multi-axis float & drift CSS keyframe animations across glyphs | M2 | ORIGINAL_REQUEST §R2 |
-| F5 | Multi-Tier Depth Blur & Opacity | Add 3-tier depth blur (0.5px to 2.2px) and opacity gradients for atmospheric depth | M2 | ORIGINAL_REQUEST §R2 |
-| F6 | Dynamic Theme Integration | Dynamically update glyph text content and color accents when station or mood changes | M2 | ORIGINAL_REQUEST §R2 |
-| F7 | Canvas RAF Animation Loop Fix | Restore recursive `requestAnimationFrame` call in `SkyEngine.renderParticles` | M3 | ORIGINAL_REQUEST §R3 |
-| F8 | Mobile Weather Kill-Switch Fix | Remove restrictive mobile screen <=768px kill-switch to enable weather on mobile | M3 | ORIGINAL_REQUEST §R3 |
-| F9 | Fog Atmospheric Rendering | Implement missing Fog particle drawing and drift logic in Canvas 2D | M3 | ORIGINAL_REQUEST §R3 |
-| F10 | Thunderstorm Lightning Flash | Wire `#lightningFlash` trigger with natural stochastic intervals and smooth CSS opacity fade | M3 | ORIGINAL_REQUEST §R3 |
-| F11 | SkyEngine API Export Fix | Export `setSkyTheme` on `SkyEngine` module to resolve Command Palette runtime `TypeError` | M3 | ORIGINAL_REQUEST §R3 |
-| F12 | Dead JS Listeners Cleanup | Remove dead listeners for `#heroSurpriseBtn`, `#globalFloatingBackBtn`, `.stage-visual`, `extrasBtn` | M4 | ORIGINAL_REQUEST §R4 |
-| F13 | HTML DOM & Duplicate ID Cleanup | Remove orphaned HTML fragments and duplicate Jam Room IDs in `index.html` | M4 | ORIGINAL_REQUEST §R4 |
-| F14 | Dead CSS Elimination | Purge orphaned Nothing Phone matrix CSS, Visualizer Studio CSS, and dead button styles | M4 | ORIGINAL_REQUEST §R4 |
-| F15 | 390px Mobile Dock Responsiveness | Adjust mobile dock width/gaps to <=363px to prevent overflow and button clipping on 390px screens | M4 | ORIGINAL_REQUEST §R4 |
-| F16 | SW Cache Version Bump | Bump cache version consistently to `aura-music-v118.0` in `sw.js`, `script.js`, and `index.html` | M4 | ORIGINAL_REQUEST §Cache |
-| F17 | Zero Console Errors & Clean Logs | Verify error-free initialization and interactions across all views | M4 | ORIGINAL_REQUEST §R4 |
-| F18 | E2E Automated Verification | Complete Tier 1-4 automated testing suite validating all features | M5 | ORIGINAL_REQUEST §Criteria |
-| F19 | Git Commit & Push | Commit all changes with clean commit log and push to `main` branch | M5 | ORIGINAL_REQUEST §Criteria |
+| F1 | Surprise Me Discovery & Event Hardening | Wire `#dockSurpriseBtn`, prune dead `#heroSurpriseBtn`, guard 9 event listeners, wrap `JSON.parse` | M1 | Survey 1, Request R1 |
+| F2 | DOM Structural Repair | Purge premature tag closure and duplicate modal fragments (lines 1152-1325) in `index.html` | M1 | Survey 1, Request R4 |
+| F3 | Dead Code & CSS Pruning | Remove 152 dead CSS selectors and 4 unused JS functions | M1 | Survey 1, Request R4 |
+| F4 | Cache Version Synchronization | Bump version to `v123.0` across `sw.js`, `index.html` (x2), and `script.js` | M1 / M4 | Survey 1, Request R4 |
+| F5 | Playback Speed Persistence | Ensure `player.setPlaybackRate` is re-applied on track change in `onState(PLAYING)` | M2 | Survey 2, Request R2 |
+| F6 | Explorer Queue Continuity | Populate continuous queue for single-track plays in `playSingleTrack()` | M2 | Survey 2, Request R2 |
+| F7 | Smooth Scrubber Drag & Seek Precision | Add Pointer Events (`pointerdown/move/up`) and 400ms seek-cooldown against interval overwrite | M2 | Survey 2, Request R2 |
+| F8 | Cinematic Background Glyphs | Implement luxury kinetic drift keyframes (38s-54s), 3-tier blur, and `clamp()` typography | M3 | Survey 3, Request R2 |
+| F9 | Weather Particle Canvas & Lightning | Restore recursive RAF, remove mobile kill-switch, add fog rendering, style lightning flash, export `setSkyTheme` | M3 | Survey 3, Request R3 |
+| F10 | Mobile Dock & Header Layout (360px-420px) | Prevent horizontal overflow on small viewports, ensure ≥40px touch targets, resolve header collision | M4 | Survey 3, Request R3 |
+| F11 | Modal Accessibility & Dismissibility | Add backdrop click and Escape key dismiss handlers across all 11 modals/drawers | M4 | Survey 3, Request R3 |
+| F12 | End-to-End Test Suite & Verification | Automated test suite covering Tiers 1-4 with pass validation | M5 | Request ACs |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Surprise Me Button (R1) | F1, F2 | none | PLANNED |
-| M2 | Premium Animated Glyphs (R2) | F3, F4, F5, F6 | none | PLANNED |
-| M3 | Weather & Climate Animations (R3) | F7, F8, F9, F10, F11 | none | PLANNED |
-| M4 | Code Polish, 390px Dock, SW Bump (R4) | F12, F13, F14, F15, F16, F17 | M1, M2, M3 | PLANNED |
-| M5 | E2E Testing & Git Push | F18, F19 | M1, M2, M3, M4 | PLANNED |
+| M1 | Static Integrity & DOM Repair | F1 (Event hardening, Surprise Me), F2 (DOM repair), F3 (Dead code pruning), F4 (Initial cache sync) | none | PLANNED |
+| M2 | Audio Engine & Scrubber Polish | F5 (Speed persistence), F6 (Queue continuity), F7 (Scrubber drag & smooth seek) | M1 | PLANNED |
+| M3 | Visual Atmospheric Engines | F8 (Cinematic background glyphs), F9 (Weather canvas & lightning) | M1 | PLANNED |
+| M4 | Mobile UX & Modal Accessibility | F10 (Mobile dock & header layout), F11 (Modal dismiss handlers), F4 (Final cache sync) | M2, M3 | PLANNED |
+| M5 | E2E Testing & Final Acceptance | F12 (Tiers 1-4 test execution, live validation, adversarial hardening) | M4 | PLANNED |
 
 ## Interface Contracts
-### Surprise Me Button (`#dockSurpriseBtn` ↔ `MoodUniverseEngine`)
-- Target element: `document.getElementById('dockSurpriseBtn')`
-- Event: `click`
-- Logic:
-  ```js
-  const surpriseBtn = document.getElementById('dockSurpriseBtn');
-  if (surpriseBtn) {
-    surpriseBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      surpriseBtn.classList.add('surprise-active');
-      setTimeout(() => surpriseBtn.classList.remove('surprise-active'), 800);
-      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
-      if (window.MoodUniverseEngine && typeof MoodUniverseEngine.playMoodStation === 'function') {
-        const stations = MoodUniverseEngine.stations || ['chill', 'focus', 'energy', 'romantic', 'ambient', 'cosmic'];
-        const randomStation = stations[Math.floor(Math.random() * stations.length)];
-        const moodId = typeof randomStation === 'object' ? (randomStation.id || randomStation.name) : randomStation;
-        MoodUniverseEngine.playMoodStation(moodId);
-      } else if (typeof playRandomStation === 'function') {
-        playRandomStation();
-      }
-    });
-  }
-  ```
+### `DualAudioEngine` ↔ YouTube Player
+- `DualAudioEngine.init(playerA, playerB)`: Attaches to active YouTube player iframe.
+- `onState(YT.PlayerState.PLAYING)`: Re-applies active `currentSpeedMode` (1.0x, 1.25x, 0.85x) to maintain user setting across track boundaries.
+- `playSingleTrack(track)`: Initializes `currentTrackQueue` with upcoming station/genre tracks to guarantee endless playback.
 
-### SkyEngine & Weather Canvas Interface
-- Exports: `SkyEngine = { init, setSkyTheme, setWeather, toggleWeather, isRunning, ... }`
-- Particle Render Loop:
-  ```js
-  function renderParticles(timestamp) {
-    if (!state.active) return;
-    // draw weather particles (rain, snow, fog, stars)
-    // check lightning condition and trigger #lightningFlash
-    state.animationFrameId = requestAnimationFrame(renderParticles);
-  }
-  ```
+### `SkyEngine` ↔ Application & Command Palette
+- `SkyEngine.setTheme(themeName, forceActive)`: Updates active weather simulation and triggers particle recalculation.
+- `SkyEngine.renderParticles()`: Executes continuous 60fps RAF loop on desktop and throttled 30fps loop on mobile with non-zero particle density.
+- `SkyEngine.triggerLightning()`: Adds `.flash` class to `#lightningFlash` with CSS opacity transition.
 
-### Glyph Engine Interface
-- Target container: `#bgGlyphs`
-- CSS Classes: `.bg-glyphs`, `.glyph`, `.heart-glyph`
-- Dynamic Theme Update: `updateGlyphsForTheme(themeName, keywordsArray)`
-
-## Code Layout
-- `index.html`: Main HTML entry point, DOM structure, dock, canvas elements, SW registration.
-- `style.css`: All CSS styling, keyframes, responsive media queries (`@media (max-width: 480px)` and `@media (max-width: 390px)`).
-- `script.js`: Core client JS application logic, audio engine, canvas engines, UI handlers.
-- `sw.js`: Service worker lifecycle and cache definitions (`CACHE_NAME = 'aura-music-v118.0'`).
+### Modals & Drawers ↔ User Input
+- All modals (`#extrasModal`, `#skyControlModal`, `#shortcutsModal`, `#premiumSidebarMenu`, `#explorerUniverseView`, `#queuePanel`, `#cinemaVideoModal`) must close on backdrop click (`e.target === modal`) and Escape keydown.
