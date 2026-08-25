@@ -8737,3 +8737,137 @@ input:focus-visible {
     will-change: width;
   }
 }
+
+/* ==========================================================================
+   AURA (R) LIVE AUDIO VISUALIZER STUDIO — ULTRA LUXURY EDITION
+   Real-Time Beat, Spectrum, Oscilloscope & Quantum Particle Engine
+   ========================================================================== */
+.visualizer-studio-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  background: rgba(3, 3, 8, 0.95);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  user-select: none;
+}
+
+.visualizer-studio-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.visualizer-container {
+  width: min(1080px, 94vw) !important;
+  height: min(680px, 90vh) !important;
+  max-height: 92vh !important;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(14, 16, 26, 0.92) 0%, rgba(6, 7, 14, 0.98) 100%) !important;
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  border-radius: 28px !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 32px 100px rgba(0, 0, 0, 0.95),
+    0 0 60px rgba(0, 240, 255, 0.15) !important;
+  padding: 20px 24px !important;
+  gap: 16px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.visualizer-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 0;
+  width: 100%;
+}
+
+.visualizer-canvas-card {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(16, 20, 36, 0.8) 0%, rgba(4, 5, 10, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.visualizer-track-overlay {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.viz-track-badge {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 8px;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 0.15em;
+}
+
+/* Theme Variations */
+.visualizer-studio-modal.theme-cyan .visualizer-container {
+  border-color: rgba(0, 240, 255, 0.35) !important;
+  box-shadow: 0 0 60px rgba(0, 240, 255, 0.15) !important;
+}
+.visualizer-studio-modal.theme-amber .visualizer-container {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 0 60px rgba(245, 158, 11, 0.15) !important;
+}
+.visualizer-studio-modal.theme-emerald .visualizer-container {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 0 60px rgba(16, 185, 129, 0.15) !important;
+}
+.visualizer-studio-modal.theme-red .visualizer-container {
+  border-color: rgba(255, 0, 51, 0.35) !important;
+  box-shadow: 0 0 60px rgba(255, 0, 51, 0.15) !important;
+}
+.visualizer-studio-modal.theme-white .visualizer-container {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.15) !important;
+}
+
+@media (max-width: 768px) {
+  .visualizer-container {
+    width: 96vw !important;
+    height: 88vh !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+  .visualizer-track-overlay {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+  }
+  .glyph-mode-chips {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+}

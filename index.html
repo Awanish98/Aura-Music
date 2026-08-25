@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=101.6">
+  <link rel="stylesheet" href="style.css?v=102.0">
 
 
 
@@ -226,10 +226,10 @@
 
       <div class="header-right">
         <!-- Nothing Phone Glyph Dot Matrix Player Trigger -->
-        <button class="header-tool-btn glyph-dot-btn" id="glyphDotBtn" title="Nothing Phone Glyph Dot Matrix Lyrics & Visualizer (D)" style="display: inline-flex; align-items: center; gap: 4px; height: 28px; background: rgba(255, 0, 51, 0.12); border: 1px solid rgba(255, 0, 51, 0.4); padding: 0 9px; border-radius: 999px; cursor: pointer; color: #ff334b; font-weight: 800; font-family: 'Space Grotesk', monospace; font-size: 8px; letter-spacing: 0.1em; transition: all 0.2s;">
-          <span style="width: 5px; height: 5px; border-radius: 50%; background: #ff0033; box-shadow: 0 0 6px #ff0033;"></span>
-          <span>DOT PLAY</span>
-        </button>
+        <button class="header-tool-btn visualizer-btn" id="glyphDotBtn" title="Live Audio Visualizer Studio (V)" style="display: inline-flex; align-items: center; gap: 6px; height: 28px; background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.4); padding: 0 11px; border-radius: 999px; cursor: pointer; color: #00f0ff; font-weight: 800; font-family: 'Space Grotesk', sans-serif; font-size: 9px; letter-spacing: 0.1em; transition: all 0.2s;">
+  <span style="font-size: 10px;">🌌</span>
+  <span>VISUALIZER</span>
+</button>
 
         <!-- Live Real-Time Date, Clock & Weather Atmosphere Pill -->
         <button class="header-tool-btn header-weather-pill" id="weatherPillBtn" title="Atmospheric Sky & Weather Controls">
@@ -330,16 +330,7 @@
         </button>
 
         <!-- Nothing Glyph Dot Play & Visualizer -->
-        <button class="sidebar-menu-btn" id="sidebarGlyphBtn" title="Nothing Phone Glyph Dot Matrix Lyrics & Visualizer">
-          <div class="sidebar-btn-icon" style="color:#ff0033; background:rgba(255,0,51,0.12); border-color:rgba(255,0,51,0.3);">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
-          </div>
-          <div class="sidebar-btn-text">
-            <span class="sidebar-btn-label" style="color:#ff334b;">Glyph Dot Play</span>
-            <span class="sidebar-btn-sub">Nothing Matrix · Lyrics · Strobe</span>
-          </div>
-          <span class="jam-sidebar-badge" style="background:#ff0033; color:#fff;">NOTHING (R)</span>
-        </button>
+        <button class="sidebar-menu-btn" id="sidebarGlyphBtn" class="sidebar-item-btn"><span class="sb-icon">🌌</span><span class="sb-text">Audio Visualizer</span></button>
 
         <div class="sidebar-divider"></div>
 
@@ -1028,80 +1019,66 @@
   </div>
 
 
-  <!-- ==================== NOTHING (R) GLYPH DOT PLAY & MATRIX VISUALIZER ==================== -->
-  <div class="glyph-matrix-modal" id="glyphMatrixModal">
+    <!-- ==================== LIVE AUDIO VISUALIZER STUDIO ==================== -->
+  <div class="glyph-matrix-modal visualizer-studio-modal" id="glyphMatrixModal">
     <div class="glyph-matrix-backdrop-glow"></div>
-    <div class="glyph-matrix-container">
+    <div class="glyph-matrix-container visualizer-container">
       
-      <!-- Nothing OS Header -->
-      <div class="glyph-header">
+      <!-- Studio Header -->
+      <div class="glyph-header visualizer-header">
         <div class="glyph-brand">
-          <span class="glyph-dot-rec"></span>
+          <span class="glyph-dot-rec" style="background: #00f0ff; box-shadow: 0 0 10px #00f0ff;"></span>
           <div class="glyph-brand-titles">
-            <span class="glyph-title">NOTHING (R) // GLYPH MATRIX 4.0</span>
-            <span class="glyph-subtitle">PHONE (4a) PRO &bull; HAPTIC SYNC ACTIVE</span>
+            <span class="glyph-title" style="letter-spacing: 0.15em;">AURA // AUDIO VISUALIZER STUDIO</span>
+            <span class="glyph-subtitle">REAL-TIME BEAT & FREQUENCY REACTIVE AUDIO ENGINE</span>
           </div>
         </div>
         <div class="glyph-actions">
           <div class="glyph-live-bpm" id="glyphLiveBpm">
-            <span class="bpm-pulse-dot"></span>
-            <span id="glyphBpmValue">124 BPM</span>
+            <span class="bpm-pulse-dot" style="background: #00f0ff;"></span>
+            <span id="glyphBpmValue">128 BPM</span>
           </div>
-          <button class="glyph-mode-pill" id="glyphColorToggleBtn" title="Switch Glyph Color">
-            <span class="glyph-color-indicator" id="glyphColorIndicator"></span>
-            <span id="glyphColorLabel">RED LED</span>
+          <button class="glyph-mode-pill" id="glyphColorToggleBtn" title="Switch Color Palette">
+            <span class="glyph-color-indicator" id="glyphColorIndicator" style="background: #00f0ff; box-shadow: 0 0 8px #00f0ff;"></span>
+            <span id="glyphColorLabel">NEON CYAN</span>
           </button>
-          <button class="glyph-mode-pill active" id="glyphHapticBtn" title="Toggle & Test Bass Haptic Pulse">
-            <span>⚡ HAPTIC PULSE</span>
+          <button class="glyph-mode-pill active" id="glyphHapticBtn" title="Toggle Bass Beat Pulse">
+            <span>⚡ BEAT PULSE</span>
           </button>
-          <button class="glyph-close-btn" id="closeGlyphBtn" title="Exit Glyph Matrix (Esc)">&times;</button>
+          <button class="glyph-close-btn" id="closeGlyphBtn" title="Exit Visualizer (Esc)">&times;</button>
         </div>
       </div>
 
-      <!-- Main Dot Matrix Display & Glyph Back Simulator -->
-      <div class="glyph-stage">
+      <!-- Main Visualizer Canvas Display -->
+      <div class="glyph-stage visualizer-stage">
         
-        <!-- Authentic Nothing Phone Back Glyph Arc Outline & LED Strips -->
-        <div class="nothing-phone-body" id="nothingPhoneBody">
-          <div class="phone-circuit-grid"></div>
+        <div class="visualizer-canvas-card">
+          <canvas id="glyphDotCanvas" width="960" height="420" style="width: 100%; height: 100%; border-radius: 16px;"></canvas>
           
-          <!-- Top-Left Camera Glyph Arc & Dual Lens cutout -->
-          <div class="glyph-camera-housing">
-            <div class="glyph-strip glyph-camera-ring" id="glyphCameraRing">
-              <div class="camera-lens-reflection"></div>
-            </div>
-            <div class="glyph-camera-arc-accent" id="glyphCameraArcAccent"></div>
+          <!-- Floating Track Info Card in Visualizer -->
+          <div class="visualizer-track-overlay">
+            <div class="viz-track-badge" id="vizTrackBadge">LIVE FREQUENCY</div>
+            <div class="glyph-lyrics-line" id="glyphLyricsLine" style="font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 0.05em;">AURA MUSIC // LIVE VISUALIZER</div>
+            <div class="glyph-track-meta" id="glyphTrackMeta" style="font-size: 11px; opacity: 0.7; letter-spacing: 0.1em;">SYNCHRONIZED AUDIO FREQUENCY</div>
           </div>
-
-          <!-- Top-Right Diagonal Glyph Strip -->
-          <div class="glyph-strip glyph-top-diag" id="glyphTopDiag"></div>
-          
-          <!-- Center Wireless Coil Glyph Circle & Diagonals -->
-          <div class="glyph-strip glyph-center-coil" id="glyphCenterCoil">
-            <div class="coil-copper-texture"></div>
-            <!-- 64x16 Dot Matrix LED Lyrics Display Canvas -->
-            <div class="glyph-dot-canvas-wrap">
-              <canvas id="glyphDotCanvas" width="480" height="140"></canvas>
-            </div>
-          </div>
-
-          <!-- Bottom Exclamation Glyph Bar & Dot -->
-          <div class="glyph-bottom-group">
-            <div class="glyph-strip glyph-bottom-bar" id="glyphBottomBar"></div>
-            <div class="glyph-strip glyph-bottom-dot" id="glyphBottomDot"></div>
-          </div>
-
-          <!-- Nothing subtle typography on casing -->
-          <div class="phone-back-wordmark">nothing (R)</div>
-        </div>
-
-        <!-- Live Streaming Lyrics Text on Dot Screen -->
-        <div class="glyph-lyrics-readout">
-          <div class="glyph-lyrics-line" id="glyphLyricsLine">NOTHING DOT PLAY // READY</div>
-          <div class="glyph-track-meta" id="glyphTrackMeta">SYNCHRONIZED AUDIO FREQUENCY</div>
         </div>
 
       </div>
+
+      <!-- Mode Switcher Toolbar -->
+      <div class="glyph-footer-bar visualizer-footer-bar">
+        <div class="glyph-mode-chips" id="glyphModeChips">
+          <button class="glyph-chip active" data-glyph-mode="spectrum">📊 NEON SPECTRUM</button>
+          <button class="glyph-chip" data-glyph-mode="wave">🌊 FLUID WAVE</button>
+          <button class="glyph-chip" data-glyph-mode="orb">🔮 QUANTUM ORB</button>
+          <button class="glyph-chip" data-glyph-mode="stardust">🌌 COSMIC STARDUST</button>
+          <button class="glyph-chip" data-glyph-mode="matrix">⚡ CYBER HUD</button>
+        </div>
+        <div class="glyph-device-tag">AURA STUDIO DSP // 64-BAND FFT &bull; MULTI-HARMONIC RHYTHM ENGINE</div>
+      </div>
+
+    </div>
+  </div>
 
       <!-- Glyph Mode Switcher Toolbar -->
       <div class="glyph-footer-bar">
@@ -1667,7 +1644,7 @@
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=101.6"></script>
+  <script src="script.js?v=102.0"></script>
 
 
 
