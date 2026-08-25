@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v120.0') caches.delete(name);
+        if (name !== 'aura-music-v121.0') caches.delete(name);
       });
     });
   }
@@ -5840,6 +5840,7 @@
 
     var titleEl = $('title');
     if (titleEl && displayTitle) titleEl.textContent = displayTitle;
+    try { updateGenZVibe(displayTitle, displayArtist); } catch (e) {}
 
     var artistEl = $('artist');
     if (artistEl && displayArtist) artistEl.textContent = displayArtist;
@@ -8009,6 +8010,108 @@
   window.applyStationTheme = applyStationTheme;
   window.currentTrackQueue = currentTrackQueue;
   window.currentTrackIndex = currentTrackIndex;
+
+
+  /* ==================== 101. GEN Z VIBE & SPEED ENGINE ==================== */
+  var GENZ_VIBES = [
+    { flame: '🔥', text: 'MAIN CHARACTER ENERGY', aura: '+10,000 AURA' },
+    { flame: '✨', text: 'CERTIFIED BANGER // NO SKIPS', aura: '100% AURA' },
+    { flame: '🖤', text: 'LATE NIGHT OVERTHINKING', aura: '3AM VIBES' },
+    { flame: '🏎️', text: 'MIDNIGHT SPEED DRIVE', aura: 'MAX DOPAMINE' },
+    { flame: '💤', text: 'ROT IN BED & FLOAT', aura: 'SOFT HOURS' },
+    { flame: '👑', text: 'MAXIMUM SWAGGER', aura: 'LOCKED IN' },
+    { flame: '🥀', text: 'UNREQUITED DELUSION', aura: 'SOUL CRUSH' },
+    { flame: '⚡', text: 'DOPAMINE OVERLOAD', aura: 'HYPED' },
+    { flame: '🍵', text: 'CHAI & RAIN MELANCHOLY', aura: 'AESTHETIC' },
+    { flame: '🌌', text: 'ASTRALLY PROJECTING', aura: 'EUPHORIA' }
+  ];
+
+  function updateGenZVibe(songTitle, artistName) {
+    var vPill = $('genzVibePill');
+    var vText = $('genzVibeText');
+    var vAura = $('vibeAuraScore');
+    var vFlame = $('vibeDotFlame');
+    if (!vText || !vAura) return;
+
+    var seed = 0;
+    var str = (songTitle || '') + (artistName || '') + (currentStationKey || '');
+    for (var i = 0; i < str.length; i++) seed += str.charCodeAt(i);
+    var item = GENZ_VIBES[seed % GENZ_VIBES.length];
+
+    vText.textContent = item.text;
+    vAura.textContent = item.aura;
+    if (vFlame) vFlame.textContent = item.flame;
+  }
+
+  // Playback Speed / Vibe Modifiers (1.0x -> 1.25x Nightcore -> 0.85x Slowed & Reverb)
+  var currentSpeedMode = '1.0'; // '1.0', '1.25', '0.85'
+  function cycleSpeedMode() {
+    try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
+    var btn = $('vibeSpeedBtn');
+    if (!player) return;
+
+    if (currentSpeedMode === '1.0') {
+      currentSpeedMode = '1.25';
+      if (btn) btn.textContent = '1.25x ⚡';
+      if (player.setPlaybackRate) player.setPlaybackRate(1.25);
+      showToast('⚡ Nightcore / Speed Up (1.25x) Active!');
+    } else if (currentSpeedMode === '1.25') {
+      currentSpeedMode = '0.85';
+      if (btn) btn.textContent = '0.85x 🌙';
+      if (player.setPlaybackRate) player.setPlaybackRate(0.85);
+      showToast('🌙 Slowed + Reverb Chill (0.85x) Active!');
+    } else {
+      currentSpeedMode = '1.0';
+      if (btn) btn.textContent = '1.0x';
+      if (player.setPlaybackRate) player.setPlaybackRate(1.0);
+      showToast('✨ Pure Original Speed (1.0x)');
+    }
+  }
+
+  // Floating Emoji Reaction Sparks on Album Tap
+  function burstReactionSpark(x, y, emoji) {
+    try { if (typeof HapticEngine !== 'undefined') HapticEngine.tap(); } catch (e) {}
+    var emojis = ['🔥', '💖', '✨', '⚡', '💀', '🚀', '😍', '💃'];
+    var chosen = emoji || emojis[Math.floor(Math.random() * emojis.length)];
+
+    for (var i = 0; i < 4; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'floating-spark-emoji';
+      spark.textContent = chosen;
+      spark.style.left = (x || (window.innerWidth / 2)) + 'px';
+      spark.style.top = (y || (window.innerHeight / 2)) + 'px';
+      spark.style.setProperty('--dx', ((Math.random() - 0.5) * 80) + 'px');
+      spark.style.setProperty('--rot', ((Math.random() - 0.5) * 60) + 'deg');
+      document.body.appendChild(spark);
+
+      setTimeout(function (s) {
+        if (s.parentNode) s.parentNode.removeChild(s);
+      }.bind(null, spark), 1200);
+    }
+  }
+
+  window.cycleSpeedMode = cycleSpeedMode;
+  window.burstReactionSpark = burstReactionSpark;
+  window.updateGenZVibe = updateGenZVibe;
+
+
+  // Wire Speed Button
+  var vibeSpeedBtn = $('vibeSpeedBtn');
+  if (vibeSpeedBtn) {
+    vibeSpeedBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cycleSpeedMode();
+    });
+  }
+
+  // Double-tap or Click Art Card for Reaction Spark Burst
+  var artCardEl = $('artCard');
+  if (artCardEl) {
+    artCardEl.addEventListener('click', function (e) {
+      if (e.target.closest('button')) return;
+      burstReactionSpark(e.clientX, e.clientY);
+    });
+  }
 
   init();
 })();
