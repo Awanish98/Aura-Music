@@ -12,7 +12,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=115.0">
+  <link rel="stylesheet" href="style.css?v=116.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -125,79 +125,6 @@
           </svg>
         </button>
 
-        <!-- Station Preset Selector Dropdown -->
-        <div class="station-dropdown-wrap">
-          <button class="station-badge-btn" id="stationSelectBtn" title="Change Frequency Station">
-            <span class="live-dot"></span>
-            <span class="station-name-label" id="currentStationLabel">STATIONS</span>
-            <svg class="dropdown-chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-          </button>
-
-          <!-- Station Dropdown Menu -->
-          <div class="station-dropdown" id="stationDropdown">
-            <div class="dropdown-header">Select Frequency Station</div>
-            <div class="station-items-list" id="stationItemsList">
-              <!-- Special Pinned Mood Universe Station Trigger -->
-              <div class="station-item" id="dropdownMoodUniTrigger" style="background: linear-gradient(135deg, rgba(236,72,153,0.18) 0%, rgba(139,92,246,0.18) 100%); border: 1px solid rgba(236,72,153,0.4); margin-bottom: 6px; border-radius: 12px;">
-                <div class="st-icon" style="font-size: 20px;">🎭</div>
-                <div class="st-info">
-                  <div class="st-title" style="color: #ec4899; font-weight: 800;">🎭 40+ AI MOOD STATIONS</div>
-                  <div class="st-desc">Bollywood, EDM, Pop, Chai, Lo-Fi, 90s, Gym, Sufi & more</div>
-                </div>
-                <span class="mood-ai-badge" style="margin-left: auto; font-size: 8px;">EXPLORE</span>
-              </div>
-              <div class="station-item active" data-station="time-travel">
-                <div class="st-icon">⏳</div>
-                <div class="st-info">
-                  <div class="st-title">⏳ Time Travel</div>
-                  <div class="st-desc">Cosmic celestial journey across 4,066 timeless melodies</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#a855f7;opacity:0.8;"></div>
-              </div>
-              <div class="station-item" data-station="my-vibes">
-                <div class="st-icon">✨</div>
-                <div class="st-info">
-                  <div class="st-title">✨ My Vibes — AI Flow</div>
-                  <div class="st-desc">Smart AI-curated frequency tailored to your taste</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ec4899;opacity:0.8;"></div>
-              </div>
-              <div class="station-item" data-station="ishq">
-                <div class="st-icon">📻</div>
-                <div class="st-info">
-                  <div class="st-title">📻 ISHQ — Pure Soul</div>
-                  <div class="st-desc">Heartfelt acoustic, lo-fi & soul melodies</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;opacity:0.8;"></div>
-              </div>
-              <div class="station-item" data-station="demanding">
-                <div class="st-icon">🔥</div>
-                <div class="st-info">
-                  <div class="st-title">🔥 Demand — Energy</div>
-                  <div class="st-desc">Fiery romantic beats & high-energy hits</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff2a5f;opacity:0.8;"></div>
-              </div>
-              <div class="station-item" data-station="90s">
-                <div class="st-icon">📼</div>
-                <div class="st-info">
-                  <div class="st-title">📼 90's — Nostalgia</div>
-                  <div class="st-desc">Timeless 90s vintage romance & duets</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#06b6d4;opacity:0.8;"></div>
-              </div>
-              <div class="station-item" data-station="edm">
-                <div class="st-icon">⚡</div>
-                <div class="st-info">
-                  <div class="st-title">⚡ EDM — Euphoria</div>
-                  <div class="st-desc">Club anthems, electronic basslines & festival vibes</div>
-                </div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#10b981;opacity:0.8;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Infinite AI Mood Radio Universe Trigger Button (Always Visible in Header) -->
         <button class="mood-universe-btn" id="moodUniverseBtn" title="Explore 40+ Endless AI Mood Radios" style="display: inline-flex !important; align-items: center; gap: 6px; height: 28px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important; border: 1px solid rgba(255, 255, 255, 0.45) !important; padding: 0 12px; border-radius: 999px; cursor: pointer; color: #ffffff !important; font-weight: 800; box-shadow: 0 0 16px rgba(236, 72, 153, 0.6) !important; z-index: 20; flex-shrink: 0; margin-left: 2px;">
           <span class="mood-btn-icon" style="font-size: 13px; line-height: 1;">🎭</span>
@@ -254,6 +181,83 @@
 
       <!-- Nav Items -->
       <div class="premium-sidebar-body">
+        <!-- Station Preset Selector Dropdown -->
+        <div class="sidebar-station-block" style="margin-bottom: 14px;">
+          <div style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.14em; color: var(--muted, rgba(255,255,255,0.6)); text-transform: uppercase; margin-bottom: 8px; padding: 0 4px;">Frequency Station</div>
+          <div class="station-dropdown-wrap" style="position: relative; width: 100%;">
+            <button class="station-badge-btn" id="stationSelectBtn" title="Change Frequency Station" style="width: 100% !important; justify-content: space-between !important; height: 42px !important; padding: 0 14px !important; border-radius: 14px !important; background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,255,255,0.14) !important;">
+              <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+                <span class="live-dot"></span>
+                <span class="station-name-label" id="currentStationLabel">TIME TRAVEL ⏳</span>
+              </div>
+              <svg class="dropdown-chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+            </button>
+
+            <!-- Station Dropdown Menu -->
+            <div class="station-dropdown" id="stationDropdown" style="width: 100%; top: calc(100% + 6px); left: 0; right: 0;">
+              <div class="dropdown-header">Select Frequency Station</div>
+              <div class="station-items-list" id="stationItemsList">
+                <!-- Special Pinned Mood Universe Station Trigger -->
+                <div class="station-item" id="dropdownMoodUniTrigger" style="background: linear-gradient(135deg, rgba(236,72,153,0.18) 0%, rgba(139,92,246,0.18) 100%); border: 1px solid rgba(236,72,153,0.4); margin-bottom: 6px; border-radius: 12px;">
+                  <div class="st-icon" style="font-size: 20px;">🎭</div>
+                  <div class="st-info">
+                    <div class="st-title" style="color: #ec4899; font-weight: 800;">🎭 40+ AI MOOD STATIONS</div>
+                    <div class="st-desc">Bollywood, EDM, Pop, Chai, Lo-Fi, 90s, Gym, Sufi & more</div>
+                  </div>
+                  <span class="mood-ai-badge" style="margin-left: auto; font-size: 8px;">EXPLORE</span>
+                </div>
+                <div class="station-item active" data-station="time-travel">
+                  <div class="st-icon">⏳</div>
+                  <div class="st-info">
+                    <div class="st-title">⏳ Time Travel</div>
+                    <div class="st-desc">Cosmic celestial journey across 4,066 timeless melodies</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#a855f7;opacity:0.8;"></div>
+                </div>
+                <div class="station-item" data-station="my-vibes">
+                  <div class="st-icon">✨</div>
+                  <div class="st-info">
+                    <div class="st-title">✨ My Vibes — AI Flow</div>
+                    <div class="st-desc">Smart AI-curated frequency tailored to your taste</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#ec4899;opacity:0.8;"></div>
+                </div>
+                <div class="station-item" data-station="ishq">
+                  <div class="st-icon">📻</div>
+                  <div class="st-info">
+                    <div class="st-title">📻 ISHQ — Pure Soul</div>
+                    <div class="st-desc">Heartfelt acoustic, lo-fi & soul melodies</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;opacity:0.8;"></div>
+                </div>
+                <div class="station-item" data-station="demanding">
+                  <div class="st-icon">🔥</div>
+                  <div class="st-info">
+                    <div class="st-title">🔥 Demand — Energy</div>
+                    <div class="st-desc">Fiery romantic beats & high-energy hits</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#ff2a5f;opacity:0.8;"></div>
+                </div>
+                <div class="station-item" data-station="90s">
+                  <div class="st-icon">📼</div>
+                  <div class="st-info">
+                    <div class="st-title">📼 90's — Nostalgia</div>
+                    <div class="st-desc">Timeless 90s vintage romance & duets</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#06b6d4;opacity:0.8;"></div>
+                </div>
+                <div class="station-item" data-station="edm">
+                  <div class="st-icon">⚡</div>
+                  <div class="st-info">
+                    <div class="st-title">⚡ EDM — Euphoria</div>
+                    <div class="st-desc">Club anthems, electronic basslines & festival vibes</div>
+                  </div>
+                  <div style="width:8px;height:8px;border-radius:50%;background:#10b981;opacity:0.8;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Mood Universe in Sidebar -->
         <button class="sidebar-menu-btn" id="sidebarMoodUniBtn" title="Explore 40+ Endless AI Mood Radios" style="background: linear-gradient(135deg, rgba(236,72,153,0.12) 0%, rgba(139,92,246,0.12) 100%); border-color: rgba(236,72,153,0.35);">
@@ -1533,7 +1537,7 @@
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="script.js?v=115.0"></script>
+  <script src="script.js?v=116.0"></script>
 
 
 
