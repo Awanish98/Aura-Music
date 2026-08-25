@@ -9037,3 +9037,89 @@ body.in-explorer-mode .shell {
   transform: none !important;
   perspective: none !important;
 }
+
+
+/* ==================== Full HD Cinema Video Player Overlay ==================== */
+.cinema-video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(4, 3, 8, 0.96);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.cinema-video-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.in-cinema-mode #playerHarness {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(92vw, 1100px) !important;
+  height: min(56.25vw, 620px) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 100001 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 50px rgba(236, 72, 153, 0.35) !important;
+  overflow: hidden !important;
+  background: #000000 !important;
+  display: block !important;
+}
+
+body.in-cinema-mode #playerA,
+body.in-cinema-mode #playerA iframe {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+  display: block !important;
+  border: none !important;
+}
+
+.cinema-video-header {
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100005;
+}
+
+.cinema-close-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.cinema-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  body.in-cinema-mode #playerHarness {
+    width: 96vw !important;
+    height: 56vw !important;
+    border-radius: 12px !important;
+  }
+}

@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v108.0') caches.delete(name);
+        if (name !== 'aura-music-v109.0') caches.delete(name);
       });
     });
   }
@@ -2389,36 +2389,24 @@
   }
 
   /* ==================== Full HD Video Cinema Theater Controller ==================== */
+    /* ==================== Full HD Video Cinema Theater Controller ==================== */
   var cinemaVideoModal = $('cinemaVideoModal');
-  var cinemaVideoStage = $('cinemaVideoStage');
-  var playerEl = $('player');
-  var playerOriginalParent = playerEl ? playerEl.parentNode : document.body;
 
   function openCinemaMode() {
-    if (!cinemaVideoModal || !playerEl) return;
+    cinemaVideoModal = cinemaVideoModal || $('cinemaVideoModal');
+    if (!cinemaVideoModal) return;
     document.body.classList.add('in-cinema-mode');
     cinemaVideoModal.classList.add('open');
-
-    // Move player container inside cinema stage
-    if (cinemaVideoStage && playerEl.parentNode !== cinemaVideoStage) {
-      cinemaVideoStage.appendChild(playerEl);
-    }
-
     syncCinemaTrackInfo();
     showToast('Entered Full HD Cinema Mode 🎬');
   }
 
   function closeCinemaMode() {
-    if (!cinemaVideoModal || !playerEl) return;
+    cinemaVideoModal = cinemaVideoModal || $('cinemaVideoModal');
+    if (!cinemaVideoModal) return;
     document.body.classList.remove('in-cinema-mode');
     cinemaVideoModal.classList.remove('open');
-
-    // Restore player container to background body
-    if (playerOriginalParent && playerEl.parentNode !== playerOriginalParent) {
-      playerOriginalParent.appendChild(playerEl);
-    }
-
-    showToast('Exited Cinema Mode (Ambient Audio Mode)');
+    showToast('Exited Cinema Mode 📻');
   }
 
   function syncCinemaTrackInfo() {
