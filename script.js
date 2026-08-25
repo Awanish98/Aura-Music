@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v118.0') caches.delete(name);
+        if (name !== 'aura-music-v119.0') caches.delete(name);
       });
     });
   }
@@ -1748,30 +1748,33 @@
         // Always load the direct authentic track array from STATION_TRACKS
         var list = (typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS[st.id] && STATION_TRACKS[st.id].length)
           ? STATION_TRACKS[st.id].slice()
-          : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0'];
+          : ['IltsCYPwtjE', 'BddP6PYo2gs', '1T3i9Qp54s0', 'b5f25X2Gvfg', 'YxWlaYCA8MU', 'k4yXQkG2s1E', 'gCYcHz2167o'];
 
+        // Shuffle queue on station tune for infinite freshness
+        list.sort(function () { return 0.5 - Math.random(); });
         currentTrackQueue = list.slice();
-        currentTrackIndex = 0;
+        currentTrackIndex = Math.floor(Math.random() * list.length);
+        window.currentTrackQueue = currentTrackQueue;
+        window.currentTrackIndex = currentTrackIndex;
+        var targetVid = currentTrackQueue[currentTrackIndex] || list[0];
 
-        if (player.loadPlaylist) {
+        if (player.loadVideoById) {
           if (desired) {
-            player.loadPlaylist(list, 0, 0);
+            player.loadVideoById(targetVid);
+            setTimeout(function () {
+              try { if (player && player.playVideo) player.playVideo(); } catch (e) {}
+            }, 200);
+          } else if (player.cueVideoById) {
+            player.cueVideoById(targetVid);
+          }
+        } else if (player.loadPlaylist) {
+          if (desired) {
+            player.loadPlaylist(currentTrackQueue, currentTrackIndex, 0);
             setTimeout(function () {
               try { if (player && player.playVideo) player.playVideo(); } catch (e) {}
             }, 200);
           } else if (player.cuePlaylist) {
-            player.cuePlaylist(list, 0, 0);
-          }
-          setTimeout(function () {
-            if (player.setLoop) player.setLoop(true);
-            if (player.setShuffle) player.setShuffle(false);
-          }, 600);
-        } else {
-          var targetVid = list[0];
-          if (desired && player.loadVideoById) {
-            player.loadVideoById(targetVid);
-          } else if (player.cueVideoById) {
-            player.cueVideoById(targetVid);
+            player.cuePlaylist(currentTrackQueue, currentTrackIndex, 0);
           }
         }
       } catch (e) {
@@ -1806,14 +1809,23 @@
 
       if (currentTrackQueue && currentTrackQueue.length > 0) {
         if (dir === 'next') {
-          currentTrackIndex = (currentTrackIndex + 1) % currentTrackQueue.length;
-          showToast('Next Song ⏭️');
+          currentTrackIndex++;
+          if (currentTrackIndex >= currentTrackQueue.length) {
+            // End of queue -> Reshuffle for non-stop infinite discovery
+            currentTrackQueue.sort(function () { return 0.5 - Math.random(); });
+            currentTrackIndex = 0;
+            showToast('Endless Radio Reshuffled 🔀');
+          } else {
+            showToast('Next Song ⏭️');
+          }
         } else {
           currentTrackIndex = (currentTrackIndex - 1 + currentTrackQueue.length) % currentTrackQueue.length;
           showToast('Previous Song ⏮️');
         }
 
         var nextVid = currentTrackQueue[currentTrackIndex];
+        window.currentTrackIndex = currentTrackIndex;
+        window.currentTrackQueue = currentTrackQueue;
         if (player) {
           if (player.loadVideoById) {
             player.loadVideoById(nextVid);
@@ -7087,6 +7099,21 @@
 
     function playMoodStation(mood) {
       if (!mood) return;
+      if (typeof mood === 'string') {
+        var found = MOOD_STATIONS.find(function(m) { return m.id === mood || m.name.toLowerCase() === mood.toLowerCase(); });
+        if (found) {
+          mood = found;
+        } else {
+          mood = {
+            id: mood.toLowerCase().replace(/\s+/g, '-'),
+            name: mood.replace(/-/g, ' ').replace(/\b\w/g, function(l){ return l.toUpperCase(); }),
+            desc: 'Endless AI Radio Frequency',
+            icon: '🎭',
+            category: 'global',
+            seedTracks: []
+          };
+        }
+      }
       desired = true;
       claimAudioMaster();
       hideAutoplayPrompt();
@@ -7095,14 +7122,14 @@
       // Synthesize dynamic station object
       var customStation = {
         id: 'mood-' + mood.id,
-        name: mood.icon + ' ' + mood.name,
-        short: mood.name + ' ' + mood.icon,
-        brand: mood.name.toUpperCase(),
-        brandSub: 'MOOD FREQUENCY // ' + mood.desc.toUpperCase(),
-        desc: mood.desc,
-        icon: mood.icon,
+        name: (mood.icon || '🎭') + ' ' + (mood.name || 'Mood Frequency'),
+        short: (mood.name || 'Mood') + ' ' + (mood.icon || '🎭'),
+        brand: (mood.name || 'MOOD FREQUENCY').toUpperCase(),
+        brandSub: 'MOOD FREQUENCY // ' + (mood.desc || 'AI VIBES').toUpperCase(),
+        desc: mood.desc || 'Endless AI Radio Frequency',
+        icon: mood.icon || '🎭',
         type: 'custom',
-        songCount: '50+ AI CURATED TRACKS',
+        songCount: '100+ AI CURATED TRACKS',
         theme: {
           bg: '#05050a',
           fg: '#ffffff',
@@ -7186,33 +7213,44 @@
         });
       }
 
-      // 4. Ensure at least 40 tracks
-      if (tracks.length < 40 && typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS['time-travel']) {
-        STATION_TRACKS['time-travel'].slice(0, 40).forEach(function (vid) {
-          if (tracks.indexOf(vid) === -1) tracks.push(vid);
+      // 4. Ensure massive endless library (at least 80-120 tracks per mood station)
+      if (typeof STATION_TRACKS !== 'undefined') {
+        ['time-travel', 'ishq', 'demanding', '90s', 'edm'].forEach(function(stKey) {
+          if (STATION_TRACKS[stKey] && Array.isArray(STATION_TRACKS[stKey])) {
+            STATION_TRACKS[stKey].forEach(function(vid) {
+              if (vid && tracks.indexOf(vid) === -1 && tracks.length < 150) {
+                tracks.push(vid);
+              }
+            });
+          }
         });
       }
 
+      // Shuffle tracks for unique endless journey every time
+      tracks.sort(function () { return 0.5 - Math.random(); });
+
       console.log('🎵 Mood Station initialized with ' + tracks.length + ' tracks:', mood.name);
 
-      currentTrackQueue = tracks;
-      currentTrackIndex = 0;
+      currentTrackQueue = tracks.slice();
+      currentTrackIndex = Math.floor(Math.random() * Math.min(tracks.length, 10)); // start at random track in first 10
+      var initialMoodVid = currentTrackQueue[currentTrackIndex] || tracks[0];
+
       if (typeof STATION_TRACKS !== 'undefined') {
-        STATION_TRACKS[customStation.id] = tracks;
+        STATION_TRACKS[customStation.id] = currentTrackQueue;
         window.STATION_TRACKS = STATION_TRACKS;
       }
       window.currentTrackQueue = currentTrackQueue;
       window.currentTrackIndex = currentTrackIndex;
 
-            var activeP = player || window.__p;
+      var activeP = player || window.__p;
       if (activeP) {
         try {
           if (activeP.unMute) activeP.unMute();
           if (activeP.setVolume) activeP.setVolume(100);
           if (activeP.loadVideoById) {
-            activeP.loadVideoById(tracks[0]);
+            activeP.loadVideoById(initialMoodVid);
           } else if (activeP.cueVideoById) {
-            activeP.cueVideoById(tracks[0]);
+            activeP.cueVideoById(initialMoodVid);
           }
           if (activeP.playVideo) {
             activeP.playVideo();
@@ -7548,8 +7586,11 @@
             DualAudioEngine.init(pA, null);
 
             setTimeout(function () {
-              var s = currentStation || stations[0];
-              if (s) loadStationPlayback(s);
+              var s = currentStation || (stations && stations[0]);
+              if (s) {
+                // Pick a random track on initial start
+                loadStationPlayback(s);
+              }
             }, 200);
           },
           onStateChange: onState,
@@ -7907,6 +7948,13 @@
     }
   }, 2500);
 
+
+  window.playMoodStation = playMoodStation;
+  window.skip = skip;
+  window.loadStationPlayback = loadStationPlayback;
+  window.applyStationTheme = applyStationTheme;
+  window.currentTrackQueue = currentTrackQueue;
+  window.currentTrackIndex = currentTrackIndex;
 
   init();
 })();
