@@ -1,6 +1,6 @@
 (function () {
   var DB_VERSION_KEY = 'ishq_db_version';
-  var CURRENT_DB_VERSION = 'v103.0';
+  var CURRENT_DB_VERSION = 'v106.0';
   var STORAGE_KEY = 'ishq_custom_stations';
 
 
@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v105.0') caches.delete(name);
+        if (name !== 'aura-music-v106.0') caches.delete(name);
       });
     });
   }
@@ -5838,56 +5838,7 @@
     }
   }
 
-  function triggerAiDj(songTitle, artist, station) {
-    if (!('speechSynthesis' in window)) return;
-    
-    var currentVol = 100;
-    if (player && player.getVolume) {
-      currentVol = player.getVolume();
-      player.setVolume(12); // Drop volume a bit lower so voice is clear
-    }
-    
-    window.speechSynthesis.cancel();
-    
-    var stationName = station ? station.name.replace(/[^a-zA-Z\s]/g, '').trim() : "Aura";
-    // Clean track name to sound better (remove brackets and feat)
-    var trackName = songTitle.split('-')[0].split('(')[0].split('[')[0].replace(/ft\.|feat\./i, '').trim(); 
-    
-    var djLines = [
-      "Swagat hai aapka " + stationName + " radio par! Mahool banaiye, kyunki agla gaana hai, " + trackName + ".",
-      "Aap sun rahe hain " + stationName + " radio. Volume thoda bada lijiye, pesh hai agla track, " + trackName + ".",
-      "Vibes ekdum set hain! " + stationName + " radio par suniye ye behtareen gaana, " + trackName + ". Let's go!",
-      "Kya baat hai! Aapke liye " + stationName + " par agla gaana hai, " + trackName + ". Enjoy kijiye!",
-      "Toh chaliye, " + stationName + " par sunte hain ek aur zabardast track... " + trackName + "."
-    ];
-    
-    var msg = new SpeechSynthesisUtterance();
-    msg.text = djLines[Math.floor(Math.random() * djLines.length)];
-    msg.lang = 'hi-IN'; // Force Hindi language
-    
-    // Pick a Hindi Voice if available (Google Hindi or Microsoft Hemant/Kalpana)
-    var voices = window.speechSynthesis.getVoices();
-    var djVoice = voices.find(function(v) {
-      return v.lang.includes("hi-IN") || v.lang.includes("hi") || v.name.includes("Hindi") || v.name.includes("India");
-    });
-    
-    if (djVoice) {
-      msg.voice = djVoice;
-    }
-    
-    // Hindi TTS sounds better with normal pitch, slightly faster rate for energy
-    msg.pitch = 1.0; 
-    msg.rate = 1.05; 
-    
-    msg.onend = function() {
-      if (player && player.setVolume) player.setVolume(currentVol);
-    };
-    msg.onerror = function() {
-      if (player && player.setVolume) player.setVolume(currentVol);
-    };
-    
-    window.speechSynthesis.speak(msg);
-  }
+  function triggerAiDj() {}
 
   function update() {
     if (!player || !apiReady) return;
@@ -5917,10 +5868,7 @@
     if (artistEl && displayArtist) artistEl.textContent = displayArtist;
 
     // AI Virtual DJ Announcement Logic
-    if (aiDjEnabled && videoId && videoId !== lastDjAnnouncedId && player.getPlayerState && player.getPlayerState() === YT.PlayerState.PLAYING) {
-      lastDjAnnouncedId = videoId;
-      triggerAiDj(displayTitle, displayArtist, currentStation);
-    }
+    
 
     var fallbackArtUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80';
     var artImg = $('art');
@@ -7813,14 +7761,7 @@
     }
   }
 
-  if ($('aiDjBtn')) {
-    $('aiDjBtn').addEventListener('click', function() {
-      aiDjEnabled = !aiDjEnabled;
-      this.classList.toggle('active', aiDjEnabled);
-      if ($('aiDjPip')) $('aiDjPip').parentElement.classList.toggle('active', aiDjEnabled);
-      showToast(aiDjEnabled ? 'AI DJ: ON 🎙️' : 'AI DJ: OFF 🔇');
-    });
-  }
+  
 
   var _playBtn = $('play');
   if (_playBtn) _playBtn.addEventListener('click', togglePlay);
