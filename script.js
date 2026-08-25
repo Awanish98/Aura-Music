@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v126.0') caches.delete(name);
+        if (name !== 'aura-music-v127.0') caches.delete(name);
       });
     });
   }
@@ -951,41 +951,41 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     var rawText = (text || bTitle.textContent || '').trim();
     var len = rawText.length;
 
-    var desktopSize = 'clamp(32px, 3.6vw, 50px)';
-    var desktopSpacing = '0.14em';
-    var mobileSize = 'clamp(22px, 6.2vw, 30px)';
-    var mobileSpacing = '0.11em';
+    var desktopSize = 'clamp(18px, 2.0vw, 26px)';
+    var desktopSpacing = '0.10em';
+    var mobileSize = 'clamp(14px, 4.0vw, 18px)';
+    var mobileSpacing = '0.06em';
 
-    if (len <= 7) {
-      // Very short names (e.g. ISHQ, DEMAND, 90'S, EDM) -> HUGE, MAJESTIC, CINEMATIC
-      desktopSize = 'clamp(40px, 4.6vw, 64px)';
-      desktopSpacing = '0.18em';
-      mobileSize = 'clamp(28px, 8.2vw, 40px)';
-      mobileSpacing = '0.14em';
-    } else if (len <= 14) {
-      // Medium short names (e.g. TIME TRAVEL, MY VIBES, POP HITS)
-      desktopSize = 'clamp(34px, 3.8vw, 54px)';
-      desktopSpacing = '0.15em';
-      mobileSize = 'clamp(24px, 7.0vw, 32px)';
-      mobileSpacing = '0.12em';
-    } else if (len <= 21) {
-      // Medium names (e.g. YOUTUBE EXPLORER, BOLLYWOOD ROMANCE, BROKEN HEART) -> BIG & BOLD!
-      desktopSize = 'clamp(28px, 3.1vw, 44px)';
+    if (len <= 8) {
+      // Short names (e.g. ISHQ, 90S, EDM)
+      desktopSize = 'clamp(22px, 2.4vw, 32px)';
       desktopSpacing = '0.12em';
-      mobileSize = 'clamp(20px, 5.5vw, 26px)';
-      mobileSpacing = '0.09em';
-    } else if (len <= 30) {
-      // Long names (e.g. DARK OBSESSION & PASSION, ROYAL WEDDING ROMANCE)
-      desktopSize = 'clamp(24px, 2.5vw, 34px)';
-      desktopSpacing = '0.09em';
-      mobileSize = 'clamp(17px, 4.5vw, 22px)';
+      mobileSize = 'clamp(16px, 4.8vw, 22px)';
+      mobileSpacing = '0.08em';
+    } else if (len <= 15) {
+      // Medium short names (e.g. ARIJIT SINGH, TIME TRAVEL, MY VIBES)
+      desktopSize = 'clamp(19px, 2.1vw, 27px)';
+      desktopSpacing = '0.10em';
+      mobileSize = 'clamp(14px, 4.2vw, 19px)';
       mobileSpacing = '0.07em';
+    } else if (len <= 24) {
+      // Medium names (e.g. SHREYA GHOSHAL, BOLLYWOOD ROMANCE)
+      desktopSize = 'clamp(16px, 1.7vw, 22px)';
+      desktopSpacing = '0.08em';
+      mobileSize = 'clamp(12px, 3.5vw, 16px)';
+      mobileSpacing = '0.05em';
+    } else if (len <= 34) {
+      // Long names
+      desktopSize = 'clamp(14px, 1.4vw, 19px)';
+      desktopSpacing = '0.06em';
+      mobileSize = 'clamp(11px, 3.0vw, 14px)';
+      mobileSpacing = '0.04em';
     } else {
       // Extra long names
-      desktopSize = 'clamp(20px, 2.0vw, 28px)';
-      desktopSpacing = '0.07em';
-      mobileSize = 'clamp(15px, 3.8vw, 18px)';
-      mobileSpacing = '0.05em';
+      desktopSize = 'clamp(12px, 1.2vw, 16px)';
+      desktopSpacing = '0.05em';
+      mobileSize = 'clamp(10px, 2.6vw, 12px)';
+      mobileSpacing = '0.03em';
     }
 
     bTitle.style.setProperty('--dynamic-brand-size', desktopSize);
