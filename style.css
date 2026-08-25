@@ -1463,21 +1463,29 @@ body.playing .wave-visualizer span:nth-child(15) { animation-duration: 0.98s; an
     transform: scaleY(1.0);
     opacity: 1;
   }
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 440px;
+}
+
+/* ==================== Progress Scrubber - Audiophile Minimalist Track ==================== */
+.progress-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  width: 100% !important;
+  max-width: 460px !important;
+  margin: 8px auto !important;
+  padding: 0 4px !important;
 }
 
 .time-label {
-  font-size: 10px;
+  font-size: 11px;
   font-family: 'Space Grotesk', monospace;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
-  color: var(--muted);
-  min-width: 34px;
+  color: var(--muted, rgba(255, 255, 255, 0.6));
+  min-width: 36px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .progress-bar-wrap {
@@ -9110,14 +9118,14 @@ body.in-explorer-mode .shell {
 
 body.in-cinema-mode #playerHarness {
   position: fixed !important;
-  top: 50% !important;
+  top: 52% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: min(92vw, 1100px) !important;
-  height: min(56.25vw, 620px) !important;
+  width: min(90vw, 1000px) !important;
+  height: min(52vw, 540px) !important;
   opacity: 1 !important;
   pointer-events: auto !important;
-  z-index: 100001 !important;
+  z-index: 1000005 !important;
   border-radius: 18px !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 50px rgba(236, 72, 153, 0.35) !important;
   overflow: hidden !important;
