@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v134.0') caches.delete(name);
+        if (name !== 'aura-music-v138.0') caches.delete(name);
       });
     });
   }
@@ -8188,6 +8188,59 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
         openSidebar();
       });
     }
+    
+    // Wire all sidebar menu buttons
+    var sbEqBtn = $('sidebarEqBtn');
+    if (sbEqBtn) {
+      sbEqBtn.addEventListener('click', function () {
+        closeSidebar();
+        var eqBtn = $('eqDockBtn') || $('eqBtn');
+        if (eqBtn) eqBtn.click();
+      });
+    }
+
+    var sbVideoBtn = $('sidebarVideoBtn');
+    if (sbVideoBtn) {
+      sbVideoBtn.addEventListener('click', function () {
+        closeSidebar();
+        if (typeof openCinemaMode === 'function') openCinemaMode();
+      });
+    }
+
+    var sbWeatherBtn = $('sidebarWeatherBtn');
+    if (sbWeatherBtn) {
+      sbWeatherBtn.addEventListener('click', function () {
+        closeSidebar();
+        if (typeof SkyEngine !== 'undefined' && SkyEngine.open) SkyEngine.open();
+      });
+    }
+
+    var sbLrcGodBtn = $('sidebarLrcGodBtn');
+    if (sbLrcGodBtn) {
+      sbLrcGodBtn.addEventListener('click', function () {
+        closeSidebar();
+        var lg = $('lrcGodDockBtn');
+        if (lg) lg.click();
+      });
+    }
+
+    var sbSurpriseBtn = $('sidebarSurpriseBtn');
+    if (sbSurpriseBtn) {
+      sbSurpriseBtn.addEventListener('click', function () {
+        closeSidebar();
+        if (typeof triggerSurpriseMe === 'function') triggerSurpriseMe();
+      });
+    }
+
+    var sbSleepBtn = $('sidebarSleepBtn');
+    if (sbSleepBtn) {
+      sbSleepBtn.addEventListener('click', function () {
+        closeSidebar();
+        var sleepModal = $('sleepTimerModal');
+        if (sleepModal) sleepModal.classList.add('open');
+      });
+    }
+
     var closeSidebarButton = $('closeSidebarBtn');
     if (closeSidebarButton) {
       closeSidebarButton.addEventListener('click', closeSidebar);

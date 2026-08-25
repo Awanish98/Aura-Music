@@ -7489,3 +7489,30 @@ footer {
     padding: 4px 6px;
   }
 }
+
+
+/* ==================== Mobile Clean Header & Dock (v138.0) ==================== */
+@media (max-width: 768px) {
+  .mood-universe-btn,
+  .header-weather-pill {
+    display: none !important;
+  }
+  header {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+  .header-left, .header-right {
+    gap: 6px !important;
+  }
+  #eqDockBtn,
+  #watchVideoBtn,
+  #lrcGodDockBtn,
+  #fsbtn {
+    display: none !important;
+  }
+  .controls-glass {
+    padding: 6px 14px !important;
+    gap: 8px !important;
+    justify-content: center !important;
+  }
+}
