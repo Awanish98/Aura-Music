@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v125.1') caches.delete(name);
+        if (name !== 'aura-music-v125.2') caches.delete(name);
       });
     });
   }
@@ -7594,28 +7594,6 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       hideAutoplayPrompt();
       document.body.classList.add('playing');
 
-      
-      // ARTIST STATION EXCLUSIVE MODE — use only real artist tracks from catalog
-      if (mood.category === 'artist' && typeof ARTIST_TRACKS_CATALOG !== 'undefined') {
-        var artistCatalogTracks = ARTIST_TRACKS_CATALOG[mood.id] || [];
-        if (artistCatalogTracks.length > 0) {
-          // Start with seed tracks, then fill from catalog (no general pool mixing)
-          tracks = mood.seedTracks ? mood.seedTracks.slice() : [];
-          artistCatalogTracks.forEach(function(vid) {
-            if (vid && tracks.indexOf(vid) === -1) tracks.push(vid);
-          });
-          tracks.sort(function() { return 0.5 - Math.random(); });
-          console.log('🎤 Artist Station (exclusive):', mood.name, '—', tracks.length, 'tracks');
-          currentTrackQueue = tracks.slice();
-          currentTrackIndex = 0;
-          if (currentTrackQueue.length > 0) {
-            playSingleTrack(currentTrackQueue[currentTrackIndex]);
-            syncPlayerUI();
-          }
-          return; // Skip general pool logic below
-        }
-      }
-
       // Synthesize dynamic station object
       var customStation = {
         id: 'mood-' + mood.id,
@@ -7659,6 +7637,20 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
       // Assemble Massive Multi-Track Queue (50+ songs minimum per mood)
       var tracks = (mood.seedTracks && mood.seedTracks.length) ? mood.seedTracks.slice() : [];
+
+      // ARTIST STATION EXCLUSIVE - only play real fetched tracks for this artist
+      if (mood.category === 'artist') {
+        var _artistTracks = (typeof ARTIST_TRACKS_CATALOG !== 'undefined' && ARTIST_TRACKS_CATALOG[mood.id]) ? ARTIST_TRACKS_CATALOG[mood.id] : [];
+        _artistTracks.forEach(function(vid) { if (vid && tracks.indexOf(vid) === -1) tracks.push(vid); });
+        tracks.sort(function() { return 0.5 - Math.random(); });
+        console.log('\uD83C\uDFA4 Artist Station:', mood.name, tracks.length, 'real tracks');
+        currentTrackQueue = tracks.slice();
+        currentTrackIndex = 0;
+        playSingleTrack(currentTrackQueue[0]);
+        syncPlayerUI();
+        return;
+      }
+
 
       // 1. Gather all matching tracks from VibeAgent catalog
       if (typeof VibeAgent !== 'undefined' && VibeAgent.catalog) {
