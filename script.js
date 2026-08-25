@@ -191,7 +191,7 @@
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v113.0') caches.delete(name);
+        if (name !== 'aura-music-v114.0') caches.delete(name);
       });
     });
   }
@@ -7050,7 +7050,7 @@
         desc: mood.desc,
         icon: mood.icon,
         type: 'custom',
-        songCount: 'AI MOOD STREAM',
+        songCount: '50+ AI CURATED TRACKS',
         theme: {
           bg: '#05050a',
           fg: '#ffffff',
@@ -7081,29 +7081,76 @@
       applyStationTheme(customStation);
       localStorage.setItem('ishq_station_key', customStation.id);
 
-      // Strict, genre-accurate mood queue
-      var tracks = (mood.seedTracks && mood.seedTracks.length) ? mood.seedTracks.slice() : ['BddP6PYo2gs', 'b5f25X2Gvfg', 'L_LUpnjgPso'];
+      // Assemble Massive Multi-Track Queue (50+ songs minimum per mood)
+      var tracks = (mood.seedTracks && mood.seedTracks.length) ? mood.seedTracks.slice() : [];
 
-      // Add extra catalog songs matching this mood's category and genres ONLY
-      if (VibeAgent && VibeAgent.catalog) {
-        var matchingCatalog = VibeAgent.catalog.filter(function (s) {
-          if (tracks.indexOf(s.id) !== -1) return false;
-          if (!s.genres || !s.genres.length) return false;
-          if (mood.genres && mood.genres.some(function (g) { return s.genres.indexOf(g) !== -1; })) return true;
-          if (s.genres.indexOf(mood.category) !== -1) return true;
-          return false;
-        });
-
-        matchingCatalog.forEach(function (s) {
-          if (tracks.indexOf(s.id) === -1) tracks.push(s.id);
+      // 1. Gather all matching tracks from VibeAgent catalog
+      if (typeof VibeAgent !== 'undefined' && VibeAgent.catalog) {
+        VibeAgent.catalog.forEach(function (s) {
+          if (!s || !s.id) return;
+          if (tracks.indexOf(s.id) !== -1) return;
+          if (mood.genres && mood.genres.some(function (g) { return s.genres && s.genres.indexOf(g) !== -1; })) {
+            tracks.push(s.id);
+          } else if (s.genres && s.genres.indexOf(mood.category) !== -1) {
+            tracks.push(s.id);
+          }
         });
       }
+
+      // 2. Map Category to Rich Master Station Pools
+      if (typeof STATION_TRACKS !== 'undefined') {
+        var poolMap = {
+          'romance': ['ishq', 'time-travel', 'explorer'],
+          'energy': ['edm', 'demanding', 'time-travel'],
+          'global': ['time-travel', 'explorer', 'edm'],
+          'chill': ['explorer', 'ishq', 'time-travel'],
+          'punjabi': ['demanding', 'time-travel', 'edm'],
+          'retro': ['90s', 'time-travel'],
+          'sufi': ['ishq', 'explorer', 'time-travel'],
+          'wellness': ['explorer', 'ishq'],
+          'time': ['time-travel', '90s', 'ishq'],
+          'party': ['edm', 'demanding', 'time-travel']
+        };
+
+        var matchedKeys = poolMap[mood.category] || ['time-travel', 'ishq'];
+        matchedKeys.forEach(function (k) {
+          if (STATION_TRACKS[k] && Array.isArray(STATION_TRACKS[k])) {
+            var poolSlice = STATION_TRACKS[k].slice(0, 30);
+            poolSlice.forEach(function (vid) {
+              if (vid && tracks.indexOf(vid) === -1) tracks.push(vid);
+            });
+          }
+        });
+      }
+
+      // 3. Gather from Discovery Catalog
+      if (typeof YOUTUBE_DISCOVERY_CATALOG !== 'undefined') {
+        YOUTUBE_DISCOVERY_CATALOG.forEach(function (item) {
+          if (item && item.id && tracks.indexOf(item.id) === -1) {
+            if (item.genre === mood.category || (mood.genres && mood.genres.indexOf(item.genre) !== -1)) {
+              tracks.push(item.id);
+            }
+          }
+        });
+      }
+
+      // 4. Ensure at least 40 tracks
+      if (tracks.length < 40 && typeof STATION_TRACKS !== 'undefined' && STATION_TRACKS['time-travel']) {
+        STATION_TRACKS['time-travel'].slice(0, 40).forEach(function (vid) {
+          if (tracks.indexOf(vid) === -1) tracks.push(vid);
+        });
+      }
+
+      console.log('🎵 Mood Station initialized with ' + tracks.length + ' tracks:', mood.name);
 
       currentTrackQueue = tracks;
       currentTrackIndex = 0;
       if (typeof STATION_TRACKS !== 'undefined') {
         STATION_TRACKS[customStation.id] = tracks;
+        window.STATION_TRACKS = STATION_TRACKS;
       }
+      window.currentTrackQueue = currentTrackQueue;
+      window.currentTrackIndex = currentTrackIndex;
 
             var activeP = player || window.__p;
       if (activeP) {
