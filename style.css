@@ -123,7 +123,7 @@ html, body {
 .bg-glyphs {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   overflow: hidden;
   background: radial-gradient(circle at 50% 40%, var(--theme-ambient) 0%, rgba(7, 7, 9, 0) 70%);
@@ -134,90 +134,88 @@ html, body {
 .bg-glyphs .glyph {
   position: absolute;
   font-family: var(--theme-font, 'Cinzel', sans-serif);
-  font-weight: 800;
-  color: #f7efe2;
+  font-weight: 900;
+  color: #ffffff;
   line-height: 1;
   user-select: none;
-  opacity: var(--o, .026);
-  transition: opacity 0.6s ease;
-  letter-spacing: 0.12em;
+  opacity: var(--o, .085);
+  transition: opacity 0.6s ease, color 0.6s ease;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   will-change: transform;
   white-space: nowrap;
-  max-width: 42vw;
+  max-width: 44vw;
   overflow: hidden;
   text-overflow: clip;
+  text-shadow: 0 0 25px rgba(255, 255, 255, 0.18), 0 0 45px var(--accent-glow, rgba(168, 85, 247, 0.35));
 }
 
 /* Top-Left Quadrant */
 .bg-glyphs .g1 {
-  top: 7%;
-  left: 5%;
-  font-size: clamp(1.4rem, 3.8vw, 3.2rem);
-  --o: .028;
-  filter: blur(0.8px);
+  top: 9%;
+  left: 4%;
+  font-size: clamp(2rem, 5.2vw, 4.5rem);
+  --o: .095;
+  filter: blur(0px);
   animation: glyphDrift1 42s ease-in-out infinite alternate;
 }
 
 /* Top-Right Quadrant */
 .bg-glyphs .g2 {
-  top: 8%;
-  right: 5%;
-  font-size: clamp(1.5rem, 4.2vw, 3.5rem);
-  --o: .024;
-  filter: blur(1.2px);
+  top: 10%;
+  right: 4%;
+  font-size: clamp(2.2rem, 5.6vw, 4.8rem);
+  --o: .090;
+  filter: blur(0px);
   text-align: right;
   animation: glyphDrift2 48s ease-in-out infinite alternate;
 }
 
 /* Bottom-Left Quadrant */
 .bg-glyphs .g3 {
-  bottom: 8%;
-  left: 5%;
-  font-size: clamp(1.4rem, 3.8vw, 3.2rem);
-  --o: .028;
-  filter: blur(1.8px);
+  bottom: 10%;
+  left: 4%;
+  font-size: clamp(2rem, 5.2vw, 4.5rem);
+  --o: .095;
+  filter: blur(0px);
   animation: glyphDrift3 54s ease-in-out infinite alternate;
 }
 
 /* Bottom-Right Quadrant */
 .bg-glyphs .g4 {
-  bottom: 8%;
-  right: 5%;
-  font-size: clamp(1.5rem, 4.2vw, 3.5rem);
-  --o: .022;
-  filter: blur(0.8px);
+  bottom: 10%;
+  right: 4%;
+  font-size: clamp(2.2rem, 5.6vw, 4.8rem);
+  --o: .085;
+  filter: blur(0px);
   text-align: right;
   animation: glyphDrift4 38s ease-in-out infinite alternate;
 }
 
-/* Far Top Header Ambient Stream */
+/* Mid-Left Floating Accent */
 .bg-glyphs .g5 {
-  top: 2.5%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(0.9rem, 2.2vw, 1.8rem);
-  --o: .018;
-  filter: blur(1.5px);
-  letter-spacing: 0.32em;
-  text-align: center;
+  top: 38%;
+  left: 3%;
+  font-size: clamp(1.2rem, 2.8vw, 2.2rem);
+  --o: .075;
+  filter: blur(0.5px);
+  letter-spacing: 0.28em;
   animation: glyphDrift5 46s ease-in-out infinite alternate;
 }
 
-/* Far Bottom Floating Accent */
+/* Mid-Right Floating Accent */
 .bg-glyphs .g6 {
-  bottom: 2.5%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(0.9rem, 2.2vw, 1.8rem);
-  --o: .018;
-  filter: blur(2.2px);
-  letter-spacing: 0.32em;
-  text-align: center;
+  top: 42%;
+  right: 3%;
+  font-size: clamp(1.2rem, 2.8vw, 2.2rem);
+  --o: .075;
+  filter: blur(0.5px);
+  letter-spacing: 0.28em;
+  text-align: right;
   animation: glyphDrift6 52s ease-in-out infinite alternate;
 }
 
-/* Subtle Centered Watermark with Deep Ambient Gaussian Blur */
+/* Subtle Centered Watermark with Majestic Glow */
 .bg-glyphs .heart-glyph {
   position: absolute;
   top: 50%;
@@ -225,18 +223,19 @@ html, body {
   transform: translate3d(-50%, -50%, 0);
   font-family: var(--theme-font, 'Cinzel', sans-serif);
   font-weight: 900;
-  font-size: clamp(2.8rem, 8.5vw, 6.8rem);
-  color: #f7efe2;
+  font-size: clamp(3.8rem, 11vw, 9.5rem);
+  color: #ffffff;
   line-height: 1;
-  opacity: .022;
-  letter-spacing: 0.16em;
+  opacity: .068;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   text-align: center;
-  max-width: 80vw;
+  max-width: 82vw;
   overflow: hidden;
   white-space: nowrap;
   transition: opacity 0.6s ease;
-  filter: blur(3.5px);
+  filter: blur(1.5px);
+  text-shadow: 0 0 35px var(--accent-glow, rgba(168,85,247,0.4));
   will-change: transform, opacity;
   animation: glyphHeartPulse 16s ease-in-out infinite;
   pointer-events: none;
@@ -244,43 +243,43 @@ html, body {
 
 @keyframes glyphDrift1 {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: translate3d(12px, -14px, 0) rotate(1.2deg); }
-  100% { transform: translate3d(-10px, 12px, 0) rotate(-1deg); }
+  50%  { transform: translate3d(14px, -16px, 0) rotate(1.2deg); }
+  100% { transform: translate3d(-12px, 14px, 0) rotate(-1deg); }
 }
 
 @keyframes glyphDrift2 {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: translate3d(-14px, 12px, 0) rotate(-1.5deg); }
-  100% { transform: translate3d(10px, -12px, 0) rotate(1deg); }
+  50%  { transform: translate3d(-16px, 14px, 0) rotate(-1.5deg); }
+  100% { transform: translate3d(12px, -14px, 0) rotate(1deg); }
 }
 
 @keyframes glyphDrift3 {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: translate3d(14px, 12px, 0) rotate(1.8deg); }
-  100% { transform: translate3d(-12px, -14px, 0) rotate(-1.2deg); }
+  50%  { transform: translate3d(16px, 14px, 0) rotate(1.8deg); }
+  100% { transform: translate3d(-14px, -16px, 0) rotate(-1.2deg); }
 }
 
 @keyframes glyphDrift4 {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: translate3d(-12px, -10px, 0) rotate(-1.2deg); }
-  100% { transform: translate3d(14px, 15px, 0) rotate(1.5deg); }
+  50%  { transform: translate3d(-14px, -12px, 0) rotate(-1.2deg); }
+  100% { transform: translate3d(16px, 18px, 0) rotate(1.5deg); }
 }
 
 @keyframes glyphDrift5 {
-  0%   { transform: translate3d(-50%, 0, 0); }
-  50%  { transform: translate3d(calc(-50% + 10px), -8px, 0); }
-  100% { transform: translate3d(calc(-50% - 10px), 8px, 0); }
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(12px, -10px, 0); }
+  100% { transform: translate3d(-10px, 10px, 0); }
 }
 
 @keyframes glyphDrift6 {
-  0%   { transform: translate3d(-50%, 0, 0); }
-  50%  { transform: translate3d(calc(-50% - 8px), 10px, 0); }
-  100% { transform: translate3d(calc(-50% + 8px), -8px, 0); }
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-10px, 12px, 0); }
+  100% { transform: translate3d(10px, -10px, 0); }
 }
 
 @keyframes glyphHeartPulse {
-  0%, 100% { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 0.020; }
-  50%      { transform: translate3d(-50%, -50%, 0) scale(1.04); opacity: 0.035; }
+  0%, 100% { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 0.065; }
+  50%      { transform: translate3d(-50%, -50%, 0) scale(1.04); opacity: 0.095; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -639,7 +638,7 @@ body.in-explorer-mode.has-art .ambient img {
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  background: radial-gradient(ellipse 95% 85% at 50% 48%, transparent 55%, rgba(4, 4, 6, 0.8) 100%);
+  background: radial-gradient(ellipse 95% 85% at 50% 48%, transparent 65%, rgba(4, 4, 6, 0.45) 100%);
 }
 
 /* Toast Notification */
