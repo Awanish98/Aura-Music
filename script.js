@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v156.0') caches.delete(name);
+        if (name !== 'aura-music-v157.0') caches.delete(name);
       });
     });
   }
@@ -8925,15 +8925,30 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v156.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v157.0) ====================
   
 
-    // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v156.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v157.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
     var adFastForwardActive = false;
     var adStartTimestamp = 0;
+
+    function sendIframeCommand(cmd, args) {
+      try {
+        var iframes = document.querySelectorAll('iframe');
+        for (var i = 0; i < iframes.length; i++) {
+          if (iframes[i].contentWindow) {
+            iframes[i].contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: cmd,
+              args: args || []
+            }), '*');
+          }
+        }
+      } catch (e) {}
+    }
 
     function checkAndBypassAd() {
       if (!player || !apiReady) return;
@@ -8941,7 +8956,6 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
         var d = (player.getVideoData && player.getVideoData()) || {};
         var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
         var adState = (typeof player.getAdState === 'function') ? player.getAdState() : 0;
-        var curTime = (typeof player.getCurrentTime === 'function') ? player.getCurrentTime() : 0;
         
         // Comprehensive Ad Detection
         var isAd = (
@@ -8962,10 +8976,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
             adStartTimestamp = Date.now();
             if (player.getVolume) lastSavedVolume = player.getVolume() || 100;
             if (player.mute) player.mute();
+            sendIframeCommand('mute');
           }
 
           // 1. Hyper-accelerate playback rate to 16x
           if (player.setPlaybackRate) player.setPlaybackRate(16);
+          sendIframeCommand('setPlaybackRate', [16]);
 
           // 2. Seek directly to end of ad
           if (player.seekTo && dur > 0) {
@@ -8973,9 +8989,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
           } else if (player.seekTo) {
             player.seekTo(99999, true);
           }
+          sendIframeCommand('seekTo', [dur > 0 ? dur : 99999, true]);
 
-          // 3. Fallback: If ad remains stuck for > 1.2s, force advance
-          if (Date.now() - adStartTimestamp > 1200) {
+          // 3. Fallback: If ad remains stuck for > 1.0s, force advance
+          if (Date.now() - adStartTimestamp > 1000) {
             adStartTimestamp = Date.now();
             if (window.currentTrackIndex !== undefined && window.currentTrackQueue && window.currentTrackQueue.length) {
               var targetVid = window.currentTrackQueue[window.currentTrackIndex];
@@ -8991,16 +9008,18 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
             adFastForwardActive = false;
             adStartTimestamp = 0;
             if (player.unMute) player.unMute();
+            sendIframeCommand('unMute');
             if (player.setVolume) player.setVolume(lastSavedVolume || 100);
             var rate = (typeof currentSpeedMode !== 'undefined') ? (parseFloat(currentSpeedMode) || 1.0) : 1.0;
             if (player.setPlaybackRate) player.setPlaybackRate(rate);
+            sendIframeCommand('setPlaybackRate', [rate]);
           }
         }
       } catch (e) {}
     }
 
-    // High-frequency 10ms Sentinel watchdog
-    setInterval(checkAndBypassAd, 10);
+    // High-frequency 5ms Sentinel watchdog
+    setInterval(checkAndBypassAd, 5);
 
     return {
       check: checkAndBypassAd

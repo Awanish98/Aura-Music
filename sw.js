@@ -1,4 +1,4 @@
-var CACHE_NAME = 'aura-music-v156.0';
+var CACHE_NAME = 'aura-music-v157.0';
 
 var AD_PATTERNS = [
   'googleads',
@@ -16,7 +16,9 @@ var AD_PATTERNS = [
   'securepubads.g.doubleclick.net',
   'static.doubleclick.net',
   'ad.doubleclick.net',
-  'adformat='
+  'adformat=',
+  'youtube.com/pagead',
+  'youtube.com/api/stats/ads'
 ];
 
 function isAdUrl(url) {
