@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v147.0') caches.delete(name);
+        if (name !== 'aura-music-v148.0') caches.delete(name);
       });
     });
   }
@@ -8825,7 +8825,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v147.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v148.0) ====================
   setInterval(function () {
     if (!player || !apiReady) return;
     try {
@@ -8843,7 +8843,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     } catch (e) {}
   }, 250);
 
-  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v147.0) ====================
+  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v148.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
@@ -8886,7 +8886,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     }
 
     // High-frequency 40ms Sentinel watchdog
-    setInterval(checkAndBypassAd, 40);
+    setInterval(checkAndBypassAd, 25);
 
     return {
       check: checkAndBypassAd

@@ -1,32 +1,26 @@
-﻿var CACHE_NAME = 'aura-music-v147.0';
+var CACHE_NAME = 'aura-music-v148.0';
 
+var AD_PATTERNS = [
+  'googleads',
+  'doubleclick.net',
+  'pagead2.googlesyndication.com',
+  'adservice.google',
+  '/api/stats/ads',
+  '/pagead/',
+  'get_midroll_info',
+  'ad_break',
+  'ptracking',
+  'adunit'
+];
 
+function isAdUrl(url) {
+  if (!url) return false;
+  for (var i = 0; i < AD_PATTERNS.length; i++) {
+    if (url.indexOf(AD_PATTERNS[i]) !== -1) return true;
+  }
+  return false;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Network first strategy - always fetch latest, fallback to cache if offline
 self.addEventListener('install', function (e) {
   self.skipWaiting();
 });
@@ -46,7 +40,16 @@ self.addEventListener('activate', function (e) {
 });
 
 self.addEventListener('fetch', function (e) {
+  var url = e.request.url;
+  
+  // 🛡️ Block Ad requests with 204 No Content so YouTube player immediately skips ads
+  if (isAdUrl(url)) {
+    e.respondWith(new Response('', { status: 204, statusText: 'No Content' }));
+    return;
+  }
+
   if (e.request.method !== 'GET') return;
+
   e.respondWith(
     fetch(e.request).catch(function () {
       return caches.match(e.request);
