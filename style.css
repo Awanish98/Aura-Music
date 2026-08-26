@@ -7989,3 +7989,71 @@ footer {
     display: flex !important;
   }
 }
+
+
+/* ==================== Developer Attribution & Portfolio Card (v153.0) ==================== */
+.author-name {
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-shadow: 0 0 12px var(--accent-glow, rgba(168, 85, 247, 0.5));
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.author-name:hover {
+  color: #c084fc;
+  text-shadow: 0 0 16px rgba(192, 132, 252, 0.9);
+  text-decoration: underline;
+}
+
+.sidebar-dev-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin: 10px 14px 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar-dev-card:hover {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25);
+}
+.sidebar-dev-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  flex-shrink: 0;
+}
+.sidebar-dev-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.sidebar-dev-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+.sidebar-dev-tagline {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
