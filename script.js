@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v167.0') caches.delete(name);
+        if (name !== 'aura-music-v168.0') caches.delete(name);
       });
     });
   }
@@ -1755,12 +1755,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   var currentSpeedMode = '1.0'; // '1.0', '1.25', '0.85'
 
   
-  // Safe zero-ad video player loader (bypasses 0.0s pre-roll ad trigger)
+  // Safe zero-ad video player loader (bypasses 0.0s pre-roll ad trigger by starting at 1.0s)
   function safePlayVideo(vid, startSec) {
     if (!player) return;
     var vidId = (typeof vid === 'object' && vid) ? (vid.videoId || vid.id) : vid;
     if (!vidId) return;
-    var s = (typeof startSec === 'number' && startSec >= 0) ? startSec : 0.1;
+    var s = (typeof startSec === 'number' && startSec >= 0) ? startSec : 1.0;
     try {
       if (player.loadVideoById) {
         player.loadVideoById({
@@ -8983,10 +8983,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v167.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v168.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v167.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v168.0) ====================
   
   /* ==================== Pure HTML5 Audio Stream Engine (Zero-Ad Pipeline) ==================== */
   var PureAudioEngine = (function() {
@@ -9091,35 +9091,55 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     function check() {
       if (!player) return;
       try {
-        if (typeof player.getVideoData === 'function') {
-          var data = player.getVideoData();
-          var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
-          
-          // Ad detection heuristics
-          var isAdTrack = false;
-          if (data && data.isAd) isAdTrack = true;
-          if (dur > 0 && dur <= 35 && data && data.title && /(advertisement|promo|sponsor|^ad$|ad)/i.test(data.title)) isAdTrack = true;
+        var ifr = document.querySelector('#playerHarness iframe, #player iframe, iframe#playerA, iframe#playerB');
+        var data = (typeof player.getVideoData === 'function') ? player.getVideoData() : null;
+        var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
+        
+        var isAd = false;
+        if (data && data.isAd) isAd = true;
+        if (dur > 0 && dur <= 45 && data && data.title && /(advertisement|promo|sponsor|^ad$|ad)/i.test(data.title)) isAd = true;
 
-          if (isAdTrack && !_skipCooldown) {
-            _skipCooldown = true;
-            console.warn('[AdShield] Commercial Ad Detected! Auto-advancing track…');
-            try { player.mute(); } catch (e) {}
-            try { player.setPlaybackRate(16); } catch (e) {}
-            try { player.seekTo(99999, true); } catch (e) {}
-            
-            // Advance to next song after brief interval
-            setTimeout(function () {
-              try { skip(1); } catch (e) {}
-              setTimeout(function () { _skipCooldown = false; }, 1200);
-            }, 300);
-            return;
+        if (isAd && !_skipCooldown) {
+          _skipCooldown = true;
+          console.warn('[AdShield] Ad in progress! Forcing instant skip...');
+
+          // Method A: Iframe postMessage RPC
+          if (ifr && ifr.contentWindow) {
+            try {
+              ifr.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: 'seekTo',
+                args: [dur ? dur : 99999, true]
+              }), '*');
+              ifr.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: 'setPlaybackRate',
+                args: [16]
+              }), '*');
+            } catch(e) {}
           }
+
+          // Method B: YT.Player API seek and fast-forward
+          try { if (player.mute) player.mute(); } catch(e) {}
+          try { if (player.setPlaybackRate) player.setPlaybackRate(16); } catch(e) {}
+          try { if (player.seekTo) player.seekTo(dur ? dur : 99999, true); } catch(e) {}
+
+          // Method C: If ad persists after 350ms, reload the actual song at startSeconds: 1.5
+          setTimeout(function () {
+            var currData = (typeof player.getVideoData === 'function') ? player.getVideoData() : null;
+            if (currData && currData.isAd) {
+              var targetSongVid = (currentTrackQueue && currentTrackQueue[currentTrackIndex]) || (currentTrack && currentTrack.id);
+              if (targetSongVid && typeof safePlayVideo === 'function') {
+                safePlayVideo(targetSongVid, 1.5);
+              }
+            }
+            setTimeout(function () { _skipCooldown = false; }, 800);
+          }, 350);
         }
       } catch (e) {}
     }
 
-    // High frequency interval check
-    setInterval(check, 100);
+    setInterval(check, 50);
 
     return {
       check: check
