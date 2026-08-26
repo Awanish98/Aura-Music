@@ -6718,171 +6718,188 @@ input:focus-visible {
 
 
 
-/* ==================== Full HD Video Cinema Theater Overlay & High-Z Back Buttons (v158.0) ==================== */
+
+/* ==================== Full HD Video Cinema Theater Modal & Guaranteed Visible Controls (v159.0) ==================== */
 .cinema-modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  z-index: 2000000 !important;
+  z-index: 2100000 !important;
   background: rgba(4, 3, 10, 0.96) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  backdrop-filter: blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
   display: none !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  padding: 18px 24px !important;
+  padding: 16px 24px !important;
   box-sizing: border-box !important;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
+  pointer-events: auto !important;
 }
 
 .cinema-modal-overlay.open {
   display: flex !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-.cinema-card {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  z-index: 2000008 !important;
 }
 
 .cinema-header {
+  position: fixed !important;
+  top: 14px !important;
+  left: 20px !important;
+  right: 20px !important;
+  height: 56px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;
-  z-index: 2000020 !important;
-  position: relative !important;
-  padding: 4px 0 12px !important;
+  z-index: 2200000 !important;
+  background: rgba(18, 14, 30, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 999px !important;
+  padding: 6px 16px 6px 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
 
 .cinema-header-left {
   display: flex !important;
   align-items: center !important;
-  gap: 16px !important;
+  gap: 14px !important;
+  min-width: 0 !important;
 }
 
 .btn-cinema-back {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  background: rgba(255, 255, 255, 0.14) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
   color: #ffffff !important;
-  padding: 10px 20px !important;
+  padding: 8px 18px !important;
   border-radius: 999px !important;
   font-size: 13px !important;
   font-weight: 800 !important;
   cursor: pointer !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.5) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  z-index: 2000025 !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-}
-
-.btn-cinema-back svg {
-  width: 18px !important;
-  height: 18px !important;
-  fill: currentColor !important;
+  flex-shrink: 0 !important;
 }
 
 .btn-cinema-back:hover {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%) !important;
-  border-color: #c084fc !important;
   transform: scale(1.05) !important;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 6px 22px rgba(236, 72, 153, 0.7) !important;
 }
 
 .cinema-info {
   display: flex !important;
   flex-direction: column !important;
-  gap: 2px !important;
+  gap: 1px !important;
+  min-width: 0 !important;
 }
 
 .cinema-tag {
-  font-size: 9px !important;
+  font-size: 8.5px !important;
   font-weight: 800 !important;
   letter-spacing: 0.12em !important;
-  color: #ec4899 !important;
+  color: #c084fc !important;
 }
 
 .cinema-title {
-  font-size: 14px !important;
+  font-size: 13.5px !important;
   font-weight: 800 !important;
   color: #ffffff !important;
-  max-width: min(50vw, 450px) !important;
+  max-width: clamp(120px, 30vw, 380px) !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
 
 .cinema-artist {
-  font-size: 11px !important;
+  font-size: 10.5px !important;
   color: rgba(255, 255, 255, 0.65) !important;
+  max-width: clamp(100px, 20vw, 240px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .cinema-actions {
   display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
-  z-index: 2000025 !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
 }
 
-.cinema-hint-pill {
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  color: rgba(255, 255, 255, 0.6) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  padding: 5px 12px !important;
+.cinema-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  padding: 8px 14px !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.cinema-action-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: #ffffff !important;
+  transform: scale(1.04) !important;
 }
 
 .cinema-close-btn {
-  width: 40px !important;
-  height: 40px !important;
+  width: 36px !important;
+  height: 36px !important;
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(239, 68, 68, 0.25) !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
   color: #ffffff !important;
-  font-size: 24px !important;
+  font-size: 22px !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  z-index: 2000025 !important;
   transition: all 0.2s ease !important;
 }
 
 .cinema-close-btn:hover {
-  background: rgba(239, 68, 68, 0.35) !important;
+  background: rgba(239, 68, 68, 0.6) !important;
   border-color: #ef4444 !important;
-  transform: scale(1.08) !important;
+  transform: scale(1.1) !important;
 }
 
+/* Video Stage */
 body.in-cinema-mode #playerHarness {
   position: fixed !important;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: min(92vw, 980px) !important;
-  height: min(52vw, 550px) !important;
+  width: min(90vw, 920px) !important;
+  height: min(48vw, 480px) !important;
+  max-height: calc(100vh - 170px) !important;
   opacity: 1 !important;
   pointer-events: auto !important;
-  z-index: 2000005 !important;
+  z-index: 2150000 !important;
   border-radius: 18px !important;
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 0 50px rgba(236, 72, 153, 0.35) !important;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 0 50px rgba(168, 85, 247, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   overflow: hidden !important;
   background: #000000 !important;
   display: block !important;
+}
+
+body.in-cinema-mode.is-fullscreen-video #playerHarness {
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  z-index: 2180000 !important;
 }
 
 body.in-cinema-mode #playerA,
@@ -6895,79 +6912,79 @@ body.in-cinema-mode #playerA iframe {
 }
 
 .cinema-footer-bar {
+  position: fixed !important;
+  bottom: 18px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 100% !important;
-  z-index: 2000020 !important;
-  position: relative !important;
-  padding: 12px 0 6px !important;
+  z-index: 2200000 !important;
 }
 
 .btn-cinema-floating-back {
   display: inline-flex !important;
   align-items: center !important;
   gap: 10px !important;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  background: rgba(18, 14, 30, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
   color: #ffffff !important;
-  padding: 12px 26px !important;
+  padding: 10px 22px !important;
   border-radius: 999px !important;
-  font-size: 13.5px !important;
+  font-size: 13px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.03em !important;
   cursor: pointer !important;
-  box-shadow: 0 6px 25px rgba(168, 85, 247, 0.45) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  transition: all 0.25s ease !important;
-  z-index: 2000025 !important;
-}
-
-.btn-cinema-floating-back svg {
-  width: 18px !important;
-  height: 18px !important;
-  fill: currentColor !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: all 0.2s ease !important;
 }
 
 .btn-cinema-floating-back:hover {
-  transform: scale(1.06) !important;
-  box-shadow: 0 8px 30px rgba(236, 72, 153, 0.65) !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%) !important;
+  border-color: #c084fc !important;
+  transform: scale(1.05) !important;
 }
 
 @media (max-width: 768px) {
-  .cinema-modal-overlay {
-    padding: 14px 16px !important;
-  }
   .cinema-header {
-    padding: 2px 0 8px !important;
+    top: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    height: 48px !important;
+    padding: 4px 10px 4px 6px !important;
   }
   .btn-cinema-back {
-    padding: 8px 14px !important;
-    font-size: 12px !important;
-  }
-  .btn-cinema-back svg {
-    width: 16px !important;
-    height: 16px !important;
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
   }
   .cinema-title {
-    max-width: calc(100vw - 190px) !important;
-    font-size: 12.5px !important;
+    font-size: 11px !important;
+    max-width: 110px !important;
   }
+  .cinema-tag {
+    font-size: 7.5px !important;
+  }
+  .cinema-action-btn span,
   .cinema-hint-pill {
     display: none !important;
   }
+  .cinema-action-btn {
+    padding: 6px 8px !important;
+  }
   body.in-cinema-mode #playerHarness {
     width: 96vw !important;
-    height: 56vw !important;
+    height: 54vw !important;
     top: 50% !important;
-    border-radius: 12px !important;
   }
   .btn-cinema-floating-back {
-    padding: 10px 20px !important;
-    font-size: 12px !important;
+    padding: 8px 16px !important;
+    font-size: 11.5px !important;
+    bottom: 12px !important;
   }
 }
+
 
 
 

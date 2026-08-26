@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v158.0') caches.delete(name);
+        if (name !== 'aura-music-v159.0') caches.delete(name);
       });
     });
   }
@@ -2538,6 +2538,25 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
   var cinemaBottomBackBtn = $('cinemaBottomBackBtn');
   if (cinemaBottomBackBtn) cinemaBottomBackBtn.addEventListener('click', closeCinemaMode);
+
+  
+  var cinemaFullscreenBtn = $('cinemaFullscreenBtn');
+  if (cinemaFullscreenBtn) {
+    cinemaFullscreenBtn.addEventListener('click', function () {
+      var harness = $('playerHarness');
+      if (!harness) return;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (harness.requestFullscreen) harness.requestFullscreen().catch(function () {});
+        else if (harness.webkitRequestFullscreen) harness.webkitRequestFullscreen();
+        else document.body.classList.toggle('is-fullscreen-video');
+        showToast('Full Screen Video Mode ⛶');
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        document.body.classList.remove('is-fullscreen-video');
+      }
+    });
+  }
 
   var closeCinemaBtn = $('closeCinemaBtn');
   if (closeCinemaBtn) closeCinemaBtn.addEventListener('click', closeCinemaMode);
@@ -8925,10 +8944,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v158.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v159.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v158.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v159.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;

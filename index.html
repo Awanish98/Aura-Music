@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="midnight">
 <head>
       <!-- ==================== Ultimate Zero-Ad Destroyer & Fast-Forward Engine ==================== -->
@@ -117,7 +117,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=158.0">
+  <link rel="stylesheet" href="style.css?v=159.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -792,37 +792,38 @@
       </div>
     </section>
 
-    <!-- ==================== Full HD Video Cinema Theater Modal ==================== -->
+        <!-- ==================== Full HD Video Cinema Theater Modal ==================== -->
     <div class="cinema-modal-overlay" id="cinemaVideoModal">
       <div class="cinema-backdrop" id="cinemaBackdrop"></div>
-      <div class="cinema-card">
-        <div class="cinema-header">
-          <div class="cinema-header-left">
-            <button class="btn-cinema-back" id="cinemaBackBtn" title="Back to Music (Esc / V)">
-              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-              <span>Back to Music</span>
-            </button>
-            <div class="cinema-info">
-              <div class="cinema-tag">🎬 FULL HD VIDEO THEATER</div>
-              <div class="cinema-title" id="cinemaTrackTitle">Now Playing Full Video</div>
-              <div class="cinema-artist" id="cinemaTrackArtist">Aura Music</div>
-            </div>
-          </div>
-          <div class="cinema-actions">
-            <span class="cinema-hint-pill">Press ESC / V to Exit</span>
-            <button class="cinema-close-btn" id="closeCinemaBtn" title="Exit Cinema Mode (Esc / V)">&times;</button>
-          </div>
-        </div>
-        <div class="cinema-video-stage" id="cinemaVideoStage">
-          <!-- Live YouTube Player docks here in Cinema Mode! -->
-        </div>
-        <div class="cinema-footer-bar">
-          <button class="btn-cinema-floating-back" id="cinemaBottomBackBtn">
-            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-            <span>Return to Audio / Radio Mode</span>
+      
+      <!-- Top Fixed Floating Header with Back & Fullscreen Buttons -->
+      <div class="cinema-header" id="cinemaHeader">
+        <div class="cinema-header-left">
+          <button class="btn-cinema-back" id="cinemaBackBtn" title="Back to Music (Esc / V)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            <span>Back to Music</span>
           </button>
+          <div class="cinema-info">
+            <div class="cinema-tag">🎬 FULL HD VIDEO THEATER</div>
+            <div class="cinema-title" id="cinemaTrackTitle">Now Playing Full Video</div>
+            <div class="cinema-artist" id="cinemaTrackArtist">Aura Music</div>
+          </div>
+        </div>
+        <div class="cinema-actions">
+          <button class="cinema-action-btn cinema-fs-btn" id="cinemaFullscreenBtn" title="Toggle Fullscreen Video (F)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+            <span>Fullscreen</span>
+          </button>
+          <span class="cinema-hint-pill">Press ESC to Exit</span>
+          <button class="cinema-close-btn" id="closeCinemaBtn" title="Exit Cinema Mode (Esc / V)">&times;</button>
         </div>
       </div>
+
+      <!-- Bottom Fixed Floating Return Pill -->
+      <div class="cinema-footer-bar">
+        <button class="btn-cinema-floating-back" id="cinemaBottomBackBtn">
     </div>
 
 
@@ -1573,6 +1574,6 @@
   <div id="player" style="display:none;"></div>
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
-  <script src="script.js?v=158.0"></script>
+  <script src="script.js?v=159.0"></script>
 </body>
 </html>
