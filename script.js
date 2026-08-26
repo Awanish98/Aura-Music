@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v146.0') caches.delete(name);
+        if (name !== 'aura-music-v147.0') caches.delete(name);
       });
     });
   }
@@ -6107,6 +6107,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   function onState(e) {
     if (!YT) return;
     if (e.data === YT.PlayerState.PLAYING) {
+      if (typeof AdShieldEngine !== 'undefined') AdShieldEngine.check();
       document.body.classList.add('playing');
       desired = true;
       hideAutoplayPrompt();
@@ -8824,7 +8825,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v146.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v147.0) ====================
   setInterval(function () {
     if (!player || !apiReady) return;
     try {
@@ -8841,3 +8842,53 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       }
     } catch (e) {}
   }, 250);
+
+  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v147.0) ====================
+  var AdShieldEngine = (function () {
+    var isMutedForAd = false;
+    var lastSavedVolume = 100;
+    var adFastForwardActive = false;
+
+    function checkAndBypassAd() {
+      if (!player || !apiReady) return;
+      try {
+        var d = (player.getVideoData && player.getVideoData()) || {};
+        var dur = player.getDuration ? player.getDuration() : 0;
+        var adState = (typeof player.getAdState === 'function') ? player.getAdState() : 0;
+        
+        var isAd = (
+          adState > 0 ||
+          (d && (d.isAd || (d.author && (d.author.toLowerCase().indexOf('ad') !== -1 || d.author.toLowerCase().indexOf('commercial') !== -1)))) ||
+          (dur > 0 && dur < 40 && d && d.video_id && typeof currentTrackQueue !== 'undefined' && currentTrackQueue.indexOf(d.video_id) === -1)
+        );
+
+        if (isAd) {
+          if (!isMutedForAd) {
+            isMutedForAd = true;
+            adFastForwardActive = true;
+            if (player.getVolume) lastSavedVolume = player.getVolume() || 100;
+            if (player.mute) player.mute();
+          }
+          // Ultra fast-forward ad to end instantly
+          if (player.setPlaybackRate) player.setPlaybackRate(16);
+          if (player.seekTo && dur > 0) player.seekTo(dur, true);
+        } else {
+          if (isMutedForAd && adFastForwardActive) {
+            isMutedForAd = false;
+            adFastForwardActive = false;
+            if (player.unMute) player.unMute();
+            if (player.setVolume) player.setVolume(lastSavedVolume);
+            var rate = (typeof currentSpeedMode !== 'undefined') ? parseFloat(currentSpeedMode) || 1.0 : 1.0;
+            if (player.setPlaybackRate) player.setPlaybackRate(rate);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // High-frequency 40ms Sentinel watchdog
+    setInterval(checkAndBypassAd, 40);
+
+    return {
+      check: checkAndBypassAd
+    };
+  })();
