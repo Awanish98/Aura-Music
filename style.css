@@ -8114,3 +8114,136 @@ footer {
     border-radius: 22px !important;
   }
 }
+
+
+/* ==================== Strict Viewport Fitting & Clean Stage (v155.0) ==================== */
+#meta, .track-meta {
+  display: none !important;
+}
+
+main {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: 580px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  min-height: 0 !important;
+}
+
+.stage {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  margin: auto 0 !important;
+}
+
+/* Proportional Album Art adapted to viewport height */
+.turntable-wrap {
+  position: relative !important;
+  width: clamp(140px, 20vh, 200px) !important;
+  height: clamp(140px, 20vh, 200px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  margin: 2px auto !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.art-card {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 30px var(--accent-glow, rgba(168, 85, 247, 0.45)) !important;
+  background: #0f0f14 !important;
+  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s ease !important;
+}
+
+.art-card:hover {
+  transform: scale(1.03) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 45px var(--accent-glow, rgba(168, 85, 247, 0.6)) !important;
+}
+
+.now-title-wrap {
+  margin-top: 2px !important;
+}
+
+.now-title {
+  font-size: clamp(16px, 2.2vh, 20px) !important;
+  line-height: 1.15 !important;
+  margin: 2px 0 0 !important;
+}
+
+.now-artist {
+  font-size: clamp(11px, 1.4vh, 13px) !important;
+  margin: 1px 0 !important;
+}
+
+.live-lyric-bar {
+  padding: 3px 12px !important;
+  margin: 2px auto !important;
+  max-width: min(90vw, 400px) !important;
+}
+
+.wave-visualizer {
+  height: 16px !important;
+  margin: 2px auto !important;
+}
+
+.progress-container {
+  margin: 2px auto !important;
+  width: min(90vw, 420px) !important;
+}
+
+.up-next-pill {
+  margin: 2px auto !important;
+  padding: 2px 8px !important;
+}
+
+.controls-glass {
+  margin: 4px auto 0 !important;
+}
+
+footer {
+  padding: 4px 12px !important;
+  font-size: 10.5px !important;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 74px !important;
+  }
+  .controls-glass {
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 6px 12px !important;
+    max-width: calc(100vw - 20px) !important;
+    gap: 4px !important;
+    z-index: 100 !important;
+    margin: 0 !important;
+  }
+  footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 85 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+}
