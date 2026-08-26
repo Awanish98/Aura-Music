@@ -879,7 +879,7 @@ body.playing .live-dot {
   pointer-events: none;
   cursor: default;
   z-index: 1;
-  max-width: calc(100% - 480px);
+  max-width: min(65vw, 600px);
   width: max-content;
   overflow: hidden;
   white-space: nowrap;
@@ -7643,4 +7643,35 @@ footer {
   border-color: #c084fc;
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
   transform: scale(1.08);
+}
+
+
+/* ==================== Crystal Clear Mobile Station Title (v143.0) ==================== */
+@media (max-width: 768px) {
+  .wordmark-container {
+    max-width: calc(100vw - 110px) !important;
+    width: auto !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10 !important;
+  }
+  .wordmark {
+    font-size: clamp(16px, 4.8vw, 22px) !important;
+    line-height: 1.15 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 8px rgba(0,0,0,0.9) !important;
+  }
+  .wordmark-sub {
+    font-size: 8px !important;
+    letter-spacing: 0.1em !important;
+    max-width: calc(100vw - 120px) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 0.9 !important;
+  }
 }
