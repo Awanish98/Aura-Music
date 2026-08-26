@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v150.0') caches.delete(name);
+        if (name !== 'aura-music-v151.0') caches.delete(name);
       });
     });
   }
@@ -1183,6 +1183,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   });
 
   function switchStation(stKey) {
+    if (typeof JamRoomEngine !== 'undefined' && JamRoomEngine.hasActiveRoom && JamRoomEngine.hasActiveRoom()) {
+      if (!JamRoomEngine.canControlPlayback()) {
+        showToast('👑 Only Room Host can switch stations');
+        return;
+      }
+    }
     var st = stations.find(function (s) { return s.id === stKey; });
     if (!st) return;
 
@@ -1803,6 +1809,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
   /* ==================== Track Skipper ==================== */
   function skip(dir) {
+    if (typeof JamRoomEngine !== 'undefined' && JamRoomEngine.hasActiveRoom && JamRoomEngine.hasActiveRoom()) {
+      if (!JamRoomEngine.canControlPlayback()) {
+        showToast('👑 Only Room Host can change songs');
+        return;
+      }
+    }
     try { HapticEngine.tap(); } catch (e) {}
     claimAudioMaster();
     desired = true;
@@ -4901,6 +4913,17 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       if (homeDock) {
         homeDock.classList.toggle('visible', !!isActive);
       }
+            var bannerTitle = $('jamDjBannerTitle');
+      var bannerSub = $('jamDjBannerSub');
+      if (bannerTitle && bannerSub) {
+        if (isHost) {
+          bannerTitle.textContent = '👑 You are Room DJ (Host)';
+          bannerSub.textContent = 'You have exclusive control to change songs, stations & playback';
+        } else {
+          bannerTitle.textContent = '🎧 Synchronized Listener';
+          bannerSub.textContent = 'Only the Room Host (👑) can change songs & switch stations';
+        }
+      }
       if (homeStatusText && isActive) {
         homeStatusText.textContent = (currentRoomId || 'JAM') + ' (' + (connections.length + 1) + ')';
       }
@@ -5540,7 +5563,9 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       broadcastState: broadcastState,
       sendReaction: sendReaction,
       sendChatMessage: sendChatMessage,
-      hasActiveRoom: function () { return !!currentRoomId; }
+      hasActiveRoom: function () { return !!currentRoomId; },
+      isHost: function () { return isHost; },
+      canControlPlayback: function () { return !currentRoomId || isHost; }
     };
   })();
 
@@ -8185,6 +8210,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
   function togglePlay() {
+    if (typeof JamRoomEngine !== 'undefined' && JamRoomEngine.hasActiveRoom && JamRoomEngine.hasActiveRoom()) {
+      if (!JamRoomEngine.canControlPlayback()) {
+        showToast('👑 Only Room Host can play/pause in room');
+        return;
+      }
+    }
     try { HapticEngine.tap(); } catch (e) {}
     if (!apiReady || !player) {
       init();
@@ -8867,7 +8898,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v150.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v151.0) ====================
   setInterval(function () {
     if (!player || !apiReady) return;
     try {
@@ -8885,7 +8916,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     } catch (e) {}
   }, 250);
 
-  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v150.0) ====================
+  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v151.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
