@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v166.0') caches.delete(name);
+        if (name !== 'aura-music-v167.0') caches.delete(name);
       });
     });
   }
@@ -4567,6 +4567,13 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     }
 
     function init() {
+      var adGuardBtn = $('sidebarAdGuardBtn');
+      if (adGuardBtn) {
+        adGuardBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          showToast('🛡️ Inbuilt Ad-Shield is Active! For 100% Zero-Ad on mobile, open in Brave Browser or use Private DNS dns.adguard.com 🚀');
+        });
+      }
       var eqDockBtn = $('eqDockBtn');
       if (eqDockBtn) {
         eqDockBtn.addEventListener('click', function () {
@@ -8976,10 +8983,108 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v166.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v167.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v166.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v167.0) ====================
+  
+  /* ==================== Pure HTML5 Audio Stream Engine (Zero-Ad Pipeline) ==================== */
+  var PureAudioEngine = (function() {
+    var audio = null;
+    var isAudioActive = false;
+    var currentUrl = '';
+
+    function getAudio() {
+      if (!audio) {
+        audio = document.getElementById('pureAudioEngine');
+        if (!audio) {
+          audio = document.createElement('audio');
+          audio.id = 'pureAudioEngine';
+          audio.preload = 'auto';
+          audio.setAttribute('playsinline', '');
+          document.body.appendChild(audio);
+        }
+        setupListeners();
+      }
+      return audio;
+    }
+
+    function setupListeners() {
+      if (!audio) return;
+      audio.addEventListener('play', function() {
+        isAudioActive = true;
+        document.body.classList.add('playing');
+        desired = true;
+        hideAutoplayPrompt();
+        show('s-ready');
+        if (player && typeof player.mute === 'function') {
+          try { player.mute(); } catch(e) {}
+        }
+      });
+
+      audio.addEventListener('pause', function() {
+        if (isAudioActive) {
+          document.body.classList.remove('playing');
+        }
+      });
+
+      audio.addEventListener('ended', function() {
+        if (isAudioActive) {
+          skip(1);
+        }
+      });
+
+      audio.addEventListener('error', function(e) {
+        console.warn('[PureAudio] Falling back to YouTube safe player', e);
+        isAudioActive = false;
+        if (player && typeof player.unMute === 'function') {
+          try { player.unMute(); } catch(err) {}
+        }
+      });
+    }
+
+    function playDirectStream(url) {
+      var a = getAudio();
+      if (!a || !url) return false;
+      currentUrl = url;
+      a.src = url;
+      a.play().then(function() {
+        isAudioActive = true;
+        if (player && typeof player.mute === 'function') {
+          try { player.mute(); player.pauseVideo(); } catch(e) {}
+        }
+      }).catch(function() {
+        isAudioActive = false;
+      });
+      return true;
+    }
+
+    function pause() {
+      if (audio && isAudioActive) audio.pause();
+    }
+
+    function resume() {
+      if (audio && isAudioActive) audio.play().catch(function() {});
+    }
+
+    function setVolume(vol) {
+      if (audio) audio.volume = Math.max(0, Math.min(1, vol / 100));
+    }
+
+    function isActive() {
+      return isAudioActive && audio && !audio.paused;
+    }
+
+    return {
+      getAudio: getAudio,
+      playDirectStream: playDirectStream,
+      pause: pause,
+      resume: resume,
+      setVolume: setVolume,
+      isActive: isActive
+    };
+  })();
+
   var AdShieldEngine = (function () {
     var _skipCooldown = false;
 
