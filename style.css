@@ -7646,164 +7646,33 @@ footer {
 }
 
 
-/* ==================== Crystal Clear Mobile Station Title (v143.0) ==================== */
-@media (max-width: 768px) {
-  .wordmark-container {
-    max-width: calc(100vw - 110px) !important;
-    width: auto !important;
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 10 !important;
-  }
-  .wordmark {
-    font-size: clamp(16px, 4.8vw, 22px) !important;
-    line-height: 1.15 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    text-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 8px rgba(0,0,0,0.9) !important;
-  }
-  .wordmark-sub {
-    font-size: 8px !important;
-    letter-spacing: 0.1em !important;
-    max-width: calc(100vw - 120px) !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 0.9 !important;
-  }
+
+/* ==================== Consolidated Ultra-Clean Mobile & Jam Architecture (v150.0) ==================== */
+.avatar-pick-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.avatar-pick-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.avatar-pick-btn.active {
+  background: rgba(168, 85, 247, 0.28);
+  border-color: #c084fc;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+  transform: scale(1.08);
 }
 
-
-/* ==================== Guaranteed Zero-Overlap Mobile Header & Title (v145.0) ==================== */
-@media (max-width: 768px) {
-  .mood-universe-btn,
-  .header-weather-pill {
-    display: none !important;
-  }
-  header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 10px 14px !important;
-    position: relative !important;
-    min-height: 52px !important;
-  }
-  .header-left, .header-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0 !important;
-    z-index: 20 !important;
-    flex-shrink: 0 !important;
-  }
-  .wordmark-container {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    max-width: calc(100vw - 120px) !important;
-    width: max-content !important;
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 10 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-  }
-  .wordmark {
-    font-size: clamp(14px, 4.2vw, 18px) !important;
-    line-height: 1.15 !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    text-shadow: 0 0 14px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 6px rgba(0,0,0,0.9) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-  }
-  .wordmark-sub {
-    font-size: 8px !important;
-    letter-spacing: 0.1em !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-    opacity: 0.85 !important;
-    display: block !important;
-  }
-}
-
-
-/* ==================== Ultra Clean Mobile Header (v146.0) ==================== */
-@media (max-width: 768px) {
-  .mood-universe-btn,
-  .header-weather-pill,
-  .queue-btn {
-    display: none !important;
-  }
-  header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 10px 16px !important;
-    position: relative !important;
-    min-height: 52px !important;
-  }
-  .header-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0 !important;
-    z-index: 20 !important;
-    flex-shrink: 0 !important;
-  }
-  .header-right {
-    display: none !important;
-  }
-  .wordmark-container {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    max-width: calc(100vw - 80px) !important;
-    width: max-content !important;
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 10 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-  }
-  .wordmark {
-    font-size: clamp(16px, 5vw, 22px) !important;
-    line-height: 1.15 !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    text-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 6px rgba(0,0,0,0.9) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-  }
-  .wordmark-sub {
-    font-size: 8px !important;
-    letter-spacing: 0.1em !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-    opacity: 0.85 !important;
-    display: block !important;
-  }
-}
-
-
-/* ==================== Jam Room Audio Sync Delay Calibration Styling (v149.0) ==================== */
+/* Jam Room Audio Sync Delay Calibration Card */
 .jam-sync-calibration-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -7814,32 +7683,27 @@ footer {
   flex-direction: column;
   gap: 10px;
 }
-
 .jam-sync-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
-
 .jam-sync-title-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 .jam-sync-bolt {
   color: #eab308;
   font-size: 14px;
 }
-
 .jam-sync-card-title {
   font-size: 12px;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: 0.06em;
 }
-
 .jam-sync-current-badge {
   font-size: 9.5px;
   font-weight: 800;
@@ -7850,21 +7714,18 @@ footer {
   border: 1px solid rgba(234, 179, 8, 0.35);
   letter-spacing: 0.04em;
 }
-
 .jam-sync-desc {
   font-size: 10.5px;
   color: var(--muted, rgba(255, 255, 255, 0.6));
   line-height: 1.4;
   margin: 0;
 }
-
 .jam-sync-chips-row {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
-
 .jam-sync-chip {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -7876,20 +7737,17 @@ footer {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .jam-sync-chip:hover {
   background: rgba(255, 255, 255, 0.16);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.4);
 }
-
 .jam-sync-chip.active {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
   border-color: #ec4899;
   color: #ffffff;
   box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
 }
-
 .jam-sync-custom-row {
   display: flex;
   align-items: center;
@@ -7897,7 +7755,6 @@ footer {
   gap: 12px;
   margin-top: 4px;
 }
-
 .jam-sync-stepper {
   display: inline-flex;
   align-items: center;
@@ -7906,7 +7763,6 @@ footer {
   border-radius: 12px;
   overflow: hidden;
 }
-
 .jam-stepper-btn {
   width: 32px;
   height: 32px;
@@ -7921,11 +7777,9 @@ footer {
   justify-content: center;
   transition: background 0.2s ease;
 }
-
 .jam-stepper-btn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
-
 .jam-stepper-val {
   min-width: 54px;
   text-align: center;
@@ -7934,7 +7788,6 @@ footer {
   color: #ffffff;
   padding: 0 6px;
 }
-
 .jam-force-resync-btn {
   display: inline-flex;
   align-items: center;
@@ -7950,25 +7803,167 @@ footer {
   box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
   transition: all 0.2s ease;
 }
-
 .jam-force-resync-btn:hover {
   transform: scale(1.04);
   box-shadow: 0 6px 20px rgba(168, 85, 247, 0.55);
 }
 
-/* ==================== Floating Home Reactions Dock Positioning (v149.0) ==================== */
+/* Floating Home Reactions Dock Positioning */
 .home-jam-reactions-dock {
-  bottom: 96px !important;
-  right: 28px !important;
+  position: fixed;
+  bottom: 100px;
+  right: 28px;
+  z-index: 95;
 }
 
+/* ==================== Master Mobile Viewport Rules (<= 768px) ==================== */
 @media (max-width: 768px) {
+  /* Top Header: Hamburger on Left, Station Title Centered */
+  header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 10px 16px !important;
+    min-height: 56px !important;
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-left {
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 44px !important;
+    z-index: 50 !important;
+    margin: 0 !important;
+  }
+
+  .header-right,
+  .mood-universe-btn,
+  .header-weather-pill,
+  .queue-btn {
+    display: none !important;
+  }
+
+  .hamburger-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    z-index: 60 !important;
+    position: relative !important;
+  }
+
+  .wordmark-container {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: calc(100vw - 120px) !important;
+    width: max-content !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+  }
+
+  .wordmark {
+    font-size: clamp(14px, 4.2vw, 19px) !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 0 16px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 6px rgba(0,0,0,0.9) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    text-align: center !important;
+  }
+
+  .wordmark-sub {
+    font-size: 8px !important;
+    letter-spacing: 0.08em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    opacity: 0.85 !important;
+    display: block !important;
+    padding: 2px 8px !important;
+    margin-top: 1px !important;
+    text-align: center !important;
+  }
+
+  /* Floating Jam Reactions Dock on Mobile: Above playing dock with zero overlap */
   .home-jam-reactions-dock {
-    bottom: 98px !important;
+    position: fixed !important;
+    bottom: 140px !important;
     left: 50% !important;
     right: auto !important;
     transform: translateX(-50%) !important;
     max-width: calc(100vw - 20px) !important;
-    z-index: 99 !important;
+    width: max-content !important;
+    padding: 4px 8px !important;
+    gap: 4px !important;
+    z-index: 90 !important;
+    background: rgba(14, 10, 26, 0.88) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(236, 72, 153, 0.3) !important;
+  }
+
+  .home-jam-status-pill {
+    padding: 4px 8px !important;
+    font-size: 9.5px !important;
+  }
+
+  .home-emoji-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+
+  /* Bottom Controls Playing Bar */
+  .controls-glass {
+    position: fixed !important;
+    bottom: 18px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 6px 12px !important;
+    max-width: calc(100vw - 20px) !important;
+    gap: 4px !important;
+    z-index: 100 !important;
+  }
+
+  .ctrl-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .ctrl-btn.play-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+
+  #fsbtn {
+    display: flex !important;
   }
 }
