@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v164.0') caches.delete(name);
+        if (name !== 'aura-music-v165.0') caches.delete(name);
       });
     });
   }
@@ -8976,103 +8976,47 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v164.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v165.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v164.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v165.0) ====================
   var AdShieldEngine = (function () {
-    var isMutedForAd = false;
-    var lastSavedVolume = 100;
-    var adFastForwardActive = false;
-    var adStartTimestamp = 0;
+    var _skipCooldown = false;
 
-    function sendIframeCommand(cmd, args) {
+    function check() {
+      if (!player) return;
       try {
-        var iframes = document.querySelectorAll('iframe');
-        for (var i = 0; i < iframes.length; i++) {
-          if (iframes[i].contentWindow) {
-            iframes[i].contentWindow.postMessage(JSON.stringify({
-              event: 'command',
-              func: cmd,
-              args: args || []
-            }), '*');
+        if (typeof player.getVideoData === 'function') {
+          var data = player.getVideoData();
+          var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
+          
+          // Ad detection heuristics
+          var isAdTrack = false;
+          if (data && data.isAd) isAdTrack = true;
+          if (dur > 0 && dur <= 35 && data && data.title && /(advertisement|promo|sponsor|^ad$|ad)/i.test(data.title)) isAdTrack = true;
+
+          if (isAdTrack && !_skipCooldown) {
+            _skipCooldown = true;
+            console.warn('[AdShield] Commercial Ad Detected! Auto-advancing track…');
+            try { player.mute(); } catch (e) {}
+            try { player.setPlaybackRate(16); } catch (e) {}
+            try { player.seekTo(99999, true); } catch (e) {}
+            
+            // Advance to next song after brief interval
+            setTimeout(function () {
+              try { skip(1); } catch (e) {}
+              setTimeout(function () { _skipCooldown = false; }, 1200);
+            }, 300);
+            return;
           }
         }
       } catch (e) {}
     }
 
-    function checkAndBypassAd() {
-      if (!player || !apiReady) return;
-      try {
-        var d = (player.getVideoData && player.getVideoData()) || {};
-        var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
-        var adState = (typeof player.getAdState === 'function') ? player.getAdState() : 0;
-        
-        // Comprehensive Ad Detection
-        var isAd = (
-          adState > 0 ||
-          (d && (d.isAd === true || d.is_ad === true)) ||
-          (d && d.author && (
-            d.author.toLowerCase().indexOf('ad') !== -1 ||
-            d.author.toLowerCase().indexOf('commercial') !== -1 ||
-            d.author.toLowerCase().indexOf('sponsor') !== -1
-          )) ||
-          (dur > 0 && dur < 45 && d && d.video_id && typeof currentTrackQueue !== 'undefined' && currentTrackQueue.indexOf(d.video_id) === -1)
-        );
-
-        if (isAd) {
-          if (!isMutedForAd) {
-            isMutedForAd = true;
-            adFastForwardActive = true;
-            adStartTimestamp = Date.now();
-            if (player.getVolume) lastSavedVolume = player.getVolume() || 100;
-            if (player.mute) player.mute();
-            sendIframeCommand('mute');
-          }
-
-          // 1. Hyper-accelerate playback rate to 16x
-          if (player.setPlaybackRate) player.setPlaybackRate(16);
-          sendIframeCommand('setPlaybackRate', [16]);
-
-          // 2. Seek directly to end of ad
-          if (player.seekTo && dur > 0) {
-            player.seekTo(dur, true);
-          } else if (player.seekTo) {
-            player.seekTo(99999, true);
-          }
-          sendIframeCommand('seekTo', [dur > 0 ? dur : 99999, true]);
-
-          // 3. Fallback: If ad remains stuck for > 1.0s, force advance
-          if (Date.now() - adStartTimestamp > 1000) {
-            adStartTimestamp = Date.now();
-            if (window.currentTrackIndex !== undefined && window.currentTrackQueue && window.currentTrackQueue.length) {
-              var targetVid = window.currentTrackQueue[window.currentTrackIndex];
-              if (targetVid && player.loadVideoById) {
-                player.loadVideoById({ videoId: targetVid, startSeconds: 0 });
-              }
-            }
-          }
-        } else {
-          // Main track is playing cleanly
-          if (isMutedForAd && adFastForwardActive) {
-            isMutedForAd = false;
-            adFastForwardActive = false;
-            adStartTimestamp = 0;
-            if (player.unMute) player.unMute();
-            sendIframeCommand('unMute');
-            if (player.setVolume) player.setVolume(lastSavedVolume || 100);
-            var rate = (typeof currentSpeedMode !== 'undefined') ? (parseFloat(currentSpeedMode) || 1.0) : 1.0;
-            if (player.setPlaybackRate) player.setPlaybackRate(rate);
-            sendIframeCommand('setPlaybackRate', [rate]);
-          }
-        }
-      } catch (e) {}
-    }
-
-    // High-frequency 5ms Sentinel watchdog
-    setInterval(checkAndBypassAd, 5);
+    // High frequency interval check
+    setInterval(check, 100);
 
     return {
-      check: checkAndBypassAd
+      check: check
     };
   })();
