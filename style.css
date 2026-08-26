@@ -8057,3 +8057,60 @@ footer {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
+/* ==================== Large Luxury Album Art Cover Stage (v154.0) ==================== */
+.turntable-wrap {
+  position: relative !important;
+  width: 240px !important;
+  height: 240px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  margin: 8px auto !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.art-card {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 240px !important;
+  height: 240px !important;
+  border-radius: 26px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.75), 0 0 35px var(--accent-glow, rgba(168, 85, 247, 0.45)) !important;
+  background: #0f0f14 !important;
+  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s ease !important;
+}
+
+.art-card:hover {
+  transform: scale(1.04) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 50px var(--accent-glow, rgba(168, 85, 247, 0.6)) !important;
+}
+
+.art {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Hide genz-vibe-pill from home screen (moved to menu) */
+.genz-vibe-pill {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .turntable-wrap {
+    width: min(65vw, 240px) !important;
+    height: min(65vw, 240px) !important;
+    margin: 6px auto !important;
+  }
+  .art-card {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 22px !important;
+  }
+}

@@ -59,7 +59,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=153.0">
+  <link rel="stylesheet" href="style.css?v=154.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -328,6 +328,18 @@
             <span class="sidebar-btn-label">Explorer</span>
             <span class="sidebar-btn-sub">YouTube Music Search</span>
           </div>
+        </button>
+
+                <!-- Midnight Speed Drive & Vibe Multiplier -->
+        <button class="sidebar-menu-btn" id="sidebarVibeSpeedBtn" title="Speed / Vibe Mode: 1.0x Normal → 1.25x Nightcore → 0.85x Slowed">
+          <div class="sidebar-btn-icon" style="color:#f59e0b; background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.25);">
+            <span style="font-size:18px;">🏎️</span>
+          </div>
+          <div class="sidebar-btn-text">
+            <span class="sidebar-btn-label">Midnight Speed Drive</span>
+            <span class="sidebar-btn-sub" id="sidebarVibeSpeedSub">1.0x Normal &middot; 1.25x Nightcore &middot; 0.85x Slowed</span>
+          </div>
+          <span class="jam-sidebar-badge" id="sidebarVibeSpeedBadge" style="background:rgba(255,255,255,0.15); color:#fff; font-weight:800;">1.0x</span>
         </button>
 
         <!-- Song Queue & Playlist -->
@@ -1503,6 +1515,6 @@
   <div id="player" style="display:none;"></div>
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
-  <script src="script.js?v=153.0"></script>
+  <script src="script.js?v=154.0"></script>
 </body>
 </html>
