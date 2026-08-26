@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v148.0') caches.delete(name);
+        if (name !== 'aura-music-v149.0') caches.delete(name);
       });
     });
   }
@@ -5351,6 +5351,48 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       }
 
       if (hostBtn) hostBtn.addEventListener('click', startHost);
+
+      var syncChipsRow = $('jamSyncChipsRow');
+      if (syncChipsRow) {
+        syncChipsRow.addEventListener('click', function (e) {
+          var chip = e.target.closest('.jam-sync-chip');
+          if (!chip) return;
+          var offset = parseFloat(chip.getAttribute('data-offset')) || 0;
+          setSyncOffset(offset);
+          showToast('⚡ Sync Offset set to ' + (offset >= 0 ? '+' : '') + offset + 's');
+        });
+      }
+
+      var minusBtn = $('jamSyncMinusBtn');
+      if (minusBtn) {
+        minusBtn.addEventListener('click', function () {
+          var next = Math.max(-10, syncOffsetSeconds - 0.5);
+          setSyncOffset(next);
+          showToast('⚡ Sync: ' + (next >= 0 ? '+' : '') + next.toFixed(1) + 's');
+        });
+      }
+
+      var plusBtn = $('jamSyncPlusBtn');
+      if (plusBtn) {
+        plusBtn.addEventListener('click', function () {
+          var next = Math.min(20, syncOffsetSeconds + 0.5);
+          setSyncOffset(next);
+          showToast('⚡ Sync: +' + next.toFixed(1) + 's');
+        });
+      }
+
+      var resyncBtn = $('jamForceResyncBtn');
+      if (resyncBtn) {
+        resyncBtn.addEventListener('click', function () {
+          if (lastReceivedHostTime > 0 && player && player.seekTo) {
+            var targetTime = Math.max(0, lastReceivedHostTime + syncOffsetSeconds);
+            player.seekTo(targetTime, true);
+            showToast('✨ Audio aligned with Room Host (' + (syncOffsetSeconds >= 0 ? '+' : '') + syncOffsetSeconds.toFixed(1) + 's)');
+          } else {
+            showToast('✨ Listening in live sync');
+          }
+        });
+      }
       if (joinBtn && codeInput) {
         joinBtn.addEventListener('click', function () {
           joinRoom(codeInput.value);
@@ -8825,7 +8867,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v148.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v149.0) ====================
   setInterval(function () {
     if (!player || !apiReady) return;
     try {
@@ -8843,7 +8885,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
     } catch (e) {}
   }, 250);
 
-  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v148.0) ====================
+  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v149.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;

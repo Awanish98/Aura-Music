@@ -59,7 +59,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=148.0">
+  <link rel="stylesheet" href="style.css?v=149.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -1168,6 +1168,44 @@
           </div>
 
           <!-- Live Reaction Bar -->
+                    <!-- Audio Sync Delay Calibration Card -->
+          <div class="jam-sync-calibration-card" id="jamSyncCalibrationCard">
+            <div class="jam-sync-card-header">
+              <div class="jam-sync-title-wrap">
+                <span class="jam-sync-bolt">⚡</span>
+                <span class="jam-sync-card-title">Audio Sync &amp; Delay Calibration</span>
+              </div>
+              <span class="jam-sync-current-badge" id="jamSyncCurrentBadge">0.0s (Live Sync)</span>
+            </div>
+            <p class="jam-sync-desc">Fine-tune audio sync offset if Bluetooth headphones or network latency creates a delay between friends.</p>
+            
+            <!-- Quick Preset Delay Offset Chips -->
+            <div class="jam-sync-chips-row" id="jamSyncChipsRow">
+              <button class="jam-sync-chip active" data-offset="0">0.0s (Live)</button>
+              <button class="jam-sync-chip" data-offset="0.5">+0.5s</button>
+              <button class="jam-sync-chip" data-offset="1.0">+1.0s</button>
+              <button class="jam-sync-chip" data-offset="2.0">+2.0s</button>
+              <button class="jam-sync-chip" data-offset="5.0">+5.0s</button>
+              <button class="jam-sync-chip" data-offset="10.0">+10.0s</button>
+              <button class="jam-sync-chip" data-offset="-0.5">-0.5s</button>
+              <button class="jam-sync-chip" data-offset="-1.0">-1.0s</button>
+            </div>
+
+            <!-- Custom Manual Stepper & Force Resync -->
+            <div class="jam-sync-custom-row">
+              <div class="jam-sync-stepper">
+                <button class="jam-stepper-btn" id="jamSyncMinusBtn" title="Decrease delay by 0.5s">−</button>
+                <span class="jam-stepper-val" id="jamSyncOffsetVal">0.0s</span>
+                <button class="jam-stepper-btn" id="jamSyncPlusBtn" title="Increase delay by 0.5s">+</button>
+              </div>
+              <button class="jam-force-resync-btn" id="jamForceResyncBtn" title="Immediately align audio with Room Host">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                <span>⚡ Re-Sync Now</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Reaction Bar -->
           <div class="jam-reaction-section">
             <div class="jam-reaction-title">
               <span>Live Reactions</span>
@@ -1447,6 +1485,6 @@
   <div id="player" style="display:none;"></div>
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
-  <script src="script.js?v=148.0"></script>
+  <script src="script.js?v=149.0"></script>
 </body>
 </html>

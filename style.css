@@ -7801,3 +7801,174 @@ footer {
     display: block !important;
   }
 }
+
+
+/* ==================== Jam Room Audio Sync Delay Calibration Styling (v149.0) ==================== */
+.jam-sync-calibration-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jam-sync-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.jam-sync-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jam-sync-bolt {
+  color: #eab308;
+  font-size: 14px;
+}
+
+.jam-sync-card-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+}
+
+.jam-sync-current-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  letter-spacing: 0.04em;
+}
+
+.jam-sync-desc {
+  font-size: 10.5px;
+  color: var(--muted, rgba(255, 255, 255, 0.6));
+  line-height: 1.4;
+  margin: 0;
+}
+
+.jam-sync-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.jam-sync-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jam-sync-chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.jam-sync-chip.active {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-color: #ec4899;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
+}
+
+.jam-sync-custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.jam-sync-stepper {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.jam-stepper-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.jam-stepper-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.jam-stepper-val {
+  min-width: 54px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ffffff;
+  padding: 0 6px;
+}
+
+.jam-force-resync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+  transition: all 0.2s ease;
+}
+
+.jam-force-resync-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.55);
+}
+
+/* ==================== Floating Home Reactions Dock Positioning (v149.0) ==================== */
+.home-jam-reactions-dock {
+  bottom: 96px !important;
+  right: 28px !important;
+}
+
+@media (max-width: 768px) {
+  .home-jam-reactions-dock {
+    bottom: 98px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    max-width: calc(100vw - 20px) !important;
+    z-index: 99 !important;
+  }
+}
