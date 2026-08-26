@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v143.0') caches.delete(name);
+        if (name !== 'aura-music-v144.0') caches.delete(name);
       });
     });
   }
@@ -8083,13 +8083,17 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
     loadApi().then(function () {
       var pA = new YT.Player('playerA', {
+        host: 'https://www.youtube-nocookie.com',
         width: '200', height: '200',
         playerVars: {
           playsinline: 1,
           controls: 0,
           disablekb: 1,
           rel: 0,
-          iv_load_policy: 3
+          iv_load_policy: 3,
+          modestbranding: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
         },
         events: {
           onReady: function () {
