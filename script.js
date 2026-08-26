@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v157.0') caches.delete(name);
+        if (name !== 'aura-music-v158.0') caches.delete(name);
       });
     });
   }
@@ -8925,10 +8925,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v157.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v158.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v157.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v158.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
