@@ -7675,3 +7675,64 @@ footer {
     opacity: 0.9 !important;
   }
 }
+
+
+/* ==================== Guaranteed Zero-Overlap Mobile Header & Title (v145.0) ==================== */
+@media (max-width: 768px) {
+  .mood-universe-btn,
+  .header-weather-pill {
+    display: none !important;
+  }
+  header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 10px 14px !important;
+    position: relative !important;
+    min-height: 52px !important;
+  }
+  .header-left, .header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    z-index: 20 !important;
+    flex-shrink: 0 !important;
+  }
+  .wordmark-container {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: calc(100vw - 120px) !important;
+    width: max-content !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+  }
+  .wordmark {
+    font-size: clamp(14px, 4.2vw, 18px) !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 0 14px var(--accent-glow, rgba(168, 85, 247, 0.7)), 0 2px 6px rgba(0,0,0,0.9) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+  .wordmark-sub {
+    font-size: 8px !important;
+    letter-spacing: 0.1em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    opacity: 0.85 !important;
+    display: block !important;
+  }
+}

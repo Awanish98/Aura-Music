@@ -1,4 +1,4 @@
-﻿var CACHE_NAME = 'aura-music-v144.0';
+﻿var CACHE_NAME = 'aura-music-v145.0';
 
 
 

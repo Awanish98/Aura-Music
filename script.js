@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v144.0') caches.delete(name);
+        if (name !== 'aura-music-v145.0') caches.delete(name);
       });
     });
   }
@@ -8813,3 +8813,22 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if (window.location.search.includes('reset=1') || window.location.search.includes('clear=1') || window.location.search.includes('purge=1')) {
     purgeAuraCacheAndReset(false);
   }
+
+
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v145.0) ====================
+  setInterval(function () {
+    if (!player || !apiReady) return;
+    try {
+      if (typeof player.getAdState === 'function') {
+        var adState = player.getAdState();
+        if (adState > 0) {
+          if (player.setPlaybackRate) player.setPlaybackRate(16);
+          if (player.seekTo && player.getDuration) player.seekTo(player.getDuration(), true);
+        }
+      }
+      var d = player.getVideoData && player.getVideoData();
+      if (d && (d.isAd || (d.author && (d.author.toLowerCase().indexOf('ad') !== -1 || d.author.toLowerCase().indexOf('commercial') !== -1)))) {
+        if (player.seekTo && player.getDuration) player.seekTo(player.getDuration(), true);
+      }
+    } catch (e) {}
+  }, 250);
