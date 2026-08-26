@@ -117,7 +117,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Syne:wght@700;800;900&family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Rozha+One&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=161.0">
+  <link rel="stylesheet" href="style.css?v=162.0">
   <script src="https://www.youtube.com/iframe_api"></script>
 
 
@@ -267,16 +267,18 @@
     <!-- Premium Left-Side Sidebar Menu -->
     <div class="premium-sidebar-menu" id="premiumSidebarMenu">
 
-      <!-- User Profile Section at Top -->
-      <div class="sidebar-user-profile">
-        <div class="sidebar-avatar-ring">
-          <span class="sidebar-avatar-emoji" id="sidebarAvatarEmoji">👤</span>
+            <!-- Sidebar Header Row -->
+      <div class="sidebar-header-row" style="display:flex; align-items:center; justify-content:space-between; padding:20px 18px 16px;">
+        <div class="sidebar-user-profile" id="sidebarUserProfileBtn" style="display:flex; align-items:center; gap:12px; cursor:pointer; flex:1; min-width:0;" title="Click to customize profile">
+          <div class="sidebar-avatar-ring">
+            <span class="sidebar-avatar-emoji" id="sidebarAvatarEmoji">👤</span>
+          </div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" id="sidebarUserName">Guest User</div>
+            <div class="sidebar-user-status">Free Plan · Aura Radio</div>
+          </div>
         </div>
-        <div class="sidebar-user-info">
-          <div class="sidebar-user-name" id="sidebarUserName">Guest User</div>
-          <div class="sidebar-user-status">Free Plan · Aura Radio</div>
-        </div>
-        <button class="close-sidebar-btn" id="closeSidebarBtn" title="Close Menu">
+        <button class="close-sidebar-btn" id="closeSidebarBtn" title="Close Menu" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
           <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
           </svg>
@@ -1574,6 +1576,6 @@
   <div id="player" style="display:none;"></div>
 
   <!-- PeerJS for Zero-Server WebRTC P2P Sync -->
-  <script src="script.js?v=161.0"></script>
+  <script src="script.js?v=162.0"></script>
 </body>
 </html>

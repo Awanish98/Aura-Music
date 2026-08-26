@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v161.0') caches.delete(name);
+        if (name !== 'aura-music-v162.0') caches.delete(name);
       });
     });
   }
@@ -5839,10 +5839,12 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
       var logoutBtn = $('logoutProfileBtn');
 
       if (profileBtn) profileBtn.addEventListener('click', open);
-      var sidebarUser = document.querySelector('.sidebar-user-profile');
-      if (sidebarUser) {
-        sidebarUser.style.cursor = 'pointer';
-        sidebarUser.addEventListener('click', open);
+      var sidebarUserBtn = $('sidebarUserProfileBtn');
+      if (sidebarUserBtn) {
+        sidebarUserBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          open();
+        });
       }
       if (closeBtn) closeBtn.addEventListener('click', close);
       if (modal) {
@@ -8373,7 +8375,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
 
     var closeSidebarButton = $('closeSidebarBtn');
     if (closeSidebarButton) {
-      closeSidebarButton.addEventListener('click', closeSidebar);
+      closeSidebarButton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeSidebar();
+      });
     }
     var sidebarBdrop = $('sidebarBackdrop');
     if (sidebarBdrop) {
@@ -8944,10 +8949,10 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v161.0) ====================
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v162.0) ====================
   
 
-      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v161.0) ====================
+      // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v162.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
