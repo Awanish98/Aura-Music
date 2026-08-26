@@ -1,20 +1,26 @@
-var CACHE_NAME = 'aura-music-v155.0';
+var CACHE_NAME = 'aura-music-v156.0';
 
 var AD_PATTERNS = [
   'googleads',
   'doubleclick.net',
   'pagead2.googlesyndication.com',
   'adservice.google',
+  'www.googleadservices.com',
   '/api/stats/ads',
   '/pagead/',
   'get_midroll_info',
   'ad_break',
   'ptracking',
-  'adunit'
+  'adunit',
+  'pubads.g.doubleclick.net',
+  'securepubads.g.doubleclick.net',
+  'static.doubleclick.net',
+  'ad.doubleclick.net',
+  'adformat='
 ];
 
 function isAdUrl(url) {
-  if (!url) return false;
+  if (!url || typeof url !== 'string') return false;
   for (var i = 0; i < AD_PATTERNS.length; i++) {
     if (url.indexOf(AD_PATTERNS[i]) !== -1) return true;
   }

@@ -195,7 +195,7 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   if ('caches' in window) {
     caches.keys().then(function (names) {
       names.forEach(function (name) {
-        if (name !== 'aura-music-v155.0') caches.delete(name);
+        if (name !== 'aura-music-v156.0') caches.delete(name);
       });
     });
   }
@@ -8925,68 +8925,82 @@ var ARTIST_TRACKS_CATALOG = {"artist-arijit-singh":["nDjloeIB3Pc","O5gwxm3NxFU",
   }
 
 
-  // ==================== Active Ad-Skipper & Fast-Forward Guard (v155.0) ====================
-  setInterval(function () {
-    if (!player || !apiReady) return;
-    try {
-      if (typeof player.getAdState === 'function') {
-        var adState = player.getAdState();
-        if (adState > 0) {
-          if (player.setPlaybackRate) player.setPlaybackRate(16);
-          if (player.seekTo && player.getDuration) player.seekTo(player.getDuration(), true);
-        }
-      }
-      var d = player.getVideoData && player.getVideoData();
-      if (d && (d.isAd || (d.author && (d.author.toLowerCase().indexOf('ad') !== -1 || d.author.toLowerCase().indexOf('commercial') !== -1)))) {
-        if (player.seekTo && player.getDuration) player.seekTo(player.getDuration(), true);
-      }
-    } catch (e) {}
-  }, 250);
+  // ==================== Active Ad-Skipper & Fast-Forward Guard (v156.0) ====================
+  
 
-  // ==================== Aura Real-Time Ad-Shield & Auto-Mute Bypass Engine (v155.0) ====================
+    // ==================== Aura Super Ad-Terminator & Instant Skip Engine (v156.0) ====================
   var AdShieldEngine = (function () {
     var isMutedForAd = false;
     var lastSavedVolume = 100;
     var adFastForwardActive = false;
+    var adStartTimestamp = 0;
 
     function checkAndBypassAd() {
       if (!player || !apiReady) return;
       try {
         var d = (player.getVideoData && player.getVideoData()) || {};
-        var dur = player.getDuration ? player.getDuration() : 0;
+        var dur = (typeof player.getDuration === 'function') ? player.getDuration() : 0;
         var adState = (typeof player.getAdState === 'function') ? player.getAdState() : 0;
+        var curTime = (typeof player.getCurrentTime === 'function') ? player.getCurrentTime() : 0;
         
+        // Comprehensive Ad Detection
         var isAd = (
           adState > 0 ||
-          (d && (d.isAd || (d.author && (d.author.toLowerCase().indexOf('ad') !== -1 || d.author.toLowerCase().indexOf('commercial') !== -1)))) ||
-          (dur > 0 && dur < 40 && d && d.video_id && typeof currentTrackQueue !== 'undefined' && currentTrackQueue.indexOf(d.video_id) === -1)
+          (d && (d.isAd === true || d.is_ad === true)) ||
+          (d && d.author && (
+            d.author.toLowerCase().indexOf('ad') !== -1 ||
+            d.author.toLowerCase().indexOf('commercial') !== -1 ||
+            d.author.toLowerCase().indexOf('sponsor') !== -1
+          )) ||
+          (dur > 0 && dur < 45 && d && d.video_id && typeof currentTrackQueue !== 'undefined' && currentTrackQueue.indexOf(d.video_id) === -1)
         );
 
         if (isAd) {
           if (!isMutedForAd) {
             isMutedForAd = true;
             adFastForwardActive = true;
+            adStartTimestamp = Date.now();
             if (player.getVolume) lastSavedVolume = player.getVolume() || 100;
             if (player.mute) player.mute();
           }
-          // Ultra fast-forward ad to end instantly
+
+          // 1. Hyper-accelerate playback rate to 16x
           if (player.setPlaybackRate) player.setPlaybackRate(16);
-          if (player.seekTo && dur > 0) player.seekTo(dur, true);
+
+          // 2. Seek directly to end of ad
+          if (player.seekTo && dur > 0) {
+            player.seekTo(dur, true);
+          } else if (player.seekTo) {
+            player.seekTo(99999, true);
+          }
+
+          // 3. Fallback: If ad remains stuck for > 1.2s, force advance
+          if (Date.now() - adStartTimestamp > 1200) {
+            adStartTimestamp = Date.now();
+            if (window.currentTrackIndex !== undefined && window.currentTrackQueue && window.currentTrackQueue.length) {
+              var targetVid = window.currentTrackQueue[window.currentTrackIndex];
+              if (targetVid && player.loadVideoById) {
+                player.loadVideoById({ videoId: targetVid, startSeconds: 0 });
+              }
+            }
+          }
         } else {
+          // Main track is playing cleanly
           if (isMutedForAd && adFastForwardActive) {
             isMutedForAd = false;
             adFastForwardActive = false;
+            adStartTimestamp = 0;
             if (player.unMute) player.unMute();
-            if (player.setVolume) player.setVolume(lastSavedVolume);
-            var rate = (typeof currentSpeedMode !== 'undefined') ? parseFloat(currentSpeedMode) || 1.0 : 1.0;
+            if (player.setVolume) player.setVolume(lastSavedVolume || 100);
+            var rate = (typeof currentSpeedMode !== 'undefined') ? (parseFloat(currentSpeedMode) || 1.0) : 1.0;
             if (player.setPlaybackRate) player.setPlaybackRate(rate);
           }
         }
       } catch (e) {}
     }
 
-    // High-frequency 40ms Sentinel watchdog
-    setInterval(checkAndBypassAd, 25);
+    // High-frequency 10ms Sentinel watchdog
+    setInterval(checkAndBypassAd, 10);
 
     return {
       check: checkAndBypassAd
