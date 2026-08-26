@@ -1,4 +1,4 @@
-var CACHE_NAME = 'aura-music-v151.0';
+var CACHE_NAME = 'aura-music-v152.0';
 
 var AD_PATTERNS = [
   'googleads',
