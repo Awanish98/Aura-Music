@@ -17,7 +17,11 @@
 </p>
 
 **Aura Music** talks directly to YouTube's internal API and plays audio through libmpv: no bundled
-browser runtime, no backend server, no ads in the audio. Developed by **Jordan**.
+browser runtime, no ads in the audio. Developed by **Jordan**.
+
+### 🌐 Web Player & Live Links
+- **GitHub Pages**: 👉 [https://awanish98.github.io/Aura-Music/](https://awanish98.github.io/Aura-Music/)
+- **1-Click Render Deployment**: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Awanish98/Aura-Music)
 
 </div>
 
