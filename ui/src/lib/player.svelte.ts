@@ -46,7 +46,7 @@ export const playback = $state({
  * "play this" path already goes through this module. The open has to happen at the click: a
  * gapless advance looks exactly like a user play from the `now-playing` event alone.
  */
-export const np = $state({ open: false, tab: 'queue' as 'queue' | 'lyrics' });
+export const np = $state({ open: false, tab: 'queue' as 'queue' | 'lyrics' | 'story' });
 
 /**
  * Backend settings the app has to know outside the settings modal (which holds the rest in its own
@@ -1091,6 +1091,7 @@ export const ui = $state({
 	share: null as BrowseItem | null, // the share modal's target
 	toast: null as Toast | null,
 	settingsOpen: false, // the settings modal
+	aiDjOpen: false, // Aura AI Smart DJ Dialog
 	ltOpen: false, // the Listen Together modal
 	linkOpen: false, // the "open a pasted link" modal
 	paletteOpen: false, // the Ctrl+K search palette

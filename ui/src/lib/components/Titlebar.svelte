@@ -18,7 +18,8 @@
 		HotspotOfflineIcon,
 		UserGroup02Icon,
 		Link04Icon,
-		MoreHorizontalIcon
+		MoreHorizontalIcon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import LastFmIcon from './LastFmIcon.svelte';
 	import DiscordIcon from './DiscordIcon.svelte';
@@ -172,12 +173,23 @@
 	</div>
 
 	<!-- Right: Tools, Account & Window controls -->
-	<div class="flex h-full items-center gap-1">
+	<div class="flex h-full items-center gap-1.5">
+		<!-- Aura AI DJ Trigger Button -->
+		<button
+			class="flex h-7 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary transition-all hover:bg-primary/20 active:scale-95 shadow-sm"
+			onclick={() => (ui.aiDjOpen = true)}
+			title="Open Aura AI DJ & Smart Music Agent"
+			aria-label="Open Aura AI DJ"
+		>
+			<HugeiconsIcon icon={SparklesIcon} size={14} class="animate-pulse" />
+			<span class="hidden sm:inline">AI DJ</span>
+		</button>
+
 		<!-- Account Menu -->
 		<AccountMenu />
 
 		<!-- Subtle Neutral Divider -->
-		<div class="mx-1 h-3.5 w-px bg-border/40"></div>
+		<div class="mx-0.5 h-3.5 w-px bg-border/40"></div>
 
 		<!-- Quick Tools Dropdown Button -->
 		<button

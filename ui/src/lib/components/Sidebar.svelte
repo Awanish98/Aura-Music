@@ -16,7 +16,8 @@
 		SquareArrowLeft01Icon,
 		SquareArrowRight01Icon,
 		FavouriteIcon,
-		CloudIcon
+		CloudIcon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import { toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
@@ -108,7 +109,7 @@
 	)}"
 >
 	<div class="flex items-center justify-center px-2 py-2 {wide('lg:justify-between')}">
-		<span class="hidden font-heading text-lg font-bold tracking-tight {wide('lg:block')}">Echo Music</span>
+		<span class="hidden font-heading text-lg font-bold tracking-tight {wide('lg:block')}">Aura Music</span>
 		<!-- Column when collapsed: the two buttons don't fit side by side in the 64px rail. -->
 		<div class="flex items-center gap-1 {collapsed ? 'flex-col' : ''}">
 			<Button
@@ -164,6 +165,22 @@
 				<span class="hidden {wide('lg:inline')}">{n.label}</span>
 			</a>
 		{/each}
+
+		<!-- Aura AI DJ Action Link -->
+		<button
+			onclick={() => (ui.aiDjOpen = true)}
+			title="Aura AI DJ & Music Agent"
+			class="group flex items-center justify-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors {wide(
+				'lg:justify-start'
+			)}"
+		>
+			<HugeiconsIcon
+				icon={SparklesIcon}
+				class="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110 text-primary"
+			/>
+			<span class="hidden {wide('lg:inline')} font-semibold">Aura AI DJ</span>
+		</button>
+
 		<button
 			onclick={() => (ui.settingsOpen = true)}
 			title={t('nav.settings')}

@@ -14,7 +14,8 @@
 		Copy01Icon,
 		Coffee02Icon,
 		DiscordIcon,
-		CloudIcon
+		CloudIcon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -33,6 +34,7 @@
 	import Changelog from '$lib/components/Changelog.svelte';
 	import DiscordSettings from '$lib/components/DiscordSettings.svelte';
 	import GoogleDriveSettings from '$lib/components/GoogleDriveSettings.svelte';
+	import AiSettings from '$lib/components/AiSettings.svelte';
 	import {
 		THEMES,
 		FONTS,
@@ -67,9 +69,10 @@
 	import { t, setLocale, currentLocale, LOCALES, type LocaleId } from '$lib/i18n.svelte';
 	import { appIcon, chooseAppIcon } from '$lib/appicon.svelte';
 
-	type TabId = 'general' | 'themes' | 'playback' | 'gdrive' | 'discord' | 'data' | 'about';
+	type TabId = 'general' | 'ai' | 'themes' | 'playback' | 'gdrive' | 'discord' | 'data' | 'about';
 	const TABS = $derived<{ id: TabId; label: string; hint: string; icon: typeof Settings02Icon }[]>([
 		{ id: 'general', label: t('settings.tabs.general'), hint: t('settings.tabs.general_hint'), icon: Settings02Icon },
+		{ id: 'ai', label: 'Aura AI & DJ', hint: 'Gemini 2.5 & Groq Llama 3.3 models', icon: SparklesIcon },
 		{ id: 'themes', label: t('settings.tabs.themes'), hint: t('settings.tabs.themes_hint'), icon: PaintBoardIcon },
 		{ id: 'playback', label: t('settings.tabs.playback'), hint: t('settings.tabs.playback_hint'), icon: PlayCircleIcon },
 		{ id: 'gdrive', label: 'Google Drive', hint: 'Cloud backup, sync & music streaming', icon: CloudIcon },
@@ -607,6 +610,8 @@
 								{/if}
 							</div>
 						</section>
+					{:else if tab === 'ai'}
+						<AiSettings />
 					{:else if tab === 'themes'}
 						<section class={GROUP}>
 							<h3 class={LABEL}>{t('settings.sections.theme')}</h3>

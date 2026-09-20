@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { HistoryIcon, Search01Icon } from '@hugeicons/core-free-icons';
+	import { HistoryIcon, Search01Icon, SparklesIcon } from '@hugeicons/core-free-icons';
 	import SearchSuggest from '$lib/components/SearchSuggest.svelte';
-	import { auth, playback } from '$lib/player.svelte';
+	import { auth, playback, ui } from '$lib/player.svelte';
 	import { thumb } from '$lib/thumb';
 	import { t, type TranslationKey } from '$lib/i18n.svelte';
 
@@ -84,6 +84,17 @@
 				</h1>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
+				<!-- Aura AI DJ Quick Access Button -->
+				<button
+					onclick={() => (ui.aiDjOpen = true)}
+					title="Open Aura AI DJ"
+					aria-label="Open Aura AI DJ"
+					class="flex h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 text-xs font-semibold text-primary transition-all hover:bg-primary/20 active:scale-95 shadow-sm"
+				>
+					<HugeiconsIcon icon={SparklesIcon} size={15} class="animate-pulse" />
+					<span class="font-medium">AI DJ</span>
+				</button>
+
 				<!-- Listen Together moved out of here and lives on the titlebar alone: history is the thing
 				     you reach for from the home page. -->
 				<button

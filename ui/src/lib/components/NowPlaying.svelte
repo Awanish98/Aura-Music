@@ -14,7 +14,8 @@
 		Video01Icon,
 		VideoOffIcon,
 		VolumeHighIcon,
-		VolumeMute02Icon
+		VolumeMute02Icon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as api from '$lib/api';
@@ -26,6 +27,7 @@
 	import QueueList from './QueueList.svelte';
 	import type { QueueScrollMemory } from '$lib/queue-history';
 	import LyricsView from './LyricsView.svelte';
+	import AiSongStory from './AiSongStory.svelte';
 
 	// Off in settings, this view drops its tabs and the queue/lyrics panels stay in charge of both
 	// (see +layout): they paint above this (z-30 over z-20), so all this needs is to hand back the
@@ -277,6 +279,9 @@
 							<Tabs.Trigger value="lyrics" class="gap-2.5">
 								<HugeiconsIcon icon={Mic01Icon} class="h-4 w-4" /> {t('player.lyrics')}
 							</Tabs.Trigger>
+							<Tabs.Trigger value="story" class="gap-2.5">
+								<HugeiconsIcon icon={SparklesIcon} class="h-4 w-4 text-primary" /> Story
+							</Tabs.Trigger>
 						</Tabs.List>
 						{#if np.tab === 'lyrics'}
 							<button
@@ -300,9 +305,13 @@
 						<Tabs.Content value="queue" class="flex min-h-0 flex-col">
 							<QueueList scrollMemory={queueScrollMemory} />
 						</Tabs.Content>
-					{:else}
+					{:else if np.tab === 'lyrics'}
 						<Tabs.Content value="lyrics" class="flex min-h-0 flex-col">
 							<LyricsView expanded={big} />
+						</Tabs.Content>
+					{:else if np.tab === 'story'}
+						<Tabs.Content value="story" class="flex min-h-0 flex-1 flex-col overflow-y-auto">
+							<AiSongStory />
 						</Tabs.Content>
 					{/if}
 				</Tabs.Root>

@@ -10,6 +10,7 @@
 	import ErrorState from '$lib/components/ErrorState.svelte';
 	import HomeHero from '$lib/components/HomeHero.svelte';
 	import Shortcuts from '$lib/components/Shortcuts.svelte';
+	import AiVibeGenerator from '$lib/components/AiVibeGenerator.svelte';
 	import RecentRail from '$lib/components/RecentRail.svelte';
 	import Shelf from '$lib/components/Shelf.svelte';
 	import ForgottenFavourites from '$lib/components/ForgottenFavourites.svelte';
@@ -370,8 +371,9 @@
 		     everything the app or YouTube chose. It steps aside entirely while a mood filter is
 		     active: none of it is filterable, and neither is the arrangement it edits. -->
 		{#if !selected}
-			<div class="mb-10 border-b pb-8">
+			<div class="mb-10 border-b pb-8 space-y-8">
 				<Shortcuts onEdit={() => (editing = true)} />
+				<AiVibeGenerator />
 			</div>
 		{/if}
 		{#snippet shelfSkeletons(n: number)}

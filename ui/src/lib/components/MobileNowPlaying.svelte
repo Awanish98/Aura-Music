@@ -22,7 +22,8 @@
 		VolumeHighIcon,
 		VolumeMute02Icon,
 		Share01Icon,
-		AudioWave01Icon
+		AudioWave01Icon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import {
 		np,
@@ -46,8 +47,9 @@
 	import QueueList from './QueueList.svelte';
 	import SleepTimerModal from './SleepTimerModal.svelte';
 	import TrackMenu from './TrackMenu.svelte';
+	import AiSongStory from './AiSongStory.svelte';
 
-	let activeTab = $state<'player' | 'lyrics' | 'queue'>('player');
+	let activeTab = $state<'player' | 'lyrics' | 'story' | 'queue'>('player');
 	let sleepModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
@@ -214,6 +216,15 @@
 		>
 			<HugeiconsIcon icon={Mic01Icon} size={14} />
 			Lyrics
+		</button>
+		<button
+			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'story'
+				? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
+				: 'bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground'}"
+			onclick={() => (activeTab = 'story')}
+		>
+			<HugeiconsIcon icon={SparklesIcon} size={14} />
+			AI Story
 		</button>
 		<button
 			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'queue'
@@ -474,6 +485,11 @@
 			<!-- Synced Lyrics View -->
 			<div class="h-full overflow-hidden rounded-2xl bg-card/40 p-2 backdrop-blur-md">
 				<LyricsView />
+			</div>
+		{:else if activeTab === 'story'}
+			<!-- Deep AI Song Meaning & Backstory View -->
+			<div class="h-full overflow-y-auto rounded-2xl bg-card/40 p-3 backdrop-blur-md">
+				<AiSongStory />
 			</div>
 		{:else if activeTab === 'queue'}
 			<!-- Up Next Queue View -->
