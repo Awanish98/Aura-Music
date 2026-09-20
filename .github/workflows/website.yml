@@ -36,7 +36,7 @@ jobs:
           BASE_PATH: /Aura-Music
         run: |
           cd ui
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

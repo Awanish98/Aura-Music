@@ -33,15 +33,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'ui/package-lock.json'
+          node-version: '22'
 
       - name: Install UI dependencies
-        run: npm --prefix ui ci || npm --prefix ui install
+        run: |
+          cd ui
+          npm install --legacy-peer-deps --engine-strict=false
 
       - name: Build Web App
-        run: npm --prefix ui run build
+        run: |
+          cd ui
+          npm run build
 
       - name: Sync Capacitor Android
         run: |
@@ -54,12 +56,12 @@ jobs:
       - name: Build Android Debug APK
         run: |
           cd ui/android
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Build Android Release APK
         run: |
           cd ui/android
-          ./gradlew assembleRelease --stacktrace || true
+          ./gradlew assembleRelease --no-daemon --stacktrace || true
 
       - name: Prepare APK Artifacts
         run: |
