@@ -361,10 +361,24 @@ export async function fetchHome(params?: string): Promise<HomePage> {
 		secList?.continuations?.[0]?.nextContinuationData?.continuation ||
 		secList?.continuations?.[0]?.reloadContinuationData?.continuation;
 
-	// FMHY Curated Sections (Live Radios, Podcasts, Soundscapes, Game Soundtracks, Top Charts)
+	// FMHY & JioSaavn 320kbps Curated Sections (Live Radios, Podcasts, Soundscapes, Top Charts)
 	try {
-		const { getFmhyHomeSections } = await import('./fmhy');
+		const { getFmhyHomeSections, fetchSaavnTrending } = await import('./fmhy');
 		const fmhySections = getFmhyHomeSections();
+		const { charts, featured } = await fetchSaavnTrending();
+
+		if (charts.length > 0) {
+			sections.unshift({
+				title: '🔥 JioSaavn & FMHY 320kbps Top Charts',
+				items: charts
+			});
+		}
+		if (featured.length > 0) {
+			sections.unshift({
+				title: '✨ Trending Playlists (Lossless Audio)',
+				items: featured
+			});
+		}
 		sections.unshift(...fmhySections);
 	} catch (e) {
 		console.warn('[FMHY Sections load error]', e);
@@ -467,11 +481,32 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		}
 	}
 
+	// 1. Parallel fetch from JioSaavn 320kbps & FMHY Lossless Engine
+	let saavnSongs: BrowseItem[] = [];
+	try {
+		const { fetchSaavnSearch } = await import('./fmhy');
+		const rawSaavn = await fetchSaavnSearch(query);
+		saavnSongs = rawSaavn.map((s) => ({
+			kind: 'song',
+			id: s.video_id,
+			title: s.title,
+			subtitle: `${s.artists} • 320kbps Lossless`,
+			thumbnail: s.thumbnail,
+			duration: s.duration,
+			artistRuns: s.artist_runs || [{ text: s.artists }],
+			isUpload: false,
+			explicit: false,
+			streamUrl: s.streamUrl
+		} as BrowseItem));
+	} catch (e) {
+		console.warn('[Saavn search integration error]', e);
+	}
+
 	const data = await post('search', { query });
 	const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
 	const secList = tab?.content?.sectionListRenderer?.contents || [];
 
-	const songs: BrowseItem[] = [];
+	const songs: BrowseItem[] = [...saavnSongs];
 	const albums: BrowseItem[] = [];
 	const artists: BrowseItem[] = [];
 	const playlists: BrowseItem[] = [];
@@ -893,6 +928,27 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 			}
 		} catch (e) {
 			console.warn('[FMHY Playlist fetch error]', e);
+		}
+	}
+
+	// Support JioSaavn Lossless Playlists & Charts
+	if (id.startsWith('saavn_') || /^\d{7,15}$/.test(id)) {
+		try {
+			const { fetchSaavnPlaylist } = await import('./fmhy');
+			const songs = await fetchSaavnPlaylist(id);
+			if (songs.length > 0) {
+				return {
+					title: 'JioSaavn 320kbps Lossless Chart',
+					subtitle: `JioSaavn • ${songs.length} tracks`,
+					thumbnail: songs[0]?.thumbnail,
+					description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
+					items: songs,
+					owned: false,
+					collaborative: false
+				};
+			}
+		} catch (e) {
+			console.warn('[Saavn playlist fetch error]', e);
 		}
 	}
 

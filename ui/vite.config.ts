@@ -30,7 +30,13 @@ const fixHugeIconsPlugin = {
 export default defineConfig({
 	server: {
 		port: 5183,
-		strictPort: true
+		strictPort: true,
+		proxy: {
+			'/api': {
+				target: 'http://localhost:3000',
+				changeOrigin: true
+			}
+		}
 	},
 	plugins: [
 		fixHugeIconsPlugin,

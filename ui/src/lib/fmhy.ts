@@ -619,6 +619,91 @@ export function convertFmhyToSongItem(item: FmhyItem): SongItem {
 	} as SongItem;
 }
 
+export async function fetchSaavnSearch(query: string): Promise<SongItem[]> {
+	if (!query) return [];
+	try {
+		const res = await fetch(`/api/saavn/search?q=${encodeURIComponent(query)}`);
+		if (res.ok) {
+			const data = await res.json();
+			return (data.results || []).map((s: any) => ({
+				video_id: s.video_id || `saavn_${s.id}`,
+				title: s.title,
+				artists: s.artists,
+				artist_runs: [{ text: s.artists }],
+				album: s.album,
+				duration: s.duration,
+				thumbnail: s.thumbnail,
+				streamUrl: s.streamUrl,
+				is_video: false,
+				is_upload: false,
+				explicit: false
+			}));
+		}
+	} catch (e) {
+		console.warn('[fetchSaavnSearch error]', e);
+	}
+	return [];
+}
+
+export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; featured: BrowseItem[] }> {
+	try {
+		const res = await fetch('/api/saavn/trending');
+		if (res.ok) {
+			const data = await res.json();
+			const charts: BrowseItem[] = (data.charts || []).map((c: any) => ({
+				kind: 'playlist',
+				id: `saavn_${c.id}`,
+				title: c.title,
+				subtitle: `${c.subtitle} • 320kbps Lossless`,
+				thumbnail: c.thumbnail,
+				artistRuns: [{ text: 'JioSaavn' }],
+				isUpload: false,
+				explicit: false
+			}));
+			const featured: BrowseItem[] = (data.featured || []).map((f: any) => ({
+				kind: 'playlist',
+				id: `saavn_${f.id}`,
+				title: f.title,
+				subtitle: `${f.subtitle} • 320kbps Lossless`,
+				thumbnail: f.thumbnail,
+				artistRuns: [{ text: 'Featured' }],
+				isUpload: false,
+				explicit: false
+			}));
+			return { charts, featured };
+		}
+	} catch (e) {
+		console.warn('[fetchSaavnTrending error]', e);
+	}
+	return { charts: [], featured: [] };
+}
+
+export async function fetchSaavnPlaylist(playlistId: string): Promise<SongItem[]> {
+	const cleanId = playlistId.replace('saavn_', '');
+	try {
+		const res = await fetch(`/api/saavn/playlist?id=${encodeURIComponent(cleanId)}`);
+		if (res.ok) {
+			const data = await res.json();
+			return (data.songs || []).map((s: any) => ({
+				video_id: s.video_id || `saavn_${s.id}`,
+				title: s.title,
+				artists: s.artists,
+				artist_runs: [{ text: s.artists }],
+				album: s.album,
+				duration: s.duration,
+				thumbnail: s.thumbnail,
+				streamUrl: s.streamUrl,
+				is_video: false,
+				is_upload: false,
+				explicit: false
+			}));
+		}
+	} catch (e) {
+		console.warn('[fetchSaavnPlaylist error]', e);
+	}
+	return [];
+}
+
 export function getFmhyHomeSections(): HomeSection[] {
 	return [
 		{
@@ -643,3 +728,4 @@ export function getFmhyHomeSections(): HomeSection[] {
 		}
 	];
 }
+

@@ -436,9 +436,15 @@ class WebPlayer {
 			if (idx !== -1) playback.queue.currentIndex = idx;
 		}
 
-		// 1. Direct audio stream (e.g. SomaFM, Nightwave Plaza)
+		// 1. Direct audio stream (e.g. JioSaavn 320kbps lossless, SomaFM, Nightwave Plaza)
 		if ((item as any).streamUrl) {
-			this.isRadioStream = true;
+			if (item.duration === 'LIVE') {
+				this.isRadioStream = true;
+				this.usingDirectAudio = false;
+			} else {
+				this.isRadioStream = false;
+				this.usingDirectAudio = true;
+			}
 			this.playAudioDirect((item as any).streamUrl);
 			return;
 		}
