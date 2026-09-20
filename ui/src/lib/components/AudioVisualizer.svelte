@@ -3,30 +3,40 @@
 	import { playback, audioFx } from '$lib/player.svelte';
 	import { webPlayer } from '$lib/webplayer';
 
-	let { barsCount = 12, height = 24, class: className = '' }: { barsCount?: number; height?: number; class?: string } = $props();
+	let { barsCount = 6, height = 16, class: className = '' }: { barsCount?: number; height?: number; class?: string } = $props();
 
-	let levels = $state<number[]>([]);
+	let containerEl: HTMLDivElement | null = $state(null);
 	let animId: number | null = null;
+	let lastTime = 0;
 
-	$effect(() => {
-		levels = Array(barsCount).fill(12);
-	});
-
-	function tick() {
-		if (!playback.paused && playback.now && audioFx.visualizerEnabled) {
-			const data = webPlayer.getVisualizerData();
-			const count = barsCount || 12;
-			const step = Math.max(1, Math.floor(data.length / count));
-			const newLevels: number[] = [];
-			for (let i = 0; i < count; i++) {
-				const val = data[i * step] || 0;
-				// map 0-255 to percentage 10% - 100%
-				const pct = Math.max(12, Math.min(100, Math.floor((val / 255) * 100)));
-				newLevels.push(pct);
+	function tick(now: number) {
+		// Throttle visualizer to ~30 FPS to keep CPU usage at 0%
+		if (now - lastTime > 32) {
+			lastTime = now;
+			if (containerEl && !playback.paused && playback.now && audioFx.visualizerEnabled) {
+				const data = webPlayer.getVisualizerData();
+				const count = barsCount || 6;
+				const step = Math.max(1, Math.floor(data.length / count));
+				const children = containerEl.children;
+				for (let i = 0; i < count && i < children.length; i++) {
+					const val = data[i * step] || 0;
+					const pct = Math.max(15, Math.min(100, Math.floor((val / 255) * 100)));
+					const bar = children[i] as HTMLElement;
+					if (bar) {
+						bar.style.height = `${pct}%`;
+						bar.style.opacity = `${0.4 + (pct / 100) * 0.6}`;
+					}
+				}
+			} else if (containerEl) {
+				const children = containerEl.children;
+				for (let i = 0; i < children.length; i++) {
+					const bar = children[i] as HTMLElement;
+					if (bar) {
+						bar.style.height = '15%';
+						bar.style.opacity = '0.4';
+					}
+				}
 			}
-			levels = newLevels;
-		} else {
-			levels = Array(barsCount || 12).fill(12);
 		}
 		animId = requestAnimationFrame(tick);
 	}
@@ -40,11 +50,11 @@
 	});
 </script>
 
-<div class="flex items-end gap-[2px] {className}" style="height: {height}px;">
-	{#each levels as lvl, i (i)}
+<div bind:this={containerEl} class="flex items-end gap-[2px] {className}" style="height: {height}px;" aria-hidden="true">
+	{#each Array(barsCount || 6) as _, i (i)}
 		<div
-			class="w-[3px] rounded-full bg-primary transition-all duration-75"
-			style="height: {lvl}%; opacity: {0.4 + (lvl / 100) * 0.6};"
+			class="w-[3px] rounded-full bg-primary transition-all duration-100 ease-out"
+			style="height: 15%; opacity: 0.4;"
 		></div>
 	{/each}
 </div>

@@ -80,6 +80,7 @@
 						alt={artist.name}
 						class="relative size-full rounded-full object-cover shadow-md border-2 border-border/60 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary"
 						loading="lazy"
+						decoding="async"
 					/>
 
 					<!-- Verified Badge -->

@@ -62,7 +62,6 @@ class WebPlayer {
 					if (this.audio.duration && !isNaN(this.audio.duration)) {
 						playback.duration = this.audio.duration;
 					}
-					this.syncMediaSessionPosition();
 				}
 			});
 
@@ -372,7 +371,7 @@ class WebPlayer {
 					}
 				} catch {}
 			}
-		}, 100);
+		}, 250);
 	}
 
 
