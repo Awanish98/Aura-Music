@@ -1,7 +1,31 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+
+const fixHugeIconsPlugin = {
+	name: 'fix-hugeicons-case-sensitivity',
+	resolveId(source: string, importer: string | undefined) {
+		if (importer && importer.includes('@hugeicons/core-free-icons') && source.startsWith('./')) {
+			const dir = path.dirname(importer);
+			const requestedFile = source.slice(2);
+			const targetPath = path.resolve(dir, requestedFile);
+			if (!fs.existsSync(targetPath)) {
+				try {
+					const files = fs.readdirSync(dir);
+					const lower = requestedFile.toLowerCase();
+					const match = files.find((f) => f.toLowerCase() === lower);
+					if (match) {
+						return path.resolve(dir, match);
+					}
+				} catch {}
+			}
+		}
+		return null;
+	}
+};
 
 export default defineConfig({
 	server: {
@@ -9,6 +33,7 @@ export default defineConfig({
 		strictPort: true
 	},
 	plugins: [
+		fixHugeIconsPlugin,
 		{
 			name: 'echo-music-dev-proxy',
 			configureServer(server) {
