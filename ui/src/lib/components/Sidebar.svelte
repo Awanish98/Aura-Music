@@ -14,7 +14,9 @@
 		MusicNote01Icon,
 		ListRestartIcon,
 		SquareArrowLeft01Icon,
-		SquareArrowRight01Icon
+		SquareArrowRight01Icon,
+		FavouriteIcon,
+		CloudIcon
 	} from '@hugeicons/core-free-icons';
 	import { toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
@@ -37,8 +39,10 @@
 
 	const nav = $derived([
 		{ href: '/', label: t('nav.home'), icon: Home01Icon },
+		{ href: '/discover', label: t('nav.discover'), icon: FavouriteIcon },
 		{ href: '/search', label: t('nav.search'), icon: Search01Icon },
-		{ href: '/library', label: t('nav.library'), icon: LibraryIcon }
+		{ href: '/library', label: t('nav.library'), icon: LibraryIcon },
+		{ href: '/drive', label: 'Google Drive', icon: CloudIcon }
 	]);
 	const isActive = (href: string) =>
 		href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
@@ -104,7 +108,7 @@
 	)}"
 >
 	<div class="flex items-center justify-center px-2 py-2 {wide('lg:justify-between')}">
-		<span class="hidden font-heading text-lg font-bold tracking-tight {wide('lg:block')}">Limusic</span>
+		<span class="hidden font-heading text-lg font-bold tracking-tight {wide('lg:block')}">Echo Music</span>
 		<!-- Column when collapsed: the two buttons don't fit side by side in the 64px rail. -->
 		<div class="flex items-center gap-1 {collapsed ? 'flex-col' : ''}">
 			<Button

@@ -6,7 +6,7 @@ import { check, type Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { toast } from './player.svelte';
 import { t } from './i18n.svelte';
-import { canSelfUpdate, getSettings, openExternal, releaseNotes } from './api';
+import { canSelfUpdate, getSettings, openExternal, releaseNotes, isTauri } from './api';
 import { getVersion } from '@tauri-apps/api/app';
 
 const RELEASES_URL = 'https://github.com/SimoHypers/limusic/releases/latest';
@@ -37,24 +37,22 @@ function isNewer(a: string, b: string): boolean {
 }
 
 async function look(): Promise<boolean> {
+	if (!isTauri()) return false;
 	let u: Update | null;
 	try {
 		u = await check();
 	} catch (e) {
-		// The plugin resolves this platform's entry in latest.json BEFORE it compares versions, so a
-		// release whose manifest is missing the entry (a CI leg failed, or is still running) makes
-		// every check throw. The quiet check swallows that, which silently leaves the whole platform
-		// with no update prompt until some later release fixes the manifest. v0.6.6 shipped without
-		// `darwin-aarch64` and did exactly that to every Mac. So ask the releases API instead: it
-		// doesn't read the manifest. Nothing signed is reachable for us to install, so the banner
-		// can only offer the download page. If that call fails too (offline, rate-limited), its
-		// error propagates and the check reports as failed, which it did.
 		console.error('update manifest unusable, falling back to the releases API', e);
-		const latest = (await releaseNotes())[0]?.version;
-		if (!latest || !isNewer(latest, await getVersion())) return false;
-		updateState.canInstall = false;
-		updateState.available = { version: latest };
-		return true;
+		try {
+			const latest = (await releaseNotes())[0]?.version;
+			const currentVer = isTauri() ? await getVersion().catch(() => '0.7.4') : '0.7.4';
+			if (!latest || !isNewer(latest, currentVer)) return false;
+			updateState.canInstall = false;
+			updateState.available = { version: latest };
+			return true;
+		} catch {
+			return false;
+		}
 	}
 	if (u) {
 		pending = u;

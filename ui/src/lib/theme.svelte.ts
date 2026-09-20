@@ -13,10 +13,9 @@
 // and survives switching presets. Anything the user hasn't touched stays null and the preset shows
 // through — the customization is a set of overrides, not a rival theme to maintain.
 
-import { convertFileSrc } from '@tauri-apps/api/core';
 import { hexToHsv, isLight } from './color';
 import { artworkAccent, toAccent, warmAccent } from './artcolor';
-import { allowFontFile } from './api';
+import { allowFontFile, convertFileSrc } from './api';
 
 export type ThemeId =
 	| 'default'

@@ -2,7 +2,7 @@
 // its rounded corners. `chrome` says whether the compositor is drawing the frame instead of us.
 // One listener, initialized once by the root layout.
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { getSettings, onUiVisible } from '$lib/api';
+import { getSettings, onUiVisible, isTauri } from '$lib/api';
 import { setUiVisible } from '$lib/theme.svelte';
 
 /** Who draws the window frame. `off` = our custom titlebar owns it (the default), `on` = the
@@ -16,6 +16,7 @@ let started = false;
 export function initWin(): () => void {
 	if (started) return () => {};
 	started = true;
+	if (!isTauri()) return () => {};
 	const w = getCurrentWindow();
 	// The window is created hidden (tauri.conf.json) so the window-state plugin can restore the
 	// saved size before anything is on screen: it only restores once the webview is ready, so a

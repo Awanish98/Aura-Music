@@ -1,8 +1,7 @@
 // The app icon the user picked (#173). Rust owns the OS-facing surfaces (window, taskbar, tray);
 // this is only the copy the SPA draws in the titlebar, so the two never disagree.
 
-import { convertFileSrc } from '@tauri-apps/api/core';
-import { appIconPath, setAppIcon } from './api';
+import { appIconPath, setAppIcon, convertFileSrc, isTauri } from './api';
 import fallback from '$lib/assets/favicon.svg';
 
 export const appIcon = $state({ src: fallback });
@@ -12,6 +11,10 @@ export const appIcon = $state({ src: fallback });
  * and the webview would otherwise redraw the image it already has.
  */
 export async function loadAppIcon(): Promise<void> {
+	if (!isTauri()) {
+		appIcon.src = fallback;
+		return;
+	}
 	const path = await appIconPath();
 	appIcon.src = path ? `${convertFileSrc(path)}?v=${Date.now()}` : fallback;
 }

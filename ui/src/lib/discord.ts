@@ -140,5 +140,5 @@ export const BUTTON_LABELS: Record<string, string> = {
 	listen: 'Listen on YouTube Music',
 	album: 'View album',
 	artist: 'View artist',
-	app: 'Get Limusic'
+	app: 'Get Echo Music'
 };

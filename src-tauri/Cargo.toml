@@ -1,9 +1,10 @@
 [package]
-name = "limusic-app"
+name = "echo-music-app"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Limusic — desktop YouTube Music client"
+authors.workspace = true
+description = "Echo Music — desktop YouTube Music client by Jordan"
 rust-version = "1.80"
 
 [lib]

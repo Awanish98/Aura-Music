@@ -26,3 +26,5 @@ rustypipe_reports/
 /skills-lock.json
 /plans
 scripts/bench.sh
+client_secret*.json
+*.credentials.json

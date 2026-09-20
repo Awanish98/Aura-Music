@@ -2,18 +2,13 @@
 
 <img src="./assets/docs/limusic-github-image.png" alt="Limusic Banner" width="100%">
 
-# Limusic
+# Aura Music
 
-**A native desktop YouTube Music client. Rust + Tauri, ad-free, no Electron.**
+**A native desktop YouTube Music client made by Jordan. Rust + Tauri, ad-free, no Electron.**
 
 <p align="center">
-  <a href="https://github.com/SimoHypers/limusic/releases/latest"><img alt="GitHub Downloads" src="https://img.shields.io/github/downloads/SimoHypers/limusic/total?style=for-the-badge&label=DOWNLOADS&color=a4c400"></a>
-  <a href="https://github.com/SimoHypers/limusic/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/SimoHypers/limusic?display_name=release&style=for-the-badge&color=a10935"></a>
-  <img alt="License" src="https://img.shields.io/github/license/SimoHypers/limusic?style=for-the-badge&color=1881cc">
-  <a href="https://hosted.weblate.org/engage/limusic/"><img alt="Translation status" src="https://img.shields.io/weblate/progress/limusic?server=https%3A%2F%2Fhosted.weblate.org&style=for-the-badge&label=TRANSLATED&color=6a3fb5"></a>
-  <a href="https://simohypers.github.io/limusic/"><img alt="Website" src="https://img.shields.io/badge/WEBSITE-limusic-e5486e?style=for-the-badge"></a>
-  <a href="https://ko-fi.com/simohypers"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/KO--FI-support-ff5e5b?style=for-the-badge&logo=kofi&logoColor=white"></a>
-  <br>
+  <img alt="Developer" src="https://img.shields.io/badge/DEVELOPER-Jordan-e5486e?style=for-the-badge">
+  <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-1881cc?style=for-the-badge">
   <img alt="Linux" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
   <img alt="Windows" src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logoColor=white">
   <img alt="macOS" src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white">
@@ -21,10 +16,8 @@
   <img alt="Rust" src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white">
 </p>
 
-**Limusic** talks directly to YouTube's internal API and plays audio through libmpv: no bundled
-browser runtime, no backend server, no ads in the audio. It started as a desktop rebuild of the
-playback engine behind [Metrolist](https://github.com/mostafaalagamy/Metrolist), an Android
-YouTube Music client, and grew from there.
+**Aura Music** talks directly to YouTube's internal API and plays audio through libmpv: no bundled
+browser runtime, no backend server, no ads in the audio. Developed by **Jordan**.
 
 </div>
 
@@ -96,7 +89,7 @@ YouTube Music client, and grew from there.
 
 Both live in the title bar, next to the window controls.
 
-- **Last.fm**: click the Last.fm mark, approve Limusic in the browser tab that
+- **Last.fm**: click the Last.fm mark, approve Aura Music in the browser tab that
   opens, and you're connected for good. Tracks scrobble at the halfway point (or
   four minutes, whichever comes first), which is Last.fm's own rule. Click again
   to see the account or disconnect.

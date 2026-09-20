@@ -1,4 +1,4 @@
-import { convertFileSrc } from '@tauri-apps/api/core';
+import { convertFileSrc } from '$lib/api';
 
 // Rewrite a Google image URL to (about) the pixel size a slot actually renders, so WebKitGTK
 // doesn't decode a 544px (or 1080p) image for a 40px row. Only lh3/yt3 googleusercontent-style

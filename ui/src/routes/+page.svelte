@@ -338,7 +338,7 @@
 				<!-- An explicit "All" is the way out of a filter. Clicking the active chip again also
 				     clears it, but nobody discovers that, and nothing else on screen says you're filtered. -->
 				<button onclick={() => load(null)} class={chipClass(!selected)}>{t('common.all')}</button>
-				{#each chips as chip (chip.params)}
+				{#each chips as chip, i (chip.title + ':' + i)}
 					<button
 						onclick={() => load(selected === chip.params ? null : chip.params)}
 						class={chipClass(selected === chip.params)}
@@ -385,7 +385,7 @@
 		     gap-10, not gap-8: with a heading, a row of cards and no rule between them, shelves any
 		     closer than this stop reading as separate sections. -->
 		<div class="content-in flex flex-col gap-10">
-			{#each visible as block (block.id)}
+			{#each visible as block, i (block.id + ':' + i)}
 				{#if block.shelf}
 					<Shelf
 						title={block.shelf.title}

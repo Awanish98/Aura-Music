@@ -1,4 +1,5 @@
 import { getCurrentWebview } from '@tauri-apps/api/webview';
+import { isTauri } from '$lib/api';
 
 // Tauri's `zoomHotkeysEnabled` polyfill caps zoom-in at 1000%, which shreds the layout long before
 // it gets there (fixed chrome overlaps, the player bar eats the page). Same hotkeys, our own
@@ -20,9 +21,11 @@ export const zoom = $state({ level: 1 });
 export function setZoom(level: number) {
 	zoom.level = level;
 	localStorage.setItem(KEY, String(level));
-	getCurrentWebview()
-		.setZoom(level)
-		.catch(() => {});
+	if (isTauri()) {
+		getCurrentWebview()
+			.setZoom(level)
+			.catch(() => {});
+	}
 }
 
 /** Nearest index, so a level stored by an older build still steps somewhere sensible. */

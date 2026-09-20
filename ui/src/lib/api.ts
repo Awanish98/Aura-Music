@@ -1,8 +1,667 @@
 // The UI's only door to Rust. context/11 UI contract — commands in, events out. The UI never
 // touches YouTube; everything here is a Tauri command or event payload.
-import { invoke } from '@tauri-apps/api/core';
-import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { invoke as tauriInvoke, isTauri, convertFileSrc as tauriConvertFileSrc } from '@tauri-apps/api/core';
+import { listen as tauriListen, type UnlistenFn } from '@tauri-apps/api/event';
 import { t } from './i18n.svelte';
+
+export { isTauri };
+
+export const convertFileSrc = (filePath: string, protocol = 'asset') => {
+	if (isTauri()) {
+		try {
+			return tauriConvertFileSrc(filePath, protocol);
+		} catch {
+			return filePath;
+		}
+	}
+	return filePath;
+};
+
+const defaultSettings: Record<string, string> = {
+	theme: 'default',
+	custom_colors: 'false',
+	primary_color: '#ff5d8f',
+	background_color: '#1a1418',
+	theme_corners: 'rounded',
+	app_font: '',
+	artwork_accent: 'true',
+	tabbed_player: 'true',
+	stream_quality: 'high',
+	audio_normalization: 'true',
+	volume_step: '5',
+	synced_lyrics: 'true',
+	word_by_word_lyrics: 'true',
+	lyrics_provider: 'boidu',
+	music_videos: 'true',
+	discord_rpc: 'false',
+	lastfm_primary_artist: 'false',
+	lastfm_primary_strict: 'false',
+	blocked_artists: '[]',
+	autostart: 'false',
+	close_to_tray: 'true',
+	native_chrome: 'off',
+	update_banner: 'true',
+	proxy: '',
+	disabled_stream_clients: '[]',
+	stream_clients: '[]',
+	visitor_data: ''
+};
+
+export function getWebStorage<T>(key: string, defaultValue: T): T {
+	if (typeof window === 'undefined') return defaultValue;
+	try {
+		const val = localStorage.getItem(`echo_${key}`);
+		return val ? JSON.parse(val) : defaultValue;
+	} catch {
+		return defaultValue;
+	}
+}
+
+export function setWebStorage<T>(key: string, value: T): void {
+	if (typeof window === 'undefined') return;
+	try {
+		localStorage.setItem(`echo_${key}`, JSON.stringify(value));
+	} catch {}
+}
+
+interface WebPlaylist {
+	id: string;
+	title: string;
+	subtitle?: string;
+	description?: string;
+	thumbnail?: string;
+	trackCount: number;
+	items: SongItem[];
+	owned: boolean;
+	collaborative: boolean;
+}
+
+const mockHome: HomePage = {
+	chips: [
+		{ title: 'Relax', params: '' },
+		{ title: 'Workout', params: '' },
+		{ title: 'Focus', params: '' },
+		{ title: 'Energize', params: '' },
+		{ title: 'Commute', params: '' }
+	],
+	sections: [
+		{
+			title: 'Welcome to Echo Music',
+			items: [
+				{
+					kind: 'song',
+					id: 'demo1',
+					title: 'Starboy',
+					subtitle: 'The Weeknd • Starboy',
+					thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=300&fit=crop'
+				},
+				{
+					kind: 'song',
+					id: 'demo2',
+					title: 'Blinding Lights',
+					subtitle: 'The Weeknd • After Hours',
+					thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop'
+				},
+				{
+					kind: 'playlist',
+					id: 'demo3',
+					title: 'Today’s Hits',
+					subtitle: 'Echo Music • 50 songs',
+					thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
+				},
+				{
+					kind: 'album',
+					id: 'demo4',
+					title: 'After Hours',
+					subtitle: 'The Weeknd • 2020',
+					thumbnail: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=300&h=300&fit=crop'
+				}
+			]
+		},
+		{
+			title: 'Quick Picks',
+			items: [
+				{
+					kind: 'song',
+					id: 'demo5',
+					title: 'Save Your Tears',
+					subtitle: 'The Weeknd',
+					thumbnail: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300&h=300&fit=crop'
+				},
+				{
+					kind: 'song',
+					id: 'demo6',
+					title: 'Die For You',
+					subtitle: 'The Weeknd',
+					thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=300&fit=crop'
+				}
+			]
+		}
+	]
+};
+
+import * as ytmusic from './ytmusic';
+import { webPlayer } from './webplayer';
+import { playback } from './player.svelte';
+
+export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+	if (isTauri()) {
+		try {
+			return await tauriInvoke<T>(cmd, args);
+		} catch (e) {
+			console.warn(`[Tauri invoke error] ${cmd}:`, e);
+			throw e;
+		}
+	}
+	// Browser live YouTube Music API & WebPlayer integration
+	if (cmd === 'get_settings') {
+		const stored = getWebStorage<Record<string, string>>('settings', {});
+		return { ...defaultSettings, ...stored } as unknown as T;
+	}
+	if (cmd === 'set_setting') {
+		if (args?.key && args?.value !== undefined) {
+			const stored = getWebStorage<Record<string, string>>('settings', {});
+			stored[String(args.key)] = String(args.value);
+			setWebStorage('settings', stored);
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'get_playback') {
+		return {
+			now: playback.now,
+			paused: playback.paused,
+			position: playback.position,
+			duration: playback.duration,
+			volume: playback.volume
+		} as unknown as T;
+	}
+	if (cmd === 'get_home') {
+		try {
+			return (await ytmusic.fetchHome(args?.params as string | undefined)) as unknown as T;
+		} catch (e) {
+			console.warn('[ytmusic get_home fallback]', e);
+			return mockHome as unknown as T;
+		}
+	}
+	if (cmd === 'get_home_more') {
+		return (await ytmusic.fetchHomeMore(args?.token as string)) as unknown as T;
+	}
+	if (cmd === 'search') {
+		const res = await ytmusic.fetchSearch(args?.query as string);
+		return (res.songs || []).map((s) => ({
+			video_id: s.id,
+			title: s.title,
+			artists: s.subtitle || 'Unknown',
+			artist_runs: s.artistRuns,
+			thumbnail: s.thumbnail,
+			duration: s.duration,
+			explicit: s.explicit
+		})) as unknown as T;
+	}
+	if (cmd === 'search_all') {
+		return (await ytmusic.fetchSearchAll(args?.query as string)) as unknown as T;
+	}
+	if (cmd === 'search_cards') {
+		return (await ytmusic.fetchSearchCards(
+			args?.query as string,
+			args?.category as 'albums' | 'artists' | 'playlists'
+		)) as unknown as T;
+	}
+	if (cmd === 'search_suggest') {
+		return (await ytmusic.fetchSearchSuggest(args?.input as string)) as unknown as T;
+	}
+	if (cmd === 'get_artist') {
+		return (await ytmusic.fetchArtist(args?.id as string)) as unknown as T;
+	}
+	if (cmd === 'get_album') {
+		return (await ytmusic.fetchAlbum(args?.id as string)) as unknown as T;
+	}
+	if (cmd === 'get_playlist') {
+		const playlistId = String(args?.id || '');
+		if (playlistId === 'VLLM' || playlistId === 'FEmusic_liked_videos') {
+			const liked = getWebStorage<SongItem[]>('liked_songs', []);
+			return {
+				title: 'Liked Music',
+				subtitle: `Auto-playlist • ${liked.length} songs`,
+				thumbnail: liked[0]?.thumbnail,
+				description: 'Your favorite liked songs',
+				owned: false,
+				collaborative: false,
+				items: liked
+			} as unknown as T;
+		}
+		if (playlistId === 'LIMUSIC_ON_REPEAT' || playlistId === 'ECHO_ON_REPEAT') {
+			const hist = getWebStorage<SongItem[]>('history', []);
+			return {
+				title: 'On Repeat',
+				subtitle: `Auto-playlist • ${Math.min(hist.length, 50)} songs`,
+				thumbnail: hist[0]?.thumbnail,
+				description: 'Songs you replay often',
+				owned: false,
+				collaborative: false,
+				items: hist.slice(0, 50)
+			} as unknown as T;
+		}
+		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+		const localPl = playlists.find((p) => p.id === playlistId);
+		if (localPl) {
+			return {
+				title: localPl.title,
+				subtitle: localPl.subtitle || `Playlist • ${localPl.items.length} songs`,
+				thumbnail: localPl.thumbnail || localPl.items[0]?.thumbnail,
+				description: localPl.description,
+				owned: true,
+				collaborative: false,
+				items: localPl.items
+			} as unknown as T;
+		}
+		return (await ytmusic.fetchPlaylist(playlistId)) as unknown as T;
+	}
+	if (cmd === 'get_lyrics') {
+		return (await ytmusic.fetchLyrics(
+			args?.title as string,
+			(args?.artists || args?.artist) as string | undefined,
+			args?.album as string | undefined,
+			args?.duration as number | undefined,
+			args?.videoId as string | undefined
+		)) as unknown as T;
+	}
+	if (cmd === 'play') {
+		const item = args?.item as SongItem;
+		if (item) {
+			webPlayer.play(item);
+			// Record to history
+			const hist = getWebStorage<SongItem[]>('history', []);
+			const filtered = hist.filter((h) => h.video_id !== item.video_id);
+			setWebStorage('history', [item, ...filtered].slice(0, 200));
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'play_index') {
+		webPlayer.playIndex(args?.index as number);
+		return undefined as unknown as T;
+	}
+	if (cmd === 'play_playlist') {
+		webPlayer.playPlaylist(
+			args?.items as SongItem[],
+			args?.start as number | null,
+			args?.sourceName as string | undefined,
+			args?.shuffle as boolean | undefined
+		);
+		return undefined as unknown as T;
+	}
+	if (cmd === 'toggle_pause') {
+		webPlayer.togglePause();
+		return undefined as unknown as T;
+	}
+	if (cmd === 'seek') {
+		webPlayer.seek(args?.position as number);
+		return undefined as unknown as T;
+	}
+	if (cmd === 'set_volume') {
+		webPlayer.setVolume(args?.volume as number);
+		return undefined as unknown as T;
+	}
+	if (cmd === 'next_track') {
+		webPlayer.next();
+		return undefined as unknown as T;
+	}
+	if (cmd === 'prev_track') {
+		webPlayer.prev();
+		return undefined as unknown as T;
+	}
+	if (cmd === 'play_next') {
+		const items = (args?.items as SongItem[]) || [];
+		if (items.length) {
+			const q = playback.queue;
+			const idx = q.currentIndex + 1;
+			q.items.splice(idx, 0, ...items);
+			playback.queue = { ...q };
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'add_to_queue') {
+		const items = (args?.items as SongItem[]) || [];
+		if (items.length) {
+			const q = playback.queue;
+			q.items.push(...items);
+			playback.queue = { ...q };
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'remove_from_queue') {
+		const idx = args?.index as number;
+		if (idx !== undefined && idx >= 0) {
+			const q = playback.queue;
+			q.items.splice(idx, 1);
+			if (q.currentIndex >= q.items.length) {
+				q.currentIndex = Math.max(0, q.items.length - 1);
+			}
+			playback.queue = { ...q };
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'move_in_queue') {
+		const from = args?.from as number;
+		const to = args?.to as number;
+		if (from !== undefined && to !== undefined) {
+			const q = playback.queue;
+			const [item] = q.items.splice(from, 1);
+			if (item) {
+				q.items.splice(to, 0, item);
+				playback.queue = { ...q };
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'clear_queued') {
+		const q = playback.queue;
+		q.items = q.items.slice(0, q.currentIndex + 1);
+		playback.queue = { ...q };
+		return undefined as unknown as T;
+	}
+	if (cmd === 'toggle_shuffle') {
+		const q = playback.queue;
+		q.shuffle = !q.shuffle;
+		playback.queue = { ...q };
+		return undefined as unknown as T;
+	}
+	if (cmd === 'set_repeat') {
+		const q = playback.queue;
+		q.repeat = args?.mode as RepeatMode;
+		playback.queue = { ...q };
+		return undefined as unknown as T;
+	}
+	if (cmd === 'get_account') return { signedIn: false } as unknown as T;
+	if (cmd === 'get_queue') {
+		return {
+			items: playback.queue.items,
+			currentIndex: playback.queue.currentIndex,
+			shuffle: playback.queue.shuffle,
+			repeat: playback.queue.repeat,
+			sourceName: playback.queue.sourceName
+		} as unknown as T;
+	}
+	if (cmd === 'get_library') {
+		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+		const liked = getWebStorage<SongItem[]>('liked_songs', []);
+		const items: BrowseItem[] = [];
+		if (liked.length > 0) {
+			items.push({
+				kind: 'playlist',
+				id: 'VLLM',
+				title: 'Liked Music',
+				subtitle: `Auto-playlist • ${liked.length} songs`,
+				thumbnail: liked[0]?.thumbnail
+			});
+		}
+		for (const pl of playlists) {
+			items.push({
+				kind: 'playlist',
+				id: pl.id,
+				title: pl.title,
+				subtitle: `Playlist • ${pl.items.length} songs`,
+				thumbnail: pl.thumbnail || pl.items[0]?.thumbnail
+			});
+		}
+		return items as unknown as T;
+	}
+	if (cmd === 'get_library_albums') {
+		return getWebStorage<BrowseItem[]>('saved_albums', []) as unknown as T;
+	}
+	if (cmd === 'get_library_artists') {
+		return getWebStorage<BrowseItem[]>('saved_artists', []) as unknown as T;
+	}
+	if (cmd === 'get_upload_albums') return [] as unknown as T;
+	if (cmd === 'get_browse_grid') return [] as unknown as T;
+	if (cmd === 'get_history') {
+		return getWebStorage<SongItem[]>('history', []) as unknown as T;
+	}
+	if (cmd === 'get_saved_accounts') return [] as unknown as T;
+	if (cmd === 'get_google_accounts') return [] as unknown as T;
+	if (cmd === 'playlist_index') {
+		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+		const map: Record<string, string[]> = {};
+		for (const pl of playlists) {
+			for (const tr of pl.items) {
+				if (!map[tr.video_id]) map[tr.video_id] = [];
+				map[tr.video_id].push(pl.id);
+			}
+		}
+		return map as unknown as T;
+	}
+	if (cmd === 'sync_playlist_index') return {} as unknown as T;
+	if (cmd === 'play_counts') return {} as unknown as T;
+	if (cmd === 'create_playlist') {
+		const id = `local_pl_${Date.now()}`;
+		const title = String(args?.title || 'New Playlist');
+		const desc = String(args?.description || '');
+		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+		const newPl: WebPlaylist = {
+			id,
+			title,
+			subtitle: 'Playlist • 0 songs',
+			description: desc,
+			trackCount: 0,
+			items: [],
+			owned: true,
+			collaborative: false
+		};
+		setWebStorage('playlists', [newPl, ...playlists]);
+		return id as unknown as T;
+	}
+	if (cmd === 'add_to_playlist') {
+		const playlistId = String(args?.playlistId || args?.id || '');
+		const track = (args?.item as SongItem) || (args?.items as SongItem[])?.[0];
+		if (playlistId && track) {
+			const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+			const target = playlists.find((p) => p.id === playlistId);
+			if (target) {
+				target.items.push(track);
+				target.trackCount = target.items.length;
+				if (!target.thumbnail && track.thumbnail) target.thumbnail = track.thumbnail;
+				setWebStorage('playlists', playlists);
+			}
+		}
+		return true as unknown as T;
+	}
+	if (cmd === 'remove_from_playlist') {
+		const playlistId = String(args?.playlistId || args?.id || '');
+		const videoId = String(args?.videoId || args?.setVideoId || '');
+		const index = args?.index as number | undefined;
+		if (playlistId) {
+			const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+			const target = playlists.find((p) => p.id === playlistId);
+			if (target) {
+				if (index !== undefined && index >= 0) {
+					target.items.splice(index, 1);
+				} else if (videoId) {
+					target.items = target.items.filter((t) => t.video_id !== videoId && t.set_video_id !== videoId);
+				}
+				target.trackCount = target.items.length;
+				setWebStorage('playlists', playlists);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'delete_playlist') {
+		const playlistId = String(args?.id || args?.playlistId || '');
+		if (playlistId) {
+			const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+			setWebStorage(
+				'playlists',
+				playlists.filter((p) => p.id !== playlistId)
+			);
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'edit_playlist_details') {
+		const playlistId = String(args?.id || args?.playlistId || '');
+		const title = args?.title ? String(args.title) : undefined;
+		const description = args?.description !== undefined ? String(args.description) : undefined;
+		if (playlistId) {
+			const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
+			const target = playlists.find((p) => p.id === playlistId);
+			if (target) {
+				if (title) target.title = title;
+				if (description !== undefined) target.description = description;
+				setWebStorage('playlists', playlists);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'rate') {
+		const videoId = String(args?.videoId || '');
+		const rating = args?.rating as Rating;
+		if (videoId) {
+			const ratings = getWebStorage<Record<string, Rating>>('ratings', {});
+			ratings[videoId] = rating;
+			setWebStorage('ratings', ratings);
+
+			const liked = getWebStorage<SongItem[]>('liked_songs', []);
+			if (rating === 'like') {
+				if (!liked.some((s) => s.video_id === videoId)) {
+					const song =
+						(playback.now && playback.now.videoId === videoId
+							? ({
+									video_id: playback.now.videoId,
+									title: playback.now.title,
+									artists: playback.now.artists,
+									artist_id: playback.now.artistId,
+									artist_runs: playback.now.artistRuns,
+									thumbnail: playback.now.thumbnail,
+									duration: playback.now.duration
+								} as SongItem)
+							: null) ||
+						playback.queue.items.find((i) => i.video_id === videoId) ||
+						({ video_id: videoId, title: 'Liked Track', artists: 'Unknown' } as SongItem);
+					setWebStorage('liked_songs', [song, ...liked]);
+				}
+			} else {
+				setWebStorage(
+					'liked_songs',
+					liked.filter((s) => s.video_id !== videoId)
+				);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'set_song_saved') {
+		const song = args?.song as SongItem;
+		const saved = args?.saved as boolean;
+		if (song) {
+			const liked = getWebStorage<SongItem[]>('liked_songs', []);
+			if (saved) {
+				if (!liked.some((s) => s.video_id === song.video_id)) {
+					setWebStorage('liked_songs', [song, ...liked]);
+				}
+			} else {
+				setWebStorage(
+					'liked_songs',
+					liked.filter((s) => s.video_id !== song.video_id)
+				);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'set_album_saved') {
+		const album = args?.album as BrowseItem;
+		const saved = args?.saved as boolean;
+		if (album) {
+			const albums = getWebStorage<BrowseItem[]>('saved_albums', []);
+			if (saved) {
+				if (!albums.some((a) => a.id === album.id)) {
+					setWebStorage('saved_albums', [album, ...albums]);
+				}
+			} else {
+				setWebStorage(
+					'saved_albums',
+					albums.filter((a) => a.id !== album.id)
+				);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'subscribe') {
+		const artist = args?.artist as BrowseItem;
+		const subscribed = args?.subscribed as boolean;
+		if (artist) {
+			const artists = getWebStorage<BrowseItem[]>('saved_artists', []);
+			if (subscribed) {
+				if (!artists.some((a) => a.id === artist.id)) {
+					setWebStorage('saved_artists', [artist, ...artists]);
+				}
+			} else {
+				setWebStorage(
+					'saved_artists',
+					artists.filter((a) => a.id !== artist.id)
+				);
+			}
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'app_icon_path') return null as unknown as T;
+	if (cmd === 'get_stream_clients') return [] as unknown as T;
+	if (cmd === 'get_blocked_artists') {
+		return getWebStorage<string[]>('blocked_artists', []) as unknown as T;
+	}
+	if (cmd === 'block_artist') {
+		const id = String(args?.channelId || args?.artist || '');
+		if (id) {
+			const blocked = getWebStorage<string[]>('blocked_artists', []);
+			if (!blocked.includes(id)) {
+				blocked.push(id);
+				setWebStorage('blocked_artists', blocked);
+			}
+			return blocked as unknown as T;
+		}
+		return [] as unknown as T;
+	}
+	if (cmd === 'unblock_artist') {
+		const id = String(args?.channelId || args?.artist || '');
+		if (id) {
+			const blocked = getWebStorage<string[]>('blocked_artists', []).filter((b) => b !== id);
+			setWebStorage('blocked_artists', blocked);
+			return blocked as unknown as T;
+		}
+		return [] as unknown as T;
+	}
+	if (cmd === 'start_radio') return undefined as unknown as T;
+	if (cmd === 'set_playlist_sort') return undefined as unknown as T;
+	if (cmd === 'set_playlist_cover') return {} as unknown as T;
+	if (cmd === 'add_local_folder' || cmd === 'remove_local_folder' || cmd === 'get_local_library')
+		return { folders: [], albums: [], artists: [], songs: [], removed: [] } as unknown as T;
+	if (cmd === 'lastfm_status') return { connected: false } as unknown as T;
+	if (cmd === 'lt_get_state')
+		return {
+			status: 'disconnected',
+			role: 'none',
+			requesting: false,
+			roomCode: null,
+			myId: null,
+			serverUrl: 'wss://sync.echomusic.local',
+			users: [],
+			currentTrack: null,
+			queue: [],
+			pendingJoins: [],
+			suggestions: []
+		} as unknown as T;
+	if (cmd === 'can_self_update') return false as unknown as T;
+	if (cmd === 'release_notes') return [] as unknown as T;
+	if (cmd === 'diagnostics') return 'Echo Music Web Mode' as unknown as T;
+	if (cmd === 'diagnostics_summary') return 'Echo Music Web Mode' as unknown as T;
+	return undefined as unknown as T;
+}
+
+export async function listen<T>(
+	event: string,
+	handler: (event: { payload: T }) => void
+): Promise<UnlistenFn> {
+	if (isTauri()) {
+		return tauriListen<T>(event, handler);
+	}
+	return () => {};
+}
 
 /** How the signed-in user rated a track (innertube `Rating`). The three states are mutually
  *  exclusive: liking a disliked track clears the dislike, and vice versa. */

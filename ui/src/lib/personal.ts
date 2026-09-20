@@ -263,13 +263,14 @@ export function markSynced(p: Personal, ids: string[]) {
  */
 export function mergeSaved(
 	p: Personal,
-	items: BrowseItem[],
+	items: BrowseItem[] | undefined | null,
 	kind: BrowseItem['kind']
 ): BrowseItem[] {
-	const local = p.saved.filter((s) => s.kind === kind);
-	if (!local.length) return items;
-	const have = new Set(items.map((i) => i.id));
-	return [...local.filter((s) => !have.has(s.id)), ...items];
+	const safeItems = Array.isArray(items) ? items : [];
+	const local = p?.saved ? p.saved.filter((s) => s.kind === kind) : [];
+	if (!local.length) return safeItems;
+	const have = new Set(safeItems.map((i) => i.id));
+	return [...local.filter((s) => !have.has(s.id)), ...safeItems];
 }
 
 // --- Sidebar pins + ordering -------------------------------------------------------------------
@@ -289,16 +290,17 @@ export function togglePin(p: Personal, id: string): 'pinned' | 'unpinned' | 'ful
  * the backend's order). Pinned ids are resolved through the live list and excluded from the tail,
  * so a playlist can never appear twice and a pin left over from a deleted playlist just vanishes.
  */
-export function orderLibrary(items: BrowseItem[], p: Personal): BrowseItem[] {
-	const byId = new Map(items.map((i) => [i.id, i]));
-	const pinned = p.pins.map((id) => byId.get(id)).filter((i): i is BrowseItem => !!i);
+export function orderLibrary(items: BrowseItem[] | undefined | null, p: Personal): BrowseItem[] {
+	const safeItems = Array.isArray(items) ? items : [];
+	const byId = new Map(safeItems.map((i) => [i.id, i]));
+	const pinned = (p?.pins || []).map((id) => byId.get(id)).filter((i): i is BrowseItem => !!i);
 	const pinnedIds = new Set(pinned.map((i) => i.id));
-	const rest = items
+	const rest = safeItems
 		.map((item, index) => ({ item, index }))
 		.filter(({ item }) => !pinnedIds.has(item.id))
 		.sort(
 			(a, b) =>
-				(p.recent[b.item.id]?.at ?? 0) - (p.recent[a.item.id]?.at ?? 0) || a.index - b.index
+				(p?.recent?.[b.item.id]?.at ?? 0) - (p?.recent?.[a.item.id]?.at ?? 0) || a.index - b.index
 		)
 		.map(({ item }) => item);
 	return [...pinned, ...rest];

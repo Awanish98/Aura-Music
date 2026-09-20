@@ -174,14 +174,14 @@ fn install_kind(app: &AppHandle) -> &'static str {
 
 /// The log to include: this run, preceded by the previous one when this run has barely started.
 fn log_text(dir: &Path, budget: usize) -> String {
-    let current = dir.join("limusic.log");
-    let previous = dir.join("limusic.log.1");
+    let current = dir.join("echo-music.log");
+    let previous = dir.join("echo-music.log.1");
     let mut text = String::new();
     if std::fs::metadata(&current).map(|m| m.len()).unwrap_or(0) < FRESH_LOG_BYTES {
         if let Some(t) = tail(&previous, budget / 2) {
-            text.push_str("=== previous run (limusic.log.1) ===\n");
+            text.push_str("=== previous run (echo-music.log.1) ===\n");
             text.push_str(&t);
-            text.push_str("\n=== this run (limusic.log) ===\n");
+            text.push_str("\n=== this run (echo-music.log) ===\n");
         }
     }
     let left = budget.saturating_sub(text.len());

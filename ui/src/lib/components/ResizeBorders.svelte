@@ -6,6 +6,7 @@
 	// whenever a system frame is drawing its own (win.chrome), where ours would sit on top of the
 	// real ones and swallow the grab.
 	import { getCurrentWindow } from '@tauri-apps/api/window';
+	import { isTauri } from '$lib/api';
 	import { win } from '$lib/win.svelte';
 	import { ui } from '$lib/player.svelte';
 
@@ -19,10 +20,10 @@
 		| 'SouthEast'
 		| 'SouthWest';
 
-	const w = getCurrentWindow();
+	const w = isTauri() ? getCurrentWindow() : null;
 
 	function start(e: MouseEvent, dir: Dir) {
-		if (e.button !== 0) return;
+		if (e.button !== 0 || !w) return;
 		e.preventDefault();
 		w.startResizeDragging(dir).catch(() => {});
 	}

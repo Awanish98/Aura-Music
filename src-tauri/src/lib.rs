@@ -147,8 +147,8 @@ fn init_logging(dir: &std::path::Path) {
         tracing_subscriber::EnvFilter::try_from_default_env()
             .unwrap_or_else(|_| "info,app_lib=debug".into())
     };
-    let path = dir.join("limusic.log");
-    let _ = std::fs::rename(&path, dir.join("limusic.log.1"));
+    let path = dir.join("echo-music.log");
+    let _ = std::fs::rename(&path, dir.join("echo-music.log.1"));
     // ponytail: one file per launch, no size cap. A run long enough to matter is a run whose log
     // someone wants anyway; add rotation if that stops being true.
     let file = std::fs::File::create(&path).ok().map(std::sync::Mutex::new);
@@ -300,9 +300,20 @@ pub fn run() {
             let cache_dir = data_dir.join("audio-cache");
             std::fs::create_dir_all(&cache_dir).ok();
 
-            // Shared: the PoToken generator persists its session token through the same file,
-            // and it is built before AppState takes ownership of everything else.
-            let db = Arc::new(Db::open(&data_dir.join("limusic.sqlite")).expect("open sqlite"));
+            let sqlite_path = if data_dir.join("echo-music.sqlite").exists() {
+                data_dir.join("echo-music.sqlite")
+            } else if data_dir.join("aura-music.sqlite").exists() {
+                // Migrate from aura-music.sqlite
+                let _ = std::fs::rename(data_dir.join("aura-music.sqlite"), data_dir.join("echo-music.sqlite"));
+                data_dir.join("echo-music.sqlite")
+            } else if data_dir.join("limusic.sqlite").exists() {
+                // Migrate from limusic.sqlite
+                let _ = std::fs::rename(data_dir.join("limusic.sqlite"), data_dir.join("echo-music.sqlite"));
+                data_dir.join("echo-music.sqlite")
+            } else {
+                data_dir.join("echo-music.sqlite")
+            };
+            let db = Arc::new(Db::open(&sqlite_path).expect("open sqlite"));
 
             // Session bootstrap (context/15 startup ordering): load the persisted login session
             // (cookie/dataSyncId/visitorData) from settings; fetch visitorData anonymously
