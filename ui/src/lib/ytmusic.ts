@@ -17,15 +17,131 @@ import type {
 } from './api';
 
 async function post(endpoint: string, body: Record<string, unknown> = {}): Promise<any> {
-	const res = await fetch(`/api/yt-music/${endpoint}`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body)
-	});
-	if (!res.ok) {
-		throw new Error(`YouTube API request failed: ${res.status} ${res.statusText}`);
+	// 1. Try local proxy endpoint first (works in vite dev server)
+	try {
+		const res = await fetch(`/api/yt-music/${endpoint}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body)
+		});
+		if (res.ok) {
+			const text = await res.text();
+			if (text.startsWith('{') || text.startsWith('[')) {
+				return JSON.parse(text);
+			}
+		}
+	} catch {}
+
+	// 2. Direct CORS proxy fallback to YouTube Music InnerTube
+	const payload = {
+		context: {
+			client: {
+				clientName: 'WEB_REMIX',
+				clientVersion: '1.20240101.01.00',
+				hl: 'en',
+				gl: 'IN'
+			}
+		},
+		...body
+	};
+
+	const proxies = [
+		`https://corsproxy.io/?url=${encodeURIComponent(`https://music.youtube.com/youtubei/v1/${endpoint}?prettyPrint=false`)}`
+	];
+
+	for (const proxyUrl of proxies) {
+		try {
+			const res = await fetch(proxyUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-YouTube-Client-Name': '67',
+					'X-YouTube-Client-Version': '1.20240101.01.00'
+				},
+				body: JSON.stringify(payload)
+			});
+			if (res.ok) {
+				const data = await res.json();
+				return data;
+			}
+		} catch {}
 	}
-	return res.json();
+
+	// 3. If search endpoint, fallback to Invidious search
+	if (endpoint === 'search' && body.query) {
+		const q = encodeURIComponent(String(body.query));
+		const invidiousEndpoints = [
+			`https://invidious.jing.rocks/api/v1/search?q=${q}&type=video`,
+			`https://inv.nadeko.net/api/v1/search?q=${q}&type=video`
+		];
+		for (const invUrl of invidiousEndpoints) {
+			try {
+				const res = await fetch(invUrl);
+				if (res.ok) {
+					const items = await res.json();
+					if (Array.isArray(items) && items.length > 0) {
+						return {
+							contents: {
+								tabbedSearchResultsRenderer: {
+									tabs: [
+										{
+											tabRenderer: {
+												content: {
+													sectionListRenderer: {
+														contents: [
+															{
+																musicShelfRenderer: {
+																	contents: items.slice(0, 20).map((it: any) => ({
+																		musicResponsiveListItemRenderer: {
+																			flexColumns: [
+																				{
+																					musicResponsiveListItemFlexColumnRenderer: {
+																						text: { runs: [{ text: it.title || it.name }] }
+																					}
+																				},
+																				{
+																					musicResponsiveListItemFlexColumnRenderer: {
+																						text: { runs: [{ text: it.author || it.uploaderName || 'Artist' }] }
+																					}
+																				}
+																			],
+																			thumbnail: {
+																				musicThumbnailRenderer: {
+																					thumbnail: {
+																						thumbnails: [
+																							{
+																								url:
+																									it.videoThumbnails?.[0]?.url ||
+																									it.thumbnail ||
+																									`https://i.ytimg.com/vi/${it.videoId || it.url?.replace('/watch?v=', '')}/hqdefault.jpg`
+																							}
+																						]
+																					}
+																				}
+																			},
+																			playlistItemData: {
+																				videoId: it.videoId || (it.url ? it.url.replace('/watch?v=', '') : '')
+																			}
+																		}
+																	}))
+																}
+															}
+														]
+													}
+												}
+											}
+										}
+									]
+								}
+							}
+						};
+					}
+				}
+			} catch {}
+		}
+	}
+
+	throw new Error(`YouTube API request failed for endpoint: ${endpoint}`);
 }
 
 function getText(node: any): string | undefined {

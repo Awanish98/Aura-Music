@@ -34,6 +34,7 @@ import SplitText from '@/components/SplitText'
 import AnimatedContent from '@/components/AnimatedContent'
 import FadeContent from '@/components/FadeContent'
 import SpotlightCard from '@/components/SpotlightCard'
+import OnlinePlayer from '@/components/OnlinePlayer'
 import { useGitHub, detectOS, REPO_URL, RELEASES_URL } from '@/lib/github'
 
 import logo from '@/assets/logo.png'
@@ -158,11 +159,12 @@ function Nav({ stars }: { stars: number | null }) {
           Aura Music
         </a>
         <div className="ml-auto hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
+          <a href="#online-player" className="text-primary-bright font-medium transition-colors hover:text-foreground">🎧 Stream Online</a>
           <a href="#features" className="transition-colors hover:text-foreground">Features</a>
           <a href="#screens" className="transition-colors hover:text-foreground">Screens</a>
           <a href="#download" className="transition-colors hover:text-foreground">Download</a>
-          <a href="./app/" className="flex items-center gap-1.5 rounded-full bg-primary/20 text-primary hover:bg-primary/30 px-3 py-1 font-semibold transition-colors">
-            ✨ Web Player
+          <a href="./app/" className="flex items-center gap-1.5 rounded-full bg-primary/20 text-primary hover:bg-primary/30 px-3.5 py-1 font-semibold transition-colors">
+            📱 Mobile App
           </a>
         </div>
         <a
@@ -221,11 +223,17 @@ function Hero({ version, downloadHref, osLabel }: { version: string | null; down
         <FadeContent duration={900} delay={650}>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="./app/"
+              href="#online-player"
               className="flex items-center gap-2.5 rounded-full bg-primary-bright px-7 py-3.5 font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105 active:scale-95"
             >
               <HugeiconsIcon icon={PlayIcon} size={20} strokeWidth={2} fill="currentColor" />
-              Launch Web App
+              Stream Online Now
+            </a>
+            <a
+              href="./app/"
+              className="flex items-center gap-2.5 rounded-full border border-primary-bright/40 bg-primary/10 px-7 py-3.5 font-medium text-primary-bright transition-colors hover:border-primary-bright hover:bg-primary/20"
+            >
+              📱 Mobile App (PWA)
             </a>
             <a
               href={downloadHref}
@@ -233,15 +241,6 @@ function Hero({ version, downloadHref, osLabel }: { version: string | null; down
             >
               <HugeiconsIcon icon={MusicNote01Icon} size={20} strokeWidth={2} />
               Download for {osLabel}
-            </a>
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2.5 rounded-full border border-white/15 px-7 py-3.5 font-medium transition-colors hover:border-white/30 hover:bg-white/5"
-            >
-              <HugeiconsIcon icon={GithubIcon} size={20} strokeWidth={2} />
-              GitHub
             </a>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
@@ -492,6 +491,7 @@ export default function App() {
       <Nav stars={info.stars} />
       <main>
         <Hero version={info.version} downloadHref={downloadHref} osLabel={osLabel} />
+        <OnlinePlayer />
         <Features />
         <Screens />
         <Download info={info} os={os} />
