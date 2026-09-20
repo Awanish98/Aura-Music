@@ -108,6 +108,63 @@ export function setSleepTimer(minutes: number | 'end' | null) {
 	}, 1000);
 }
 
+export type EqPreset = 'flat' | 'bass_boost' | 'vocal' | 'treble' | 'acoustic' | 'electronic' | 'rock' | 'classical';
+
+export const EQ_PRESETS: Record<EqPreset, { name: string; bass: number; mid: number; treble: number; desc: string }> = {
+	bass_boost: { name: 'Bass Boost', bass: 8, mid: -1, treble: 2, desc: 'Deep punchy sub-bass & enhanced low end' },
+	vocal: { name: 'Vocal Booster', bass: -2, mid: 6, treble: 3, desc: 'Crisp & clear vocals, ideal for acoustic & podcasts' },
+	electronic: { name: 'Electronic / EDM', bass: 7, mid: 0, treble: 6, desc: 'High energy kicks, synth shimmer & drops' },
+	acoustic: { name: 'Acoustic & Indie', bass: 3, mid: 4, treble: 3, desc: 'Warm acoustic strings and natural tone' },
+	rock: { name: 'Rock / Metal', bass: 6, mid: -2, treble: 7, desc: 'Aggressive guitars and crisp cymbals' },
+	treble: { name: 'Treble Booster', bass: -3, mid: 1, treble: 8, desc: 'Maximum brightness and clarity' },
+	classical: { name: 'Classical & Symphony', bass: 3, mid: 2, treble: 5, desc: 'Balanced orchestral stage dynamics' },
+	flat: { name: 'Flat / Studio Direct', bass: 0, mid: 0, treble: 0, desc: 'Pure uncolored audio reproduction' }
+};
+
+export const audioFx = $state({
+	eqOpen: false,
+	eqPreset: 'bass_boost' as EqPreset,
+	bass: 8,
+	mid: -1,
+	treble: 2,
+	audioQuality: (browser ? localStorage.getItem('aura_audio_quality') || '320k' : '320k') as '320k' | '160k' | '128k' | '64k',
+	visualizerEnabled: true
+});
+
+export function setEqPreset(preset: EqPreset) {
+	const p = EQ_PRESETS[preset];
+	if (p) {
+		audioFx.eqPreset = preset;
+		audioFx.bass = p.bass;
+		audioFx.mid = p.mid;
+		audioFx.treble = p.treble;
+		if (browser) {
+			import('./webplayer').then(({ webPlayer }) => {
+				webPlayer.updateEq(audioFx.bass, audioFx.mid, audioFx.treble);
+			});
+		}
+	}
+}
+
+export function setEqBands(bass: number, mid: number, treble: number) {
+	audioFx.bass = bass;
+	audioFx.mid = mid;
+	audioFx.treble = treble;
+	if (browser) {
+		import('./webplayer').then(({ webPlayer }) => {
+			webPlayer.updateEq(bass, mid, treble);
+		});
+	}
+}
+
+export function setAudioQuality(q: '320k' | '160k' | '128k' | '64k') {
+	audioFx.audioQuality = q;
+	if (browser) {
+		localStorage.setItem('aura_audio_quality', q);
+		toast.success(`Audio quality: ${q === '320k' ? '320kbps Lossless Ultra' : q === '160k' ? '160kbps High' : q === '128k' ? '128kbps Standard' : 'Data Saver'}`);
+	}
+}
+
 export function setPlaybackSpeed(speed: number) {
 	playback.speed = speed;
 	api.setSpeed(speed).catch(() => {});

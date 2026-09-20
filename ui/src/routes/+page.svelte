@@ -17,6 +17,10 @@
 	import FamiliarArtists from '$lib/components/FamiliarArtists.svelte';
 	import HomeLayoutDialog from '$lib/components/HomeLayoutDialog.svelte';
 	import TrackRowSkeleton from '$lib/components/TrackRowSkeleton.svelte';
+	import FeaturedArtistsRail from '$lib/components/FeaturedArtistsRail.svelte';
+	import LiveRadiosShelf from '$lib/components/LiveRadiosShelf.svelte';
+	import MoodsGrid from '$lib/components/MoodsGrid.svelte';
+	import { getFmhyHomeSections } from '$lib/fmhy';
 	import * as api from '$lib/api';
 	import type { BrowseItem, HomeChip, HomePage, HomeSection } from '$lib/api';
 	import {
@@ -50,6 +54,8 @@
 	let selected = $state<string | null>(null);
 	let loadingMore = $state(false);
 	let moreError = $state(false);
+
+	const fmhySections = $derived(getFmhyHomeSections());
 
 	// Google Drive Personal Music
 	let gdriveSongs = $state<api.SongItem[]>([]);
@@ -367,13 +373,14 @@
 		</div>
 	{/if}
 	<div class="px-6 pb-6 pt-6">
-		<!-- Zone one: what's yours. The grid you arranged, above the rule that separates it from
-		     everything the app or YouTube chose. It steps aside entirely while a mood filter is
-		     active: none of it is filterable, and neither is the arrangement it edits. -->
+		<!-- Zone one: what's yours + curated rich music content -->
 		{#if !selected}
-			<div class="mb-10 border-b pb-8 space-y-8">
+			<div class="mb-10 border-b pb-8 space-y-10">
 				<Shortcuts onEdit={() => (editing = true)} />
 				<AiVibeGenerator />
+				<FeaturedArtistsRail />
+				<MoodsGrid />
+				<LiveRadiosShelf />
 			</div>
 		{/if}
 		{#snippet shelfSkeletons(n: number)}
@@ -438,21 +445,21 @@
 			{:else if error}
 				<ErrorState message={error} onRetry={() => load(selected)} />
 			{:else if !home?.sections.length}
-				<!-- A dead end needs a way out, not a sentence. Signed out, that's the sign-in that fills
-				     this page; signed in, an empty feed is a bad response and retrying usually fixes it. -->
-				<div class="flex flex-col items-center gap-3 py-20 text-center">
-					<HugeiconsIcon icon={MusicNote01Icon} class="h-8 w-8 text-muted-foreground/40" />
-					<p class="max-w-sm text-sm text-muted-foreground">
-						{auth.account?.signedIn
-							? t('home.feed_empty')
-							: t('home.signed_out_hint')}
-					</p>
-					{#if auth.account?.signedIn}
-						<Button variant="outline" size="sm" onclick={() => load(selected)}>{t('common.try_again')}</Button>
-					{:else}
-						<Button size="sm" onclick={() => api.loginWebview()}>{t('common.sign_in_google')}</Button>
-					{/if}
+				<!-- FMHY Curated Shelves fallback when signed out or empty YouTube feed -->
+				<div class="space-y-10">
+					{#each fmhySections as sec}
+						<Shelf title={sec.title} items={sec.items} queueAll={false} />
+					{/each}
 				</div>
+				{#if !auth.account?.signedIn}
+					<div class="flex flex-col items-center gap-3 py-10 text-center border-t border-border/40 mt-6">
+						<HugeiconsIcon icon={MusicNote01Icon} class="h-8 w-8 text-muted-foreground/40" />
+						<p class="max-w-sm text-sm text-muted-foreground">
+							{t('home.signed_out_hint')}
+						</p>
+						<Button size="sm" onclick={() => api.loginWebview()}>{t('common.sign_in_google')}</Button>
+					</div>
+				{/if}
 			{:else if home.continuation}
 				{#if moreError}
 					<div class="p-3 text-center">

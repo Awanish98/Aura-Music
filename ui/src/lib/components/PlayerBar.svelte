@@ -19,7 +19,8 @@
 		MaximizeScreenIcon,
 		MusicNote01Icon,
 		ArrowUp01Icon,
-		ArrowDown01Icon
+		ArrowDown01Icon,
+		AudioWave02Icon
 	} from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -29,6 +30,7 @@
 		np,
 		playback,
 		ui,
+		audioFx,
 		commitVolume,
 		cycleRepeat,
 		dragVolume,
@@ -42,7 +44,11 @@
 	import ArtistLine from './ArtistLine.svelte';
 	import Marquee from './Marquee.svelte';
 	import TrackMenu from './TrackMenu.svelte';
+	import EqualizerDialog from './EqualizerDialog.svelte';
+	import AudioVisualizer from './AudioVisualizer.svelte';
 	import { t } from '$lib/i18n.svelte';
+
+	let showEq = $state(false);
 
 	let {
 		onToggleQueue,
@@ -289,6 +295,7 @@
 						>
 							{isCloud ? 'Cloud' : isLive ? 'Live' : 'Lossless'}
 						</span>
+						<AudioVisualizer height={14} barsCount={6} class="hidden 2xl:flex ml-1 text-primary" />
 					{/if}
 				</div>
 			</div>
@@ -467,6 +474,16 @@
 					<HugeiconsIcon icon={MaximizeScreenIcon} class="h-5 w-5 {ui.videoMode !== 'hidden' ? 'text-primary' : ''}" />
 				</Button>
 				<Button
+					variant={showEq ? 'secondary' : 'ghost'}
+					size="icon-sm"
+					onclick={() => (showEq = !showEq)}
+					aria-label="Sound Equalizer & Audio FX"
+					title="Sound Equalizer & Audio FX"
+				>
+					<HugeiconsIcon icon={AudioWave02Icon} class="h-5 w-5 {audioFx.eqPreset !== 'flat' ? 'text-primary' : ''}" />
+				</Button>
+
+				<Button
 					variant={lyricsOpen ? 'secondary' : 'ghost'}
 					size="icon-sm"
 					onclick={onToggleLyrics}
@@ -501,3 +518,6 @@
 		</div>
 	</div>
 </footer>
+
+<EqualizerDialog bind:open={showEq} />
+

@@ -2,6 +2,27 @@
 import type { BrowseItem, HomeSection, SongItem } from './api';
 import { getApiUrl } from './apiBase';
 
+export interface FmhyArtist {
+	id: string;
+	name: string;
+	subtitle: string;
+	followers: string;
+	thumbnail: string;
+	genre: string;
+	searchQuery: string;
+	tags: string[];
+}
+
+export interface FmhyMood {
+	id: string;
+	title: string;
+	subtitle: string;
+	gradient: string;
+	icon: string;
+	searchQuery: string;
+	tags: string[];
+}
+
 export interface FmhyItem {
 	id: string;
 	title: string;
@@ -16,6 +37,284 @@ export interface FmhyItem {
 	tags: string[];
 	duration?: string;
 }
+
+export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
+	{
+		id: 'artist_arijit_singh',
+		name: 'Arijit Singh',
+		subtitle: 'King of Bollywood Romance',
+		followers: '48.5M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Arijit_Singh_002_20230323062147_500x500.jpg',
+		genre: 'Bollywood / Romance',
+		searchQuery: 'Arijit Singh Top Songs',
+		tags: ['Bollywood', 'Romantic', 'Hindi', 'Melody']
+	},
+	{
+		id: 'artist_shreya_ghoshal',
+		name: 'Shreya Ghoshal',
+		subtitle: 'Melody Queen of India',
+		followers: '32.1M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_004_20230323062031_500x500.jpg',
+		genre: 'Bollywood Melodies',
+		searchQuery: 'Shreya Ghoshal Best Songs',
+		tags: ['Bollywood', 'Melody', 'Classical', 'Hindi']
+	},
+	{
+		id: 'artist_diljit_dosanjh',
+		name: 'Diljit Dosanjh',
+		subtitle: 'Global Punjabi Icon & G.O.A.T',
+		followers: '28.4M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Diljit_Dosanjh_004_20221006184542_500x500.jpg',
+		genre: 'Punjabi Pop',
+		searchQuery: 'Diljit Dosanjh Top Hits',
+		tags: ['Punjabi', 'Bhangra', 'Pop', 'Global']
+	},
+	{
+		id: 'artist_karan_aujla',
+		name: 'Karan Aujla',
+		subtitle: 'Geetan Di Machine',
+		followers: '25.7M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Karan_Aujla_002_20220909062335_500x500.jpg',
+		genre: 'Punjabi Hip-Hop',
+		searchQuery: 'Karan Aujla Latest Hits',
+		tags: ['Punjabi', 'Hip-Hop', 'Rap', 'Urban']
+	},
+	{
+		id: 'artist_the_weeknd',
+		name: 'The Weeknd',
+		subtitle: 'Starboy & Synthpop Legend',
+		followers: '115M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&h=500&fit=crop',
+		genre: 'R&B / Synthpop',
+		searchQuery: 'The Weeknd Top Hits',
+		tags: ['R&B', 'Synthpop', 'Global', 'Pop']
+	},
+	{
+		id: 'artist_taylor_swift',
+		name: 'Taylor Swift',
+		subtitle: 'The Eras Icon & Pop Queen',
+		followers: '110M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop',
+		genre: 'Pop / Storyteller',
+		searchQuery: 'Taylor Swift Best Songs',
+		tags: ['Pop', 'Country', 'Hits', 'Acoustic']
+	},
+	{
+		id: 'artist_anuv_jain',
+		name: 'Anuv Jain',
+		subtitle: 'Soulful Acoustic & Indie Ballads',
+		followers: '14.2M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Anuv_Jain_001_20211029141738_500x500.jpg',
+		genre: 'Indie Acoustic',
+		searchQuery: 'Anuv Jain All Songs',
+		tags: ['Indie', 'Acoustic', 'Hindi', 'Chill']
+	},
+	{
+		id: 'artist_atif_aslam',
+		name: 'Atif Aslam',
+		subtitle: 'Sufi, Rock & Romantic Legend',
+		followers: '36.8M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Atif_Aslam_002_20221006184542_500x500.jpg',
+		genre: 'Romantic / Sufi',
+		searchQuery: 'Atif Aslam Superhit Songs',
+		tags: ['Romantic', 'Sufi', 'Bollywood', 'Rock']
+	},
+	{
+		id: 'artist_ap_dhillon',
+		name: 'AP Dhillon',
+		subtitle: 'Brown Munde & Modern Wave',
+		followers: '22.3M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/AP_Dhillon_003_20220909062335_500x500.jpg',
+		genre: 'Punjabi Trap',
+		searchQuery: 'AP Dhillon All Hits',
+		tags: ['Punjabi', 'Trap', 'Party', 'Brown Munde']
+	},
+	{
+		id: 'artist_sidhu_moose_wala',
+		name: 'Sidhu Moose Wala',
+		subtitle: 'Legendary Pioneer of Desi Rap',
+		followers: '35.1M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Sidhu_Moose_Wala_004_20220909062335_500x500.jpg',
+		genre: 'Punjabi Hip-Hop',
+		searchQuery: 'Sidhu Moose Wala Top Tracks',
+		tags: ['Punjabi', 'Hip-Hop', 'Rap', 'Legend']
+	},
+	{
+		id: 'artist_pritam',
+		name: 'Pritam',
+		subtitle: "Bollywood's #1 Melody Director",
+		followers: '42.0M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Pritam_003_20230323062147_500x500.jpg',
+		genre: 'Bollywood Composer',
+		searchQuery: 'Pritam Best Bollywood Songs',
+		tags: ['Bollywood', 'Composer', 'Soundtracks', 'Hits']
+	},
+	{
+		id: 'artist_billie_eilish',
+		name: 'Billie Eilish',
+		subtitle: 'Alternative Pop & Dark Melodies',
+		followers: '95M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&h=500&fit=crop',
+		genre: 'Alternative Pop',
+		searchQuery: 'Billie Eilish Top Hits',
+		tags: ['Alternative', 'Pop', 'Dark Pop', 'Global']
+	},
+	{
+		id: 'artist_drake',
+		name: 'Drake',
+		subtitle: '6 God & Hip-Hop Titan',
+		followers: '88M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop',
+		genre: 'Hip-Hop / Rap',
+		searchQuery: 'Drake Best Hits',
+		tags: ['Hip-Hop', 'Rap', 'R&B', 'Global']
+	},
+	{
+		id: 'artist_bruno_mars',
+		name: 'Bruno Mars',
+		subtitle: 'Funk, Retro Soul & 24K Magic',
+		followers: '82M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop',
+		genre: 'Funk / Pop',
+		searchQuery: 'Bruno Mars Top Songs',
+		tags: ['Funk', 'Pop', 'Soul', 'Retro']
+	},
+	{
+		id: 'artist_badshah',
+		name: 'Badshah',
+		subtitle: 'Club & Commercial Rap King',
+		followers: '26.5M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Badshah_005_20230323062031_500x500.jpg',
+		genre: 'Desi Rap',
+		searchQuery: 'Badshah Party Anthems',
+		tags: ['Rap', 'Party', 'Dance', 'Bollywood']
+	},
+	{
+		id: 'artist_neha_kakkar',
+		name: 'Neha Kakkar',
+		subtitle: 'Bollywood Party & Dance Queen',
+		followers: '30.2M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Neha_Kakkar_006_20230323062031_500x500.jpg',
+		genre: 'Bollywood Dance',
+		searchQuery: 'Neha Kakkar Dance Hits',
+		tags: ['Bollywood', 'Dance', 'Party', 'Pop']
+	},
+	{
+		id: 'artist_armaan_malik',
+		name: 'Armaan Malik',
+		subtitle: 'Prince of Romance & Pop',
+		followers: '18.7M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Armaan_Malik_004_20230323062031_500x500.jpg',
+		genre: 'Pop / Romantic',
+		searchQuery: 'Armaan Malik Best Songs',
+		tags: ['Romantic', 'Pop', 'Hindi', 'English']
+	},
+	{
+		id: 'artist_darshan_raval',
+		name: 'Darshan Raval',
+		subtitle: 'Monsoon & Indie Romance',
+		followers: '19.5M Listeners',
+		thumbnail: 'https://c.saavncdn.com/artists/Darshan_Raval_005_20230323062031_500x500.jpg',
+		genre: 'Indie Pop',
+		searchQuery: 'Darshan Raval Hits',
+		tags: ['Indie', 'Monsoon', 'Romantic', 'Hindi']
+	},
+	{
+		id: 'artist_ed_sheeran',
+		name: 'Ed Sheeran',
+		subtitle: 'Acoustic Pop & Storytelling',
+		followers: '90M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&h=500&fit=crop',
+		genre: 'Acoustic Pop',
+		searchQuery: 'Ed Sheeran All Hits',
+		tags: ['Acoustic', 'Pop', 'Singer-Songwriter', 'Global']
+	},
+	{
+		id: 'artist_dua_lipa',
+		name: 'Dua Lipa',
+		subtitle: 'Future Nostalgia & Disco Pop',
+		followers: '85M Listeners',
+		thumbnail: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&h=500&fit=crop',
+		genre: 'Dance Pop',
+		searchQuery: 'Dua Lipa Best Hits',
+		tags: ['Dance', 'Pop', 'Disco', 'Club']
+	}
+];
+
+export const FMHY_GENRES_AND_MOODS: FmhyMood[] = [
+	{
+		id: 'mood_bollywood_romance',
+		title: 'Bollywood Romance',
+		subtitle: 'Timeless love songs & soulful ballads',
+		gradient: 'from-pink-500 via-rose-600 to-red-700',
+		icon: '❤️',
+		searchQuery: 'Bollywood Romantic Hits All Time',
+		tags: ['Romantic', 'Bollywood', 'Love', 'Hindi']
+	},
+	{
+		id: 'mood_punjabi_hype',
+		title: 'Punjabi Hype & Dhol',
+		subtitle: 'Bhangra beats, high energy & swag',
+		gradient: 'from-amber-500 via-orange-600 to-red-600',
+		icon: '🔥',
+		searchQuery: 'Top Punjabi Party Hits Bhangra',
+		tags: ['Punjabi', 'Bhangra', 'Party', 'Energy']
+	},
+	{
+		id: 'mood_chill_lofi',
+		title: 'Chill Lo-Fi & Study',
+		subtitle: 'Relaxing beats to code and focus',
+		gradient: 'from-indigo-600 via-purple-600 to-pink-600',
+		icon: '☕',
+		searchQuery: 'Lofi Hip Hop Study Beats Relax',
+		tags: ['Lofi', 'Study', 'Coding', 'Chill']
+	},
+	{
+		id: 'mood_late_night',
+		title: 'Late Night Acoustic',
+		subtitle: 'Gentle guitar, rain & midnight vibes',
+		gradient: 'from-blue-700 via-indigo-800 to-slate-900',
+		icon: '🌙',
+		searchQuery: 'Late Night Acoustic Soulful Songs',
+		tags: ['Acoustic', 'Night', 'Calm', 'Soul']
+	},
+	{
+		id: 'mood_gym_phonk',
+		title: 'Gym & Heavy Phonk',
+		subtitle: 'Aggressive workout drive & hard bass',
+		gradient: 'from-red-600 via-orange-700 to-zinc-900',
+		icon: '⚡',
+		searchQuery: 'Gym Workout Motivation Drift Phonk',
+		tags: ['Gym', 'Phonk', 'Workout', 'Bass']
+	},
+	{
+		id: 'mood_ghazals_sufi',
+		title: 'Sufi & Timeless Ghazals',
+		subtitle: 'Soul-stirring poetry & classical ragas',
+		gradient: 'from-emerald-700 via-teal-800 to-cyan-900',
+		icon: '✨',
+		searchQuery: 'Best Ghazals Sufi Music Legends',
+		tags: ['Sufi', 'Ghazal', 'Classical', 'Poetry']
+	},
+	{
+		id: 'mood_edm_festival',
+		title: 'EDM & Dance Arena',
+		subtitle: 'Euphoric drops & festival bangers',
+		gradient: 'from-cyan-500 via-blue-600 to-indigo-700',
+		icon: '🎧',
+		searchQuery: 'Top EDM Festival Hits Dance',
+		tags: ['EDM', 'Dance', 'Electro', 'Festival']
+	},
+	{
+		id: 'mood_deep_sleep',
+		title: 'Deep Sleep & Ambient',
+		subtitle: 'Delta waves, rainstorms & peaceful rest',
+		gradient: 'from-slate-800 via-zinc-900 to-black',
+		icon: '🌌',
+		searchQuery: 'Deep Sleep Ambient Rain Soundscape',
+		tags: ['Sleep', 'Ambient', 'Relax', 'Meditation']
+	}
+];
 
 export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 	{
@@ -225,6 +524,39 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		description: 'Carefully curated sleep-inducing drone ambient music without abrupt changes or beats.',
 		streamUrl: 'http://radio.stereoscenic.com/asp-h',
 		tags: ['Sleep', 'Ambient', 'Drone', 'Night'],
+		duration: 'LIVE'
+	},
+	{
+		id: 'fmhy_radio_bollywood_retro',
+		title: 'Bollywood 90s & 2000s Retro Radio',
+		subtitle: 'Golden Era Hindi Classics 24/7',
+		category: 'radio',
+		thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop',
+		description: 'Kumar Sanu, Alka Yagnik, Udit Narayan, Sonu Nigam & AR Rahman golden era hits.',
+		searchQuery: '90s Hindi Romantic Songs Live Radio',
+		tags: ['Bollywood', '90s', 'Retro', 'Hindi'],
+		duration: 'LIVE'
+	},
+	{
+		id: 'fmhy_radio_punjabi_hits',
+		title: 'Desi Punjabi Non-Stop Radio',
+		subtitle: 'Bhangra, Dhol & Urban Punjabi 24/7',
+		category: 'radio',
+		thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+		description: 'Continuous non-stop Punjabi hits, energetic remixes, and urban bass.',
+		searchQuery: 'Punjabi Songs 24/7 Live Stream Hits',
+		tags: ['Punjabi', 'Bhangra', 'Dance', 'Desi'],
+		duration: 'LIVE'
+	},
+	{
+		id: 'fmhy_radio_bbc_radio1',
+		title: 'BBC Radio 1 Dance & Anthems',
+		subtitle: 'UK Global Hits & Electronic • BBC',
+		category: 'radio',
+		thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=400&fit=crop',
+		description: 'The worlds biggest pop hits, club anthems, and live DJ sets from London.',
+		searchQuery: 'BBC Radio 1 Dance Live Stream',
+		tags: ['BBC', 'Pop', 'Dance', 'UK'],
 		duration: 'LIVE'
 	}
 ];
