@@ -73,13 +73,16 @@ class WebPlayer {
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
 			container.style.position = 'fixed';
-			container.style.width = '240px';
-			container.style.height = '180px';
-			container.style.bottom = '0px';
-			container.style.right = '0px';
-			container.style.opacity = '0.001';
-			container.style.pointerEvents = 'none';
-			container.style.zIndex = '-9999';
+			container.style.width = '180px';
+			container.style.height = '100px';
+			container.style.bottom = '80px';
+			container.style.right = '16px';
+			container.style.borderRadius = '10px';
+			container.style.overflow = 'hidden';
+			container.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+			container.style.border = '1px solid rgba(255,255,255,0.12)';
+			container.style.zIndex = '45';
+			container.style.backgroundColor = '#000';
 			document.body.appendChild(container);
 		}
 
@@ -87,8 +90,8 @@ class WebPlayer {
 			if (!window.YT || !window.YT.Player || this.ytPlayer) return;
 			try {
 				this.ytPlayer = new window.YT.Player('echo-yt-iframe-player', {
-					height: '180',
-					width: '240',
+					height: '100',
+					width: '180',
 					playerVars: {
 						autoplay: 1,
 						controls: 0,
@@ -468,15 +471,6 @@ class WebPlayer {
 		if (targetVideoId) {
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
-
-			// Quick direct audio check (< 1.5s) for zero-lag native HTML5 audio
-			const directUrl = await this.getDirectAudioUrl(targetVideoId);
-			if (directUrl) {
-				this.playAudioDirect(directUrl);
-				return;
-			}
-
-			// Fallback to YouTube Iframe player
 			this.loadAndPlayYt(targetVideoId);
 		}
 	}
