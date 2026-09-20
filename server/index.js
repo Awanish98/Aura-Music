@@ -208,7 +208,61 @@ app.get('/api/spotify/resolve', async (req, res) => {
 	}
 });
 
-// 5. Serve Built Static Frontend (if present)
+// 5. Radio Stations
+app.get('/api/radio/stations', (req, res) => {
+	const stations = [
+		{
+			id: 'radio_lofi_girl',
+			title: 'Lofi Girl - Relax & Study Radio',
+			subtitle: 'Chillhop / Lofi Beats',
+			thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg',
+			videoId: 'jfKfPfyJRdk',
+			duration: 'LIVE',
+			artists: 'Lofi Girl'
+		},
+		{
+			id: 'radio_synthwave',
+			title: 'Synthwave Radio - Chill / Retro Beats',
+			subtitle: 'Lofi Girl / Synthwave',
+			thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/maxresdefault.jpg',
+			videoId: '4xDzrJKXOOY',
+			duration: 'LIVE',
+			artists: 'Lofi Girl'
+		},
+		{
+			id: 'radio_somafm_drone',
+			title: 'SomaFM Drone Zone',
+			subtitle: 'Served with Best Ambient Textures',
+			thumbnail: 'https://somafm.com/img3/dronezone400.jpg',
+			streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
+			videoId: 'ambient_drone_soma',
+			duration: 'LIVE',
+			artists: 'SomaFM'
+		},
+		{
+			id: 'radio_nightwave_plaza',
+			title: 'Nightwave Plaza',
+			subtitle: 'Vaporwave Radio',
+			thumbnail: 'https://plaza.one/img/logo.png',
+			streamUrl: 'https://radio.plaza.one/mp3',
+			videoId: 'nightwave_plaza_stream',
+			duration: 'LIVE',
+			artists: 'Nightwave Plaza'
+		},
+		{
+			id: 'radio_chillhop',
+			title: 'Chillhop Radio - Jazzy & Lofi Beats',
+			subtitle: 'Chillhop Music',
+			thumbnail: 'https://i.ytimg.com/vi/5yx6BWlEVcY/maxresdefault.jpg',
+			videoId: '5yx6BWlEVcY',
+			duration: 'LIVE',
+			artists: 'Chillhop Music'
+		}
+	];
+	res.json(stations);
+});
+
+// 6. Serve Built Static Frontend (if present)
 const clientBuildPath = path.resolve(__dirname, '../ui/build');
 app.use(express.static(clientBuildPath));
 
