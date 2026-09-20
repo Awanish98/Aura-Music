@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,30 +17,44 @@ concurrency:
 
 jobs:
   deploy:
+    name: Build and Deploy Aura Music Web
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-          cache-dependency-path: ui/pnpm-lock.yaml
-      - name: Build Web App (UI)
+
+      - name: Install UI dependencies and Build
         env:
           BASE_PATH: /Aura-Music
         run: |
           cd ui
-          pnpm install --no-frozen-lockfile
-          pnpm build
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+          npm install --legacy-peer-deps --engine-strict=false
+          npm run build
+
+      - name: Deploy to GitHub Pages branch (gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ui/build
+          publish_branch: gh-pages
+          force_orphan: true
+
+      - name: Configure GitHub Pages
+        continue-on-error: true
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        continue-on-error: true
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ui/build
-      - id: deployment
+
+      - name: Deploy to GitHub Pages
+        continue-on-error: true
+        id: deployment
         uses: actions/deploy-pages@v4
