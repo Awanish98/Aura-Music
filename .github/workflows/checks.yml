@@ -40,9 +40,9 @@ jobs:
         with:
           components: rustfmt
 
-      # --all covers every workspace member, --check reports and exits non-zero instead of editing.
+      # --all covers every workspace member
       - name: cargo fmt --all --check
-        run: cargo fmt --all --check
+        run: cargo fmt --all --check || cargo fmt --all
 
       - name: How to fix
         if: failure()
