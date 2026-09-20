@@ -33,11 +33,10 @@ class WebPlayer {
 	init() {
 		if (typeof window === 'undefined') return;
 
-		// 1. Initialize HTML5 Audio for direct streams
+		// 1. Initialize HTML5 Audio for direct streams (NO crossOrigin = 'anonymous' to prevent CDN CORS blocking)
 		if (!this.audio) {
 			this.audio = new Audio();
 			this.audio.preload = 'auto';
-			this.audio.crossOrigin = 'anonymous';
 			this.audio.volume = (playback.volume ?? 100) / 100;
 
 			this.audio.addEventListener('play', () => {
@@ -59,7 +58,7 @@ class WebPlayer {
 				if (this.audio && (this.usingDirectAudio || this.isRadioStream)) {
 					playback.position = this.audio.currentTime || 0;
 					playback.positionAt = performance.now();
-					if (this.audio.duration && !isNaN(this.audio.duration)) {
+					if (this.audio.duration && !isNaN(this.audio.duration) && this.audio.duration > 0) {
 						playback.duration = this.audio.duration;
 					}
 				}
@@ -69,10 +68,17 @@ class WebPlayer {
 				this.next();
 			});
 
+			this.audio.addEventListener('error', (e) => {
+				console.warn('[Aura Audio Playback Error]', this.audio?.error, e);
+				if (this.currentItem) {
+					this.retryWithAlternativeStream(this.currentItem);
+				}
+			});
+
 			this.setupMediaSession();
 		}
 
-		// 2. Initialize YouTube IFrame Player API for direct YouTube Music streaming
+		// 2. Initialize YouTube IFrame Player API in persistent hidden container
 		this.initYouTubePlayer();
 	}
 
@@ -103,12 +109,18 @@ class WebPlayer {
 			this.analyser.fftSize = 64;
 			this.analyser.smoothingTimeConstant = 0.8;
 
-			this.audioSource = this.audioCtx.createMediaElementSource(this.audio);
-			this.audioSource.connect(this.lowFilter);
-			this.lowFilter.connect(this.midFilter);
-			this.midFilter.connect(this.highFilter);
-			this.highFilter.connect(this.analyser);
-			this.analyser.connect(this.audioCtx.destination);
+			try {
+				if (!this.audioSource) {
+					this.audioSource = this.audioCtx.createMediaElementSource(this.audio);
+					this.audioSource.connect(this.lowFilter);
+					this.lowFilter.connect(this.midFilter);
+					this.midFilter.connect(this.highFilter);
+					this.highFilter.connect(this.analyser);
+					this.analyser.connect(this.audioCtx.destination);
+				}
+			} catch (nodeErr) {
+				console.warn('[AudioFX Node connect warning - playing via native output]', nodeErr);
+			}
 		} catch (e) {
 			console.warn('[Aura WebPlayer AudioFX Warning]', e);
 		}
@@ -125,7 +137,6 @@ class WebPlayer {
 
 	getVisualizerData(): Uint8Array {
 		if (!this.analyser) {
-			// Return fallback visualizer data based on playback state
 			const arr = new Uint8Array(16);
 			if (!playback.paused && playback.now) {
 				const now = Date.now() / 150;
@@ -161,20 +172,16 @@ class WebPlayer {
 		if (typeof window === 'undefined') return;
 		if (this.ytPlayer) return;
 
-		let mount = document.getElementById('echo-video-mount');
 		let container = document.getElementById('echo-yt-iframe-player');
 		if (!container) {
+			const host = document.createElement('div');
+			host.id = 'echo-yt-player-host';
+			host.style.cssText =
+				'position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;';
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
-			if (mount) {
-				mount.appendChild(container);
-			} else {
-				container.style.width = '100%';
-				container.style.height = '100%';
-				document.body.appendChild(container);
-			}
-		} else if (mount && container.parentElement !== mount) {
-			mount.appendChild(container);
+			host.appendChild(container);
+			document.body.appendChild(host);
 		}
 
 		const createPlayer = () => {
@@ -194,7 +201,6 @@ class WebPlayer {
 						enablejsapi: 1,
 						origin: typeof window !== 'undefined' ? window.location.origin : undefined
 					},
-
 					events: {
 						onReady: () => {
 							this.ytReady = true;
@@ -227,7 +233,6 @@ class WebPlayer {
 							} else if (event.data === 0) {
 								this.next();
 							} else if (event.data === 3 || event.data === -1 || event.data === 5) {
-								// BUFFERING, UNSTARTED, CUED - ensure playback starts
 								playback.paused = false;
 								try {
 									this.ytPlayer.playVideo();
@@ -374,7 +379,6 @@ class WebPlayer {
 		}, 250);
 	}
 
-
 	private stopProgress() {
 		if (this.progressInterval) {
 			clearInterval(this.progressInterval);
@@ -383,7 +387,6 @@ class WebPlayer {
 	}
 
 	private async resolveBestVideoId(item: SongItem): Promise<string | null> {
-		// 1. Direct standard YouTube 11-char video ID
 		if (
 			item.video_id &&
 			!item.video_id.startsWith('sp:') &&
@@ -391,18 +394,18 @@ class WebPlayer {
 			!item.video_id.startsWith('fmhy_') &&
 			!item.video_id.startsWith('LOCAL:') &&
 			!item.video_id.startsWith('demo') &&
+			!item.video_id.startsWith('saavn_') &&
 			item.video_id.length === 11
 		) {
 			return item.video_id;
 		}
 
-		// 2. FMHY Item Lookup
 		if (item.video_id && (item.video_id.startsWith('fmhy_') || item.video_id.startsWith('radio_'))) {
 			const { findFmhyItem } = await import('./fmhy');
 			const fmItem = findFmhyItem(item.video_id);
 			if (fmItem) {
 				if (fmItem.streamUrl) {
-					(item as any).streamUrl = fmItem.streamUrl;
+					item.streamUrl = fmItem.streamUrl;
 					return null;
 				}
 				if (fmItem.videoId) {
@@ -432,8 +435,18 @@ class WebPlayer {
 
 	private async retryWithAlternativeStream(item: SongItem) {
 		try {
-			const fallbackQuery = `${item.title} ${item.artists || ''} official audio`;
-			const searchRes = await fetchSearch(fallbackQuery);
+			const fallbackQuery = `${item.title} ${item.artists || ''}`.trim();
+			// 1. Try JioSaavn direct 320kbps search
+			const { fetchSaavnSearch } = await import('./fmhy');
+			const saavnResults = await fetchSaavnSearch(fallbackQuery);
+			if (saavnResults.length > 0 && saavnResults[0]?.streamUrl && saavnResults[0].streamUrl !== item.streamUrl) {
+				item.streamUrl = saavnResults[0].streamUrl;
+				this.playAudioDirect(saavnResults[0].streamUrl);
+				return;
+			}
+
+			// 2. Try alternative YouTube Audio
+			const searchRes = await fetchSearch(`${fallbackQuery} official audio`);
 			if (searchRes.songs?.length) {
 				const match = searchRes.songs.find((s) => s.id && s.id !== item.video_id) || searchRes.songs[0];
 				if (match?.id) {
@@ -455,11 +468,11 @@ class WebPlayer {
 
 		for (const ep of endpoints) {
 			try {
-				const res = await fetch(ep, { signal: AbortSignal.timeout(1800) });
+				const res = await fetch(ep, { signal: AbortSignal.timeout(2200) });
 				if (res.ok) {
 					const data = await res.json();
 					if (Array.isArray(data.adaptiveFormats)) {
-						const audios = data.adaptiveFormats.filter((f: any) => f.type?.includes('audio'));
+						const audios = data.adaptiveFormats.filter((f: any) => f.type?.includes('audio') || f.mimeType?.includes('audio'));
 						if (audios.length > 0) {
 							const sorted = audios.sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
 							if (sorted[0]?.url) return sorted[0].url;
@@ -485,12 +498,15 @@ class WebPlayer {
 		if (this.audio) {
 			this.audio.src = url;
 			this.audio.volume = (playback.volume ?? 100) / 100;
-			this.audio.play().catch((e) => {
-				console.warn('[Direct Audio Play Error]', e);
-				if (this.currentItem?.video_id) {
-					this.loadAndPlayYt(this.currentItem.video_id);
-				}
-			});
+			const playPromise = this.audio.play();
+			if (playPromise !== undefined) {
+				playPromise.catch((e) => {
+					console.warn('[Direct Audio Play Error - Falling back]', e);
+					if (this.currentItem) {
+						this.retryWithAlternativeStream(this.currentItem);
+					}
+				});
+			}
 		}
 	}
 
@@ -522,6 +538,10 @@ class WebPlayer {
 	async play(item: SongItem) {
 		this.init();
 		this.currentItem = item;
+
+		if (this.audioCtx && this.audioCtx.state === 'suspended') {
+			this.audioCtx.resume().catch(() => {});
+		}
 
 		const parseDurationToSeconds = (dur?: string | number): number => {
 			if (typeof dur === 'number') return dur;
@@ -562,8 +582,8 @@ class WebPlayer {
 			if (idx !== -1) playback.queue.currentIndex = idx;
 		}
 
-		// 1. Direct audio stream (e.g. JioSaavn 320kbps lossless, SomaFM, Nightwave Plaza)
-		if ((item as any).streamUrl) {
+		// 1. Direct stream URL already attached (e.g. JioSaavn 320kbps lossless, SomaFM, Nightwave Plaza)
+		if (item.streamUrl) {
 			if (item.duration === 'LIVE') {
 				this.isRadioStream = true;
 				this.usingDirectAudio = false;
@@ -571,7 +591,7 @@ class WebPlayer {
 				this.isRadioStream = false;
 				this.usingDirectAudio = true;
 			}
-			this.playAudioDirect((item as any).streamUrl);
+			this.playAudioDirect(item.streamUrl);
 			return;
 		}
 
@@ -599,9 +619,60 @@ class WebPlayer {
 			}
 		}
 
-		// 3. Resolve target YouTube Video ID
+		// 3. FMHY Item Lookup
+		if (item.video_id && (item.video_id.startsWith('fmhy_') || item.video_id.startsWith('radio_'))) {
+			const { findFmhyItem } = await import('./fmhy');
+			const fmItem = findFmhyItem(item.video_id);
+			if (fmItem) {
+				if (fmItem.streamUrl) {
+					item.streamUrl = fmItem.streamUrl;
+					this.isRadioStream = fmItem.duration === 'LIVE';
+					this.usingDirectAudio = !this.isRadioStream;
+					this.playAudioDirect(fmItem.streamUrl);
+					return;
+				}
+				if (fmItem.videoId) {
+					this.loadAndPlayYt(fmItem.videoId);
+					return;
+				}
+			}
+		}
+
+		// 4. JioSaavn 320kbps Lossless Audio Resolver (Zero Ad, CD Quality)
+		const query = `${item.title} ${item.artists || ''}`.replace(/\s+/g, ' ').trim();
+		if (query && !item.video_id?.startsWith('LOCAL:')) {
+			try {
+				const { fetchSaavnSearch } = await import('./fmhy');
+				const results = await fetchSaavnSearch(query);
+				if (results.length > 0 && results[0]?.streamUrl) {
+					const match = results[0];
+					item.streamUrl = match.streamUrl;
+					if (match.thumbnail && !item.thumbnail) item.thumbnail = match.thumbnail;
+					this.isRadioStream = false;
+					this.usingDirectAudio = true;
+					this.playAudioDirect(match.streamUrl);
+					return;
+				}
+			} catch (e) {
+				console.warn('[JioSaavn search resolver error]', e);
+			}
+		}
+
+		// 5. Backend Direct Audio Stream Extractor Proxy
 		const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
-		if (targetVideoId) {
+		if (targetVideoId && targetVideoId.length === 11) {
+			try {
+				const directStream = await this.getDirectAudioUrl(targetVideoId);
+				if (directStream) {
+					item.streamUrl = directStream;
+					this.isRadioStream = false;
+					this.usingDirectAudio = true;
+					this.playAudioDirect(directStream);
+					return;
+				}
+			} catch {}
+
+			// 6. YouTube IFrame Fallback
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
 			this.loadAndPlayYt(targetVideoId);
@@ -651,6 +722,9 @@ class WebPlayer {
 		if (this.usingDirectAudio || this.isRadioStream) {
 			if (!this.audio) return;
 			if (this.audio.paused) {
+				if (this.audioCtx && this.audioCtx.state === 'suspended') {
+					this.audioCtx.resume().catch(() => {});
+				}
 				this.audio.play().catch(console.warn);
 			} else {
 				this.audio.pause();

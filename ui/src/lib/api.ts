@@ -209,7 +209,8 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 			artist_runs: s.artistRuns,
 			thumbnail: s.thumbnail,
 			duration: s.duration,
-			explicit: s.explicit
+			explicit: s.explicit,
+			streamUrl: s.streamUrl
 		})) as unknown as T;
 	}
 	if (cmd === 'search_all') {
@@ -733,6 +734,8 @@ export interface SongItem {
 	/** One of the user's own YouTube Music uploads. Set by Rust and passed straight back on play:
 	 *  only an authenticated client can stream one, and the row is where that is known. */
 	is_upload?: boolean;
+	/** Direct 320kbps CD-Quality or Live Radio stream URL */
+	streamUrl?: string;
 }
 
 export interface NowPlaying {
@@ -819,6 +822,8 @@ export interface BrowseItem {
 	/** Song cards only: one of the user's own uploads. Carried into the SongItem `asSong` builds,
 	 *  because that flag is what picks the login-only client chain when it plays. */
 	isUpload?: boolean;
+	/** Direct audio stream URL */
+	streamUrl?: string;
 }
 
 export interface HomeSection {

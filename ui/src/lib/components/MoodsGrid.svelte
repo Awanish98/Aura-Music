@@ -9,8 +9,9 @@
 	async function playMood(mood: FmhyMood) {
 		try {
 			const res = await api.search(mood.searchQuery);
-			if (res.songs && res.songs.length > 0) {
-				webPlayer.playPlaylist(res.songs, 0, `${mood.title} Mix`);
+			const songs = Array.isArray(res) ? res : (res as any)?.songs || [];
+			if (songs.length > 0) {
+				webPlayer.playPlaylist(songs, 0, `${mood.title} Mix`);
 			} else {
 				goto(`/search?q=${encodeURIComponent(mood.searchQuery)}`);
 			}

@@ -22,8 +22,9 @@
 		e.stopPropagation();
 		try {
 			const res = await api.search(artist.searchQuery);
-			if (res.songs && res.songs.length > 0) {
-				webPlayer.playPlaylist(res.songs, 0, `${artist.name} Hits`);
+			const songs = Array.isArray(res) ? res : (res as any)?.songs || [];
+			if (songs.length > 0) {
+				webPlayer.playPlaylist(songs, 0, `${artist.name} Hits`);
 			} else {
 				exploreArtist(artist);
 			}
