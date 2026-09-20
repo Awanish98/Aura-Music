@@ -1,249 +1,149 @@
 <div align="center">
 
-<img src="./assets/docs/limusic-github-image.png" alt="Limusic Banner" width="100%">
+<img src="./assets/docs/aura-music-banner.jpg" alt="Aura Music Banner" width="100%" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
-# Aura Music
+# ⚡ Aura Music
 
-**A native desktop YouTube Music client made by Jordan. Rust + Tauri, ad-free, no Electron.**
+**Next-Gen Lossless Music Streaming, FMHY 24/7 Radio, Apple Music Word-Synced Karaoke Lyrics & Native Android APK**
 
 <p align="center">
-  <img alt="Developer" src="https://img.shields.io/badge/DEVELOPER-Jordan-e5486e?style=for-the-badge">
+  <img alt="Developer" src="https://img.shields.io/badge/DEVELOPER-Awanish98-8b5cf6?style=for-the-badge&logo=github&logoColor=white">
+  <img alt="Quality" src="https://img.shields.io/badge/AUDIO-320kbps_Lossless-10b981?style=for-the-badge&logo=safari&logoColor=white">
+  <img alt="Android APK" src="https://img.shields.io/badge/Android_APK-Available-3DDC84?style=for-the-badge&logo=android&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-1881cc?style=for-the-badge">
-  <img alt="Linux" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
-  <img alt="Windows" src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logoColor=white">
-  <img alt="macOS" src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white">
+  <img alt="Live Web" src="https://img.shields.io/badge/Live_Web-Active-ff5722?style=for-the-badge">
+  <img alt="SvelteKit" src="https://img.shields.io/badge/SvelteKit_5-FF3E00?style=for-the-badge&logo=svelte&logoColor=white">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri_2-24C8D8?style=for-the-badge&logo=tauri&logoColor=white">
-  <img alt="Rust" src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white">
 </p>
 
-**Aura Music** talks directly to YouTube's internal API and plays audio through libmpv: no bundled
-browser runtime, no ads in the audio. Developed by **Jordan**.
+**Aura Music** is an ultra-fast, ad-free, high-fidelity music player and streaming platform crafted with **SvelteKit 5, Rust, Tauri 2, and Capacitor Android**. Powered by lossless audio streams from **JioSaavn CDN**, commercial-free live radio engines from **[FreeMediaHeckYeah (FMHY)](https://fmhy.net/audio)**, and real-time **Apple Music Word-to-Word Karaoke Synced Lyrics**.
 
-### 🌐 Web Player & Live Links
-- **GitHub Pages**: 👉 [https://awanish98.github.io/Aura-Music/](https://awanish98.github.io/Aura-Music/)
-- **1-Click Render Deployment**: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Awanish98/Aura-Music)
+---
+
+### 🌐 Live Web Player & Cloud Deployment
+
+| Platform | Link / Deployment | Status |
+|---|---|---|
+| **Live Web App** | 👉 **[https://aura-music-1no9.onrender.com](https://aura-music-1no9.onrender.com)** | 🟢 Online |
+| **Android APK (Direct Download)** | 📦 **[Download Android APK (GitHub Actions)](https://github.com/Awanish98/Aura-Music/actions)** | 🚀 Ready |
+| **GitHub Pages** | 🌐 **[https://awanish98.github.io/Aura-Music/](https://awanish98.github.io/Aura-Music/)** | 🟢 Live |
+| **1-Click Render Deploy** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Awanish98/Aura-Music) | ⚡ 1-Click |
 
 </div>
 
 ---
 
-## Features
+## ✨ Features & Capabilities
 
-- **Ad-free playback**: streams come straight from YouTube's API, ads never do
-- **Search & browse**: songs, albums, artists, playlists and the YTM home feed, with results previewing as you type
-- **Sign in** with your YouTube Music account: in-app Google login or cookie-paste, several accounts at once with switching between them
-- **Your library**: playlists, liked songs, saved albums and artists, your uploads, and write actions (like, add to playlist, create/edit/delete playlists including cover art, subscribe, save to library)
-- **History**: everything you have played, in YouTube Music's own day buckets
-- **Gapless playback** with loudness normalization, powered by libmpv
-- **Queue** with radio/automix continuation, drag to reorder, restored across restarts
-- **Synced lyrics**: side panel with auto-scroll and click-to-jump, word by word where the source has the timings, with translations under each line
-- **Music videos**: optional, the video plays where the artwork sits, with the same gapless audio behind it
-- **Mini Player and theater mode**: shrink to a strip that keeps playing, or go fullscreen with cover and lyrics side by side
-- **Local Music**: play your own files, with all metadata still intact
-- **Last.fm scrobbling**: connect once from the title bar, every play is scrobbled
-- **Discord Rich Presence**: artwork, live progress bar, one click to toggle
-- **OS media keys** and now-playing integration (MPRIS on Linux, SMTC on Windows, plus playback buttons on the Windows taskbar preview)
-- **System tray**: close the window, keep the music; play/pause and skip from the tray, optional start-on-login
-- **Listen Together**: synced listening rooms over a small self-hosted relay
-- **Keyboard and mouse**: `Ctrl+K` searches from anywhere, `Ctrl+H` lists every shortcut, right-click menus throughout, `Ctrl` and the wheel zooms the interface
-- **Six languages**: English, Spanish, French, Turkish, Brazilian Portuguese and Indonesian, with more in progress
-- **Self-updating builds** (AppImage on Linux, setup.exe on Windows, .app on macOS)
-- **Make it yours**: accent palettes, custom colors, your own fonts, corner roundness, a custom app icon, and an adaptive theme that recolors the app from the playing cover
+### 🎧 1. JioSaavn 320kbps Lossless Audio Streaming
+- **Pure CD-Quality**: Direct encrypted stream URL decoding with instant on-the-fly DES-ECB decryption to unthrottled **320kbps AAC/MP4** (`_320.mp4`).
+- **Zero Ads & Zero Buffering**: Instant HTML5 direct playback without middleman trackers or video throttling.
+- **Top Hindi, Bollywood, English & Global Charts**: Top 50 trending charts and featured curated playlists updating in real time.
 
----
+### 📻 2. FMHY 24/7 Commercial-Free Live Radio
+Curated from top community-recommended free audio engines on FMHY:
+- **SomaFM**: *Groove Salad* (Ambient/Downtempo), *Drone Zone*, *Secret Agent*, *DEF CON Radio*, *Suburbs of Goa*, *Lush*.
+- **Vaporwave & Future Funk**: *Nightwave Plaza* 24/7.
+- **Lofi & Synthwave**: 24/7 Relax / Study Chill Beats.
+- **Radio Paradise**: Mellow, Rock, and Main Mixes in high-fidelity audio.
+- **LISTEN.moe**: 24/7 J-Pop, K-Pop, and Anime Soundtracks.
+- **WQXR New York**: Classical Symphony & World Concerts.
 
-## Screenshots
+### 🎤 3. Apple Music Word-to-Word Karaoke Synced Lyrics
+- **High-Precision Syllable Timing**: Synthesizes and aligns syllable durations for genuine word-by-word highlighted sweeps.
+- **Dynamic 60-120fps Sweeping Glow**: Words illuminate smoothly with glowing gradients, scale pops (`scale-[1.06]`), and animated pulsing interlude dots (`• • •`).
+- **Dynamic Ambient Glow**: Ambient background radiates soft colors matching the album artwork.
+- **Tap-to-Seek**: Click on any lyric line to jump playback time immediately.
 
-<table>
-  <tr>
-    <td><img src="website/src/assets/screen-playlist.webp" alt="A playlist in Limusic"></td>
-    <td><img src="website/src/assets/screen-lyrics.webp" alt="Word-by-word synced lyrics"></td>
-  </tr>
-  <tr>
-    <td><img src="website/src/assets/screen-album.webp" alt="An album page, colors adapted to the cover"></td>
-    <td><img src="website/src/assets/screen-video.webp" alt="A music video playing with lyrics alongside"></td>
-  </tr>
-</table>
+### 📺 4. Floating & Fullscreen Video Player
+- **Multi-Mode Experience**: Toggle between Mini Floating Player, Theater Mode, or Fullscreen.
+- **Always-on-Top & PiP**: Drag or float the video anywhere while browsing your music library or lyrics.
+
+### 📱 5. Native Android Application
+- **Background Playback**: Full support for background playback and lockscreen controls via `FOREGROUND_SERVICE_MEDIA_PLAYBACK` and `WAKE_LOCK`.
+- **Hardware Media Controls**: Full OS integration for play/pause, next/prev, volume, and headset buttons.
+- **Automated CI/CD APK Pipeline**: Every update automatically builds and publishes `.apk` packages via GitHub Actions.
 
 ---
 
-<h2 align="center">Download & Install</h2>
+## 📥 Download & Platforms
+
+| Platform | Format / Source | Installation Notes |
+|---|---|---|
+| **Android Smartphone / Tablet** | `.apk` (Direct Download) | Download from [GitHub Actions Artifacts](https://github.com/Awanish98/Aura-Music/actions) & install |
+| **Web Browser** | [Web App](https://aura-music-1no9.onrender.com) | Works across all modern browsers (Chrome, Edge, Safari, Firefox) |
+| **Windows Desktop** | `.exe` / `.msi` | Native Tauri 2 lightweight desktop app |
+| **Linux Desktop** | `.AppImage` / `.deb` / `.rpm` | Native high-performance client with MPRIS support |
+| **macOS Desktop** | `.dmg` | Apple Silicon & Intel native builds |
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+```mermaid
+graph TD
+    A[Client UI - SvelteKit 5 + Tailwind CSS] -->|Audio & Media Controls| B[Aura Player Core]
+    B -->|320kbps Lossless Stream| C[JioSaavn CDN]
+    B -->|24/7 Live Stream| D[FMHY Radio Engines]
+    B -->|Word-Synced Lyrics| E[LRCLIB & Timed Lyrics API]
+    A -->|Native Android Shell| F[Capacitor Android Native App]
+    A -->|Desktop Core| G[Tauri 2 + Rust Core]
+```
+
+- **Frontend**: SvelteKit 5, Svelte Runes, Tailwind CSS, Lucide / Hugeicons, Mode Watcher (Dark/OLED theme).
+- **Backend Server**: Node.js, Express, DES-ECB Crypto Engine, Axios, CORS Middleware.
+- **Mobile Runtime**: Capacitor Android SDK 36 (Java 21 JDK).
+- **Desktop Runtime**: Tauri 2, Rust, libmpv.
+
+---
+
+## 🚀 Local Development Setup
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Awanish98/Aura-Music.git
+cd Aura-Music
+```
+
+### 2. Start Backend Streaming Server
+```bash
+cd server
+npm install
+npm start
+# Backend server runs on http://localhost:3000
+```
+
+### 3. Start Frontend UI
+```bash
+cd ../ui
+npm install
+npm run dev
+# Frontend runs on http://localhost:5173
+```
+
+### 4. Build Android Native APK
+```bash
+cd ui
+npm run build
+npx cap sync android
+cd android
+./gradlew assembleDebug
+```
+
+---
+
+## 🤝 Contributing & Community
+
+Contributions, feature requests, and PRs are always welcome!
+Feel free to open an issue or submit a pull request on [GitHub](https://github.com/Awanish98/Aura-Music).
+
+---
+
+## 📄 License & Disclaimer
+
+- **License**: [GPL-3.0 License](LICENSE)
+- **Disclaimer**: This project is built for educational and personal streaming purposes utilizing public APIs and free media resources. All trademarks, logos, and audio rights belong to their respective copyright holders.
 
 <p align="center">
-  <a href="https://github.com/SimoHypers/limusic/releases/latest">
-    <img src="https://img.shields.io/badge/GitHub_Releases-100000?style=for-the-badge&logo=github&logoColor=white" height="40">
-  </a>
+  Crafted with ❤️ by <b><a href="https://github.com/Awanish98">Awanish98</a></b>
 </p>
-
-| Platform | File | Notes |
-|---|---|---|
-| Linux | `.AppImage` | Self-updating, libmpv bundled. Needs glibc 2.39+ (Ubuntu 24.04+, Debian 13+, Fedora 40+) |
-| Linux (Ubuntu/Debian) | `.deb` | No self-update. Needs Ubuntu 24.04+ / Debian 13+; apt pulls libmpv and webkit2gtk in for you |
-| Linux (Fedora/RHEL) | `.rpm` | Needs `mpv-libs` installed (`sudo dnf install mpv-libs`). No updates, redownload each release |
-| Linux (Fedora COPR) | [COPR](https://copr.fedorainfracloud.org/coprs/oguzkarayemis/limusic/) | `sudo dnf copr enable oguzkarayemis/limusic` then `sudo dnf install limusic`. Community-maintained by [@oguzkarayemis](https://github.com/oguzkarayemis), updates through dnf |
-| Linux (Arch) | [AUR](https://aur.archlinux.org/packages/limusic-bin) | `yay -S limusic-bin`. Community-maintained by [@xiryuudev](https://github.com/xiryuudev), updates through pacman |
-| Windows | `-setup.exe` | Self-updating |
-| Windows | `.msi` | Plain installer, no auto-update |
-| macOS (Apple Silicon) | `.dmg` | Self-updating. Unsigned, so the first launch needs `xattr -dr com.apple.quarantine /Applications/limusic.app` |
-| macOS (Intel) | none | Build from source, see [docs/BUILD-PLATFORMS.md](docs/BUILD-PLATFORMS.md) |
-
----
-
-## Scrobbling & Discord
-
-Both live in the title bar, next to the window controls.
-
-- **Last.fm**: click the Last.fm mark, approve Aura Music in the browser tab that
-  opens, and you're connected for good. Tracks scrobble at the halfway point (or
-  four minutes, whichever comes first), which is Last.fm's own rule. Click again
-  to see the account or disconnect.
-- **Discord**: click the Discord mark to toggle Rich Presence. Green dot means
-  it's live. The card shows the track, artist, album art, and a progress bar, and
-  it disappears when you pause.
-
-Building from source? Last.fm needs your own API credentials, and they are not in
-the repo. Get a key at [last.fm/api/account/create](https://www.last.fm/api/account/create)
-and put it in `src-tauri/lastfm.keys`:
-
-```
-LIMUSIC_LASTFM_API_KEY=your_key
-LIMUSIC_LASTFM_API_SECRET=your_secret
-```
-
-Without that file everything else still builds and runs; the Last.fm button just
-reports that it isn't configured.
-
----
-
-## Lyrics
-
-Open the panel with the microphone button in the player bar, next to the queue
-button. It takes the same side of the window as the queue, so opening one closes
-the other.
-
-Lyrics come from [Boidu](https://boidu.dev) first, then
-[LRCLIB](https://lrclib.net), then YouTube Music's own timed lyrics, then
-Netease, QQ Music and Kugou, falling back to plain un-timed text when nobody has
-a synced version. Matching is keyed on the track's exact length, because popular
-songs exist as several cuts and the wrong one drifts a few seconds out. Results
-are cached locally, so replaying a track is instant.
-
-Boidu is the only source with per-word timings, which is what lets a line
-highlight word by word as it's sung. It goes first for that reason, which also
-means it is asked about every track you play. Turn it off in **Settings ->
-Playback -> Word-by-word lyrics** and the other sources still provide
-line-by-line lyrics. Netease additionally supplies translations, shown under
-each line where it has them.
-
-Note that YouTube Music's lyrics are licensed per region and are missing
-entirely in some countries. Where that's the case, LRCLIB does all the work.
-
----
-
-## Listen Together
-
-Synced listening with friends. Everyone streams their own audio from YouTube;
-the room only relays play/pause, seeks, track changes and the queue. One person
-hosts the relay:
-
-```bash
-cargo run -p sync-server        # plain WebSocket on 0.0.0.0:8080
-```
-
-Front it with something that terminates TLS (Tailscale Funnel, Cloudflare
-Tunnel), then paste the `wss://` URL into the Listen Together panel in the app.
-Rooms have join codes and the host approves every join and every track
-suggestion.
-
----
-
-## Translations
-
-Limusic is translated on [Weblate](https://hosted.weblate.org/engage/limusic/),
-who host it free for libre projects.
-
-<a href="https://hosted.weblate.org/engage/limusic/">
-  <img src="https://hosted.weblate.org/widget/limusic/ui/multi-auto.svg" alt="Translation status">
-</a>
-
-English, Spanish, French, Turkish, Brazilian Portuguese and Indonesian ship in
-the app today.
-The badge above shows everything else in flight.
-
-**Translate on Weblate, not in a pull request.** Weblate keeps its own copy of
-the catalogs, so a hand-edited `fr.json` merged here puts the two out of sync
-and the next batch of real translations arrives as a merge conflict. Weblate
-also shows you the English original beside each string, flags translations that
-went stale when the English changed, checks that placeholders like `{count}`
-survived, and opens the pull request for you. Anything untranslated falls back
-to English in the app, so partial work is safe to submit.
-
-`en.json` is the exception: it changes by hand, in whichever pull request
-changes the UI. Switching a finished language on in the picker takes a small
-code change too, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
-
----
-
-## Building from Source
-
-Fedora:
-
-```bash
-sudo dnf install mpv-libs mpv-libs-devel webkit2gtk4.1-devel \
-  gcc gcc-c++ make openssl-devel librsvg2-devel
-cd ui && pnpm install && cd ..
-cargo tauri build
-```
-
-Windows and macOS instructions live in [docs/BUILD-PLATFORMS.md](docs/BUILD-PLATFORMS.md).
-
----
-
-## How It Works, Briefly
-
-- A pure Rust crate speaks YouTube's InnerTube API, impersonating several
-  official client identities and falling back between them when one fails.
-- YouTube's stream URLs are protected by obfuscated JavaScript (the signature
-  cipher and the `n` parameter) and by BotGuard attestation. Limusic runs that
-  JavaScript where it expects to run, in a real webview, hidden, and never lets
-  any of it touch the UI process.
-- Audio goes through libmpv: gapless transitions, an on-disk cache, and
-  loudness normalization from YouTube's own metadata.
-- The UI is a SvelteKit SPA that only ever talks to the Rust core. It never
-  contacts YouTube itself.
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=simohypers%2Flimusic&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=simohypers/limusic&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=simohypers/limusic&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=simohypers/limusic&type=date&legend=top-left" />
- </picture>
-</a>
-
----
-
-## Support
-
-Limusic is free and stays free. If it earned a coffee,
-[ko-fi.com/simohypers](https://ko-fi.com/simohypers) is where to leave one.
-
----
-
-## Disclaimer
-
-This project is not affiliated with, funded, authorized, endorsed by, or in
-any way associated with YouTube, Google LLC, or any of their affiliates and
-subsidiaries.
-
-All trademarks, service marks, and intellectual property rights referenced in
-this project belong to their respective owners.
-
----
-
-## License
-
-[GPL-3.0](LICENSE)

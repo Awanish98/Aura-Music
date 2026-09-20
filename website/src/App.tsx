@@ -45,10 +45,8 @@ import screenVideo from '@/assets/screen-video.webp'
 import screenTogether from '@/assets/screen-listen-together.webp'
 import screenMini from '@/assets/screen-mini.webp'
 
-const SPOTLIGHT = 'rgba(229, 72, 110, 0.16)' as const
-const WEBLATE_URL = 'https://hosted.weblate.org/engage/limusic/'
-const AUR_URL = 'https://aur.archlinux.org/packages/limusic-bin'
-const KOFI_URL = 'https://ko-fi.com/simohypers'
+const SPOTLIGHT = 'rgba(139, 92, 246, 0.16)' as const
+const APK_DOWNLOAD_URL = `${REPO_URL}/actions`
 const BUILD_DOCS_URL = `${REPO_URL}/blob/master/docs/BUILD-PLATFORMS.md`
 
 const FEATURES = [
@@ -349,16 +347,13 @@ interface DownloadCard {
 function Download({ info, os }: { info: ReturnType<typeof useGitHub>; os: string }) {
   const cards: DownloadCard[] = [
     {
-      os: 'Linux',
+      os: 'Android',
       icon: PackageIcon,
-      detected: os === 'linux',
+      detected: /Android/i.test(navigator.userAgent),
       links: [
-        { label: '.AppImage, any distro', href: info.appimage },
-        { label: '.deb, Ubuntu and Debian', href: info.deb },
-        { label: '.rpm, Fedora and RHEL', href: info.rpm },
-        { label: 'AUR, Arch Linux', href: AUR_URL },
+        { label: 'Download APK (Direct)', href: APK_DOWNLOAD_URL },
       ],
-      note: 'Only the AppImage updates itself. All builds need glibc 2.39 or newer (Ubuntu 24.04+, Debian 13+, Fedora 40+), and the rpm needs mpv-libs installed.',
+      note: 'Native Android APK with background playback and lockscreen controls. Supports Android 7.0+.',
     },
     {
       os: 'Windows',
@@ -369,6 +364,17 @@ function Download({ info, os }: { info: ReturnType<typeof useGitHub>; os: string
         { label: 'MSI package', href: info.msi },
       ],
       note: 'The installer updates itself. The MSI is a plain install with no auto-update.',
+    },
+    {
+      os: 'Linux',
+      icon: PackageIcon,
+      detected: os === 'linux',
+      links: [
+        { label: '.AppImage, any distro', href: info.appimage },
+        { label: '.deb, Ubuntu and Debian', href: info.deb },
+        { label: '.rpm, Fedora and RHEL', href: info.rpm },
+      ],
+      note: 'Only the AppImage updates itself. All builds need glibc 2.39 or newer.',
     },
     {
       os: 'macOS',
@@ -396,12 +402,11 @@ function Download({ info, os }: { info: ReturnType<typeof useGitHub>; os: string
         <p className="text-center text-xs font-semibold tracking-widest text-primary-bright uppercase">Download</p>
         <h2 className="mt-3 text-center font-heading text-3xl font-bold tracking-tight sm:text-4xl">Get Aura Music</h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-muted-foreground">
-          Free and open source. Install it, sign in with your YouTube account if you want your
-          library, and press play.
+          Free and open source. Install on Android, Windows, Mac, or Linux, or use the online web player.
         </p>
       </FadeContent>
 
-      <div className="mt-12 grid gap-5 md:grid-cols-3">
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c, i) => (
           <AnimatedContent key={c.os} distance={40} duration={0.8} delay={i * 0.1} threshold={0.15}>
             <div
@@ -462,13 +467,10 @@ function Footer() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-5">
           <a href={REPO_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
-            <HugeiconsIcon icon={GithubIcon} size={15} strokeWidth={2} /> Source
+            <HugeiconsIcon icon={GithubIcon} size={15} strokeWidth={2} /> GitHub Source
           </a>
-          <a href={WEBLATE_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
-            <HugeiconsIcon icon={TranslateIcon} size={15} strokeWidth={2} /> Translate
-          </a>
-          <a href={KOFI_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
-            <HugeiconsIcon icon={Coffee02Icon} size={15} strokeWidth={2} /> Buy me a coffee
+          <a href={APK_DOWNLOAD_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
+            <HugeiconsIcon icon={PackageIcon} size={15} strokeWidth={2} /> Android APK
           </a>
           <a href={`${REPO_URL}/blob/master/LICENSE`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
             <HugeiconsIcon icon={SourceCodeIcon} size={15} strokeWidth={2} /> GPL-3.0

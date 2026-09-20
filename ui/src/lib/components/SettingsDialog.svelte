@@ -282,7 +282,7 @@
 				version,
 				system
 			});
-			await api.openExternal(`https://github.com/SimoHypers/limusic/issues/new?${q}`);
+			await api.openExternal(`https://github.com/Awanish98/Aura-Music/issues/new?${q}`);
 		} catch (e) {
 			diagError = String(e);
 		}
