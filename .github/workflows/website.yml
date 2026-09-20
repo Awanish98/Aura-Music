@@ -3,7 +3,7 @@ name: Deploy website
 on:
   push:
     branches: [master, main]
-    paths: ['website/**', '.github/workflows/website.yml']
+    paths: ['website/**', 'ui/**', '.github/workflows/website.yml']
   workflow_dispatch:
 
 permissions:
@@ -30,11 +30,24 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: website/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-        working-directory: website
-      - run: pnpm build
-        working-directory: website
+          cache-dependency-path: |
+            website/pnpm-lock.yaml
+            ui/pnpm-lock.yaml
+      - name: Build Web App (UI)
+        env:
+          BASE_PATH: /Aura-Music/app
+        run: |
+          cd ui
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Build Landing Page Website
+        run: |
+          cd website
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Bundle Web App with Website
+        run: |
+          cp -r ui/build website/dist/app
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

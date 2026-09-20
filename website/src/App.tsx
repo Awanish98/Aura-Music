@@ -161,6 +161,9 @@ function Nav({ stars }: { stars: number | null }) {
           <a href="#features" className="transition-colors hover:text-foreground">Features</a>
           <a href="#screens" className="transition-colors hover:text-foreground">Screens</a>
           <a href="#download" className="transition-colors hover:text-foreground">Download</a>
+          <a href="./app/" className="flex items-center gap-1.5 rounded-full bg-primary/20 text-primary hover:bg-primary/30 px-3 py-1 font-semibold transition-colors">
+            ✨ Web Player
+          </a>
         </div>
         <a
           href={REPO_URL}
@@ -195,12 +198,12 @@ function Hero({ version, downloadHref, osLabel }: { version: string | null; down
       <div className="relative mx-auto max-w-6xl px-4 pt-36 pb-20 text-center sm:px-6 sm:pt-44">
         <FadeContent duration={800}>
           <p className="mx-auto mb-6 w-fit rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs tracking-widest text-muted-foreground uppercase">
-            Free · Open source · Linux, Windows &amp; macOS
+            Free · Open source · Linux, Windows, macOS &amp; Mobile Web
           </p>
         </FadeContent>
 
         <SplitText
-          text="Your music. Ad-free. Native."
+          text="Your music. Ad-free. Everywhere."
           tag="h1"
           splitType="words"
           delay={120}
@@ -210,19 +213,25 @@ function Hero({ version, downloadHref, osLabel }: { version: string | null; down
 
         <FadeContent duration={900} delay={400}>
           <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Aura Music is a lightweight desktop player for YouTube Music made by Jordan. Search anything, hit play, and
-            listen without ads. Your playlists, your library, your own files, synced lyrics and
-            friends listening along, in a window that opens instantly.
+            Aura Music is a modern, lightweight music player for YouTube Music, FMHY discover, and Google Drive cloud streaming.
+            Search anything, hit play, and listen without ads on mobile &amp; desktop.
           </p>
         </FadeContent>
 
         <FadeContent duration={900} delay={650}>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
             <a
-              href={downloadHref}
-              className="flex items-center gap-2.5 rounded-full bg-primary-bright px-7 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/40 transition-transform hover:scale-105"
+              href="./app/"
+              className="flex items-center gap-2.5 rounded-full bg-primary-bright px-7 py-3.5 font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105 active:scale-95"
             >
               <HugeiconsIcon icon={PlayIcon} size={20} strokeWidth={2} fill="currentColor" />
+              Launch Web App
+            </a>
+            <a
+              href={downloadHref}
+              className="flex items-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-7 py-3.5 font-medium transition-colors hover:border-white/40 hover:bg-white/10"
+            >
+              <HugeiconsIcon icon={MusicNote01Icon} size={20} strokeWidth={2} />
               Download for {osLabel}
             </a>
             <a
@@ -232,7 +241,7 @@ function Hero({ version, downloadHref, osLabel }: { version: string | null; down
               className="flex items-center gap-2.5 rounded-full border border-white/15 px-7 py-3.5 font-medium transition-colors hover:border-white/30 hover:bg-white/5"
             >
               <HugeiconsIcon icon={GithubIcon} size={20} strokeWidth={2} />
-              View on GitHub
+              GitHub
             </a>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">

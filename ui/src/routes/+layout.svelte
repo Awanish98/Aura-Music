@@ -40,6 +40,8 @@
 	import LinkDialog from '$lib/components/LinkDialog.svelte';
 	import MiniPlayer from '$lib/components/MiniPlayer.svelte';
 	import NowPlaying from '$lib/components/NowPlaying.svelte';
+	import MobileNowPlaying from '$lib/components/MobileNowPlaying.svelte';
+	import MobileNav from '$lib/components/MobileNav.svelte';
 	import TheaterMode from '$lib/components/TheaterMode.svelte';
 	import VideoSurface from '$lib/components/VideoSurface.svelte';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
@@ -176,7 +178,7 @@
 			<Sidebar />
 			<!-- dragScroll: dragging a card up to home's Shortcuts grid has to be possible from anywhere in
 			     the feed, so aiming at the top edge scrolls this container while the drag is in flight. -->
-			<main class="min-w-0 flex-1 overflow-y-auto" {@attach dragScroll}>
+			<main class="min-w-0 flex-1 overflow-y-auto pb-36 md:pb-0" {@attach dragScroll}>
 				<!-- Remount the current page on sign-in/out so it refetches with the new account, and on
 				     a refresh (titlebar button / F5), which drops the browse cache first. -->
 				{#key `${auth.epoch}:${ui.epoch}`}
@@ -187,7 +189,12 @@
 			     has to keep playing while the view is closed. It renders nothing but a zero-sized
 			     parking container until the view borrows the picture. -->
 			<VideoSurface />
-			{#if np.open && playback.now}<NowPlaying {queueOpen} {lyricsOpen} />{/if}
+			{#if np.open && playback.now}
+				<MobileNowPlaying />
+				<div class="hidden md:contents">
+					<NowPlaying {queueOpen} {lyricsOpen} />
+				</div>
+			{/if}
 			<!-- Lyrics before queue: side by side over the page, lyrics on the left, queue on the right. -->
 			{#if lyricsOpen}<LyricsPanel onClose={() => (lyricsOpen = false)} {queueOpen} />{/if}
 			{#if queueOpen}<QueuePanel onClose={() => (queueOpen = false)} />{/if}
@@ -197,7 +204,7 @@
 			     z-20 on the wrapper, not the bar: the intro's transform makes this a stacking context,
 			     so a z on the footer inside would be trapped under it. The now-playing view is z-20 and
 			     earlier in the DOM, which is what puts it behind the bar as it slides in and out. -->
-			<div class="relative z-20" in:fly={{ y: 64, duration: 250, easing: cubicOut }}>
+			<div class="relative z-20 mb-14 md:mb-0" in:fly={{ y: 64, duration: 250, easing: cubicOut }}>
 				<PlayerBar
 					onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
 					queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
@@ -206,6 +213,8 @@
 				/>
 			</div>
 		{/if}
+		<!-- Mobile Bottom Navigation Bar (< md) -->
+		<MobileNav />
 	</div>
 
 	<!-- Theater mode covers everything, titlebar included, and puts the window in fullscreen for as

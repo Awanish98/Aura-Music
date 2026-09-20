@@ -1016,6 +1016,7 @@ export const setVolume = (volume: number) => invoke<void>('set_volume', { volume
 /** Tempo (0.25–2.0) + pitch (−12..=12 semitones). Not persisted: resets on restart. */
 export const setPlaybackParams = (speed: number, semitones: number) =>
 	invoke<void>('set_playback_params', { speed, semitones });
+export const setSpeed = (speed: number) => setPlaybackParams(speed, 0);
 export const getQueue = () => invoke<QueueState>('get_queue');
 /** A `limusicvideo://` URL for the track's music video, or null when there isn't one. `maxHeight`
  *  caps the picture at what the box on screen can actually show. The bytes are proxied through

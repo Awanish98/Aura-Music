@@ -134,7 +134,7 @@
 	<span
 		class="pointer-events-none absolute inset-x-0 text-center text-xs font-semibold tracking-wider text-muted-foreground/80 uppercase"
 	>
-		Echo Music
+		Aura Music
 	</span>
 
 	<!-- Left: Navigation controls -->
@@ -192,7 +192,7 @@
 		<!-- Theater Mode (Only when playback is active) -->
 		{#if playback.now}
 			<button
-				class="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+				class="hidden sm:flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 				onclick={() => (ui.theaterOpen = true)}
 				title={t('player.theater_mode')}
 				aria-label={t('player.theater_mode')}
@@ -201,18 +201,20 @@
 			</button>
 		{/if}
 
-		<!-- Mini Player -->
-		<button
-			class="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-			onclick={openMiniPlayer}
-			title={t('a11y.toggle_mini')}
-			aria-label={t('a11y.toggle_mini')}
-		>
-			<HugeiconsIcon icon={MinimizeScreenIcon} class="h-3.5 w-3.5" />
-		</button>
+		<!-- Mini Player (Desktop only) -->
+		{#if isTauri()}
+			<button
+				class="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+				onclick={openMiniPlayer}
+				title={t('a11y.toggle_mini')}
+				aria-label={t('a11y.toggle_mini')}
+			>
+				<HugeiconsIcon icon={MinimizeScreenIcon} class="h-3.5 w-3.5" />
+			</button>
+		{/if}
 
-		<!-- Native/Custom Window Controls -->
-		{#if win.chrome === 'off'}
+		<!-- Native/Custom Window Controls (Tauri only) -->
+		{#if isTauri() && win.chrome === 'off'}
 			<div class="mx-1 h-3.5 w-px bg-border/40"></div>
 
 			<div class="flex items-center">
@@ -239,7 +241,7 @@
 				</button>
 			</div>
 		{:else}
-			<div class="w-2"></div>
+			<div class="w-1"></div>
 		{/if}
 	</div>
 </header>

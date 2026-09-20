@@ -55,10 +55,64 @@ export const np = $state({ open: false, tab: 'queue' as 'queue' | 'lyrics' });
  */
 export const prefs = $state({
 	musicVideos: false,
-	/** `discord_rpc`. Two places toggle it (the titlebar button and the Discord settings tab) and
-	 *  each drew its own indicator, so turning it off in one left the other stale. One owner. */
 	discordRpc: false
 });
+
+// Sleep Timer Reactive State
+export const sleepTimer = $state({
+	active: false,
+	remainingSecs: 0,
+	endOfSong: false,
+	timerId: null as any
+});
+
+export function setSleepTimer(minutes: number | 'end' | null) {
+	if (sleepTimer.timerId) {
+		clearInterval(sleepTimer.timerId);
+		sleepTimer.timerId = null;
+	}
+
+	if (minutes === null) {
+		sleepTimer.active = false;
+		sleepTimer.remainingSecs = 0;
+		sleepTimer.endOfSong = false;
+		toast.success('Sleep timer turned off');
+		return;
+	}
+
+	if (minutes === 'end') {
+		sleepTimer.active = true;
+		sleepTimer.endOfSong = true;
+		sleepTimer.remainingSecs = Math.max(0, Math.floor(playback.duration - playback.position));
+		toast.success('Sleep timer: stops after this song');
+		return;
+	}
+
+	const totalSecs = minutes * 60;
+	sleepTimer.active = true;
+	sleepTimer.endOfSong = false;
+	sleepTimer.remainingSecs = totalSecs;
+	toast.success(`Sleep timer set for ${minutes} min`);
+
+	sleepTimer.timerId = setInterval(() => {
+		if (sleepTimer.remainingSecs > 1) {
+			sleepTimer.remainingSecs -= 1;
+		} else {
+			clearInterval(sleepTimer.timerId);
+			sleepTimer.timerId = null;
+			sleepTimer.active = false;
+			sleepTimer.remainingSecs = 0;
+			api.togglePause();
+			toast('Sleep timer: music paused');
+		}
+	}, 1000);
+}
+
+export function setPlaybackSpeed(speed: number) {
+	playback.speed = speed;
+	api.setSpeed(speed).catch(() => {});
+	toast.success(`Speed: ${speed}x`);
+}
 
 /** videoId → the in-flight or settled loopback URL for its music video (null when it has none).
  *

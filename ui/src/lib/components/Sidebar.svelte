@@ -103,7 +103,7 @@
 </script>
 
 <aside
-	class="flex h-full w-16 shrink-0 flex-col border-r bg-sidebar p-3 text-sidebar-foreground {wide(
+	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r bg-sidebar p-3 text-sidebar-foreground {wide(
 		'lg:w-60'
 	)}"
 >
