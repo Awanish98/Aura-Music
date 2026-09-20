@@ -68,30 +68,28 @@ class WebPlayer {
 		if (typeof window === 'undefined') return;
 		if (this.ytPlayer) return;
 
+		let mount = document.getElementById('echo-video-mount');
 		let container = document.getElementById('echo-yt-iframe-player');
 		if (!container) {
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
-			container.style.position = 'fixed';
-			container.style.width = '180px';
-			container.style.height = '100px';
-			container.style.bottom = '80px';
-			container.style.right = '16px';
-			container.style.borderRadius = '10px';
-			container.style.overflow = 'hidden';
-			container.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
-			container.style.border = '1px solid rgba(255,255,255,0.12)';
-			container.style.zIndex = '45';
-			container.style.backgroundColor = '#000';
-			document.body.appendChild(container);
+			if (mount) {
+				mount.appendChild(container);
+			} else {
+				container.style.width = '100%';
+				container.style.height = '100%';
+				document.body.appendChild(container);
+			}
+		} else if (mount && container.parentElement !== mount) {
+			mount.appendChild(container);
 		}
 
 		const createPlayer = () => {
 			if (!window.YT || !window.YT.Player || this.ytPlayer) return;
 			try {
 				this.ytPlayer = new window.YT.Player('echo-yt-iframe-player', {
-					height: '100',
-					width: '180',
+					height: '100%',
+					width: '100%',
 					playerVars: {
 						autoplay: 1,
 						controls: 0,
@@ -103,6 +101,7 @@ class WebPlayer {
 						enablejsapi: 1,
 						origin: typeof window !== 'undefined' ? window.location.origin : undefined
 					},
+
 					events: {
 						onReady: () => {
 							this.ytReady = true;

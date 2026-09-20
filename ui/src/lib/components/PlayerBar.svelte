@@ -16,6 +16,7 @@
 		Add01Icon,
 		InfinityIcon,
 		MinimizeScreenIcon,
+		MaximizeScreenIcon,
 		MusicNote01Icon,
 		ArrowUp01Icon,
 		ArrowDown01Icon
@@ -27,6 +28,7 @@
 	import {
 		np,
 		playback,
+		ui,
 		commitVolume,
 		cycleRepeat,
 		dragVolume,
@@ -432,6 +434,23 @@
 					<HugeiconsIcon icon={MinimizeScreenIcon} class="h-5 w-5" />
 				</Button>
 				<Button
+					variant={ui.videoMode !== 'hidden' ? 'secondary' : 'ghost'}
+					size="icon-sm"
+					onclick={() => {
+						if (ui.videoMode === 'hidden') {
+							ui.videoMode = 'docked';
+						} else if (ui.videoMode === 'docked') {
+							ui.videoMode = 'expanded';
+						} else {
+							ui.videoMode = 'docked';
+						}
+					}}
+					aria-label="Video Player (Mini / Fullscreen)"
+					title="Video Player (Mini / Fullscreen)"
+				>
+					<HugeiconsIcon icon={MaximizeScreenIcon} class="h-5 w-5 {ui.videoMode !== 'hidden' ? 'text-primary' : ''}" />
+				</Button>
+				<Button
 					variant={lyricsOpen ? 'secondary' : 'ghost'}
 					size="icon-sm"
 					onclick={onToggleLyrics}
@@ -439,6 +458,7 @@
 				>
 					<HugeiconsIcon icon={Mic01Icon} class="h-5 w-5" />
 				</Button>
+
 				<Button
 					variant={queueOpen ? 'secondary' : 'ghost'}
 					size="icon-sm"

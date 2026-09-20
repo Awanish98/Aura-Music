@@ -44,6 +44,7 @@
 	import MobileNowPlaying from '$lib/components/MobileNowPlaying.svelte';
 	import MobileNav from '$lib/components/MobileNav.svelte';
 	import TheaterMode from '$lib/components/TheaterMode.svelte';
+	import FloatingVideoPlayer from '$lib/components/FloatingVideoPlayer.svelte';
 	import VideoSurface from '$lib/components/VideoSurface.svelte';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import KeyboardShortcuts from '$lib/components/KeyboardShortcuts.svelte';
@@ -225,6 +226,7 @@
 	     long as it is mounted. Nothing playing means nothing to show, and that guard is also what
 	     closes it (and leaves fullscreen) when the queue runs out. -->
 	{#if ui.theaterOpen && playback.now}<TheaterMode />{/if}
+	{#if !ui.theaterOpen && playback.now}<FloatingVideoPlayer />{/if}
 
 	<CommandPalette />
 	<KeyboardShortcuts />
