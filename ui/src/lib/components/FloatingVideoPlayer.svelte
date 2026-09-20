@@ -119,14 +119,14 @@
 		<button
 			onclick={() => setMode('docked')}
 			transition:scale={{ duration: 200, easing: cubicOut }}
-			class="fixed bottom-24 right-6 z-40 flex items-center gap-2 rounded-full border border-white/20 bg-background/90 px-4 py-2 text-xs font-semibold shadow-2xl backdrop-blur-xl transition hover:scale-105 hover:border-primary/50 hover:bg-card hover:text-primary"
+			class="fixed bottom-32 right-4 md:bottom-24 md:right-8 z-40 flex items-center gap-2 rounded-full border border-white/20 bg-background/90 px-3.5 py-1.5 md:px-4 md:py-2 text-[11px] md:text-xs font-semibold shadow-2xl backdrop-blur-xl transition hover:scale-105 hover:border-primary/50 hover:bg-card hover:text-primary"
 			aria-label="Restore Video Player"
 		>
-			<span class="relative flex h-2.5 w-2.5">
+			<span class="relative flex h-2 w-2 md:h-2.5 md:w-2.5">
 				<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-				<span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary"></span>
+				<span class="relative inline-flex h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-primary"></span>
 			</span>
-			<span>🎬 Video Player</span>
+			<span>🎬 Video</span>
 		</button>
 	{:else}
 		<!-- Main Floating / Expanded / Fullscreen Video Container -->
@@ -152,7 +152,7 @@
 					? 'fixed inset-x-4 top-1/2 z-50 mx-auto -translate-y-1/2 max-w-5xl rounded-3xl border border-white/20 bg-black/95 shadow-[0_32px_80px_rgba(0,0,0,0.9)] aspect-video'
 					: ui.videoMode === 'fullscreen' || isFullscreen
 						? 'fixed inset-0 z-[100] h-screen w-screen bg-black rounded-none border-0'
-						: 'fixed bottom-24 right-4 md:right-8 z-40 w-72 sm:w-80 md:w-96 rounded-2xl border border-white/15 bg-black/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl aspect-video'}"
+						: 'fixed bottom-32 right-4 md:bottom-24 md:right-8 z-40 w-64 sm:w-80 md:w-96 rounded-2xl border border-white/15 bg-black/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl aspect-video'}"
 		>
 			<!-- Ambient Artwork Glow Background -->
 			{#if now?.thumbnail}

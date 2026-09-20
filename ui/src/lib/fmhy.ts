@@ -1,5 +1,6 @@
 // Curated Music, Podcasts, Radio & Soundscapes from FreeMediaHeckYeah (FMHY Audio Guide: https://fmhy.net/audio)
 import type { BrowseItem, HomeSection, SongItem } from './api';
+import { getApiUrl } from './apiBase';
 
 export interface FmhyItem {
 	id: string;
@@ -622,7 +623,8 @@ export function convertFmhyToSongItem(item: FmhyItem): SongItem {
 export async function fetchSaavnSearch(query: string): Promise<SongItem[]> {
 	if (!query) return [];
 	try {
-		const res = await fetch(`/api/saavn/search?q=${encodeURIComponent(query)}`);
+		const url = getApiUrl(`/api/saavn/search?q=${encodeURIComponent(query)}`);
+		const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
 		if (res.ok) {
 			const data = await res.json();
 			return (data.results || []).map((s: any) => ({
@@ -645,9 +647,15 @@ export async function fetchSaavnSearch(query: string): Promise<SongItem[]> {
 	return [];
 }
 
+let cachedTrending: { charts: BrowseItem[]; featured: BrowseItem[] } | null = null;
+
 export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; featured: BrowseItem[] }> {
+	if (cachedTrending && cachedTrending.charts.length > 0) {
+		return cachedTrending;
+	}
 	try {
-		const res = await fetch('/api/saavn/trending');
+		const url = getApiUrl('/api/saavn/trending');
+		const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
 		if (res.ok) {
 			const data = await res.json();
 			const charts: BrowseItem[] = (data.charts || []).map((c: any) => ({
@@ -670,7 +678,8 @@ export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; feat
 				isUpload: false,
 				explicit: false
 			}));
-			return { charts, featured };
+			cachedTrending = { charts, featured };
+			return cachedTrending;
 		}
 	} catch (e) {
 		console.warn('[fetchSaavnTrending error]', e);
@@ -681,7 +690,8 @@ export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; feat
 export async function fetchSaavnPlaylist(playlistId: string): Promise<SongItem[]> {
 	const cleanId = playlistId.replace('saavn_', '');
 	try {
-		const res = await fetch(`/api/saavn/playlist?id=${encodeURIComponent(cleanId)}`);
+		const url = getApiUrl(`/api/saavn/playlist?id=${encodeURIComponent(cleanId)}`);
+		const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
 		if (res.ok) {
 			const data = await res.json();
 			return (data.songs || []).map((s: any) => ({

@@ -15,6 +15,7 @@ import type {
 	SearchResults,
 	SongItem
 } from './api';
+import { getApiUrl } from './apiBase';
 
 async function post(endpoint: string, body: Record<string, unknown> = {}): Promise<any> {
 	// 1. Try local proxy endpoint first (only when running locally on dev server)
@@ -1071,7 +1072,8 @@ export async function fetchLyrics(
 		if (album) qParams.set('album', album);
 		if (duration && duration > 0) qParams.set('duration', Math.round(duration).toString());
 
-		const res = await fetch(`/api/lyrics?${qParams.toString()}`);
+		const url = getApiUrl(`/api/lyrics?${qParams.toString()}`);
+		const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
 		if (res.ok) {
 			const data = await res.json();
 			if (data && Array.isArray(data.lines) && data.lines.length > 0) {
