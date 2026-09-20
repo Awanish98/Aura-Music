@@ -1,0 +1,14 @@
+{
+  "name": "aura-music",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aura Music - Premium Desktop & Web Music Streaming Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix ui run dev -- --host",
+    "build": "npm --prefix ui run build",
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "start": "npm --prefix server start"
+  }
+}
