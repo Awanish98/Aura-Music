@@ -85,3 +85,27 @@ jobs:
           name: Aura-Music-Android-APK
           path: release-apks/*.apk
           retention-days: 30
+
+      - name: Release APK to GitHub Releases
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-android
+          name: "Aura Music Android v1.0.0 (Production Release)"
+          draft: false
+          prerelease: false
+          files: release-apks/*.apk
+          body: |
+            ## 📱 Aura Music Android v1.0.0 Production APK
+
+            ### 🚀 What's New:
+            - **Lossless 320kbps Audio**: Direct unthrottled streaming with zero ads.
+            - **24/7 Live FMHY Radios & Lofi**: Commercial-free stations (SomaFM, Nightwave Plaza, Chillhop, Radio Paradise).
+            - **Apple Music Syllable-Synced Karaoke Lyrics**: Smooth sweeping glowing highlights.
+            - **Background Lockscreen Audio Playback**: Full MediaSession notifications with seek, skip, play/pause controls.
+            - **Sound Equalizer & Audio FX**: Custom Bass, Mid, Treble dB sliders and presets.
+            - **Google Drive Personal Cloud Music**: Stream tracks directly from your Google Drive.
+            - **Aura AI DJ**: Powered by intelligent AI music recommendation engine.
+
+            ### 📥 Download Link:
+            - [Aura-Music-debug.apk](https://github.com/Awanish98/Aura-Music/releases/download/v1.0.0-android/Aura-Music-debug.apk)

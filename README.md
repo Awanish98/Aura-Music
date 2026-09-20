@@ -24,9 +24,10 @@
 
 | Platform | Link / Deployment | Status |
 |---|---|---|
-| **Live Web App (Render)** | 👉 **[https://aura-music-1no9.onrender.com](https://aura-music-1no9.onrender.com)** | 🟢 Online |
+| **Live Web App (Render)** | 👉 **[https://aura-music-1no9.onrender.com](https://aura-music-1no9.onrender.com)** | 🟢 100% Online |
 | **GitHub Pages** | 🌐 **[https://awanish98.github.io/Aura-Music/](https://awanish98.github.io/Aura-Music/)** | 🟢 Live |
-| **Android APK (Direct Download)** | 📦 **[Download Android APK (GitHub Actions)](https://github.com/Awanish98/Aura-Music/actions)** | 🚀 Ready |
+| **Android APK (Direct Download)** | 📱 **[Download Aura-Music-debug.apk](https://github.com/Awanish98/Aura-Music/releases/tag/v1.0.0-android)** | 📦 v1.0.0 APK |
+| **GitHub Actions Builds** | ⚙️ **[All APK & CI Artifacts](https://github.com/Awanish98/Aura-Music/actions)** | 🚀 Ready |
 | **1-Click Vercel Deploy** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAwanish98%2FAura-Music) | ⚡ 1-Click |
 | **1-Click Render Deploy** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Awanish98/Aura-Music) | ⚡ 1-Click |
 | **1-Click Netlify Deploy** | [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Awanish98/Aura-Music) | ⚡ 1-Click |
