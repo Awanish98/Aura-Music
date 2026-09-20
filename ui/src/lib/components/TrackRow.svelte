@@ -10,7 +10,7 @@
 	} from '@hugeicons/core-free-icons';
 	import * as api from '$lib/api';
 	import type { SongItem } from '$lib/api';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { lt } from '$lib/lt.svelte';
 	import { anySaved, isLiked, ratingOf, savedPlaylists, toggleRating } from '$lib/player.svelte';
 	import SavedInPlaylists from './SavedInPlaylists.svelte';
@@ -229,15 +229,25 @@
 			{/if}
 			{#if !hideThumb}
 				{#if song.thumbnail}
-					<img src={thumb(song.thumbnail, 96)} alt="" class="h-10 w-10 shrink-0 rounded-md object-cover" loading="lazy" />
+					<img
+						src={thumb(song.thumbnail, 96, song.title, 'song')}
+						alt={song.title}
+						class="h-10 w-10 shrink-0 rounded-md object-cover shadow-xs"
+						loading="lazy"
+						decoding="async"
+						onerror={(e) => {
+							const target = e.currentTarget as HTMLImageElement;
+							target.src = generateAvatarSvg(song.title, 'song');
+						}}
+					/>
 				{:else}
-					<!-- An untagged file has no artwork of its own. A music note keeps the row aligned
-					     with its neighbours and says so plainly. -->
-					<div
-						class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground/50"
-					>
-						<HugeiconsIcon icon={MusicNote01Icon} class="h-4 w-4" />
-					</div>
+					<img
+						src={generateAvatarSvg(song.title, 'song')}
+						alt={song.title}
+						class="h-10 w-10 shrink-0 rounded-md object-cover shadow-xs"
+						loading="lazy"
+						decoding="async"
+					/>
 				{/if}
 			{/if}
 		</div>

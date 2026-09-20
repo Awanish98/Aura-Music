@@ -23,7 +23,7 @@
 	import { canVideo, claimVideo, parkVideo, showVideo, video } from '$lib/video.svelte';
 	import { appearance } from '$lib/theme.svelte';
 	import { t } from '$lib/i18n.svelte';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import QueueList from './QueueList.svelte';
 	import type { QueueScrollMemory } from '$lib/queue-history';
 	import LyricsView from './LyricsView.svelte';
@@ -222,23 +222,21 @@
 						<!-- The artwork, when the video above isn't the picture. Both arms carry the same
 						     guard rather than nesting, so the branch below keeps its indentation. -->
 						{#if !showVideo() && src && attempt < srcs.length}
-							<!-- The 120 underneath is the one the player bar already has for this track, so it
-							     paints on the frame the track changes. Without it an <img> keeps showing the
-							     *previous* track's picture for as long as this one's fetch takes (#77): 720 is
-							     a size nothing else in the app asks for, so it is always a cold request. -->
 							<img
 								{src}
-								alt=""
+								alt={playback.now?.title || 'Aura'}
 								onerror={imgFailed}
 								style={srcs[2] ? `background-image:url(${srcs[2]})` : undefined}
 								class="aspect-square w-full rounded-2xl bg-cover object-cover shadow-2xl"
+								decoding="async"
 							/>
 						{:else if !showVideo()}
-							<div
-								class="flex aspect-square w-full items-center justify-center rounded-2xl bg-muted text-muted-foreground/40"
-							>
-								<HugeiconsIcon icon={MusicNote01Icon} class="h-16 w-16" />
-							</div>
+							<img
+								src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+								alt={playback.now?.title || 'Aura'}
+								class="aspect-square w-full rounded-2xl bg-cover object-cover shadow-2xl"
+								decoding="async"
+							/>
 						{/if}
 					</button>
 					{#if canVideo()}

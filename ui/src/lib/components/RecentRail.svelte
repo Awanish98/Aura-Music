@@ -18,7 +18,7 @@
 	import SectionHeading from './SectionHeading.svelte';
 	import { ON_REPEAT_ID } from '$lib/api';
 	import type { BrowseItem } from '$lib/api';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { setDragItem } from '$lib/dnd';
 	import { openItem, playItem } from '$lib/browse';
 	import { t } from '$lib/i18n.svelte';
@@ -76,31 +76,24 @@
 						: 'rounded-md'}"
 				>
 					{#if item.thumbnail && !failed[item.thumbnail]}
-						<!-- 400 for a 40px slot: it's the size every card on the page already asked for, so
-						     it comes straight out of the webview's cache. -->
 						<img
 							src={thumb(item.thumbnail, 400)}
-							alt=""
+							alt={item.title}
 							class="h-full w-full object-cover"
 							loading="lazy"
+							decoding="async"
 							draggable="false"
 							onerror={() => (failed = { ...failed, [item.thumbnail!]: true })}
 						/>
 					{:else}
-						{@const onRepeat = item.id === ON_REPEAT_ID}
-						<div
-							class="flex h-full w-full items-center justify-center {onRepeat
-								? 'bg-primary/10 text-primary'
-								: 'text-muted-foreground/50'}"
-						>
-							<!-- altIcon/showAlt, not a third ternary: `icon` is read once at mount. -->
-							<HugeiconsIcon
-								icon={round ? UserIcon : MusicNote01Icon}
-								altIcon={ListRestartIcon}
-								showAlt={onRepeat}
-								class="h-4 w-4"
-							/>
-						</div>
+						<img
+							src={generateAvatarSvg(item.title, item.kind)}
+							alt={item.title}
+							class="h-full w-full object-cover"
+							loading="lazy"
+							decoding="async"
+							draggable="false"
+						/>
 					{/if}
 				</div>
 				<div class="min-w-0 flex-1">

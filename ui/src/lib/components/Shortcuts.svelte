@@ -29,7 +29,7 @@
 	import ShortcutPicker from './ShortcutPicker.svelte';
 	import { ON_REPEAT_ID } from '$lib/api';
 	import type { BrowseItem } from '$lib/api';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { openItem, playItem } from '$lib/browse';
 	import { library, personal, placePick, removePick } from '$lib/player.svelte';
 	import { freshen, MAX_PICKS } from '$lib/personal';
@@ -253,25 +253,22 @@
 								{#if item.thumbnail && !failed[item.thumbnail] && !onRepeat}
 									<img
 										src={thumb(item.thumbnail, 400)}
-										alt=""
+										alt={item.title}
 										class="h-full w-full object-cover"
 										loading="lazy"
+										decoding="async"
 										draggable="false"
 										onerror={() => (failed = { ...failed, [item.thumbnail!]: true })}
 									/>
 								{:else}
-									<div
-										class="flex h-full w-full items-center justify-center {onRepeat
-											? 'bg-primary/10 text-primary'
-											: 'text-muted-foreground/50'}"
-									>
-										<HugeiconsIcon
-											icon={round ? UserIcon : MusicNote01Icon}
-											altIcon={ListRestartIcon}
-											showAlt={onRepeat}
-											class={onRepeat ? 'h-7 w-7' : 'h-5 w-5'}
-										/>
-									</div>
+									<img
+										src={generateAvatarSvg(item.title, item.kind)}
+										alt={item.title}
+										class="h-full w-full object-cover"
+										loading="lazy"
+										decoding="async"
+										draggable="false"
+									/>
 								{/if}
 							</div>
 							<!-- Text details with responsive padding -->

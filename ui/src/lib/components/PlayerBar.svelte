@@ -40,7 +40,7 @@
 		toggleNowPlayingRating,
 		wheelVolume
 	} from '$lib/player.svelte';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import ArtistLine from './ArtistLine.svelte';
 	import Marquee from './Marquee.svelte';
 	import TrackMenu from './TrackMenu.svelte';
@@ -163,16 +163,26 @@
 			{#key playback.now?.videoId}
 				{#if playback.now?.thumbnail}
 					<img
-						src={thumb(playback.now.thumbnail, 120)}
+						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
 						class="h-10 w-10 shrink-0 rounded-lg object-cover shadow-md"
 						in:fade={{ duration: 250 }}
+						decoding="async"
+						onerror={(e) => {
+							const target = e.currentTarget as HTMLImageElement;
+							target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+						}}
 					/>
 				{:else}
-					<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground/50">
-						<HugeiconsIcon icon={MusicNote01Icon} class="h-4 w-4" />
-					</div>
+					<img
+						src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+						alt=""
+						style="max-width:none"
+						class="h-10 w-10 shrink-0 rounded-lg object-cover shadow-md"
+						in:fade={{ duration: 250 }}
+						decoding="async"
+					/>
 				{/if}
 			{/key}
 			<div class="min-w-0 flex-1">
@@ -233,18 +243,26 @@
 			{#key playback.now?.videoId}
 				{#if playback.now?.thumbnail}
 					<img
-						src={thumb(playback.now.thumbnail, 120)}
+						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-12 w-12 shrink-0 rounded-lg object-cover"
+						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm"
 						in:fade={{ duration: 250 }}
+						decoding="async"
+						onerror={(e) => {
+							const target = e.currentTarget as HTMLImageElement;
+							target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+						}}
 					/>
 				{:else}
-					<div
-						class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground/50"
-					>
-						<HugeiconsIcon icon={MusicNote01Icon} class="h-5 w-5" />
-					</div>
+					<img
+						src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+						alt=""
+						style="max-width:none"
+						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm"
+						in:fade={{ duration: 250 }}
+						decoding="async"
+					/>
 				{/if}
 			{/key}
 			<div class="min-w-0">

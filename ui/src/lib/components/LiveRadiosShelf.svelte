@@ -2,6 +2,7 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import { PlayIcon, Radio02Icon, VolumeHighIcon, Wifi01Icon } from '@hugeicons/core-free-icons';
 	import { FMHY_RADIO_STATIONS, convertFmhyToSongItem, type FmhyItem } from '$lib/fmhy';
+	import { generateAvatarSvg } from '$lib/thumb';
 	import { webPlayer } from '$lib/webplayer';
 	import { playback } from '$lib/player.svelte';
 
@@ -46,6 +47,10 @@
 						class="size-full object-cover transition-transform duration-300 group-hover:scale-105"
 						loading="lazy"
 						decoding="async"
+						onerror={(e) => {
+							const target = e.currentTarget as HTMLImageElement;
+							target.src = generateAvatarSvg(station.title, 'radio');
+						}}
 					/>
 
 					<!-- Live Badge -->

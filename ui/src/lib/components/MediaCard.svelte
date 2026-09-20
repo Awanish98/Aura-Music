@@ -8,7 +8,7 @@
 	} from '@hugeicons/core-free-icons';
 	import { ON_REPEAT_ID } from '$lib/api';
 	import type { BrowseItem } from '$lib/api';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { setDragItem } from '$lib/dnd';
 	import { openItem, playItem } from '$lib/browse';
 	import ItemMenu from './ItemMenu.svelte';
@@ -107,32 +107,22 @@
 					<img
 						{src}
 						{srcset}
-						alt=""
+						alt={item.title}
 						class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
 						loading="lazy"
+						decoding="async"
 						draggable="false"
 						onerror={imgFailed}
 					/>
 				{:else}
-					<div
-						class="flex h-full w-full items-center justify-center {onRepeat
-							? 'bg-primary/10 text-primary'
-							: 'text-muted-foreground/50'}"
-					>
-						<!-- altIcon/showAlt, not a third ternary: `icon` is read once at mount. -->
-						<HugeiconsIcon
-							icon={round ? UserIcon : MusicNote01Icon}
-							altIcon={ListRestartIcon}
-							showAlt={onRepeat}
-							class={onRepeat
-								? compact
-									? 'h-7 w-7'
-									: 'h-10 w-10'
-								: compact
-									? 'h-5 w-5'
-									: 'h-7 w-7'}
-						/>
-					</div>
+					<img
+						src={generateAvatarSvg(item.title, item.kind)}
+						alt={item.title}
+						class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+						loading="lazy"
+						decoding="async"
+						draggable="false"
+					/>
 				{/if}
 				{#if item.kind !== 'artist'}
 					<!-- transition-[opacity,transform], not transition-all: opacity and translate are the

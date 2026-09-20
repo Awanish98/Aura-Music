@@ -8,6 +8,7 @@
 		ArrowRight01Icon
 	} from '@hugeicons/core-free-icons';
 	import { FMHY_TOP_ARTISTS, type FmhyArtist } from '$lib/fmhy';
+	import { generateAvatarSvg } from '$lib/thumb';
 	import { webPlayer } from '$lib/webplayer';
 	import * as api from '$lib/api';
 
@@ -81,6 +82,10 @@
 						class="relative size-full rounded-full object-cover shadow-md border-2 border-border/60 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary"
 						loading="lazy"
 						decoding="async"
+						onerror={(e) => {
+							const target = e.currentTarget as HTMLImageElement;
+							target.src = generateAvatarSvg(artist.name, 'artist');
+						}}
 					/>
 
 					<!-- Verified Badge -->
