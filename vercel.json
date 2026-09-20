@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm --prefix ui install --legacy-peer-deps",
   "buildCommand": "npm --prefix ui run build",
   "outputDirectory": "ui/build",
   "cleanUrls": true,

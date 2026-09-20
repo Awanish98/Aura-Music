@@ -4,9 +4,13 @@
   "private": true,
   "description": "Aura Music - Premium Desktop & Web Music Streaming Platform",
   "type": "module",
+  "workspaces": [
+    "ui",
+    "server"
+  ],
   "scripts": {
     "dev": "npm --prefix ui run dev -- --host",
-    "build": "npm --prefix ui run build",
+    "build": "npm --prefix ui install --legacy-peer-deps && npm --prefix ui run build",
     "server": "npm --prefix server start",
     "server:dev": "npm --prefix server run dev",
     "start": "npm --prefix server start"
