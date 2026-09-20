@@ -17,27 +17,26 @@ class WebPlayer {
 	private currentItem: SongItem | null = null;
 	private progressInterval: ReturnType<typeof setInterval> | null = null;
 	private isRadioStream = false;
+	private usingDirectAudio = false;
 	private pendingVideoId: string | null = null;
 
 	init() {
 		if (typeof window === 'undefined') return;
 
-		// 1. Initialize HTML5 Audio for direct radio streams (e.g. SomaFM, MP3 streams)
+		// 1. Initialize HTML5 Audio for direct streams
 		if (!this.audio) {
 			this.audio = new Audio();
 			this.audio.preload = 'auto';
 			this.audio.volume = (playback.volume ?? 100) / 100;
 
 			this.audio.addEventListener('play', () => {
-				if (this.isRadioStream) {
-					playback.paused = false;
-					this.startProgress();
-					this.updateMediaSessionState('playing');
-				}
+				playback.paused = false;
+				this.startProgress();
+				this.updateMediaSessionState('playing');
 			});
 
 			this.audio.addEventListener('pause', () => {
-				if (this.isRadioStream) {
+				if (this.usingDirectAudio || this.isRadioStream) {
 					playback.paused = true;
 					this.stopProgress();
 					this.updateMediaSessionState('paused');
@@ -45,7 +44,7 @@ class WebPlayer {
 			});
 
 			this.audio.addEventListener('timeupdate', () => {
-				if (this.isRadioStream && this.audio) {
+				if (this.audio && (this.usingDirectAudio || this.isRadioStream)) {
 					playback.position = this.audio.currentTime || 0;
 					playback.positionAt = performance.now();
 					if (this.audio.duration && !isNaN(this.audio.duration)) {
@@ -55,7 +54,7 @@ class WebPlayer {
 			});
 
 			this.audio.addEventListener('ended', () => {
-				if (this.isRadioStream) this.next();
+				this.next();
 			});
 
 			this.setupMediaSession();
@@ -85,7 +84,7 @@ class WebPlayer {
 		}
 
 		const createPlayer = () => {
-			if (!window.YT || !window.YT.Player) return;
+			if (!window.YT || !window.YT.Player || this.ytPlayer) return;
 			try {
 				this.ytPlayer = new window.YT.Player('echo-yt-iframe-player', {
 					height: '180',
@@ -132,8 +131,12 @@ class WebPlayer {
 								this.updateMediaSessionState('paused');
 							} else if (event.data === 0) {
 								this.next();
-							} else if (event.data === 3) {
+							} else if (event.data === 3 || event.data === -1 || event.data === 5) {
+								// BUFFERING, UNSTARTED, CUED - ensure playback starts
 								playback.paused = false;
+								try {
+									this.ytPlayer.playVideo();
+								} catch {}
 							}
 						},
 						onError: (err: any) => {
@@ -157,6 +160,14 @@ class WebPlayer {
 				if (prevCallback) prevCallback();
 				createPlayer();
 			};
+
+			const checkYT = setInterval(() => {
+				if (window.YT && window.YT.Player) {
+					clearInterval(checkYT);
+					createPlayer();
+				}
+			}, 100);
+			setTimeout(() => clearInterval(checkYT), 6000);
 
 			if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
 				const tag = document.createElement('script');
@@ -306,8 +317,57 @@ class WebPlayer {
 		} catch {}
 	}
 
+	private async getDirectAudioUrl(videoId: string): Promise<string | null> {
+		const endpoints = [
+			`https://inv.nadeko.net/api/v1/videos/${videoId}`,
+			`https://invidious.jing.rocks/api/v1/videos/${videoId}`,
+			`https://pipedapi.kavin.rocks/streams/${videoId}`
+		];
+
+		for (const ep of endpoints) {
+			try {
+				const res = await fetch(ep, { signal: AbortSignal.timeout(1800) });
+				if (res.ok) {
+					const data = await res.json();
+					if (Array.isArray(data.adaptiveFormats)) {
+						const audios = data.adaptiveFormats.filter((f: any) => f.type?.includes('audio'));
+						if (audios.length > 0) {
+							const sorted = audios.sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+							if (sorted[0]?.url) return sorted[0].url;
+						}
+					}
+					if (Array.isArray(data.audioStreams) && data.audioStreams.length > 0) {
+						const sorted = [...data.audioStreams].sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+						if (sorted[0]?.url) return sorted[0].url;
+					}
+				}
+			} catch {}
+		}
+		return null;
+	}
+
+	private playAudioDirect(url: string) {
+		if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.pauseVideo === 'function') {
+			try {
+				this.ytPlayer.pauseVideo();
+			} catch {}
+		}
+		this.usingDirectAudio = true;
+		if (this.audio) {
+			this.audio.src = url;
+			this.audio.volume = (playback.volume ?? 100) / 100;
+			this.audio.play().catch((e) => {
+				console.warn('[Direct Audio Play Error]', e);
+				if (this.currentItem?.video_id) {
+					this.loadAndPlayYt(this.currentItem.video_id);
+				}
+			});
+		}
+	}
+
 	private loadAndPlayYt(videoId: string) {
 		if (this.audio) this.audio.pause();
+		this.usingDirectAudio = false;
 		this.isRadioStream = false;
 
 		if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.loadVideoById === 'function') {
@@ -334,6 +394,16 @@ class WebPlayer {
 		this.init();
 		this.currentItem = item;
 
+		const parseDurationToSeconds = (dur?: string | number): number => {
+			if (typeof dur === 'number') return dur;
+			if (!dur) return 0;
+			const parts = String(dur).split(':').map((p) => parseInt(p, 10));
+			if (parts.some(isNaN)) return 0;
+			if (parts.length === 2) return parts[0] * 60 + parts[1];
+			if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+			return 0;
+		};
+
 		const now: NowPlaying = {
 			videoId: item.video_id,
 			title: item.title,
@@ -351,6 +421,7 @@ class WebPlayer {
 		playback.paused = false;
 		playback.position = 0;
 		playback.positionAt = performance.now();
+		playback.duration = parseDurationToSeconds(item.duration) || 0;
 
 		this.updateMediaSession(now);
 
@@ -365,15 +436,7 @@ class WebPlayer {
 		// 1. Direct audio stream (e.g. SomaFM, Nightwave Plaza)
 		if ((item as any).streamUrl) {
 			this.isRadioStream = true;
-			if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.pauseVideo === 'function') {
-				try {
-					this.ytPlayer.pauseVideo();
-				} catch {}
-			}
-			if (this.audio) {
-				this.audio.src = (item as any).streamUrl;
-				this.audio.play().catch(console.warn);
-			}
+			this.playAudioDirect((item as any).streamUrl);
 			return;
 		}
 
@@ -391,15 +454,7 @@ class WebPlayer {
 						const blob = await res.blob();
 						const blobUrl = URL.createObjectURL(blob);
 						this.isRadioStream = true;
-						if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.pauseVideo === 'function') {
-							try {
-								this.ytPlayer.pauseVideo();
-							} catch {}
-						}
-						if (this.audio) {
-							this.audio.src = blobUrl;
-							this.audio.play().catch(console.warn);
-						}
+						this.playAudioDirect(blobUrl);
 						return;
 					}
 				}
@@ -408,14 +463,21 @@ class WebPlayer {
 			}
 		}
 
-		// 3. Resolve best YouTube Music Video ID if Spotify or custom
-		const targetVideoId = await this.resolveBestVideoId(item);
+		// 3. Resolve target YouTube Video ID
+		const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
 		if (targetVideoId) {
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
+
+			// Quick direct audio check (< 1.5s) for zero-lag native HTML5 audio
+			const directUrl = await this.getDirectAudioUrl(targetVideoId);
+			if (directUrl) {
+				this.playAudioDirect(directUrl);
+				return;
+			}
+
+			// Fallback to YouTube Iframe player
 			this.loadAndPlayYt(targetVideoId);
-		} else if (item.video_id && !this.isRadioStream) {
-			this.loadAndPlayYt(item.video_id);
 		}
 	}
 
@@ -459,7 +521,7 @@ class WebPlayer {
 	}
 
 	togglePause() {
-		if (this.isRadioStream) {
+		if (this.usingDirectAudio || this.isRadioStream) {
 			if (!this.audio) return;
 			if (this.audio.paused) {
 				this.audio.play().catch(console.warn);
@@ -479,17 +541,13 @@ class WebPlayer {
 	}
 
 	seek(position: number) {
-		if (this.isRadioStream) {
-			if (this.audio) {
-				this.audio.currentTime = position;
-				playback.position = position;
-				playback.positionAt = performance.now();
-			}
+		playback.position = position;
+		playback.positionAt = performance.now();
+		if ((this.usingDirectAudio || this.isRadioStream) && this.audio) {
+			this.audio.currentTime = position;
 		} else if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.seekTo === 'function') {
 			try {
 				this.ytPlayer.seekTo(position, true);
-				playback.position = position;
-				playback.positionAt = performance.now();
 			} catch {}
 		}
 	}

@@ -17,20 +17,23 @@ import type {
 } from './api';
 
 async function post(endpoint: string, body: Record<string, unknown> = {}): Promise<any> {
-	// 1. Try local proxy endpoint first (works in vite dev server)
-	try {
-		const res = await fetch(`/api/yt-music/${endpoint}`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body)
-		});
-		if (res.ok) {
-			const text = await res.text();
-			if (text.startsWith('{') || text.startsWith('[')) {
-				return JSON.parse(text);
+	// 1. Try local proxy endpoint first (only when running locally on dev server)
+	if (typeof window !== 'undefined' && !window.location.hostname.includes('github.io')) {
+		try {
+			const res = await fetch(`/api/yt-music/${endpoint}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body),
+				signal: AbortSignal.timeout(1200)
+			});
+			if (res.ok) {
+				const text = await res.text();
+				if (text.startsWith('{') || text.startsWith('[')) {
+					return JSON.parse(text);
+				}
 			}
-		}
-	} catch {}
+		} catch {}
+	}
 
 	// 2. Direct CORS proxy fallback to YouTube Music InnerTube
 	const payload = {
@@ -45,8 +48,10 @@ async function post(endpoint: string, body: Record<string, unknown> = {}): Promi
 		...body
 	};
 
+	const targetUrl = `https://music.youtube.com/youtubei/v1/${endpoint}?prettyPrint=false`;
 	const proxies = [
-		`https://corsproxy.io/?url=${encodeURIComponent(`https://music.youtube.com/youtubei/v1/${endpoint}?prettyPrint=false`)}`
+		`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`,
+		`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
 	];
 
 	for (const proxyUrl of proxies) {
@@ -58,7 +63,8 @@ async function post(endpoint: string, body: Record<string, unknown> = {}): Promi
 					'X-YouTube-Client-Name': '67',
 					'X-YouTube-Client-Version': '1.20240101.01.00'
 				},
-				body: JSON.stringify(payload)
+				body: JSON.stringify(payload),
+				signal: AbortSignal.timeout(2200)
 			});
 			if (res.ok) {
 				const data = await res.json();
@@ -71,12 +77,12 @@ async function post(endpoint: string, body: Record<string, unknown> = {}): Promi
 	if (endpoint === 'search' && body.query) {
 		const q = encodeURIComponent(String(body.query));
 		const invidiousEndpoints = [
-			`https://invidious.jing.rocks/api/v1/search?q=${q}&type=video`,
-			`https://inv.nadeko.net/api/v1/search?q=${q}&type=video`
+			`https://inv.nadeko.net/api/v1/search?q=${q}&type=video`,
+			`https://invidious.jing.rocks/api/v1/search?q=${q}&type=video`
 		];
 		for (const invUrl of invidiousEndpoints) {
 			try {
-				const res = await fetch(invUrl);
+				const res = await fetch(invUrl, { signal: AbortSignal.timeout(2200) });
 				if (res.ok) {
 					const items = await res.json();
 					if (Array.isArray(items) && items.length > 0) {
