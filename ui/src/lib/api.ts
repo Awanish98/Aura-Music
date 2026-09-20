@@ -86,54 +86,68 @@ const mockHome: HomePage = {
 	],
 	sections: [
 		{
-			title: 'Welcome to Echo Music',
+			title: '🔥 Trending & Global Hits',
 			items: [
 				{
 					kind: 'song',
-					id: 'demo1',
-					title: 'Starboy',
-					subtitle: 'The Weeknd • Starboy',
-					thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=300&fit=crop'
+					id: '4NRXx6U8ABQ',
+					title: 'Blinding Lights',
+					subtitle: 'The Weeknd • After Hours',
+					thumbnail: 'https://i.ytimg.com/vi/4NRXx6U8ABQ/hqdefault.jpg',
+					duration: '3:20'
 				},
 				{
 					kind: 'song',
-					id: 'demo2',
-					title: 'Blinding Lights',
+					id: '34Na4j8AVgA',
+					title: 'Starboy (ft. Daft Punk)',
+					subtitle: 'The Weeknd • Starboy',
+					thumbnail: 'https://i.ytimg.com/vi/34Na4j8AVgA/hqdefault.jpg',
+					duration: '3:50'
+				},
+				{
+					kind: 'song',
+					id: 'XXYlFuWEuKi',
+					title: 'Save Your Tears',
 					subtitle: 'The Weeknd • After Hours',
-					thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop'
+					thumbnail: 'https://i.ytimg.com/vi/XXYlFuWEuKi/hqdefault.jpg',
+					duration: '3:35'
 				},
 				{
-					kind: 'playlist',
-					id: 'demo3',
-					title: 'Today’s Hits',
-					subtitle: 'Echo Music • 50 songs',
-					thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
+					kind: 'song',
+					id: 'BddP6PYo2gs',
+					title: 'Kesariya',
+					subtitle: 'Arijit Singh, Pritam • Brahmāstra',
+					thumbnail: 'https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg',
+					duration: '4:28'
 				},
 				{
-					kind: 'album',
-					id: 'demo4',
-					title: 'After Hours',
-					subtitle: 'The Weeknd • 2020',
-					thumbnail: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=300&h=300&fit=crop'
+					kind: 'song',
+					id: 'Umqb9KENgmk',
+					title: 'Tum Hi Ho',
+					subtitle: 'Arijit Singh • Aashiqui 2',
+					thumbnail: 'https://i.ytimg.com/vi/Umqb9KENgmk/hqdefault.jpg',
+					duration: '4:22'
 				}
 			]
 		},
 		{
-			title: 'Quick Picks',
+			title: '📻 24/7 Live Radios & Chill',
 			items: [
 				{
 					kind: 'song',
-					id: 'demo5',
-					title: 'Save Your Tears',
-					subtitle: 'The Weeknd',
-					thumbnail: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300&h=300&fit=crop'
+					id: 'jfKfPfyJRdk',
+					title: 'Lofi Girl - Relax & Study Radio',
+					subtitle: 'Lofi Girl • 24/7 Live Stream',
+					thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg',
+					duration: 'LIVE'
 				},
 				{
 					kind: 'song',
-					id: 'demo6',
-					title: 'Die For You',
-					subtitle: 'The Weeknd',
-					thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=300&fit=crop'
+					id: '4xDzrJKXOOY',
+					title: 'Synthwave Radio - Chill Beats',
+					subtitle: 'Lofi Girl • 24/7 Retro Beats',
+					thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/maxresdefault.jpg',
+					duration: 'LIVE'
 				}
 			]
 		}

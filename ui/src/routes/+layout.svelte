@@ -26,6 +26,7 @@
 	import { t } from '$lib/i18n.svelte';
 	import { blockForeignDrag, dragScroll } from '$lib/dnd';
 	import { suppressNative } from '$lib/menu';
+	import { webPlayer } from '$lib/webplayer';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import Titlebar from '$lib/components/Titlebar.svelte';
 	import ResizeBorders from '$lib/components/ResizeBorders.svelte';
@@ -123,6 +124,9 @@
 		}
 		// First: it reveals the window (see initWin).
 		const teardownWin = initWin();
+		if (!isTauri()) {
+			webPlayer.init();
+		}
 		checkForUpdatesQuiet();
 		// Repeat while the app stays open: ✕ hides to tray by default, so this component can stay
 		// mounted for days and a mount-only check would never see a release published in between.

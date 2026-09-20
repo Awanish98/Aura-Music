@@ -1,6 +1,7 @@
 // Pure Native HTML5 & YouTube Web Audio Engine for Echo Music (100% Ad-Free & Background Playback)
 import { playback, np } from './player.svelte';
 import type { NowPlaying, QueueState, SongItem } from './api';
+import { fetchSearch } from './ytmusic';
 
 declare global {
 	interface Window {
@@ -73,13 +74,13 @@ class WebPlayer {
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
 			container.style.position = 'fixed';
-			container.style.width = '200px';
-			container.style.height = '200px';
-			container.style.bottom = '-400px';
-			container.style.left = '-400px';
-			container.style.opacity = '0';
+			container.style.width = '240px';
+			container.style.height = '180px';
+			container.style.bottom = '0px';
+			container.style.right = '0px';
+			container.style.opacity = '0.001';
 			container.style.pointerEvents = 'none';
-			container.style.zIndex = '-999';
+			container.style.zIndex = '-9999';
 			document.body.appendChild(container);
 		}
 
@@ -87,8 +88,8 @@ class WebPlayer {
 			if (!window.YT || !window.YT.Player) return;
 			try {
 				this.ytPlayer = new window.YT.Player('echo-yt-iframe-player', {
-					height: '200',
-					width: '200',
+					height: '180',
+					width: '240',
 					playerVars: {
 						autoplay: 1,
 						controls: 0,
@@ -97,7 +98,8 @@ class WebPlayer {
 						rel: 0,
 						modestbranding: 1,
 						playsinline: 1,
-						origin: window.location.origin
+						enablejsapi: 1,
+						origin: typeof window !== 'undefined' ? window.location.origin : undefined
 					},
 					events: {
 						onReady: () => {
@@ -199,7 +201,7 @@ class WebPlayer {
 		navigator.mediaSession.metadata = new MediaMetadata({
 			title: now.title,
 			artist: now.artists,
-			album: 'Echo Music',
+			album: 'Aura Music',
 			artwork
 		});
 	}
@@ -247,6 +249,8 @@ class WebPlayer {
 			!item.video_id.startsWith('sp:') &&
 			!item.video_id.startsWith('radio_') &&
 			!item.video_id.startsWith('fmhy_') &&
+			!item.video_id.startsWith('LOCAL:') &&
+			!item.video_id.startsWith('demo') &&
 			item.video_id.length === 11
 		) {
 			return item.video_id;
@@ -266,30 +270,9 @@ class WebPlayer {
 				}
 				if (fmItem.searchQuery) {
 					try {
-						const res = await fetch('/api/yt-music/search', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ query: fmItem.searchQuery })
-						});
-						if (res.ok) {
-							const data = await res.json();
-							const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
-							const secList = tab?.content?.sectionListRenderer?.contents || [];
-							for (const sec of secList) {
-								const card = sec.musicCardShelfRenderer;
-								const cardVid = card?.title?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId;
-								if (cardVid) return cardVid;
-								for (const c of card?.contents || []) {
-									const vid = c.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-									if (vid) return vid;
-								}
-								const shelf = sec.musicShelfRenderer;
-								for (const c of shelf?.contents || []) {
-									const vid = c.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-									if (vid) return vid;
-								}
-							}
-						}
+						const searchRes = await fetchSearch(fmItem.searchQuery);
+						if (searchRes.songs?.[0]?.id) return searchRes.songs[0].id;
+						if (searchRes.top?.[0]?.id) return searchRes.top[0].id;
 					} catch {}
 				}
 			}
@@ -297,32 +280,9 @@ class WebPlayer {
 
 		try {
 			const query = (item as any).searchQuery || `${item.title} ${item.artists || ''}`.trim();
-			const res = await fetch('/api/yt-music/search', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query })
-			});
-			if (res.ok) {
-				const data = await res.json();
-				const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
-				const secList = tab?.content?.sectionListRenderer?.contents || [];
-				for (const sec of secList) {
-					const card = sec.musicCardShelfRenderer;
-					const cardVid = card?.title?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId;
-					if (cardVid) return cardVid;
-
-					for (const c of card?.contents || []) {
-						const vid = c.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-						if (vid) return vid;
-					}
-
-					const shelf = sec.musicShelfRenderer;
-					for (const c of shelf?.contents || []) {
-						const vid = c.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-						if (vid) return vid;
-					}
-				}
-			}
+			const searchRes = await fetchSearch(query);
+			if (searchRes.songs?.[0]?.id) return searchRes.songs[0].id;
+			if (searchRes.top?.[0]?.id) return searchRes.top[0].id;
 		} catch (e) {
 			console.warn('[Echo WebPlayer] Search fallback error:', e);
 		}
@@ -333,26 +293,14 @@ class WebPlayer {
 	private async retryWithAlternativeStream(item: SongItem) {
 		try {
 			const fallbackQuery = `${item.title} ${item.artists || ''} official audio`;
-			const res = await fetch('/api/yt-music/search', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: fallbackQuery })
-			});
-			if (res.ok) {
-				const data = await res.json();
-				const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
-				const secList = tab?.content?.sectionListRenderer?.contents || [];
-				for (const sec of secList) {
-					const shelf = sec.musicShelfRenderer;
-					for (const c of shelf?.contents || []) {
-						const vid = c.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-						if (vid && vid !== item.video_id) {
-							item.video_id = vid;
-							if (playback.now) playback.now.videoId = vid;
-							this.loadAndPlayYt(vid);
-							return;
-						}
-					}
+			const searchRes = await fetchSearch(fallbackQuery);
+			if (searchRes.songs?.length) {
+				const match = searchRes.songs.find((s) => s.id && s.id !== item.video_id) || searchRes.songs[0];
+				if (match?.id) {
+					item.video_id = match.id;
+					if (playback.now) playback.now.videoId = match.id;
+					this.loadAndPlayYt(match.id);
+					return;
 				}
 			}
 		} catch {}
@@ -460,16 +408,14 @@ class WebPlayer {
 			}
 		}
 
-		// 2. Resolve best YouTube Music Video ID if Spotify or custom
+		// 3. Resolve best YouTube Music Video ID if Spotify or custom
 		const targetVideoId = await this.resolveBestVideoId(item);
 		if (targetVideoId) {
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
-		}
-
-		const vid = targetVideoId || item.video_id;
-		if (vid) {
-			this.loadAndPlayYt(vid);
+			this.loadAndPlayYt(targetVideoId);
+		} else if (item.video_id && !this.isRadioStream) {
+			this.loadAndPlayYt(item.video_id);
 		}
 	}
 
