@@ -1005,6 +1005,53 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 	}
 }
 
+function cleanLyricQuery(str: string): string {
+	if (!str) return '';
+	return str
+		.replace(/(\(|\[)(Official|Lyric|Audio|Video|Visualizer|HD|4K|Remastered|feat\.?|ft\.?|From\s*".*?").*?(\)|\])/gi, '')
+		.replace(/[-–|].*$/g, '')
+		.trim();
+}
+
+function synthesizeWordTimings(lines: LyricLine[]): LyricLine[] {
+	for (let i = 0; i < lines.length; i++) {
+		const cur = lines[i];
+		if (cur.words && cur.words.length > 0) continue;
+		if (cur.time_ms === undefined || !cur.text || !cur.text.trim()) continue;
+
+		let nextTimeMs = (i < lines.length - 1 && lines[i + 1].time_ms !== undefined)
+			? lines[i + 1].time_ms!
+			: cur.time_ms + 4000;
+		let duration = nextTimeMs - cur.time_ms;
+		if (duration > 6500) duration = 5000;
+		if (duration < 600) duration = Math.max(600, cur.text.length * 80);
+
+		cur.end_time_ms = cur.time_ms + duration;
+
+		const rawWords = cur.text.match(/\S+\s*/g) || [cur.text];
+		const totalWeight = rawWords.reduce((acc, w) => acc + Math.max(2, w.trim().length), 0);
+
+		let currentWordStart = cur.time_ms;
+		const words = [];
+
+		for (let wIdx = 0; wIdx < rawWords.length; wIdx++) {
+			const wText = rawWords[wIdx];
+			const charWeight = Math.max(2, wText.trim().length);
+			const wordDur = Math.round((charWeight / totalWeight) * duration);
+			const wordEnd = (wIdx === rawWords.length - 1) ? (cur.time_ms + duration) : (currentWordStart + wordDur);
+
+			words.push({
+				text: wText,
+				start_ms: currentWordStart,
+				end_ms: Math.max(currentWordStart + 80, wordEnd)
+			});
+			currentWordStart = wordEnd;
+		}
+		cur.words = words;
+	}
+	return lines;
+}
+
 export async function fetchLyrics(
 	title: string,
 	artist?: string,
@@ -1014,84 +1061,54 @@ export async function fetchLyrics(
 ): Promise<Lyrics | null> {
 	if (!title) return null;
 
-	// Clean track title (strip "Official Music Video", "(feat. ...)", "[Audio]", etc. for better matching)
-	const cleanTitle = title
-		.replace(/(\(|\[)(Official|Lyric|Audio|Video|Visualizer|HD|4K|Remastered|feat\.?|ft\.?).*?(\)|\])/gi, '')
-		.trim();
+	const cleanTitle = cleanLyricQuery(title) || title;
+	const cleanArtist = cleanLyricQuery((artist || '').split(',')[0].split('&')[0]) || artist;
 
-	// Clean artist string
-	const cleanArtist = (artist || '').split(',')[0].split('&')[0].trim();
-
-	// 1. Try Boidu API for word-level karaoke timings if duration available
-	if (duration && duration > 0) {
-		try {
-			const boiduUrl = `https://lyrics-api.boidu.dev/lyrics?title=${encodeURIComponent(cleanTitle)}&artist=${encodeURIComponent(cleanArtist)}&duration=${Math.round(duration)}`;
-			const bRes = await fetch(boiduUrl, { headers: { 'User-Agent': 'EchoMusic/1.0' } });
-			if (bRes.ok) {
-				const bData = await bRes.json();
-				if (bData && Array.isArray(bData.lines) && bData.lines.length > 0) {
-					const lines: LyricLine[] = bData.lines.map((l: any) => ({
-						time_ms: l.time_ms ?? l.time ?? (l.start ? Math.round(l.start * 1000) : undefined),
-						end_time_ms: l.end_time_ms ?? (l.end ? Math.round(l.end * 1000) : undefined),
-						text: l.text || '',
-						words: l.words?.map((w: any) => ({
-							text: w.text,
-							start_ms: w.start_ms ?? Math.round(w.start * 1000),
-							end_ms: w.end_ms ?? Math.round(w.end * 1000)
-						}))
-					}));
-
-					return {
-						source: 'Boidu',
-						synced: true,
-						instrumental: false,
-						lines
-					};
-				}
-			}
-		} catch {
-			// Fallback to LRCLIB
-		}
-	}
-
-	// 2. Try LRCLIB Exact Match
+	// 1. Prioritize Aura Backend Apple Music Word-to-Word Engine
 	try {
-		const getParams = new URLSearchParams({ track_name: cleanTitle || title });
+		const qParams = new URLSearchParams({ title: cleanTitle });
+		if (cleanArtist) qParams.set('artist', cleanArtist);
+		if (album) qParams.set('album', album);
+		if (duration && duration > 0) qParams.set('duration', Math.round(duration).toString());
+
+		const res = await fetch(`/api/lyrics?${qParams.toString()}`);
+		if (res.ok) {
+			const data = await res.json();
+			if (data && Array.isArray(data.lines) && data.lines.length > 0) {
+				return {
+					source: data.source || 'Apple Music (Synced)',
+					synced: !!data.synced,
+					instrumental: !!data.instrumental,
+					lines: synthesizeWordTimings(data.lines)
+				};
+			}
+		}
+	} catch {}
+
+	// 2. Direct LRCLIB Client Fallback
+	try {
+		const getParams = new URLSearchParams({ track_name: cleanTitle });
 		if (cleanArtist) getParams.set('artist_name', cleanArtist);
 		if (album) getParams.set('album_name', album);
 		if (duration && duration > 0) getParams.set('duration', Math.round(duration).toString());
 
 		let res = await fetch(`https://lrclib.net/api/get?${getParams.toString()}`, {
-			headers: { 'User-Agent': 'EchoMusic/1.0' }
+			headers: { 'User-Agent': 'AuraMusic/1.2.0' }
 		}).catch(() => null);
-
-		// Fallback to internal proxy if direct fails
-		if (!res || !res.ok) {
-			res = await fetch(`/api/lyrics?${getParams.toString()}`).catch(() => null);
-		}
 
 		let data = res && res.ok ? await res.json() : null;
 
-		// 3. Try LRCLIB Search if Exact Match not found
 		if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
 			const q = `${cleanTitle} ${cleanArtist}`.trim();
 			const searchRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
-				headers: { 'User-Agent': 'EchoMusic/1.0' }
+				headers: { 'User-Agent': 'AuraMusic/1.2.0' }
 			}).catch(() => null);
 
 			if (searchRes && searchRes.ok) {
 				const searchItems = await searchRes.json();
 				if (Array.isArray(searchItems) && searchItems.length > 0) {
-					// Choose best matching item by duration or first item
-					if (duration && duration > 0) {
-						data = searchItems.reduce((prev: any, curr: any) => {
-							const prevDiff = Math.abs((prev.duration || 0) - duration);
-							const currDiff = Math.abs((curr.duration || 0) - duration);
-							return currDiff < prevDiff ? curr : prev;
-						}, searchItems[0]);
-					} else {
-						data = searchItems[0];
-					}
+					const synced = searchItems.filter((x: any) => x.syncedLyrics);
+					data = synced.length > 0 ? synced[0] : searchItems[0];
 				}
 			}
 		}
@@ -1103,7 +1120,7 @@ export async function fetchLyrics(
 			if (data.syncedLyrics) {
 				isSynced = true;
 				for (const line of data.syncedLyrics.split('\n')) {
-					const match = line.match(/^\[(\d+):(\d+\.\d+)\]\s*(.*)$/);
+					const match = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
 					if (match) {
 						const min = parseInt(match[1], 10);
 						const sec = parseFloat(match[2]);
@@ -1124,16 +1141,16 @@ export async function fetchLyrics(
 					source: 'LRCLIB',
 					synced: isSynced,
 					instrumental: !!data.instrumental,
-					lines
+					lines: isSynced ? synthesizeWordTimings(lines) : lines
 				};
 			}
 		}
 	} catch (e) {
-		console.warn('[LRCLIB fetch error]', e);
+		console.warn('[LRCLIB fetch fallback error]', e);
 	}
 
-	// 4. Try YouTube Music timed lyrics browse if videoId available
-	if (videoId && !videoId.startsWith('sp:') && !videoId.startsWith('gdrive:') && !videoId.startsWith('fmhy_')) {
+	// 3. Try YouTube Music timed lyrics browse if videoId available
+	if (videoId && !videoId.startsWith('sp:') && !videoId.startsWith('gdrive:') && !videoId.startsWith('fmhy_') && !videoId.startsWith('saavn_')) {
 		try {
 			const nextData = await post('next', { videoId });
 			const tabs = nextData?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs;
@@ -1156,7 +1173,7 @@ export async function fetchLyrics(
 						source: 'YouTube Music',
 						synced: true,
 						instrumental: false,
-						lines
+						lines: synthesizeWordTimings(lines)
 					};
 				} else if (lyricsRenderer?.description?.runs) {
 					const plainText = lyricsRenderer.description.runs.map((r: any) => r.text).join('');

@@ -333,26 +333,204 @@ app.get('/api/stream', async (req, res) => {
 	}
 });
 
-// 7. LRCLIB Synced Lyrics Proxy
+// 7. Word-to-Word Apple Music Synced Lyrics Engine (LRCLIB + Natural Timing Synthesizer)
+function cleanLyricString(str) {
+	if (!str || typeof str !== 'string') return '';
+	return str
+		.replace(/(\(|\[)(Official|Lyric|Audio|Video|Visualizer|HD|4K|Remastered|feat\.?|ft\.?|From\s*".*?").*?(\)|\])/gi, '')
+		.replace(/[-–|].*$/g, '')
+		.trim();
+}
+
+function parseAndEnrichLrc(syncedLyrics) {
+	if (!syncedLyrics || typeof syncedLyrics !== 'string') return [];
+	const rawLines = syncedLyrics.split('\n');
+	const lines = [];
+
+	for (const raw of rawLines) {
+		const trimmed = raw.trim();
+		if (!trimmed) continue;
+
+		const lineTimeMatch = trimmed.match(/^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/);
+		if (!lineTimeMatch) continue;
+
+		const min = parseInt(lineTimeMatch[1], 10);
+		const sec = parseFloat(lineTimeMatch[2]);
+		const lineTimeMs = Math.round((min * 60 + sec) * 1000);
+		let content = lineTimeMatch[3].trim();
+
+		// Check for word-level time tags: <00:12.34>word
+		const wordTags = [...content.matchAll(/<(\d+):(\d+(?:\.\d+)?)>([^<]*)/g)];
+		if (wordTags.length > 0) {
+			const words = [];
+			for (let i = 0; i < wordTags.length; i++) {
+				const wMin = parseInt(wordTags[i][1], 10);
+				const wSec = parseFloat(wordTags[i][2]);
+				const wStart = Math.round((wMin * 60 + wSec) * 1000);
+				const wText = wordTags[i][3];
+				let wEnd = wStart + 400;
+				if (i < wordTags.length - 1) {
+					const nextMin = parseInt(wordTags[i + 1][1], 10);
+					const nextSec = parseFloat(wordTags[i + 1][2]);
+					wEnd = Math.round((nextMin * 60 + nextSec) * 1000);
+				}
+				words.push({ text: wText, start_ms: wStart, end_ms: Math.max(wStart + 100, wEnd) });
+			}
+			lines.push({
+				time_ms: lineTimeMs,
+				text: words.map((w) => w.text).join(''),
+				words
+			});
+		} else {
+			lines.push({
+				time_ms: lineTimeMs,
+				text: content
+			});
+		}
+	}
+
+	lines.sort((a, b) => a.time_ms - b.time_ms);
+
+	// Word Timing Synthesizer (Apple Music style natural phrasing & syllable weighting)
+	for (let i = 0; i < lines.length; i++) {
+		const cur = lines[i];
+		if (cur.words && cur.words.length > 0) continue;
+		if (!cur.text || !cur.text.trim()) continue;
+
+		let nextTimeMs = i < lines.length - 1 ? lines[i + 1].time_ms : cur.time_ms + 4000;
+		let duration = nextTimeMs - cur.time_ms;
+		if (duration > 6500) duration = 5000;
+		if (duration < 600) duration = Math.max(600, cur.text.length * 80);
+
+		cur.end_time_ms = cur.time_ms + duration;
+
+		const rawWords = cur.text.match(/\S+\s*/g) || [cur.text];
+		const totalWeight = rawWords.reduce((acc, w) => acc + Math.max(2, w.trim().length), 0);
+
+		let currentWordStart = cur.time_ms;
+		const words = [];
+
+		for (let wIdx = 0; wIdx < rawWords.length; wIdx++) {
+			const wText = rawWords[wIdx];
+			const charWeight = Math.max(2, wText.trim().length);
+			const wordDur = Math.round((charWeight / totalWeight) * duration);
+			const wordEnd = wIdx === rawWords.length - 1 ? cur.time_ms + duration : currentWordStart + wordDur;
+
+			words.push({
+				text: wText,
+				start_ms: currentWordStart,
+				end_ms: Math.max(currentWordStart + 80, wordEnd)
+			});
+			currentWordStart = wordEnd;
+		}
+		cur.words = words;
+	}
+
+	return lines;
+}
+
 app.get('/api/lyrics', async (req, res) => {
-	const { title, artist, album, duration } = req.query;
-	const qs = new URLSearchParams();
-	if (title) qs.set('track_name', String(title));
-	if (artist) qs.set('artist_name', String(artist));
-	if (album) qs.set('album_name', String(album));
-	if (duration) qs.set('duration', String(duration));
+	const { title, track_name, artist, artist_name, album, album_name, duration } = req.query;
+	const songTitle = String(title || track_name || '').trim();
+	const songArtist = String(artist || artist_name || '').trim();
+	const songAlbum = String(album || album_name || '').trim();
+	const songDur = duration ? Math.round(Number(duration)) : undefined;
+
+	if (!songTitle) {
+		return res.status(400).json({ error: 'Missing title parameter' });
+	}
+
+	const cleanTitle = cleanLyricString(songTitle) || songTitle;
+	const cleanArtist = cleanLyricString(songArtist.split(',')[0].split('&')[0]) || songArtist;
 
 	try {
-		const lyrRes = await fetch(`https://lrclib.net/api/get?${qs.toString()}`, {
-			headers: { 'User-Agent': 'Aura Music v1.0.0' }
-		});
-		const data = await lyrRes.text();
-		res.setHeader('Content-Type', 'application/json');
-		res.status(lyrRes.status).send(data);
+		// 1. Try Exact Match on LRCLIB
+		const exactParams = new URLSearchParams({ track_name: cleanTitle });
+		if (cleanArtist) exactParams.set('artist_name', cleanArtist);
+		if (songAlbum) exactParams.set('album_name', songAlbum);
+		if (songDur && songDur > 0) exactParams.set('duration', songDur.toString());
+
+		let lrcData = null;
+		try {
+			const getRes = await fetch(`https://lrclib.net/api/get?${exactParams.toString()}`, {
+				headers: { 'User-Agent': 'AuraMusic/1.2.0' },
+				signal: AbortSignal.timeout(3500)
+			});
+			if (getRes.ok) {
+				const json = await getRes.json();
+				if (json && (json.syncedLyrics || json.plainLyrics)) {
+					lrcData = json;
+				}
+			}
+		} catch {}
+
+		// 2. Try Search on LRCLIB if exact didn't return synced lyrics
+		if (!lrcData || !lrcData.syncedLyrics) {
+			const queries = [
+				`${cleanTitle} ${cleanArtist}`.trim(),
+				cleanTitle,
+				songTitle
+			];
+
+			for (const q of queries) {
+				if (!q) continue;
+				try {
+					const sRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
+						headers: { 'User-Agent': 'AuraMusic/1.2.0' },
+						signal: AbortSignal.timeout(3500)
+					});
+					if (sRes.ok) {
+						const items = await sRes.json();
+						if (Array.isArray(items) && items.length > 0) {
+							// Prefer synced items
+							const synced = items.filter((x) => x.syncedLyrics);
+							if (synced.length > 0) {
+								if (songDur && songDur > 0) {
+									lrcData = synced.reduce((prev, curr) => {
+										const prevDiff = Math.abs((prev.duration || 0) - songDur);
+										const currDiff = Math.abs((curr.duration || 0) - songDur);
+										return currDiff < prevDiff ? curr : prev;
+									}, synced[0]);
+								} else {
+									lrcData = synced[0];
+								}
+								break;
+							} else if (!lrcData && items[0]?.plainLyrics) {
+								lrcData = items[0];
+							}
+						}
+					}
+				} catch {}
+			}
+		}
+
+		if (lrcData) {
+			if (lrcData.syncedLyrics) {
+				const lines = parseAndEnrichLrc(lrcData.syncedLyrics);
+				return res.json({
+					source: 'LRCLIB (Apple Music Synced)',
+					synced: true,
+					instrumental: !!lrcData.instrumental,
+					lines
+				});
+			} else if (lrcData.plainLyrics) {
+				const lines = lrcData.plainLyrics.split('\n').map((text) => ({ text }));
+				return res.json({
+					source: 'LRCLIB',
+					synced: false,
+					instrumental: false,
+					lines
+				});
+			}
+		}
+
+		res.status(404).json({ error: 'Lyrics not found' });
 	} catch (e) {
+		console.error('[Lyrics API Error]', e);
 		res.status(500).json({ error: String(e) });
 	}
 });
+
 
 // 8. Spotify Entity & Metadata Resolver
 app.get('/api/spotify/resolve', async (req, res) => {

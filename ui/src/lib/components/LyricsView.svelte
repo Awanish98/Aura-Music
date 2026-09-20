@@ -3,15 +3,9 @@
 	import { playback } from '$lib/player.svelte';
 	import { t } from '$lib/i18n.svelte';
 
-	// `expanded` only sizes the type and centres the column. The owner of the extra room (the side
-	// panel, or the now-playing view) decides how much there is. Toggling it must not remount this
-	// component, or the lyrics refetch and the scroll position is lost.
-	// `compact` is the mini-player: a ~220px column with no room for the source footer or a
-	// scrollbar. It only shrinks the type and chrome; the sync/auto-scroll logic is identical.
 	let { expanded = false, compact = false }: { expanded?: boolean; compact?: boolean } =
 		$props();
 
-	/** "3:21" / "1:02:03" → seconds. */
 	function durationSecs(d?: string): number | undefined {
 		if (!d) return undefined;
 		const parts = d.split(':').map(Number);
@@ -23,7 +17,6 @@
 	let loading = $state(true);
 	let scroller: HTMLElement | undefined = $state();
 
-	// videoId of the fetch whose result is (or will be) shown — guards stale responses.
 	let requested = '';
 
 	$effect(() => {
@@ -38,22 +31,19 @@
 		const id = (requested = now.videoId);
 		loading = true;
 		lyrics = null;
-		// Album isn't in now-playing, but the queue item usually has it — better LRCLIB matching.
 		const album = playback.queue.items[playback.queue.currentIndex]?.album;
 		api.getLyrics({
 			videoId: id,
 			title: now.title,
 			artists: now.artists,
 			album: album ?? undefined,
-			// The track's own length — NOT playback.duration, which still holds the previous
-			// track's value for a moment after a track change.
 			duration: durationSecs(now.duration)
 		})
 			.then((l) => {
 				if (requested !== id) return;
 				lyrics = l;
 				loading = false;
-				hasScrolled = false; // first positioning on a new track is an instant jump
+				hasScrolled = false;
 			})
 			.catch(() => {
 				if (requested !== id) return;
@@ -61,7 +51,7 @@
 			});
 	});
 
-	// Last synced line whose cue has passed (lines arrive sorted by time).
+	// Active line index based on current playback timestamp
 	const activeIndex = $derived.by(() => {
 		if (!lyrics?.synced) return -1;
 		const currentMs = posMs;
@@ -75,20 +65,35 @@
 		return i;
 	});
 
-	// Auto-scroll pauses while the user is scrolling (wheel/touch/scrollbar), resumes after 3s.
-	// Tracked via input events, not `scroll`, so our own smooth scrolls don't trip it.
+	// Determine if we are in an instrumental interlude / prelude
+	const isInstrumentalGap = $derived.by(() => {
+		if (!lyrics?.synced || !lyrics.lines.length) return false;
+		const currentMs = posMs;
+		// Intro before first line
+		if (activeIndex === -1 && lyrics.lines[0]?.time_ms && lyrics.lines[0].time_ms > 3000) {
+			return currentMs < lyrics.lines[0].time_ms - 800;
+		}
+		if (activeIndex >= 0 && activeIndex < lyrics.lines.length - 1) {
+			const curLine = lyrics.lines[activeIndex];
+			const nextLine = lyrics.lines[activeIndex + 1];
+			const curEnd = curLine.end_time_ms || (curLine.time_ms ? curLine.time_ms + 4000 : currentMs);
+			if (nextLine.time_ms && nextLine.time_ms - curEnd > 4000) {
+				return currentMs > curEnd + 500 && currentMs < nextLine.time_ms - 800;
+			}
+		}
+		return false;
+	});
+
 	let userScrollUntil = 0;
 	let hasScrolled = false;
 	function onUserScroll() {
-		userScrollUntil = Date.now() + 3000;
+		userScrollUntil = Date.now() + 3500;
 	}
 
 	let wasExpanded: boolean | undefined;
 
 	$effect(() => {
 		const i = activeIndex;
-		// Re-centre after the layout width/font changes, and jump rather than glide across it.
-		// (Also fires on the first run, where both values are already at their defaults.)
 		if (expanded !== wasExpanded) {
 			wasExpanded = expanded;
 			hasScrolled = false;
@@ -97,15 +102,12 @@
 		if (i < 0 || !scroller || Date.now() < userScrollUntil) return;
 		const line = scroller.querySelector(`[data-line="${i}"]`);
 		if (!line) return;
-		// Scroll the scroller itself, never `scrollIntoView`: that walks up and scrolls every
-		// scrollable ancestor too, including theater mode's `overflow-hidden` grid, which then has
-		// no scrollbar to put it back (issue #168).
+
 		const lineRect = line.getBoundingClientRect();
 		const boxRect = scroller.getBoundingClientRect();
 		scroller.scrollTo({
 			top:
 				scroller.scrollTop + (lineRect.top - boxRect.top) - (boxRect.height - lineRect.height) / 2,
-			// Opening mid-song jumps straight to the line; after that, glide.
 			behavior: hasScrolled ? 'smooth' : 'instant'
 		});
 		hasScrolled = true;
@@ -114,20 +116,15 @@
 	function seekTo(line: api.LyricLine) {
 		if (line.time_ms === undefined) return;
 		const secs = line.time_ms / 1000;
-		playback.position = secs; // optimistic — the mpv tick confirms
-		userScrollUntil = 0; // jump the view along with the seek
+		playback.position = secs;
+		playback.positionAt = performance.now();
+		userScrollUntil = 0;
 		api.seek(secs);
 	}
 
-	// mpv's position arrives ~4x a second. Run a local clock forward from each one so the karaoke
-	// sweep moves every frame instead of stepping four times a second.
+	// 60-120fps high-precision frame clock for Apple Music word-to-word sweeping
 	let interpolatedPosSecs = $state(playback.position);
 
-	/** The rAF clock exists for the word sweep and nothing else. Unsynced lyrics have no cues, and
-	 *  line-level-only lyrics move at most once a line, so both are served perfectly well by the
-	 *  position tick they already get. Without this gate the loop ran at refresh rate for any
-	 *  mounted lyrics panel, on every track, for the whole session, which meant the app never
-	 *  reached an idle frame. */
 	const needsFrameClock = $derived(
 		!!lyrics?.synced && lyrics.lines.some((l) => (l.words?.length ?? 0) > 0)
 	);
@@ -138,9 +135,6 @@
 			interpolatedPosSecs = pos;
 			return;
 		}
-		// Rebase on every run. Rebasing only when the value moved kept the base timestamp from
-		// before a pause, so resuming after N seconds paused ran the clock N seconds fast until
-		// the next tick corrected it.
 		const base = pos;
 		const baseAt = performance.now();
 		interpolatedPosSecs = pos;
@@ -162,102 +156,125 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -- handlers only detect scroll intent -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	bind:this={scroller}
 	onwheel={onUserScroll}
 	ontouchmove={onUserScroll}
 	onpointerdown={onUserScroll}
-	class="min-h-0 flex-1 overflow-y-auto {compact
-		? 'px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+	class="relative min-h-0 flex-1 overflow-y-auto selection:bg-white/20 {compact
+		? 'px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
 		: expanded
-			? 'px-10 py-6'
-			: 'px-5 py-6'}"
+			? 'px-8 py-10 md:px-16 lg:px-24'
+			: 'px-5 py-8'}"
 >
+	<!-- Apple Music Ambient Glowing Glow Backdrop -->
+	{#if playback.now?.thumbnail && !compact}
+		<div
+			class="pointer-events-none absolute -inset-10 z-0 opacity-15 blur-3xl transition-opacity duration-1000"
+			style="background-image: url('{playback.now.thumbnail}'); background-size: cover; background-position: center;"
+		></div>
+	{/if}
+
 	{#if loading}
-		<div class="space-y-3">
+		<div class="relative z-10 space-y-4 py-8">
 			{#each { length: 8 } as _, i (i)}
-				<div class="h-5 animate-pulse rounded bg-muted" style="width:{55 + ((i * 17) % 40)}%"></div>
+				<div
+					class="h-7 animate-pulse rounded-lg bg-white/10"
+					style="width:{50 + ((i * 19) % 45)}%; animation-delay: {i * 120}ms"
+				></div>
 			{/each}
 		</div>
 	{:else if lyrics?.instrumental}
-		<p class="py-8 text-center text-lg text-muted-foreground">{t('lyrics.instrumental')} ♪</p>
+		<div class="relative z-10 flex flex-col items-center justify-center py-20 text-center">
+			<div class="mb-4 flex space-x-2">
+				<span class="h-3 w-3 animate-bounce rounded-full bg-primary/70 [animation-delay:-0.3s]"></span>
+				<span class="h-3 w-3 animate-bounce rounded-full bg-primary/70 [animation-delay:-0.15s]"></span>
+				<span class="h-3 w-3 animate-bounce rounded-full bg-primary/70"></span>
+			</div>
+			<p class="text-xl font-bold tracking-wider text-muted-foreground">{t('lyrics.instrumental')} ♪</p>
+		</div>
 	{:else if lyrics && lyrics.synced}
-		<!-- Bottom padding only, so the last lines can still center-scroll. A matching top padding
-		     would put half a panel of void above line 1, which is all you see until the song has
-		     played far enough to scroll past it (issue #201). Instead the opening lines sit at the
-		     top and centering starts once there is room above, the way every other lyrics view
-		     behaves. -->
-		<div class="pb-[55vh] {expanded ? 'mx-auto max-w-3xl' : ''}">
+		<div class="relative z-10 pb-[60vh] pt-6 {expanded ? 'mx-auto max-w-4xl' : ''}">
+			<!-- Apple Music Intro / Interlude Pulsing Dots Indicator -->
+			{#if isInstrumentalGap}
+				<div class="my-6 flex items-center gap-2 px-2 text-primary/80 transition-all duration-300">
+					<span class="h-2.5 w-2.5 animate-ping rounded-full bg-primary"></span>
+					<span class="text-xs font-semibold uppercase tracking-widest text-primary/80">Musical Interlude</span>
+				</div>
+			{/if}
+
 			{#each lyrics.lines as line, i (i)}
 				{@const isActive = i === activeIndex}
+				{@const dist = Math.abs(i - activeIndex)}
 				{@const isPast = i < activeIndex}
-				<!-- Dimming is `opacity` on the line, never a translucent text colour. A colour with
-				     alpha is composited glyph by glyph, so wherever two glyphs overlap the coverage
-				     adds up and the overlap comes out brighter than the rest of the line: very
-				     visible in scripts whose marks sit on top of the letters, Devanagari in issue
-				     #191. `opacity` paints the line opaque first and fades it once, as a group. -->
-				<button
-					data-line={i}
-					onclick={() => seekTo(line)}
-					class="block w-full origin-left cursor-pointer text-left font-heading font-bold leading-snug transition-[color,opacity,transform] duration-300 ease-out hover:text-foreground hover:opacity-100
-						{expanded ? 'py-3 text-3xl' : compact ? 'py-1 text-sm' : 'py-2 text-xl'}
-						{isActive
-						? 'scale-[1.04] text-foreground'
-						: isPast
-							? 'text-muted-foreground opacity-40'
-							: 'text-muted-foreground opacity-70'}"
-				>
-					{#if line.words && line.words.length > 0}
-						<!-- Word-by-Word Karaoke Sweep Animation (Better-Lyrics style, highly optimized) -->
-						<span class="inline-flex flex-wrap items-baseline">
-							{#each line.words as word, wIdx (wIdx)}
-								{@const isWordEnd = word.text.endsWith(' ')}
-								{@const cleanText = word.text.trimEnd()}
-								{#if isActive}
-									{@const progress = getWordProgress(word, posMs)}
-									{@const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100)}
-									{@const isCurrentWord = progress > 0 && progress < 1}
-									<!-- Only the gradient stop moves per frame; the clip/fill are static, so they
-									     live in the class and aren't re-serialised 60 times a second. Both
-									     colours are theme tokens: the sung half was hardcoded white, which is
-									     invisible on every light theme. -->
-									<span
-										class="inline-block bg-clip-text text-transparent [-webkit-text-fill-color:transparent] transition-transform duration-100 ease-out {isWordEnd ? 'mr-[0.26em]' : ''} {isCurrentWord
-											? 'scale-[1.03]'
-											: ''}"
-										style="background-image: linear-gradient(90deg, var(--foreground) {pct}%, var(--muted-foreground) {pct}%)"
-									>
-										{cleanText}
-									</span>
-								{:else}
-									<!-- Colour and dimming both come from the line. -->
-									<span class="inline-block {isWordEnd ? 'mr-[0.26em]' : ''}">
-										{cleanText}
-									</span>
-								{/if}
-							{/each}
-						</span>
-					{:else}
-						<span>{line.text || '♪'}</span>
-					{/if}
 
-					<!-- Translation line rendering -->
-					{#if line.translation}
-						<p class="mt-1 text-sm font-normal italic tracking-wide opacity-80 transition-opacity">
-							{line.translation}
-						</p>
-					{/if}
-				</button>
+				{#if line.text && line.text.trim()}
+					<button
+						data-line={i}
+						onclick={() => seekTo(line)}
+						class="group relative block w-full origin-left cursor-pointer rounded-xl text-left font-heading font-extrabold tracking-tight transition-all duration-300 ease-out hover:opacity-100 hover:scale-[1.02]
+							{expanded ? 'my-3 py-3 text-3xl md:text-4xl' : compact ? 'my-1 py-1.5 text-base' : 'my-2 py-2 text-2xl'}
+							{isActive
+							? 'scale-[1.04] text-white opacity-100 drop-shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
+							: isPast
+								? 'opacity-35 hover:opacity-80'
+								: dist <= 2
+									? 'opacity-55 hover:opacity-90'
+									: 'opacity-30 hover:opacity-75'}"
+						style={!isActive && dist > 1 && !compact ? `filter: blur(${Math.min(1.2, dist * 0.4)}px);` : ''}
+					>
+						{#if line.words && line.words.length > 0}
+							<!-- Apple Music Word-to-Word Karaoke Sweep Rendering -->
+							<span class="inline-flex flex-wrap items-baseline">
+								{#each line.words as word, wIdx (wIdx)}
+									{@const isWordEnd = word.text.endsWith(' ')}
+									{@const cleanText = word.text.trimEnd()}
+									{#if isActive}
+										{@const progress = getWordProgress(word, posMs)}
+										{@const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100)}
+										{@const isCurrentWord = progress > 0 && progress < 1}
+										{@const isSung = progress >= 1}
+
+										<span
+											class="inline-block transition-transform duration-100 ease-out {isWordEnd ? 'mr-[0.28em]' : ''} {isCurrentWord ? 'scale-[1.06]' : ''}"
+											style={isSung
+												? 'color: #ffffff; text-shadow: 0 0 16px rgba(255,255,255,0.4);'
+												: isCurrentWord
+													? `background-image: linear-gradient(90deg, #ffffff ${pct}%, rgba(255,255,255,0.32) ${pct}%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(255,255,255,0.6);`
+													: 'color: rgba(255, 255, 255, 0.35);'}
+										>
+											{cleanText}
+										</span>
+									{:else}
+										<span class="inline-block {isWordEnd ? 'mr-[0.28em]' : ''}">
+											{cleanText}
+										</span>
+									{/if}
+								{/each}
+							</span>
+						{:else}
+							<span>{line.text}</span>
+						{/if}
+
+						{#if line.translation}
+							<p class="mt-1 text-sm font-medium italic tracking-wide opacity-75 transition-opacity">
+								{line.translation}
+							</p>
+						{/if}
+					</button>
+				{:else}
+					<div class="h-4"></div>
+				{/if}
 			{/each}
 		</div>
 	{:else if lyrics}
 		<div
-			class="space-y-2 leading-relaxed text-foreground opacity-90 {expanded
-				? 'mx-auto max-w-3xl text-xl'
+			class="relative z-10 space-y-3 leading-relaxed text-foreground opacity-90 {expanded
+				? 'mx-auto max-w-3xl text-2xl'
 				: compact
-					? 'text-xs'
-					: 'text-[15px]'}"
+					? 'text-sm'
+					: 'text-lg'}"
 		>
 			{#each lyrics.lines as line, i (i)}
 				{#if line.text}
@@ -273,12 +290,19 @@
 			{/each}
 		</div>
 	{:else}
-		<p class="py-8 text-center text-sm text-muted-foreground">{t('lyrics.none_found')}</p>
+		<div class="relative z-10 flex flex-col items-center justify-center py-20 text-center">
+			<p class="text-base text-muted-foreground">{t('lyrics.none_found')}</p>
+		</div>
 	{/if}
 </div>
+
 {#if lyrics && !loading && !compact}
-	<p class="border-t px-4 py-2 text-xs text-muted-foreground">
-		{lyrics.source.startsWith('Source:') ? lyrics.source : `Lyrics from ${lyrics.source}`}
-	</p>
+	<div class="relative z-10 flex items-center justify-between border-t border-white/10 px-5 py-2.5 text-xs text-muted-foreground backdrop-blur-md">
+		<span>{lyrics.source.startsWith('Source:') ? lyrics.source : `Lyrics: ${lyrics.source}`}</span>
+		<span class="flex items-center gap-1.5 font-medium text-emerald-400">
+			<span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Apple Music Word-Sync Active
+		</span>
+	</div>
 {/if}
+
 

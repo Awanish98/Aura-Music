@@ -230,10 +230,13 @@ class WebPlayer {
 	private startProgress() {
 		this.stopProgress();
 		this.progressInterval = setInterval(() => {
-			if (this.isRadioStream) {
+			if (this.usingDirectAudio || this.isRadioStream) {
 				if (this.audio) {
 					playback.position = this.audio.currentTime || 0;
 					playback.positionAt = performance.now();
+					if (this.audio.duration && !isNaN(this.audio.duration) && this.audio.duration > 0) {
+						playback.duration = this.audio.duration;
+					}
 				}
 			} else if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.getCurrentTime === 'function') {
 				try {
@@ -246,8 +249,9 @@ class WebPlayer {
 					}
 				} catch {}
 			}
-		}, 250);
+		}, 100);
 	}
+
 
 	private stopProgress() {
 		if (this.progressInterval) {
