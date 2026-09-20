@@ -42,9 +42,58 @@
 	// rearranges the rest of the page lives here rather than following a section that can be hidden.
 	let { onEdit }: { onEdit?: () => void } = $props();
 
+	const DEFAULT_STARTERS: BrowseItem[] = [
+		{
+			id: 'RDCLAK5uy_kbc3eE-z_9gU-N_gMv69h5f63G4P39t64',
+			title: 'Hindi Superhits Top 50',
+			subtitle: 'Bollywood & Hindi Hits',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80'
+		},
+		{
+			id: 'RDCLAK5uy_kmPRjHDECIcuVwnKsx2scAIaqQIryrr8g',
+			title: "Today's Global Hits",
+			subtitle: 'Top 50 International',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80'
+		},
+		{
+			id: 'gdrive:library',
+			title: 'Google Drive Cloud',
+			subtitle: 'Your Personal Audio Collection',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80'
+		},
+		{
+			id: 'saavn:trending',
+			title: 'Lossless Hi-Fi Master',
+			subtitle: '320kbps Studio Quality',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80'
+		},
+		{
+			id: 'fmhy:lofi-girl',
+			title: '24/7 Lofi Chill Radio',
+			subtitle: 'Relax • Study • Focus',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&auto=format&fit=crop&q=80'
+		},
+		{
+			id: 'fmhy:somafm-groovesalad',
+			title: 'SomaFM Groove Salad',
+			subtitle: 'Ambient Beats & Lounge',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80'
+		}
+	];
+
 	// Tiles are stored as a snapshot of the card, so a playlist that has gained tracks since it was
 	// pinned would keep showing the old count; `freshen` overlays the live library row (#67).
-	const picks = $derived(personal.picks.map((p) => freshen(p, library.items)));
+	const picks = $derived.by(() => {
+		const userPicks = personal.picks.map((p) => freshen(p, library.items));
+		if (userPicks.length === 0) return DEFAULT_STARTERS;
+		return userPicks;
+	});
 	let picking = $state(false);
 	// Where a drop would land: the id of the tile it goes in front of, `null` for the end of the grid,
 	// `undefined` when no drag of ours is over the section at all.
@@ -169,7 +218,7 @@
 				</span>
 			</button>
 		{:else}
-			<div data-grid class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-2">
+			<div data-grid class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
 				{#each picks as item (item.id)}
 					{@const round = item.kind === 'artist'}
 					{@const onRepeat = item.id === ON_REPEAT_ID}
@@ -180,7 +229,7 @@
 							<div class="absolute -left-1 bottom-0 top-0 z-20 w-0.5 rounded-full bg-primary"></div>
 						{/if}
 						<div
-							class="flex h-16 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border bg-card/40 text-left transition-colors hover:border-foreground/20 hover:bg-card"
+							class="flex h-16 sm:h-18 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-border/40 bg-card/60 backdrop-blur-md text-left transition-all duration-200 hover:border-primary/40 hover:bg-card hover:shadow-md hover:scale-[1.01]"
 							role="button"
 							tabindex="0"
 							draggable="true"
@@ -195,13 +244,11 @@
 							}}
 							title={item.subtitle ? `${item.title} — ${item.subtitle}` : item.title}
 						>
-							<!-- Art bleeds into the tile's leading edge (a circle can't, so an artist's is
-							     inset). Play lives *on* the cover rather than as a third control on the right:
-							     no reserved gutter, and it puts the action where the eye already is. -->
+							<!-- Art bleeds into the tile's leading edge -->
 							<div
 								class="relative shrink-0 overflow-hidden bg-muted {round
-									? 'my-2 ml-2 h-12 w-12 rounded-full'
-									: 'h-16 w-16'}"
+									? 'my-2 ml-2 h-12 w-12 rounded-full ring-2 ring-border/50'
+									: 'h-16 w-16 sm:h-18 sm:w-18'}"
 							>
 								{#if item.thumbnail && !failed[item.thumbnail] && !onRepeat}
 									<img
@@ -218,7 +265,6 @@
 											? 'bg-primary/10 text-primary'
 											: 'text-muted-foreground/50'}"
 									>
-										<!-- altIcon/showAlt, not a third ternary: `icon` is read once at mount. -->
 										<HugeiconsIcon
 											icon={round ? UserIcon : MusicNote01Icon}
 											altIcon={ListRestartIcon}
@@ -227,41 +273,50 @@
 										/>
 									</div>
 								{/if}
-								{#if !round}
-									<button
-										class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/60 focus-visible:opacity-100 group-hover/pick:opacity-100"
-										class:animate-pulse={busy === item.id}
-										disabled={busy === item.id}
-										aria-label={t('a11y.play_item', { title: item.title })}
-										onclick={(e) => {
-											e.stopPropagation();
-											play(item);
-										}}
-									>
-										<HugeiconsIcon icon={PlayIcon} class="h-5 w-5" />
-									</button>
-								{/if}
 							</div>
-							<!-- pr-14 keeps the title clear of the ⋯ and remove buttons in the corner. -->
-							<div class="min-w-0 flex-1 pr-14">
-								<div class="truncate text-sm font-medium">{item.title}</div>
+							<!-- Text details with responsive padding -->
+							<div class="min-w-0 flex-1 pr-10 sm:pr-12">
+								<div class="truncate text-xs sm:text-sm font-semibold tracking-tight text-foreground group-hover/pick:text-primary transition-colors">
+									{item.title}
+								</div>
 								{#if item.subtitle}
-									<div class="truncate text-xs text-muted-foreground">{item.subtitle}</div>
+									<div class="truncate text-[11px] sm:text-xs text-muted-foreground">
+										{item.subtitle}
+									</div>
 								{/if}
 							</div>
 						</div>
+
+						<!-- Spotify-style Floating Accent Play Button -->
+						{#if !round}
+							<button
+								class="absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden sm:flex size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 opacity-0 transition-all duration-200 hover:scale-110 active:scale-95 focus-visible:opacity-100 group-hover/pick:opacity-100"
+								class:animate-pulse={busy === item.id}
+								disabled={busy === item.id}
+								aria-label={t('a11y.play_item', { title: item.title })}
+								onclick={(e) => {
+									e.stopPropagation();
+									play(item);
+								}}
+							>
+								<HugeiconsIcon icon={PlayIcon} class="h-4 w-4 fill-current ml-0.5" />
+							</button>
+						{/if}
+
 						<ItemMenu
 							{item}
 							triggerClass="absolute right-7 top-1 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-muted-foreground opacity-0 transition hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring group-hover/pick:opacity-100"
 						/>
-						<button
-							onclick={() => removePick(item.id)}
-							title={t('home.remove_shortcut')}
-							aria-label={t('home.remove_shortcut')}
-							class="absolute right-1 top-1 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-muted-foreground opacity-0 transition hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring group-hover/pick:opacity-100"
-						>
-							<HugeiconsIcon icon={Cancel01Icon} class="h-3 w-3" />
-						</button>
+						{#if personal.picks.some((p) => p.id === item.id)}
+							<button
+								onclick={() => removePick(item.id)}
+								title={t('home.remove_shortcut')}
+								aria-label={t('home.remove_shortcut')}
+								class="absolute right-1 top-1 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-muted-foreground opacity-0 transition hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring group-hover/pick:opacity-100"
+							>
+								<HugeiconsIcon icon={Cancel01Icon} class="h-3 w-3" />
+							</button>
+						{/if}
 					</div>
 				{/each}
 

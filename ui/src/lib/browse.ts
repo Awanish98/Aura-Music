@@ -32,22 +32,28 @@ export const asSong = (i: BrowseItem): SongItem => ({
 });
 
 /** Where a non-song item lives. Songs have no page — they play. */
-export const hrefFor = (i: BrowseItem): string =>
+export const hrefFor = (i: BrowseItem): string => {
+	if (i.id === 'gdrive:library' || i.id === '/drive') return '/drive';
 	// A local artist is drawn as an artist (circle, no play button) but opens the album route:
 	// there is no channel behind files on disk, so the real artist page has nothing to show.
-	i.id.startsWith(api.LOCAL_ARTIST_PREFIX)
+	return i.id.startsWith(api.LOCAL_ARTIST_PREFIX)
 		? `/album/${encodeURIComponent(i.id)}`
 		: i.kind === 'artist'
 			? `/artist/${encodeURIComponent(i.id)}`
 			: i.kind === 'album'
 				? `/album/${encodeURIComponent(i.id)}`
 				: `/playlist/${encodeURIComponent(i.id)}`;
+};
 
 /** Primary click: a song plays, everything else opens its page. */
 export function openItem(item: BrowseItem): void {
 	// A click counts as "used" for Shortcuts eviction wherever the item was rendered. No-op unless
 	// this item is actually on the grid.
 	touchPick(item.id);
+	if (item.id === 'gdrive:library' || item.id === '/drive') {
+		goto('/drive');
+		return;
+	}
 	if (item.kind === 'song') playSong(asSong(item));
 	else goto(hrefFor(item));
 }
@@ -60,6 +66,16 @@ export function openItem(item: BrowseItem): void {
  */
 export async function playItem(item: BrowseItem, shuffle = false): Promise<void> {
 	touchPick(item.id);
+	if (item.id === 'gdrive:library') {
+		const songs = api.getWebStorage<SongItem[]>('gdrive_songs', []);
+		if (songs.length > 0) {
+			const items = shuffle ? [...songs].sort(() => Math.random() - 0.5) : songs;
+			await api.playPlaylist(items, 0, undefined, 'Google Drive Cloud', shuffle);
+		} else {
+			goto('/drive');
+		}
+		return;
+	}
 	if (item.kind === 'song') {
 		playSong(asSong(item));
 		return;

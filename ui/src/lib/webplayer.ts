@@ -465,7 +465,8 @@ class WebPlayer {
 					if (res.ok) {
 						const blob = await res.blob();
 						const blobUrl = URL.createObjectURL(blob);
-						this.isRadioStream = true;
+						this.isRadioStream = false;
+						this.usingDirectAudio = true;
 						this.playAudioDirect(blobUrl);
 						return;
 					}

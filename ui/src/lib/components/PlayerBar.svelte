@@ -269,12 +269,28 @@
 						</span>
 					{/if}
 				</div>
-				<ArtistLine
-					runs={playback.now?.artistRuns}
-					text={playback.now?.artists ?? ''}
-					marquee
-					class="block max-w-full text-xs text-muted-foreground"
-				/>
+				<div class="flex items-center gap-2">
+					<ArtistLine
+						runs={playback.now?.artistRuns}
+						text={playback.now?.artists ?? ''}
+						marquee
+						class="block max-w-full text-xs text-muted-foreground"
+					/>
+					{#if playback.now}
+						{@const id = playback.now.videoId || ''}
+						{@const isCloud = id.startsWith('gdrive:')}
+						{@const isLive = playback.now.duration === 'LIVE' || id.startsWith('fmhy:')}
+						<span
+							class="hidden xl:inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.2 text-[9px] font-bold tracking-wider uppercase {isCloud
+								? 'bg-blue-500/15 text-blue-400 border border-blue-500/25'
+								: isLive
+									? 'bg-red-500/15 text-red-400 border border-red-500/25'
+									: 'bg-primary/15 text-primary border border-primary/25'}"
+						>
+							{isCloud ? 'Cloud' : isLive ? 'Live' : 'Lossless'}
+						</span>
+					{/if}
+				</div>
 			</div>
 			{#if playback.now}
 				<div class="flex items-center">

@@ -10,6 +10,7 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		Add01Icon,
+		CloudIcon,
 		CloudSyncIcon,
 		CloudUploadIcon,
 		DriveIcon,
@@ -26,6 +27,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import LibrarySongs from '$lib/components/LibrarySongs.svelte';
 	import LocalMusic from '$lib/components/LocalMusic.svelte';
+	import DriveMusic from '$lib/components/DriveMusic.svelte';
 	import MediaCard from '$lib/components/MediaCard.svelte';
 	import MediaCardSkeleton from '$lib/components/MediaCardSkeleton.svelte';
 	import ErrorState from '$lib/components/ErrorState.svelte';
@@ -247,6 +249,9 @@
 			<Tabs.Trigger value="uploads">
 				<HugeiconsIcon icon={CloudUploadIcon} class="h-4 w-4" /> {t('library.uploads_tab')}
 			</Tabs.Trigger>
+			<Tabs.Trigger value="drive">
+				<HugeiconsIcon icon={CloudIcon} class="h-4 w-4" /> Google Drive
+			</Tabs.Trigger>
 			<Tabs.Trigger value="local">
 				<HugeiconsIcon icon={DriveIcon} class="h-4 w-4" /> {t('library.local_tab')}
 			</Tabs.Trigger>
@@ -323,8 +328,9 @@
 				{/if}
 			{/if}
 		</Tabs.Content>
+		<Tabs.Content value="drive">{#if tab === 'drive'}<DriveMusic />{/if}</Tabs.Content>
 		<Tabs.Content value="local">{#if tab === 'local'}<LocalMusic />{/if}</Tabs.Content>
-		{#if tab === 'local' || tab === 'songs' || tab === 'uploads'}
+		{#if tab === 'local' || tab === 'songs' || tab === 'uploads' || tab === 'drive'}
 			<!-- nothing else: the grid states below have no bearing on these three -->
 		{:else if loading}
 			<div class="card-grid">

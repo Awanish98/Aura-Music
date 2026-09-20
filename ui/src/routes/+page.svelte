@@ -44,15 +44,31 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	// The mood chips + which one is active. Kept out of `home` so the row survives a filter switch's
-	// loading state (every home response carries the same chips anyway). Limusic is music-only.
+	// loading state (every home response carries the same chips anyway).
 	let chips = $state<HomeChip[]>([]);
 	let selected = $state<string | null>(null);
 	let loadingMore = $state(false);
 	let moreError = $state(false);
+
+	// Google Drive Personal Music
+	let gdriveSongs = $state<api.SongItem[]>([]);
+	onMount(() => {
+		gdriveSongs = api.getWebStorage<api.SongItem[]>('gdrive_songs', []);
+	});
+	const gdriveItems = $derived<BrowseItem[]>(
+		gdriveSongs.map((s) => ({
+			id: s.video_id,
+			title: s.title,
+			subtitle: s.artists,
+			kind: 'song',
+			thumbnail: s.thumbnail,
+			duration: s.duration
+		}))
+	);
+
 	// Anything already on the Shortcuts grid is dropped: a shortcut is something you play, so the two
 	// lists otherwise converge on the same handful of items and the top of home shows them twice in
-	// two different shapes. Recents earn their space by being what Shortcuts *isn't*. Nine survivors
-	// = three full columns; the window is generous because most of it gets filtered away.
+	// two different shapes.
 	const pinned = $derived(new Set(personal.picks.map((p) => p.id)));
 	// Same snapshot problem as the Shortcuts tiles: the stored card is what it looked like when it
 	// was last played from, so the live library row wins where there is one (#67).
@@ -63,48 +79,38 @@
 			.map((r) => freshen(r, library.items))
 	);
 
-	// Outlined at rest, filled with the accent when on. Grey-on-grey pills that go black when
-	// selected are YouTube Music's chip row exactly, and they carry no colour of the app at all;
-	// this way the one active filter is the only saturated thing above the feed.
+	// Outlined at rest, filled with the accent when on.
 	const chipClass = (active: boolean) =>
 		`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
 			active
-				? 'border-primary bg-primary text-primary-foreground'
-				: 'border-border text-muted-foreground hover:border-foreground/25 hover:text-foreground'
+				? 'border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30'
+				: 'border-border/60 bg-card/40 text-muted-foreground hover:border-foreground/25 hover:text-foreground'
 		}`;
 
-	// "Forgotten favourites" is pulled out of the feed and rendered as a list above it (see the
-	// markup) — the shelf's cards say nothing about a song, and this one is meant to be read.
-	// Songs only: if YouTube ever fills that shelf with something else, it stays a normal card row.
+	// "Forgotten favourites" is pulled out of the feed and rendered as a list above it
 	const isForgotten = (s: HomeSection) =>
 		/forgotten/i.test(s.title) && s.items.some((i) => i.kind === 'song');
-	// Held separately from `home`, not derived from it: YouTube sends the shelf a page or two into the
-	// feed, so it survives the revalidating `home = fresh` that drops back to page one, and a revisit
-	// reads it from the cache instead of walking continuations again.
 	let forgotten = $state<HomeSection | null>(null);
-	let seeking = $state(false); // walking continuations to find it — the slot shows a skeleton
+	let seeking = $state(false);
 	const feed = $derived(home?.sections.filter((s) => !isForgotten(s)) ?? []);
 
 	// --- the arrangement the user set in the Edit modal (personal.ts) ---------------------------
-	// The two sections the app builds itself get reserved keys — a YouTube shelf title can't start
-	// with "@" — so they keep their slot even before (or without) any content to show.
 	const RECENT = '@recent';
 	const FAMILIAR = '@familiar';
 	const FORGOTTEN = '@forgotten';
+	const GDRIVE = '@gdrive';
+
 	type Block =
 		| { id: string; key: string; title: string; shelf?: undefined }
 		| { id: string; key: string; title: string; shelf: HomeSection };
 	let editing = $state(false);
 	const hidden = $derived(hiddenSections(personal));
-	/**
-	 * Every section home can show, in the user's order, hidden ones included — the modal lists those
-	 * to offer them back. Shelves are keyed on their title (all YouTube gives us that survives a
-	 * restart) but rendered under a positional id, because a feed walked far enough does repeat one.
-	 */
+
 	const blocks = $derived.by(() => {
 		const local: Block[] = selected
 			? [] // a mood feed is the chip's: neither of ours belongs in it
 			: [
+					...(gdriveItems.length ? [{ id: GDRIVE, key: GDRIVE, title: 'Google Drive Cloud Music' }] : []),
 					{ id: RECENT, key: RECENT, title: t('home.jump_back_in') },
 					{ id: FAMILIAR, key: FAMILIAR, title: t('home.familiar_artists') },
 					{ id: FORGOTTEN, key: FORGOTTEN, title: t('home.forgotten_favourites') }
@@ -394,6 +400,15 @@
 						community={/community/i.test(block.shelf.title)}
 						onMore={block.shelf.moreBrowseId ? () => showMore(block.shelf!) : undefined}
 					/>
+				{:else if block.key === GDRIVE}
+					{#if gdriveItems.length}
+						<Shelf
+							title="Google Drive Cloud Music"
+							items={gdriveItems}
+							queueAll={true}
+							onMore={() => goto('/drive')}
+						/>
+					{/if}
 				{:else if block.key === RECENT}
 					{#if recent.length}<RecentRail items={recent} />{/if}
 				{:else if block.key === FAMILIAR}

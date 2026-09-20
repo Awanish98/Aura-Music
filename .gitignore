@@ -56,5 +56,6 @@ server/node_modules/
 node_modules/
 ui/node_modules/
 dist/
-build/
 *.log
+.env
+.env.*
