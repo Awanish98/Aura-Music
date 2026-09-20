@@ -99,41 +99,39 @@ export class AiMusicAgent {
 
 		let rawText = '';
 
-		// 1. Try Primary Gemini API Key
-		const geminiKeys = [
-			AI_CONFIG.geminiApiKey,
-			DEFAULT_GEMINI_SEC
-		].filter(Boolean);
-
-		for (const key of geminiKeys) {
-			try {
-				rawText = await this.callGeminiWithKey(key, promptWithContext, context?.history);
-				if (rawText) break;
-			} catch (err) {
-				console.warn('[Gemini AI key attempt failed, trying next provider]', err);
-			}
+		// 1. Try Backend Proxy First (has multi-model xKiro, Gemini, Groq, & server fallback)
+		try {
+			rawText = await this.callBackend(promptWithContext);
+		} catch (err) {
+			console.warn('[Backend AI unavailable, trying direct client providers]', err);
 		}
 
-		// 2. Fallback to Groq API
-		if (!rawText) {
-			const groqKey = AI_CONFIG.groqApiKey;
-			if (groqKey) {
+		// 2. Direct Gemini / Groq if user provided custom keys
+		if (!rawText || rawText.length < 20) {
+			const geminiKey = localStorage.getItem('aura_gemini_key') || AI_CONFIG.geminiApiKey;
+			if (geminiKey) {
 				try {
-					rawText = await this.callGroq(promptWithContext, context?.history);
+					rawText = await this.callGeminiWithKey(geminiKey, promptWithContext, context?.history);
 				} catch (err) {
-					console.warn('[Groq AI error, falling back to backend]', err);
+					console.warn('[Client Gemini attempt failed]', err);
 				}
 			}
 		}
 
-		// 3. Fallback to Backend Proxy
-		if (!rawText) {
-			try {
-				rawText = await this.callBackend(promptWithContext);
-			} catch (err) {
-				rawText =
-					"I'm tuned in! While connecting to AI servers, I can still generate recommendations for you. What vibe would you like to listen to?";
+		if (!rawText || rawText.length < 20) {
+			const groqKey = localStorage.getItem('aura_groq_key') || AI_CONFIG.groqApiKey;
+			if (groqKey) {
+				try {
+					rawText = await this.callGroq(promptWithContext, context?.history);
+				} catch (err) {
+					console.warn('[Client Groq attempt failed]', err);
+				}
 			}
+		}
+
+		// 3. Guaranteed Client-Side Smart Curation Fallback (Zero Offline Failure)
+		if (!rawText || rawText.length < 20) {
+			rawText = this.getClientHeuristics(userPrompt);
 		}
 
 		// Parse tracks from response if any JSON block is present
@@ -176,16 +174,30 @@ export class AiMusicAgent {
 	}
 
 	/**
-	 * Test connections to Gemini and Groq API
+	 * Test connections to AI providers
 	 */
 	public async testProviders(): Promise<{
 		gemini: { ok: boolean; message: string; latency: number };
 		groq: { ok: boolean; message: string; latency: number };
+		backend: { ok: boolean; message: string; latency: number };
 	}> {
 		const results = {
 			gemini: { ok: false, message: '', latency: 0 },
-			groq: { ok: false, message: '', latency: 0 }
+			groq: { ok: false, message: '', latency: 0 },
+			backend: { ok: false, message: '', latency: 0 }
 		};
+
+		// Test Backend AI
+		const tb = performance.now();
+		try {
+			const res = await this.callBackend('Reply with only the word "OK"');
+			results.backend.ok = res.length > 0;
+			results.backend.latency = Math.round(performance.now() - tb);
+			results.backend.message = 'Aura Cloud AI Active';
+		} catch (e: any) {
+			results.backend.ok = false;
+			results.backend.message = 'Backend sleeping or connecting';
+		}
 
 		// Test Gemini
 		const t0 = performance.now();
@@ -196,10 +208,10 @@ export class AiMusicAgent {
 			);
 			results.gemini.ok = res.toLowerCase().includes('ok');
 			results.gemini.latency = Math.round(performance.now() - t0);
-			results.gemini.message = 'Connected to Gemini 2.5 Flash';
+			results.gemini.message = 'Connected to Gemini';
 		} catch (e: any) {
 			results.gemini.ok = false;
-			results.gemini.message = e.message || 'Connection failed';
+			results.gemini.message = e.message || 'Key invalid or API disabled';
 		}
 
 		// Test Groq
@@ -208,13 +220,24 @@ export class AiMusicAgent {
 			const res = await this.callGroq('Reply with only the word "OK"');
 			results.groq.ok = res.toLowerCase().includes('ok');
 			results.groq.latency = Math.round(performance.now() - t1);
-			results.groq.message = 'Connected to Groq Llama 3.3 70B';
+			results.groq.message = 'Connected to Groq';
 		} catch (e: any) {
 			results.groq.ok = false;
-			results.groq.message = e.message || 'Connection failed';
+			results.groq.message = e.message || 'Key invalid';
 		}
 
 		return results;
+	}
+
+	private async callBackend(prompt: string): Promise<string> {
+		const res = await fetch(getApiUrl('/api/ai/agent'), {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ prompt })
+		});
+		if (!res.ok) throw new Error(`Backend AI error (${res.status})`);
+		const data = await res.json();
+		return data.text || '';
 	}
 
 	private async callGeminiWithKey(
@@ -242,14 +265,9 @@ export class AiMusicAgent {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				systemInstruction: {
-					parts: [{ text: SYSTEM_PROMPT }]
-				},
+				systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
 				contents,
-				generationConfig: {
-					temperature: 0.7,
-					maxOutputTokens: 1000
-				}
+				generationConfig: { temperature: 0.7, maxOutputTokens: 1000 }
 			})
 		});
 
@@ -259,8 +277,7 @@ export class AiMusicAgent {
 		}
 
 		const data = await res.json();
-		const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-		return text;
+		return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 	}
 
 	private async callGroq(
@@ -300,15 +317,58 @@ export class AiMusicAgent {
 		return data.choices?.[0]?.message?.content || '';
 	}
 
-	private async callBackend(prompt: string): Promise<string> {
-		const res = await fetch(getApiUrl('/api/ai/agent'), {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ prompt })
-		});
-		if (!res.ok) throw new Error('Backend AI unavailable');
-		const data = await res.json();
-		return data.text || '';
+	private getClientHeuristics(prompt: string): string {
+		const p = prompt.toLowerCase();
+		let text = `Here is a custom playlist tailored to your vibe: "${prompt}". Enjoy high-fidelity sound!`;
+		let tracks = [
+			{ title: "Tum Hi Ho", artists: "Arijit Singh", query: "Tum Hi Ho Arijit Singh" },
+			{ title: "Starboy", artists: "The Weeknd ft. Daft Punk", query: "Starboy The Weeknd" },
+			{ title: "Apna Bana Le", artists: "Arijit Singh, Sachin-Jigar", query: "Apna Bana Le Bhediya" },
+			{ title: "Blinding Lights", artists: "The Weeknd", query: "Blinding Lights The Weeknd" }
+		];
+
+		if (p.includes('workout') || p.includes('gym') || p.includes('energy') || p.includes('pump') || p.includes('hype')) {
+			text = "Here is a high-energy workout mix to push your performance and elevate your adrenaline:";
+			tracks = [
+				{ title: "Till I Collapse", artists: "Eminem ft. Nate Dogg", query: "Till I Collapse Eminem" },
+				{ title: "Stronger", artists: "Kanye West", query: "Stronger Kanye West" },
+				{ title: "Can't Hold Us", artists: "Macklemore & Ryan Lewis", query: "Cant Hold Us Macklemore" },
+				{ title: "Believer", artists: "Imagine Dragons", query: "Believer Imagine Dragons" },
+				{ title: "Zinda", artists: "Siddharth Mahadevan", query: "Zinda Bhaag Milkha Bhaag" },
+				{ title: "Kar Har Maidaan Fateh", artists: "Sukhwinder Singh", query: "Kar Har Maidaan Fateh Sanju" }
+			];
+		} else if (p.includes('sad') || p.includes('heartbreak') || p.includes('cry') || p.includes('pain') || p.includes('alone') || p.includes('broken')) {
+			text = "I'm with you. Here are deep, emotive melodies to accompany your mood and bring peace:";
+			tracks = [
+				{ title: "Channa Mereya", artists: "Arijit Singh, Pritam", query: "Channa Mereya Arijit Singh" },
+				{ title: "Agar Tum Saath Ho", artists: "Arijit Singh, Alka Yagnik", query: "Agar Tum Saath Ho Tamasha" },
+				{ title: "Someone Like You", artists: "Adele", query: "Someone Like You Adele" },
+				{ title: "Fix You", artists: "Coldplay", query: "Fix You Coldplay" },
+				{ title: "Tune Jo Na Kaha", artists: "Mohit Chauhan", query: "Tune Jo Na Kaha New York" },
+				{ title: "Faasle", artists: "Aditya Rikhari", query: "Faasle Aditya Rikhari" }
+			];
+		} else if (p.includes('lofi') || p.includes('study') || p.includes('chill') || p.includes('focus') || p.includes('code') || p.includes('rain')) {
+			text = "Here are smooth lofi beats and acoustic textures for deep focus and relaxation:";
+			tracks = [
+				{ title: "I Need a Girl", artists: "Lofi Fruits Music", query: "I Need a Girl Lofi Fruits" },
+				{ title: "Khaare Raaste", artists: "Yashraj, Dropped Out", query: "Khaare Raaste Yashraj" },
+				{ title: "Baarishein", artists: "Anuv Jain", query: "Baarishein Anuv Jain" },
+				{ title: "death bed (coffee for your head)", artists: "Powfu ft. beabadoobee", query: "death bed Powfu" },
+				{ title: "Cozy Winter Lofi", artists: "Chillhop Music", query: "Cozy Winter Lofi Chillhop" },
+				{ title: "Choo Lo", artists: "The Local Train", query: "Choo Lo The Local Train" }
+			];
+		} else if (p.includes('party') || p.includes('dance') || p.includes('club') || p.includes('punjabi') || p.includes('bhangra')) {
+			text = "Turn up the volume! Here is an explosive party mix to electrify your space:";
+			tracks = [
+				{ title: "Brown Munde", artists: "AP Dhillon, Gurinder Gill", query: "Brown Munde AP Dhillon" },
+				{ title: "Tauba Tauba", artists: "Karan Aujla", query: "Tauba Tauba Karan Aujla" },
+				{ title: "Proper Patola", artists: "Diljit Dosanjh, Badshah", query: "Proper Patola Diljit Dosanjh" },
+				{ title: "Players", artists: "Badshah, Karan Aujla", query: "Players Badshah Karan Aujla" },
+				{ title: "One Kiss", artists: "Calvin Harris, Dua Lipa", query: "One Kiss Calvin Harris" }
+			];
+		}
+
+		return `${text}\n\n\`\`\`json\n${JSON.stringify({ tracks }, null, 2)}\n\`\`\``;
 	}
 
 	/**
