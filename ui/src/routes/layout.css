@@ -707,21 +707,56 @@ html.art-tint.dark {
    `auto` keyword swaps in the measured size after a card's first paint, so the scrollbar stays put.
    Paint containment clips at the card's own box, which the group-hover shadow stays inside: it
    reaches ~27px below the cover and there are 52px of title, subtitle and padding under it. */
+/* Responsive card grid: 2 columns on mobile, fixed columns on tablet/desktop */
 .card-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 10rem);
-	/* Pinned, not auto. An auto row is as tall as its tallest card, and a skipped card reports the
-	   contain-intrinsic-size below while a rendered one reports its real height — which is 1rem
-	   shorter when the item has no subtitle. So any row straddling the skip boundary changed height
-	   as you scrolled, and since a hover is what forces the layout pass that reconciles it, hovering
-	   near that boundary reflowed the grid, moved the scroll position, and changed which cards were
-	   skipped. Same number for both and the loop can't start. */
-	grid-auto-rows: 12.75rem;
-	gap: 1rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+}
+@media (min-width: 480px) {
+	.card-grid {
+		grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+		gap: 0.875rem;
+	}
+}
+@media (min-width: 640px) {
+	.card-grid {
+		grid-template-columns: repeat(auto-fill, 10rem);
+		grid-auto-rows: 12.75rem;
+		gap: 1rem;
+	}
 }
 .card-grid > * {
 	content-visibility: auto;
 	contain-intrinsic-size: auto 12.75rem;
+}
+
+/* Touch & Mobile Utilities */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.touch-pan {
+	-webkit-overflow-scrolling: touch;
+	touch-action: pan-y;
+}
+
+.glass-pill {
+	background: color-mix(in srgb, var(--card) 85%, transparent);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.glass-panel {
+	background: color-mix(in srgb, var(--background) 88%, transparent);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
 }
 
 /* A track title too wide for the player scrolls itself instead of stopping at an ellipsis.

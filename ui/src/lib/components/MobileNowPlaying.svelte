@@ -157,84 +157,96 @@
 			class="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover opacity-35 blur-3xl transition-opacity duration-700 dark:opacity-45"
 		/>
 	{/if}
-	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background"></div>
+	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background"></div>
 
-	<!-- Top Bar -->
-	<header class="relative z-10 flex shrink-0 items-center justify-between px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-2">
+	<!-- Top Drag Handle & Bar -->
+	<header class="relative z-10 flex shrink-0 flex-col px-4 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] pb-1">
+		<!-- Drag-to-dismiss handle bar -->
 		<button
-			class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-95"
+			type="button"
+			aria-label="Dismiss player"
+			class="w-12 h-1.5 rounded-full bg-white/25 mx-auto mb-2 hover:bg-white/40 cursor-pointer active:scale-95 transition-transform"
 			onclick={() => (np.open = false)}
-			aria-label="Minimize"
-		>
-			<HugeiconsIcon icon={ArrowDown01Icon} size={22} />
-		</button>
+		></button>
 
-		<div class="flex flex-col items-center text-center">
-			<span class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-				{playback.queue.sourceName || 'Now Playing'}
-			</span>
-			<span class="text-xs font-medium text-foreground truncate max-w-[200px]">
-				{playback.now?.title ?? ''}
-			</span>
-		</div>
+		<div class="flex items-center justify-between">
+			<button
+				class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
+				onclick={() => (np.open = false)}
+				aria-label="Minimize"
+			>
+				<HugeiconsIcon icon={ArrowDown01Icon} size={22} />
+			</button>
 
-		<div class="flex items-center gap-1">
-			{#if currentSong}
-				<TrackMenu
-					song={currentSong}
-					linksOnly={false}
-					onAdd={() => openAddToPlaylist(currentSong!)}
-					triggerClass="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-95"
-				/>
-			{:else}
-				<button
-					class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
-					onclick={() => (sleepModalOpen = true)}
-				>
-					<HugeiconsIcon icon={Moon02Icon} size={20} />
-				</button>
-			{/if}
+			<div class="flex flex-col items-center text-center px-2 min-w-0 flex-1">
+				<span class="text-[10px] font-bold tracking-widest text-primary/80 uppercase">
+					{playback.queue.sourceName || 'Now Playing'}
+				</span>
+				<span class="text-xs font-semibold text-foreground truncate max-w-[200px]">
+					{playback.now?.title ?? ''}
+				</span>
+			</div>
+
+			<div class="flex items-center gap-1">
+				{#if currentSong}
+					<TrackMenu
+						song={currentSong}
+						linksOnly={false}
+						onAdd={() => openAddToPlaylist(currentSong!)}
+						triggerClass="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
+					/>
+				{:else}
+					<button
+						class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
+						onclick={() => (sleepModalOpen = true)}
+					>
+						<HugeiconsIcon icon={Moon02Icon} size={20} />
+					</button>
+				{/if}
+			</div>
 		</div>
 	</header>
 
-	<!-- Tab Switcher (Player, Lyrics, Queue) -->
-	<div class="relative z-10 flex shrink-0 items-center justify-center gap-1.5 px-4 py-1.5">
-		<button
-			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'player'
-				? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-				: 'bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground'}"
-			onclick={() => (activeTab = 'player')}
-		>
-			<HugeiconsIcon icon={MusicNote01Icon} size={14} />
-			Track
-		</button>
-		<button
-			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'lyrics'
-				? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-				: 'bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground'}"
-			onclick={() => (activeTab = 'lyrics')}
-		>
-			<HugeiconsIcon icon={Mic01Icon} size={14} />
-			Lyrics
-		</button>
-		<button
-			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'story'
-				? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-				: 'bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground'}"
-			onclick={() => (activeTab = 'story')}
-		>
-			<HugeiconsIcon icon={SparklesIcon} size={14} />
-			AI Story
-		</button>
-		<button
-			class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {activeTab === 'queue'
-				? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-				: 'bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground'}"
-			onclick={() => (activeTab = 'queue')}
-		>
-			<HugeiconsIcon icon={Queue01Icon} size={14} />
-			Queue
-		</button>
+	<!-- Segmented Glass Tab Switcher (Track, Lyrics, AI Story, Queue) -->
+	<div class="relative z-10 flex shrink-0 items-center justify-center px-4 py-1.5">
+		<div class="flex items-center gap-1 rounded-full bg-black/30 p-1 border border-white/10 shadow-inner backdrop-blur-md">
+			<button
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
+					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
+					: 'text-muted-foreground hover:text-foreground'}"
+				onclick={() => (activeTab = 'player')}
+			>
+				<HugeiconsIcon icon={MusicNote01Icon} size={14} />
+				Track
+			</button>
+			<button
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'lyrics'
+					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
+					: 'text-muted-foreground hover:text-foreground'}"
+				onclick={() => (activeTab = 'lyrics')}
+			>
+				<HugeiconsIcon icon={Mic01Icon} size={14} />
+				Lyrics
+			</button>
+			<button
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'story'
+					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
+					: 'text-muted-foreground hover:text-foreground'}"
+				onclick={() => (activeTab = 'story')}
+			>
+				<HugeiconsIcon icon={SparklesIcon} size={14} />
+				AI Story
+			</button>
+			<button
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'queue'
+					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
+					: 'text-muted-foreground hover:text-foreground'}"
+				onclick={() => (activeTab = 'queue')}
+			>
+				<HugeiconsIcon icon={Queue01Icon} size={14} />
+				Queue
+			</button>
+		</div>
 	</div>
 
 	<!-- Main Content Area based on Tab -->
@@ -357,7 +369,7 @@
 			<!-- Hero Playback Transport Controls -->
 			<div class="mt-4 shrink-0 flex items-center justify-between px-2">
 				<button
-					class="flex size-10 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90 {shuffleOn
+					class="flex size-11 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90 {shuffleOn
 						? 'text-primary'
 						: ''}"
 					onclick={() => api.toggleShuffle()}
@@ -367,7 +379,7 @@
 				</button>
 
 				<button
-					class="flex size-12 items-center justify-center rounded-full text-foreground transition active:scale-90"
+					class="flex size-12 items-center justify-center rounded-full text-foreground transition hover:scale-110 active:scale-90"
 					onclick={() => api.prevTrack()}
 					aria-label="Previous"
 				>
@@ -375,7 +387,7 @@
 				</button>
 
 				<button
-					class="flex size-18 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl shadow-primary/40 transition-transform active:scale-90 hover:scale-105"
+					class="flex size-18 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_0_35px_var(--primary)] transition-all duration-200 active:scale-90 hover:scale-105"
 					onclick={() => api.togglePause()}
 					aria-label={playback.paused ? 'Play' : 'Pause'}
 				>
@@ -389,7 +401,7 @@
 				</button>
 
 				<button
-					class="flex size-12 items-center justify-center rounded-full text-foreground transition active:scale-90"
+					class="flex size-12 items-center justify-center rounded-full text-foreground transition hover:scale-110 active:scale-90"
 					onclick={() => api.nextTrack()}
 					aria-label="Next"
 				>
@@ -397,7 +409,7 @@
 				</button>
 
 				<button
-					class="flex size-10 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90 {repeat !==
+					class="flex size-11 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90 {repeat !==
 					'off'
 						? 'text-primary'
 						: ''}"

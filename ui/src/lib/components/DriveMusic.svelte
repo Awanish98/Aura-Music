@@ -316,7 +316,7 @@
 								<Button
 									variant="ghost"
 									size="icon"
-									class="h-8 w-8 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+									class="h-8 w-8 text-muted-foreground hover:text-foreground opacity-90 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
 									onclick={(e) => {
 										e.stopPropagation();
 										addToQueue(song);

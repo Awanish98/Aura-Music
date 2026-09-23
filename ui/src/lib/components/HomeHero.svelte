@@ -65,8 +65,8 @@
 			class="absolute inset-0 bg-gradient-to-r from-background/80 via-background/30 to-transparent"
 		></div>
 	</div>
-	<div class="relative p-6 pt-8">
-		<div class="flex items-start justify-between gap-4">
+	<div class="relative p-4 sm:p-6 pt-6 sm:pt-8">
+		<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
 			<div class="flex min-w-0 items-center gap-3">
 				{#if auth.account?.signedIn && auth.account.thumbnail}
 					<!-- max-width:none defeats Tailwind Preflight's `img{max-width:100%}`, which in a tight box
@@ -75,11 +75,11 @@
 					<img
 						src={thumb(auth.account.thumbnail, 128)}
 						alt=""
-						style="width:2.75rem;height:2.75rem;max-width:none"
-						class="shrink-0 rounded-full object-cover ring-2 ring-border"
+						style="width:2.5rem;height:2.5rem;max-width:none"
+						class="shrink-0 rounded-full object-cover ring-2 ring-border sm:w-11 sm:h-11"
 					/>
 				{/if}
-				<h1 class="truncate font-heading text-4xl font-bold tracking-tight drop-shadow">
+				<h1 class="truncate font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow">
 					{daypart}{auth.account?.name ? `, ${auth.account.name.split(' ')[0]}` : ''}
 				</h1>
 			</div>
@@ -95,17 +95,16 @@
 					<span class="font-medium">AI DJ</span>
 				</button>
 
-				<!-- Listen Together moved out of here and lives on the titlebar alone: history is the thing
-				     you reach for from the home page. -->
+				<!-- History Quick Button -->
 				<button
 					onclick={() => goto('/history')}
 					title={t('nav.history')}
 					aria-label={t('nav.history')}
-					class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+					class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
 				>
-					<HugeiconsIcon icon={HistoryIcon} class="h-5 w-5" />
+					<HugeiconsIcon icon={HistoryIcon} class="h-4 w-4" />
 				</button>
-				<form class="relative w-full max-w-xs" onsubmit={(e) => { e.preventDefault(); goSearch(); }}>
+				<form class="hidden md:block relative w-full max-w-xs" onsubmit={(e) => { e.preventDefault(); goSearch(); }}>
 					<HugeiconsIcon
 						icon={Search01Icon}
 						class="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"

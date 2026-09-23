@@ -124,8 +124,8 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="border-b p-6">
-		<h1 class="mb-4 font-heading text-2xl font-bold">{t('common.search')}</h1>
+	<div class="sticky top-0 z-10 border-b border-border/40 bg-background/80 backdrop-blur-xl p-4 sm:p-6">
+		<h1 class="mb-3 font-heading text-xl sm:text-2xl font-bold tracking-tight">{t('common.search')}</h1>
 		<form
 			class="flex max-w-xl gap-2"
 			onsubmit={(e) => {
@@ -138,15 +138,15 @@
 				placeholder={t('common.search_placeholder')}
 				onpick={() => (lastQuery = query)}
 			/>
-			<Button type="submit" class="gap-2" disabled={searching}>
+			<Button type="submit" class="gap-2 shrink-0" disabled={searching}>
 				<HugeiconsIcon icon={Search01Icon} class="h-4 w-4" />
-				{searching ? t('common.searching') : t('common.search')}
+				<span class="hidden sm:inline">{searching ? t('common.searching') : t('common.search')}</span>
 			</Button>
 		</form>
 		{#if error}<div class="mt-2"><ErrorState message={error} onRetry={runSearch} /></div>{/if}
 	</div>
 
-	<div class="min-h-0 flex-1 overflow-y-auto p-6">
+	<div class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 		{#if searching}
 			<div class="flex flex-col gap-10">
 				<section>

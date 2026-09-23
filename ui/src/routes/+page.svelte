@@ -346,8 +346,8 @@
 	     Opaque rather than blurred — a backdrop-filter repainting on every scroll frame is the one
 	     thing WebKitGTK reliably chokes on. -->
 	{#if chips.length}
-		<div class="sticky top-0 z-20 border-b bg-background px-6 pt-2.5">
-			<div class="flex gap-2 overflow-x-auto pb-2">
+		<div class="sticky top-0 z-20 border-b border-border/40 bg-background/90 backdrop-blur-xl px-4 sm:px-6 pt-2.5">
+			<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
 				<!-- An explicit "All" is the way out of a filter. Clicking the active chip again also
 				     clears it, but nobody discovers that, and nothing else on screen says you're filtered. -->
 				<button onclick={() => load(null)} class={chipClass(!selected)}>{t('common.all')}</button>
@@ -364,7 +364,7 @@
 	{:else if loading}
 		<!-- Hold the bar's height on a cold load: chips arrive with the feed, and popping them in
 		     afterwards shoves the whole page down under the cursor. -->
-		<div class="sticky top-0 z-20 border-b bg-background px-6 pt-2.5" aria-hidden="true">
+		<div class="sticky top-0 z-20 border-b border-border/40 bg-background/90 backdrop-blur-xl px-4 sm:px-6 pt-2.5" aria-hidden="true">
 			<div class="flex gap-2 overflow-hidden pb-2">
 				{#each ['w-10', 'w-16', 'w-20', 'w-14', 'w-24', 'w-16'] as w, i (i)}
 					<Skeleton class="h-8 shrink-0 rounded-full {w}" />
@@ -372,7 +372,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="px-6 pb-6 pt-6">
+	<div class="px-4 sm:px-6 pb-6 pt-4 sm:pt-6">
 		<!-- Zone one: what's yours + curated rich music content -->
 		{#if !selected}
 			<div class="mb-10 border-b pb-8 space-y-10">

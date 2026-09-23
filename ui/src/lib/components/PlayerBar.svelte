@@ -138,6 +138,29 @@
 		if (pressedControl || isControl(e.target)) return;
 		np.open = !np.open;
 	}
+
+	// Mobile mini player swipe gestures to skip
+	let miniTouchStartX = 0;
+	let miniTouchStartY = 0;
+
+	function onMiniTouchStart(e: TouchEvent) {
+		miniTouchStartX = e.touches[0].clientX;
+		miniTouchStartY = e.touches[0].clientY;
+	}
+
+	function onMiniTouchEnd(e: TouchEvent) {
+		const dx = e.changedTouches[0].clientX - miniTouchStartX;
+		const dy = e.changedTouches[0].clientY - miniTouchStartY;
+		if (Math.abs(dx) > 50 && Math.abs(dy) < 40) {
+			if (dx < 0) {
+				api.nextTrack();
+			} else {
+				api.prevTrack();
+			}
+		}
+		miniTouchStartX = 0;
+		miniTouchStartY = 0;
+	}
 </script>
 
 <!-- The chevron button below is the keyboard equivalent of clicking the bar, so the bar itself
@@ -146,11 +169,15 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative border-t bg-card/95 backdrop-blur-xl transition-all select-none {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border-t rounded-2xl md:rounded-none bg-card/90 md:bg-card/95 backdrop-blur-2xl border border-white/10 md:border-t-border/50 md:border-x-0 md:border-b-0 shadow-2xl md:shadow-none shadow-black/50 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
 >
-	<!-- Mobile Mini Player Bar (< md) -->
-	<div class="flex md:hidden w-full items-center justify-between gap-3 px-3 py-2.5 relative">
-		<!-- Top Mini Progress Line -->
+	<!-- Mobile Floating Island Mini Player Capsule (< md) -->
+	<div
+		class="flex md:hidden w-full items-center justify-between gap-3 px-3 py-2 relative"
+		ontouchstart={onMiniTouchStart}
+		ontouchend={onMiniTouchEnd}
+	>
+		<!-- Top Micro Progress Line -->
 		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-primary/20 overflow-hidden">
 			<div
 				class="h-full bg-primary transition-all duration-150"
@@ -166,7 +193,7 @@
 						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-lg object-cover shadow-md"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10"
 						in:fade={{ duration: 250 }}
 						decoding="async"
 						onerror={(e) => {
@@ -179,15 +206,15 @@
 						src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-lg object-cover shadow-md"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10"
 						in:fade={{ duration: 250 }}
 						decoding="async"
 					/>
 				{/if}
 			{/key}
-			<div class="min-w-0 flex-1">
+			<div class="min-w-0 flex-1 pr-1">
 				<Marquee text={playback.now?.title ?? t('player.not_playing')} class="text-xs font-semibold text-foreground" />
-				<div class="truncate text-[11px] text-muted-foreground">
+				<div class="truncate text-[11px] font-medium text-muted-foreground">
 					{playback.now?.artists ?? ''}
 				</div>
 			</div>
@@ -198,7 +225,7 @@
 			<Button
 				variant="ghost"
 				size="icon-sm"
-				class="text-muted-foreground hover:text-foreground"
+				class="h-8 w-8 text-muted-foreground hover:text-foreground active:scale-90"
 				onclick={toggleLike}
 				aria-label={t('common.like')}
 			>
@@ -212,7 +239,7 @@
 			<Button
 				variant="default"
 				size="icon-sm"
-				class="rounded-full shadow-md bg-primary text-primary-foreground"
+				class="h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 active:scale-90 transition-transform"
 				onclick={() => api.togglePause()}
 				aria-label={playback.paused ? t('player.play') : t('player.pause')}
 			>
@@ -227,7 +254,7 @@
 			<Button
 				variant="ghost"
 				size="icon-sm"
-				class="text-muted-foreground hover:text-foreground"
+				class="h-8 w-8 text-muted-foreground hover:text-foreground active:scale-90"
 				onclick={() => api.nextTrack()}
 				aria-label={t('player.next')}
 			>

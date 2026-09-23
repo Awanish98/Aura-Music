@@ -180,7 +180,7 @@
 	data-selected={selectable ? selected : undefined}
 	aria-describedby={selectable ? selectionDescriptionId : undefined}
 	aria-label={selectable ? t(guestAdd ? 'selection.track_guest' : 'selection.track', { title: song.title }) : guestAdd ? `Add ${song.title} to the session queue` : `Play ${song.title}`}
-	class="group flex w-full cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent/10 {selected
+	class="group flex w-full cursor-pointer items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent/10 active:bg-accent/15 select-none {selected
 		? 'bg-primary/15'
 		: active
 		? 'bg-accent/10'
@@ -359,7 +359,7 @@
 			{inLibraryList}
 			triggerClass="cursor-pointer rounded-md p-1.5 text-muted-foreground transition hover:bg-accent/20 hover:text-foreground focus-visible:opacity-100 {compact
 				? ''
-				: 'opacity-0 group-hover:opacity-100'}"
+				: 'opacity-80 md:opacity-0 md:group-hover:opacity-100'}"
 		/>
 	</div>
 </div>

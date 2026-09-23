@@ -184,7 +184,7 @@
 			<Sidebar />
 			<!-- dragScroll: dragging a card up to home's Shortcuts grid has to be possible from anywhere in
 			     the feed, so aiming at the top edge scrolls this container while the drag is in flight. -->
-			<main class="min-w-0 flex-1 overflow-y-auto pb-36 md:pb-0" {@attach dragScroll}>
+			<main class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-0" {@attach dragScroll}>
 				<!-- Remount the current page on sign-in/out so it refetches with the new account, and on
 				     a refresh (titlebar button / F5), which drops the browse cache first. -->
 				{#key `${auth.epoch}:${ui.epoch}`}
@@ -207,16 +207,19 @@
 		</div>
 		{#if playback.now}
 			<!-- Slides up from its own height on first play; leaves instantly (bar removal is rare).
-			     z-20 on the wrapper, not the bar: the intro's transform makes this a stacking context,
-			     so a z on the footer inside would be trapped under it. The now-playing view is z-20 and
-			     earlier in the DOM, which is what puts it behind the bar as it slides in and out. -->
-			<div class="relative z-20 mb-14 md:mb-0" in:fly={{ y: 64, duration: 250, easing: cubicOut }}>
-				<PlayerBar
-					onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
-					queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
-					onToggleLyrics={() => (tabbed ? (np.tab = 'lyrics') : (lyricsOpen = !lyricsOpen))}
-					lyricsOpen={tabbed ? np.tab === 'lyrics' : lyricsOpen}
-				/>
+			     Floating island pill on mobile above bottom nav, docked bar on desktop. -->
+			<div
+				class="fixed md:relative bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-auto inset-x-0 z-20 px-2.5 sm:px-3 md:px-0 pointer-events-none md:pointer-events-auto"
+				in:fly={{ y: 64, duration: 250, easing: cubicOut }}
+			>
+				<div class="pointer-events-auto max-w-lg md:max-w-none mx-auto w-full">
+					<PlayerBar
+						onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
+						queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
+						onToggleLyrics={() => (tabbed ? (np.tab = 'lyrics') : (lyricsOpen = !lyricsOpen))}
+						lyricsOpen={tabbed ? np.tab === 'lyrics' : lyricsOpen}
+					/>
+				</div>
 			</div>
 		{/if}
 		<!-- Mobile Bottom Navigation Bar (< md) -->
