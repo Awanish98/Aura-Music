@@ -267,26 +267,26 @@
 	<div class="hidden md:flex w-full items-center gap-2 px-2 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
 		<!-- Now playing -->
 		<div class="flex min-w-0 flex-1 items-center gap-3" data-ctx>
-			{#key playback.now?.videoId}
+			{#key playback.now?.videoId || 'idle'}
 				{#if playback.now?.thumbnail}
 					<img
 						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm"
+						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm ring-1 ring-white/10"
 						in:fade={{ duration: 250 }}
 						decoding="async"
 						onerror={(e) => {
 							const target = e.currentTarget as HTMLImageElement;
-							target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+							target.src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80';
 						}}
 					/>
 				{:else}
 					<img
-						src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
-						alt=""
+						src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80"
+						alt="Aura Music"
 						style="max-width:none"
-						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm"
+						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm ring-1 ring-white/10"
 						in:fade={{ duration: 250 }}
 						decoding="async"
 					/>
@@ -296,8 +296,8 @@
 				<div class="flex items-center gap-1.5">
 					{#snippet title()}
 						<Marquee
-							text={playback.now?.title ?? t('player.not_playing')}
-							class="text-sm font-medium"
+							text={playback.now?.title ?? 'Aura Music • Ready'}
+							class="text-sm font-semibold text-foreground"
 						/>
 					{/snippet}
 					{#if albumId}
@@ -323,7 +323,7 @@
 				<div class="flex items-center gap-2">
 					<ArtistLine
 						runs={playback.now?.artistRuns}
-						text={playback.now?.artists ?? ''}
+						text={playback.now?.artists ?? 'Select any song to start playback'}
 						marquee
 						class="block max-w-full text-xs text-muted-foreground"
 					/>
@@ -418,14 +418,24 @@
 				<Button
 					variant="default"
 					size="icon"
-					class="rounded-full shadow-lg"
-					onclick={() => api.togglePause()}
+					class="rounded-full shadow-lg h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-transform"
+					onclick={() => {
+						if (!playback.now && playback.queue.items.length === 0) {
+							import('$lib/curatedFeed').then(({ CURATED_TOP_SONGS }) => {
+								if (CURATED_TOP_SONGS.length > 0) {
+									api.play(CURATED_TOP_SONGS[0]);
+								}
+							});
+						} else {
+							api.togglePause();
+						}
+					}}
 					aria-label={playback.paused ? t('player.play') : t('player.pause')}
 				>
 					<HugeiconsIcon
 						icon={PauseIcon}
 						altIcon={PlayIcon}
-						showAlt={playback.paused}
+						showAlt={!playback.now || playback.paused}
 						class="h-5 w-5"
 						fill="currentColor"
 					/>

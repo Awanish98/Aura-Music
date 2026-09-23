@@ -15,6 +15,7 @@ export const GDRIVE_CONFIG = {
 		}
 	},
 	scopes: [
+		'https://www.googleapis.com/auth/youtube.readonly',
 		'https://www.googleapis.com/auth/drive.file',
 		'https://www.googleapis.com/auth/drive.readonly',
 		'https://www.googleapis.com/auth/userinfo.profile',
@@ -211,8 +212,9 @@ class GoogleDriveManager {
 							this.state.connected = true;
 
 							await this.fetchAccountInfo();
+							this.syncUserYouTubePlaylists().catch(() => {});
 							this.notify();
-							toast.success(`Google Drive connected: ${this.state.user?.email || 'Authenticated'}`);
+							toast.success(`Google Account connected: ${this.state.user?.name || this.state.user?.email || 'Authenticated'}`);
 							resolve(this.getState());
 						} else {
 							reject(new Error('No access token returned from Google.'));
@@ -630,6 +632,148 @@ class GoogleDriveManager {
 		if (!uploadRes.ok) throw new Error('Failed to save lyrics to Google Drive');
 		toast.success(`Saved lyrics for "${title}" to Google Drive`);
 	}
+
+	/**
+	 * Fetch User's YouTube Playlists via YouTube Data API v3
+	 */
+	public async fetchUserYouTubePlaylists(): Promise<YouTubeUserPlaylist[]> {
+		const token = this.state.accessToken;
+		if (!token) return [];
+
+		try {
+			const res = await fetch(
+				'https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&mine=true&maxResults=50',
+				{
+					headers: { Authorization: `Bearer ${token}` }
+				}
+			);
+
+			if (!res.ok) {
+				const err = await res.text();
+				console.warn('[YouTube Playlists fetch error]', err);
+				return [];
+			}
+
+			const data = await res.json();
+			const playlists: YouTubeUserPlaylist[] = (data.items || []).map((item: any) => {
+				const snippet = item.snippet || {};
+				const thumbs = snippet.thumbnails || {};
+				const thumbnail =
+					thumbs.maxres?.url ||
+					thumbs.high?.url ||
+					thumbs.medium?.url ||
+					thumbs.default?.url ||
+					'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80';
+
+				return {
+					id: item.id,
+					title: snippet.title || 'Untitled Playlist',
+					description: snippet.description || '',
+					thumbnail,
+					itemCount: item.contentDetails?.itemCount || 0,
+					channelTitle: snippet.channelTitle || 'YouTube'
+				};
+			});
+
+			return playlists;
+		} catch (e) {
+			console.warn('[YouTube Playlists fetch exception]', e);
+			return [];
+		}
+	}
+
+	/**
+	 * Fetch Tracks from a YouTube Playlist via YouTube Data API v3
+	 */
+	public async fetchYouTubePlaylistItems(playlistId: string): Promise<SongItem[]> {
+		const token = this.state.accessToken;
+		if (!token) return [];
+
+		try {
+			const res = await fetch(
+				`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${encodeURIComponent(playlistId)}`,
+				{
+					headers: { Authorization: `Bearer ${token}` }
+				}
+			);
+
+			if (!res.ok) {
+				console.warn('[YouTube Playlist Items error]', await res.text());
+				return [];
+			}
+
+			const data = await res.json();
+			const songs: SongItem[] = (data.items || [])
+				.map((item: any) => {
+					const snippet = item.snippet || {};
+					const videoId = item.contentDetails?.videoId || snippet.resourceId?.videoId;
+					if (!videoId || snippet.title === 'Private video' || snippet.title === 'Deleted video') {
+						return null;
+					}
+
+					const thumbs = snippet.thumbnails || {};
+					const thumbnail =
+						thumbs.maxres?.url ||
+						thumbs.high?.url ||
+						thumbs.medium?.url ||
+						thumbs.default?.url ||
+						'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80';
+
+					const rawTitle = snippet.title || 'Unknown Title';
+					let title = rawTitle;
+					let artist = snippet.videoOwnerChannelTitle || snippet.channelTitle || 'YouTube Music';
+
+					// Clean artist - title if formatted with hyphen
+					if (rawTitle.includes(' - ')) {
+						const parts = rawTitle.split(' - ');
+						artist = parts[0].replace(/\[.*?\]|\(.*?\)/g, '').trim();
+						title = parts.slice(1).join(' - ').replace(/\[.*?\]|\(.*?\)/g, '').trim();
+					}
+
+					return {
+						video_id: videoId,
+						title,
+						artists: artist,
+						artist_runs: [{ text: artist }],
+						album: snippet.channelTitle || 'YouTube Playlist',
+						duration: '3:30',
+						thumbnail,
+						is_video: false,
+						is_upload: false,
+						explicit: false
+					} as SongItem;
+				})
+				.filter(Boolean) as SongItem[];
+
+			return songs;
+		} catch (e) {
+			console.warn('[YouTube Playlist Items exception]', e);
+			return [];
+		}
+	}
+
+	/**
+	 * Sync User's YouTube Playlists into Local Storage and trigger updates
+	 */
+	public async syncUserYouTubePlaylists(): Promise<YouTubeUserPlaylist[]> {
+		if (!this.isConnected()) return [];
+		const playlists = await this.fetchUserYouTubePlaylists();
+		if (typeof window !== 'undefined' && playlists.length > 0) {
+			localStorage.setItem('echo_youtube_playlists', JSON.stringify(playlists));
+			window.dispatchEvent(new CustomEvent('echo_youtube_synced', { detail: playlists }));
+		}
+		return playlists;
+	}
+}
+
+export interface YouTubeUserPlaylist {
+	id: string;
+	title: string;
+	description: string;
+	thumbnail: string;
+	itemCount: number;
+	channelTitle: string;
 }
 
 export const gdrive = new GoogleDriveManager();
+

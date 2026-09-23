@@ -44,46 +44,46 @@
 
 	const DEFAULT_STARTERS: BrowseItem[] = [
 		{
-			id: 'RDCLAK5uy_kbc3eE-z_9gU-N_gMv69h5f63G4P39t64',
-			title: 'Hindi Superhits Top 50',
-			subtitle: 'Bollywood & Hindi Hits',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80'
-		},
-		{
-			id: 'RDCLAK5uy_kmPRjHDECIcuVwnKsx2scAIaqQIryrr8g',
-			title: "Today's Global Hits",
-			subtitle: 'Top 50 International',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80'
-		},
-		{
-			id: 'gdrive:library',
-			title: 'Google Drive Cloud',
-			subtitle: 'Your Personal Audio Collection',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80'
-		},
-		{
-			id: 'saavn:trending',
-			title: 'Lossless Hi-Fi Master',
-			subtitle: '320kbps Studio Quality',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80'
-		},
-		{
-			id: 'fmhy:lofi-girl',
-			title: '24/7 Lofi Chill Radio',
-			subtitle: 'Relax • Study • Focus',
+			id: 'VLLM',
+			title: 'Liked Songs',
+			subtitle: 'Auto-playlist • Favorites',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&auto=format&fit=crop&q=80'
 		},
 		{
-			id: 'fmhy:somafm-groovesalad',
-			title: 'SomaFM Groove Salad',
-			subtitle: 'Ambient Beats & Lounge',
+			id: 'curated_chart_hindi_50',
+			title: 'Hindi Superhits Top 50',
+			subtitle: 'Top Bollywood Charts',
 			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80'
+			thumbnail: 'https://c.saavncdn.com/editorial/Hindi-Top50_20260601072033.jpg'
+		},
+		{
+			id: 'daily_mix_01',
+			title: 'Daily Mix 01',
+			subtitle: 'Arijit Singh, Pritam',
+			kind: 'playlist',
+			thumbnail: 'https://c.saavncdn.com/editorial/BestofArijitSingh_20260424083515.jpg'
+		},
+		{
+			id: 'curated_chart_punjabi_50',
+			title: 'Punjabi Top 50',
+			subtitle: 'Diljit, Karan Aujla, Shubh',
+			kind: 'playlist',
+			thumbnail: 'https://c.saavncdn.com/editorial/Punjabi-Top50_20260520081244.jpg'
+		},
+		{
+			id: 'curated_chart_global_50',
+			title: "Today's Global Hits",
+			subtitle: 'Top 50 International',
+			kind: 'playlist',
+			thumbnail: 'https://c.saavncdn.com/editorial/InternationalPopHits_20260515082010.jpg'
+		},
+		{
+			id: 'artist_diljit_dosanjh',
+			title: 'Diljit Dosanjh Radio',
+			subtitle: 'Artist Station • Punjabi Pop',
+			kind: 'artist',
+			thumbnail: 'https://c.saavncdn.com/editorial/BestofDiljitDosanjh_20260605051230.jpg'
 		}
 	];
 

@@ -157,6 +157,7 @@ const mockHome: HomePage = {
 import * as ytmusic from './ytmusic';
 import { webPlayer } from './webplayer';
 import { playback } from './player.svelte';
+import { getRichCuratedHome, getCuratedPlaylist } from './curatedFeed';
 
 export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
 	if (isTauri()) {
@@ -191,10 +192,14 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 	}
 	if (cmd === 'get_home') {
 		try {
+			const feed = await getRichCuratedHome(args?.params as string | undefined);
+			if (feed && feed.sections && feed.sections.length > 0) {
+				return feed as unknown as T;
+			}
 			return (await ytmusic.fetchHome(args?.params as string | undefined)) as unknown as T;
 		} catch (e) {
 			console.warn('[ytmusic get_home fallback]', e);
-			return mockHome as unknown as T;
+			return (await getRichCuratedHome(args?.params as string | undefined)) as unknown as T;
 		}
 	}
 	if (cmd === 'get_home_more') {
@@ -238,7 +243,7 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 			return {
 				title: 'Liked Music',
 				subtitle: `Auto-playlist • ${liked.length} songs`,
-				thumbnail: liked[0]?.thumbnail,
+				thumbnail: liked[0]?.thumbnail || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80',
 				description: 'Your favorite liked songs',
 				owned: false,
 				collaborative: false,
@@ -250,13 +255,21 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 			return {
 				title: 'On Repeat',
 				subtitle: `Auto-playlist • ${Math.min(hist.length, 50)} songs`,
-				thumbnail: hist[0]?.thumbnail,
+				thumbnail: hist[0]?.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80',
 				description: 'Songs you replay often',
 				owned: false,
 				collaborative: false,
 				items: hist.slice(0, 50)
 			} as unknown as T;
 		}
+
+		// Curated Charts, Daily Mixes, and Artist Radios
+		const curated = await getCuratedPlaylist(playlistId);
+		if (curated) {
+			return curated as unknown as T;
+		}
+
+		// User Local Playlists
 		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
 		const localPl = playlists.find((p) => p.id === playlistId);
 		if (localPl) {
@@ -270,6 +283,33 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 				items: localPl.items
 			} as unknown as T;
 		}
+
+		// YouTube User Playlists (via Google OAuth)
+		if (playlistId.startsWith('PL') || playlistId.startsWith('UU') || playlistId.startsWith('FL') || playlistId.startsWith('RD') || playlistId.startsWith('yt_')) {
+			const cleanYtId = playlistId.replace(/^yt_/, '');
+			try {
+				const { gdrive } = await import('./gdrive');
+				if (gdrive.isConnected()) {
+					const ytSongs = await gdrive.fetchYouTubePlaylistItems(cleanYtId);
+					if (ytSongs && ytSongs.length > 0) {
+						const ytPlaylists = getWebStorage<any[]>('youtube_playlists', []);
+						const meta = ytPlaylists.find((p) => p.id === cleanYtId || p.id === playlistId);
+						return {
+							title: meta?.title || 'YouTube Playlist',
+							subtitle: meta?.channelTitle ? `${meta.channelTitle} • ${ytSongs.length} songs` : `YouTube • ${ytSongs.length} songs`,
+							thumbnail: meta?.thumbnail || ytSongs[0]?.thumbnail,
+							description: meta?.description || 'Your synced YouTube playlist',
+							owned: true,
+							collaborative: false,
+							items: ytSongs
+						} as unknown as T;
+					}
+				}
+			} catch (err) {
+				console.warn('[YouTube playlist fetch error]', err);
+			}
+		}
+
 		return (await ytmusic.fetchPlaylist(playlistId)) as unknown as T;
 	}
 	if (cmd === 'get_lyrics') {
@@ -423,6 +463,13 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 				const updatedAccs = [newAcc, ...accounts.filter((a) => a.email !== user.email)];
 				setWebStorage('saved_google_accounts', updatedAccs);
 
+				// Background sync YouTube Playlists & Drive files
+				gdrive.syncUserYouTubePlaylists().then((ytPls) => {
+					if (ytPls && ytPls.length > 0) {
+						setWebStorage('youtube_playlists', ytPls);
+					}
+				}).catch(() => {});
+
 				gdrive.scanAudioFiles().then((files) => {
 					if (files.length > 0) {
 						setWebStorage('gdrive_songs', files);
@@ -449,6 +496,7 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 			gdrive.logout();
 		} catch {}
 		setWebStorage('google_user', null);
+		setWebStorage('youtube_playlists', []);
 		emitWebEvent('auth-changed', { signedIn: false });
 		return undefined as unknown as T;
 	}
@@ -502,16 +550,29 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
 		const liked = getWebStorage<SongItem[]>('liked_songs', []);
 		const gdriveSongs = getWebStorage<SongItem[]>('gdrive_songs', []);
+		const ytPlaylists = getWebStorage<any[]>('youtube_playlists', []);
 		const items: BrowseItem[] = [];
+
 		if (liked.length > 0) {
 			items.push({
 				kind: 'playlist',
 				id: 'VLLM',
 				title: 'Liked Music',
 				subtitle: `Auto-playlist • ${liked.length} songs`,
-				thumbnail: liked[0]?.thumbnail
+				thumbnail: liked[0]?.thumbnail || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80'
 			});
 		}
+
+		for (const yt of ytPlaylists) {
+			items.push({
+				kind: 'playlist',
+				id: yt.id,
+				title: yt.title,
+				subtitle: `YouTube • ${yt.itemCount || 0} tracks`,
+				thumbnail: yt.thumbnail
+			});
+		}
+
 		if (gdriveSongs.length > 0) {
 			items.push({
 				kind: 'playlist',
@@ -521,6 +582,7 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 				thumbnail: gdriveSongs[0]?.thumbnail
 			});
 		}
+
 		for (const pl of playlists) {
 			items.push({
 				kind: 'playlist',
