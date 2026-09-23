@@ -1156,6 +1156,8 @@ export const ui = $state({
 	videoOpen: false, // whether the floating music video player is visible
 	videoMode: 'hidden' as 'docked' | 'expanded' | 'fullscreen' | 'hidden',
 	shortcutsOpen: false, // the Ctrl+H (⌘/ on macOS) keyboard-shortcuts list
+	legalOpen: false, // Privacy, Terms, About, Contact dialog
+	legalTab: 'privacy' as 'privacy' | 'terms' | 'about' | 'contact',
 	channelPickerOpen: false,
 	channelPickerRequired: false, // true while a multi-channel login is not finalized yet
 	channelIdentities: [] as AccountIdentity[],

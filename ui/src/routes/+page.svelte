@@ -340,6 +340,7 @@
 </script>
 
 <div {@attach watchScroll}>
+	<h1 class="sr-only">Aura Music – Free High-Fidelity Music Streaming, Synced Lyrics & Personalized Charts</h1>
 	<HomeHero />
 	<!-- Mood chips filter the whole feed, so they're page-level controls: sticky, they stay reachable
 	     while the feed scrolls under them instead of leaving with the header they were pinned to.

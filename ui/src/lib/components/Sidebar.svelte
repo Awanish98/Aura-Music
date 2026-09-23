@@ -141,7 +141,7 @@
 		</div>
 	</div>
 
-	<nav class="mt-2 flex flex-col gap-1">
+	<nav class="mt-2 flex flex-col gap-1" aria-label="Main Navigation">
 		{#each nav as n (n.href)}
 			<a
 				href={n.href}
@@ -275,6 +275,14 @@
 						<p class="px-3 py-1.5 text-xs text-muted-foreground">{t('common.loading')}</p>
 					{/if}
 				{/each}
+			</div>
+
+			<!-- Trust & Legal Navigation Links -->
+			<div class="mt-auto border-t border-sidebar-border/40 px-3 py-2 text-[11px] text-muted-foreground/60 flex flex-wrap gap-x-3 gap-y-1">
+				<button onclick={() => { ui.legalTab = 'privacy'; ui.legalOpen = true; }} class="hover:text-primary transition-colors cursor-pointer">Privacy</button>
+				<button onclick={() => { ui.legalTab = 'terms'; ui.legalOpen = true; }} class="hover:text-primary transition-colors cursor-pointer">Terms</button>
+				<button onclick={() => { ui.legalTab = 'about'; ui.legalOpen = true; }} class="hover:text-primary transition-colors cursor-pointer">About</button>
+				<button onclick={() => { ui.legalTab = 'contact'; ui.legalOpen = true; }} class="hover:text-primary transition-colors cursor-pointer">Contact</button>
 			</div>
 		</div>
 

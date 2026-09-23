@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import CryptoJS from 'crypto-js';
@@ -10,13 +11,37 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// High-performance gzip/deflate compression for fast TTFB
+app.use(compression());
+
+// Middleware & Security Headers
 app.use(cors());
 app.use(express.json());
 
-// Request logging
+// Global Security, Privacy, and Content-Security-Policy Headers
 app.use((req, res, next) => {
-	res.setHeader('Referrer-Policy', 'no-referrer');
+	res.setHeader('X-Content-Type-Options', 'nosniff');
+	res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+	res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+	res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+	res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+	res.setHeader('X-XSS-Protection', '1; mode=block');
+
+	// Content Security Policy
+	const csp = [
+		"default-src 'self'",
+		"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://accounts.google.com https://apis.google.com",
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+		"font-src 'self' https://fonts.gstatic.com data:",
+		"img-src 'self' data: blob: https: http:",
+		"media-src 'self' data: blob: https: http:",
+		"connect-src 'self' https: http: wss: ws:",
+		"frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com",
+		"object-src 'none'",
+		"base-uri 'self'"
+	].join('; ');
+	res.setHeader('Content-Security-Policy', csp);
+
 	next();
 });
 
@@ -799,12 +824,27 @@ Recommend 4 to 8 songs matching the user's request. Format recommendations in a 
 	res.json({ text: formattedText, provider: 'smart-curator' });
 });
 
-// 11. Serve Built Static Frontend (if present)
+// 11. Serve Built Static Frontend with high-efficiency caching
 const clientBuildPath = path.resolve(__dirname, '../ui/build');
-app.use(express.static(clientBuildPath));
+app.use(
+	express.static(clientBuildPath, {
+		maxAge: '1d',
+		etag: true,
+		setHeaders: (res, filePath) => {
+			if (filePath.match(/\.(js|css|woff2|png|jpg|jpeg|svg|webp|ico|json)$/)) {
+				res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+			}
+		}
+	})
+);
 
+// SPA routing + Fix Soft 404 (non-existent asset files return true 404 status)
 app.get('*', (req, res, next) => {
 	if (req.path.startsWith('/api/')) return next();
+	// If path has a file extension (.png, .js, .css, etc.) and reached here, the asset does not exist
+	if (path.extname(req.path)) {
+		return res.status(404).type('text/plain').send('404: Resource not found');
+	}
 	res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
 		if (err) {
 			res.status(404).send('Aura Music UI build not found. Run npm run build in ui folder.');

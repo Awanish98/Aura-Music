@@ -2,16 +2,112 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Aura Music – Free High-Fidelity Music Streaming & Lyrics</title>
+		<meta name="description" content="Aura Music is a high-fidelity music streaming and discovery web app featuring curated trending charts, synced lyrics, and personalized playlists." />
+		<link rel="canonical" href="https://aura-music-1no9.onrender.com/" />
+
+		<!-- OpenGraph / Facebook / LinkedIn / Slack -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://aura-music-1no9.onrender.com/" />
+		<meta property="og:title" content="Aura Music – Free High-Fidelity Music Streaming & Lyrics" />
+		<meta property="og:description" content="Stream lossless 320kbps audio, discover trending charts, explore curated daily mixes, and sing along with real-time synced lyrics." />
+		<meta property="og:image" content="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&h=630&fit=crop&q=80" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:site_name" content="Aura Music" />
+
+		<!-- Twitter / X Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content="https://aura-music-1no9.onrender.com/" />
+		<meta name="twitter:title" content="Aura Music – Free High-Fidelity Music Streaming & Lyrics" />
+		<meta name="twitter:description" content="Stream lossless 320kbps audio, discover trending charts, explore curated daily mixes, and sing along with real-time synced lyrics." />
+		<meta name="twitter:image" content="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&h=630&fit=crop&q=80" />
+
+		<!-- Mobile PWA & Icons -->
 		<meta name="theme-color" content="#09090b" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="apple-mobile-web-app-title" content="Aura Music" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
-		<link rel="apple-touch-icon" href="%sveltekit.assets%/favicon.png" />
-		<title>Aura Music</title>
-		<script src="https://www.youtube.com/iframe_api"></script>
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" type="image/png" sizes="192x192" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/favicon.png" sizes="192x192" />
+
+		<!-- JSON-LD Structured Data for Rich Search Results -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@graph": [
+				{
+					"@type": "WebSite",
+					"@id": "https://aura-music-1no9.onrender.com/#website",
+					"url": "https://aura-music-1no9.onrender.com/",
+					"name": "Aura Music",
+					"description": "High-fidelity music streaming with synced lyrics and trending charts",
+					"potentialAction": {
+						"@type": "SearchAction",
+						"target": "https://aura-music-1no9.onrender.com/search?q={search_term_string}",
+						"query-input": "required name=search_term_string"
+					}
+				},
+				{
+					"@type": "WebApplication",
+					"@id": "https://aura-music-1no9.onrender.com/#app",
+					"name": "Aura Music",
+					"url": "https://aura-music-1no9.onrender.com/",
+					"applicationCategory": "MultimediaApplication",
+					"operatingSystem": "All",
+					"offers": {
+						"@type": "Offer",
+						"price": "0",
+						"priceCurrency": "USD"
+					}
+				},
+				{
+					"@type": "BreadcrumbList",
+					"@id": "https://aura-music-1no9.onrender.com/#breadcrumbs",
+					"itemListElement": [
+						{
+							"@type": "ListItem",
+							"position": 1,
+							"name": "Home",
+							"item": "https://aura-music-1no9.onrender.com/"
+						},
+						{
+							"@type": "ListItem",
+							"position": 2,
+							"name": "Discover",
+							"item": "https://aura-music-1no9.onrender.com/discover"
+						},
+						{
+							"@type": "ListItem",
+							"position": 3,
+							"name": "Library",
+							"item": "https://aura-music-1no9.onrender.com/library"
+						}
+					]
+				}
+			]
+		}
+		</script>
+
+		<!-- Print Stylesheet -->
+		<style media="print">
+			@media print {
+				body {
+					background: #ffffff !important;
+					color: #000000 !important;
+				}
+				nav, aside, .player-bar, #echo-video-mount, .no-print {
+					display: none !important;
+				}
+			}
+		</style>
+
+		<!-- Non-blocking deferred YouTube IFrame API -->
+		<script src="https://www.youtube.com/iframe_api" defer></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
