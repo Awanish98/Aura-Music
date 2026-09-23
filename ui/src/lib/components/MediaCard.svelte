@@ -89,20 +89,15 @@
 		     A wrapper, because the shadow has to paint outside a box that the cover below clips. -->
 		<div class="relative">
 			<div
-				class="pointer-events-none absolute inset-0 opacity-0 shadow-xl transition-opacity duration-300 group-hover:opacity-100 {round
+				class="pointer-events-none absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100 {round
 					? 'rounded-full'
-					: 'rounded-lg'}"
+					: 'rounded-2xl'}"
 			></div>
-			<!-- No resting shadow. Measured (perf/hover.mjs, 300 cards, scrolled): it was three quarters
-			     of the hover cost, and not because of the hovered card. WebKit rasterizes in tiles, so
-			     repainting one card re-rasterizes its whole tile, and that means re-blurring the shadow
-			     of every card in the tile. One blurred shadow per cover, nine covers a tile, on every
-			     card the pointer crosses. Dropping it took p90 frame time from ~105ms to ~33ms; the
-			     hover lift below is nearly free by comparison because only one card ever has it. -->
+			
 			<div
 				class="relative aspect-square w-full overflow-hidden bg-muted {round
-					? 'rounded-full'
-					: 'rounded-lg'}"
+					? 'rounded-full ring-2 ring-border/60'
+					: 'rounded-xl ring-1 ring-white/10 shadow-sm transition-all duration-300 group-hover:shadow-xl'}"
 			>
 				{#if item.thumbnail && attempt < 2 && !onRepeat}
 					<img
@@ -126,12 +121,10 @@
 					/>
 				{/if}
 				{#if item.kind !== 'artist'}
-					<!-- transition-[opacity,transform], not transition-all: opacity and translate are the
-					     only things that change, and both composite. -->
 					<button
-						class="absolute flex translate-y-1 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 shadow-lg transition-[opacity,transform] duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 focus-visible:opacity-100 {compact
+						class="absolute flex translate-y-1 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 shadow-xl transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110 active:scale-95 focus-visible:opacity-100 {compact
 							? 'bottom-1.5 right-1.5 h-7 w-7'
-							: 'bottom-2 right-2 h-9 w-9'}"
+							: 'bottom-2.5 right-2.5 h-10 w-10'}"
 						class:animate-pulse={playing}
 						disabled={playing}
 						aria-label="Play {item.title}"
@@ -140,21 +133,21 @@
 							playNow();
 						}}
 					>
-						<HugeiconsIcon icon={PlayIcon} class={compact ? 'h-3 w-3' : 'h-4 w-4'} />
+						<HugeiconsIcon icon={PlayIcon} class={compact ? 'h-3.5 w-3.5 fill-current' : 'h-4 w-4 fill-current'} />
 					</button>
 				{/if}
 			</div>
 		</div>
 		<div class="min-w-0 {round ? 'text-center' : ''}">
-			<div class="truncate font-medium {compact ? 'text-xs' : 'text-sm'}">{item.title}</div>
+			<div class="truncate font-semibold text-foreground group-hover:text-primary transition-colors {compact ? 'text-xs' : 'text-sm'}">{item.title}</div>
 			{#if item.subtitle || item.explicit}
 				<div
-					class="flex items-center gap-1 text-muted-foreground {round
+					class="flex items-center gap-1 text-muted-foreground font-medium {round
 						? 'justify-center'
 						: ''} {compact ? 'text-[0.6875rem]' : 'text-xs'}"
 				>
 					{#if item.explicit}
-						<ExplicitIcon class="h-3 w-3 shrink-0" />
+						<ExplicitIcon class="h-3 w-3 shrink-0 text-red-400" />
 					{/if}
 					<span class="truncate">{item.subtitle}</span>
 				</div>

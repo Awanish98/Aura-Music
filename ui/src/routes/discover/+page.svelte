@@ -202,25 +202,31 @@
 						playFmhyItem(item);
 					}
 				}}
-				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border/70 bg-card/50 p-3 transition-all hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md {isCurrentlyPlaying(
+				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-white/10 bg-card/60 p-3 shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-2xl {isCurrentlyPlaying(
 					item
 				)
-					? 'border-primary ring-1 ring-primary'
+					? 'border-primary ring-2 ring-primary/60 bg-primary/5'
 					: ''}"
 			>
+				<!-- Ambient Glow on Hover -->
+				<div
+					class="pointer-events-none absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100"
+				></div>
+
 				<!-- Thumbnail Container -->
-				<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
+				<div class="relative aspect-square w-full overflow-hidden rounded-xl bg-muted ring-1 ring-white/10">
 					<img
 						src={item.thumbnail}
 						alt={item.title}
 						loading="lazy"
-						class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+						decoding="async"
+						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
 					/>
 
 					<!-- Live Badge -->
 					{#if item.duration === 'LIVE'}
 						<div
-							class="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-red-600/90 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white shadow-sm backdrop-blur-sm"
+							class="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-red-600/90 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-white shadow-md backdrop-blur-md border border-red-500/40"
 						>
 							<span class="h-1.5 w-1.5 animate-ping rounded-full bg-white"></span>
 							<span>LIVE</span>
@@ -229,27 +235,27 @@
 
 					<!-- Category Pill -->
 					<div
-						class="absolute right-2.5 top-2.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-sm"
+						class="absolute right-2.5 top-2.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-md border border-white/10"
 					>
 						{item.category}
 					</div>
 
 					<!-- Hover Play Overlay -->
 					<div
-						class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+						class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:opacity-100"
 					>
 						<div
-							class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform group-hover:scale-110"
+							class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/50 transition-transform group-hover:scale-110 active:scale-95"
 						>
-							<HugeiconsIcon icon={PlayIcon} class="h-6 w-6 fill-current" />
+							<HugeiconsIcon icon={PlayIcon} class="h-6 w-6 fill-current translate-x-0.5" />
 						</div>
 					</div>
 				</div>
 
 				<!-- Details -->
-				<div class="mt-3 flex flex-1 flex-col justify-between gap-2">
-					<div class="flex flex-col">
-						<h2 class="line-clamp-1 font-heading text-base font-semibold leading-tight group-hover:text-primary">
+				<div class="mt-3 flex flex-1 flex-col justify-between gap-2 min-w-0">
+					<div class="flex flex-col min-w-0">
+						<h2 class="line-clamp-1 font-heading text-base font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
 							{item.title}
 						</h2>
 						<p class="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
