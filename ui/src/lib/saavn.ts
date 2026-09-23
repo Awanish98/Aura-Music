@@ -235,3 +235,81 @@ export async function fetchSaavnPlaylistDetailsDirect(playlistId: string): Promi
 		songs: []
 	};
 }
+
+export async function fetchSaavnAlbumDetailsDirect(albumId: string): Promise<{
+	id: string;
+	title: string;
+	artist: string;
+	thumbnail: string;
+	subtitle: string;
+	description: string;
+	songs: SongItem[];
+}> {
+	const cleanId = albumId.replace('saavn_album_', '').replace('saavn_', '');
+
+	// 1. Try local proxy
+	try {
+		const apiUrl = getApiUrl(`/api/saavn/album?id=${encodeURIComponent(cleanId)}`);
+		const res = await fetch(apiUrl, { signal: AbortSignal.timeout(8000) });
+		if (res.ok) {
+			const data = await res.json();
+			const songs = (data.songs || data.list || []).map((s: any) => ({
+				...s,
+				video_id: s.video_id || `saavn_${s.id}`,
+				artist_runs: s.artist_runs || [{ text: s.artists || s.primary_artists || 'Various Artists' }]
+			}));
+			return {
+				id: `saavn_album_${cleanId}`,
+				title: (data.title || data.name || 'Album').replace(/&quot;/g, '"'),
+				artist: data.primary_artists || data.artist || 'Various Artists',
+				subtitle: `Album • ${songs.length} songs`,
+				thumbnail: data.thumbnail || (data.image || '').replace('150x150', '500x500') || songs[0]?.thumbnail || '',
+				description: data.description || 'Lossless 320kbps Album from JioSaavn',
+				songs
+			};
+		}
+	} catch {}
+
+	// 2. Direct CORS fallback
+	const directEndpoints = [
+		`https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&_marker=0&cc=in&albumid=${encodeURIComponent(cleanId)}`,
+		`https://corsproxy.io/?url=${encodeURIComponent(`https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&_marker=0&cc=in&albumid=${encodeURIComponent(cleanId)}`)}`,
+		`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&_marker=0&cc=in&albumid=${encodeURIComponent(cleanId)}`)}`
+	];
+
+	for (const ep of directEndpoints) {
+		try {
+			const res = await fetch(ep, { signal: AbortSignal.timeout(6000) });
+			if (res.ok) {
+				const text = await res.text();
+				if (!text.includes('{')) continue;
+				const data = JSON.parse(text);
+				const songs = (data.songs || data.list || [])
+					.map(formatSaavnSong)
+					.filter((s: SongItem | null): s is SongItem => !!s && !!s.streamUrl);
+				if (songs.length > 0 || data.title || data.name) {
+					return {
+						id: `saavn_album_${cleanId}`,
+						title: (data.title || data.name || 'Album').replace(/&quot;/g, '"'),
+						artist: data.primary_artists || data.artist || 'Various Artists',
+						subtitle: `Album • ${songs.length} songs`,
+						thumbnail: (data.image || '').replace('150x150', '500x500') || songs[0]?.thumbnail || '',
+						description: data.header_desc || data.description || 'Lossless 320kbps Album from JioSaavn',
+						songs
+					};
+				}
+			}
+		} catch {}
+	}
+
+	return {
+		id: `saavn_album_${cleanId}`,
+		title: 'Lossless Album',
+		artist: 'Various Artists',
+		subtitle: 'Album',
+		thumbnail: '',
+		description: '',
+		songs: []
+	};
+}
+

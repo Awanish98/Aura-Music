@@ -764,17 +764,70 @@ export async function fetchArtist(id: string): Promise<ArtistPage> {
 }
 
 export async function fetchAlbum(id: string): Promise<AlbumPage> {
+	// 1. JioSaavn 320kbps Album Resolver
+	if (id.startsWith('saavn_album_') || id.startsWith('saavn_')) {
+		try {
+			const { fetchSaavnAlbumDetailsDirect } = await import('./saavn');
+			const saavnAlbum = await fetchSaavnAlbumDetailsDirect(id);
+			if (saavnAlbum && saavnAlbum.songs.length > 0) {
+				return {
+					title: saavnAlbum.title,
+					artist: saavnAlbum.artist,
+					artistId: undefined,
+					artistRuns: [{ text: saavnAlbum.artist }],
+					subtitle: saavnAlbum.subtitle,
+					secondSubtitle: 'JioSaavn • 320kbps Lossless',
+					description: saavnAlbum.description,
+					thumbnail: saavnAlbum.thumbnail,
+					items: saavnAlbum.songs,
+					explicit: false,
+					inLibrary: false,
+					sections: []
+				};
+			}
+		} catch (e) {
+			console.warn('[Saavn Album Fetch Error]', e);
+		}
+	}
+
+	// 2. Spotify Album Resolver
+	if (id.startsWith('spotify:album:') || id.includes('open.spotify.com/album/')) {
+		try {
+			const pl = await fetchPlaylist(id);
+			return {
+				title: pl.title,
+				artist: pl.subtitle || 'Various Artists',
+				artistId: undefined,
+				artistRuns: [{ text: pl.subtitle || 'Various Artists' }],
+				subtitle: 'Album',
+				secondSubtitle: 'Spotify',
+				description: pl.description,
+				thumbnail: pl.thumbnail,
+				items: pl.items,
+				explicit: false,
+				inLibrary: false,
+				sections: []
+			};
+		} catch {}
+	}
+
+	// 3. YouTube Music Browse API
 	try {
 		const data = await post('browse', { browseId: id });
 		const header =
-			data.header?.musicDetailHeaderRenderer || data.header?.musicResponsiveHeaderRenderer;
+			data.header?.musicDetailHeaderRenderer ||
+			data.header?.musicResponsiveHeaderRenderer ||
+			data.contents?.musicResponsiveHeaderRenderer ||
+			data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicResponsiveHeaderRenderer;
+		
 		const title = getText(header?.title) || 'Album';
 		const subtitle = getText(header?.subtitle);
 		const secondSubtitle = getText(header?.secondSubtitle);
 		const description = getText(header?.description);
 		const thumbnail = getThumb(
 			header?.thumbnail?.croppedSquareThumbnailRenderer?.thumbnail ||
-				header?.thumbnail?.musicThumbnailRenderer?.thumbnail
+			header?.thumbnail?.musicThumbnailRenderer?.thumbnail ||
+			header?.thumbnail?.musicVisualHeaderRenderer?.thumbnail
 		);
 
 		const artistRun = header?.subtitle?.runs?.find(
@@ -784,12 +837,23 @@ export async function fetchAlbum(id: string): Promise<AlbumPage> {
 		const artistId = artistRun?.navigationEndpoint?.browseEndpoint?.browseId;
 
 		const items: SongItem[] = [];
-		const secList =
-			data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content
-				?.sectionListRenderer?.contents ||
-			data.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer
-				?.contents ||
-			[];
+
+		// Extract shelves from singleColumn, twoColumn, and tabs
+		const secList: any[] = [
+			...(data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents || []),
+			...(data.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents || []),
+			...(data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents || []),
+			...(data.contents?.sectionListRenderer?.contents || [])
+		];
+
+		// Check direct tab content shelf
+		const directTabShelf = data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicShelfRenderer ||
+			data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicPlaylistShelfRenderer ||
+			data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicShelfRenderer;
+
+		if (directTabShelf) {
+			secList.push({ musicShelfRenderer: directTabShelf });
+		}
 
 		for (const sec of secList) {
 			const shelf = sec.musicShelfRenderer || sec.musicPlaylistShelfRenderer;
@@ -804,6 +868,63 @@ export async function fetchAlbum(id: string): Promise<AlbumPage> {
 					}
 				}
 			}
+		}
+
+		// Fallback 1: If items are empty, fetch via playlist endpoint
+		if (items.length === 0) {
+			try {
+				const pl = await fetchPlaylist(id);
+				if (pl.items.length > 0) {
+					return {
+						title: title !== 'Album' ? title : pl.title,
+						artist,
+						artistId,
+						artistRuns: artistRun ? [{ text: artist, id: artistId }] : [{ text: artist }],
+						subtitle: subtitle || pl.subtitle,
+						secondSubtitle,
+						description: description || pl.description,
+						thumbnail: thumbnail || pl.thumbnail,
+						items: pl.items,
+						explicit: false,
+						inLibrary: false,
+						sections: []
+					};
+				}
+			} catch {}
+		}
+
+		// Fallback 2: If still empty, search YouTube / Saavn using album title
+		if (items.length === 0 && title && title !== 'Album') {
+			try {
+				const searchRes = await fetchSearch(title);
+				if (searchRes.songs && searchRes.songs.length > 0) {
+					const matchedSongs = searchRes.songs.map((s) => ({
+						video_id: s.id,
+						title: s.title,
+						artists: s.subtitle || artist,
+						artist_runs: s.artistRuns || [{ text: s.subtitle || artist }],
+						album: title,
+						album_id: id,
+						thumbnail: s.thumbnail || thumbnail,
+						duration: s.duration,
+						streamUrl: s.streamUrl
+					}));
+					return {
+						title,
+						artist,
+						artistId,
+						artistRuns: artistRun ? [{ text: artist, id: artistId }] : [{ text: artist }],
+						subtitle: subtitle || `Album • ${matchedSongs.length} songs`,
+						secondSubtitle: 'Lossless Audio',
+						description,
+						thumbnail,
+						items: matchedSongs,
+						explicit: false,
+						inLibrary: false,
+						sections: []
+					};
+				}
+			} catch {}
 		}
 
 		return {

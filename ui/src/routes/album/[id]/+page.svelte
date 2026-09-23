@@ -240,65 +240,70 @@
     <!-- Header with the blurred album cover as a hero backdrop -->
     <div class="content-in relative overflow-hidden">
         {#if album.thumbnail}
-            <!-- Blurred backdrop: blur-2xl destroys any detail a bigger source would carry, so
-                 ask for the smallest thing that still reads as the cover's colours. -->
             <img
-                src={thumb(album.thumbnail, 96)}
+                src={thumb(album.thumbnail, 120)}
                 alt=""
-                class="absolute inset-0 h-full w-full art-wash scale-110 object-cover opacity-50 blur-2xl"
+                class="absolute inset-0 h-full w-full art-wash scale-125 object-cover opacity-40 blur-3xl"
             />
         {/if}
         <div
-            class="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-background/40"
+            class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30"
         ></div>
 
-        <div class="absolute right-6 top-6 z-10">
+        <div class="absolute right-6 top-6 z-10 hidden sm:block">
             <TrackFilter bind:value={query} placeholder={t("common.search_this_album")} />
         </div>
 
-        <div class="relative flex flex-col gap-5 p-6 pt-10">
-            <div class="flex items-end gap-5">
-                <!-- Inline width/height so the size holds even against a stale dev-server CSS that -->
-                <!-- hasn't regenerated a newly-used spacing utility (would fall back to intrinsic size). -->
+        <div class="relative flex flex-col gap-6 p-6 pt-10 sm:p-8 md:p-10">
+            <div class="flex flex-col sm:flex-row items-center sm:items-end gap-6 md:gap-8">
                 {#if album.thumbnail}
-                    <img
-                        src={thumb(album.thumbnail, 400)}
-                        alt=""
-                        style="width:7rem;height:7rem"
-                        class="shrink-0 rounded-xl object-cover shadow-2xl"
-                    />
+                    <div class="relative group shrink-0">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-primary/30 to-purple-600/30 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                        <img
+                            src={thumb(album.thumbnail, 500)}
+                            alt={album.title ?? "Album"}
+                            class="relative w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 rounded-2xl object-cover shadow-2xl ring-1 ring-white/15"
+                        />
+                    </div>
                 {:else}
                     <div
-                        style="width:7rem;height:7rem"
-                        class="shrink-0 rounded-xl bg-muted"
-                    ></div>
-                {/if}
-                <div class="min-w-0">
-                    <div
-                        class="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                        class="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 shrink-0 rounded-2xl bg-muted flex items-center justify-center ring-1 ring-white/10"
                     >
-                        {album.subtitle ?? "Album"}
+                        <span class="text-4xl">🎵</span>
                     </div>
+                {/if}
+
+                <div class="min-w-0 flex-1 text-center sm:text-left">
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                        <span class="rounded-full bg-primary/15 border border-primary/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                            {album.subtitle ?? "Album"}
+                        </span>
+                        <span class="rounded-full bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                            Lossless 320kbps
+                        </span>
+                    </div>
+
                     <h1
-                        class="mt-1 font-heading text-4xl font-bold tracking-tight drop-shadow"
+                        class="mt-2.5 font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md text-foreground"
                     >
                         {album.title ?? "Album"}
                     </h1>
+
                     <div
-                        class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
+                        class="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-1.5 text-sm text-muted-foreground font-medium"
                     >
                         {#if album.explicit}
-                            <ExplicitIcon class="h-4 w-4 shrink-0" />
+                            <ExplicitIcon class="h-4 w-4 shrink-0 text-red-400" />
                         {/if}
                         {#if album.artist}
                             <span
-                                class="flex items-center gap-1.5 font-medium text-foreground"
+                                class="flex items-center gap-2 font-semibold text-foreground"
                             >
                                 {#if album.artistThumbnail}
                                     <img
                                         src={album.artistThumbnail}
                                         alt=""
-                                        class="h-5 w-5 rounded-full object-cover"
+                                        class="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
                                     />
                                 {/if}
                                 <ArtistLine
@@ -308,24 +313,28 @@
                             </span>
                         {/if}
                         {#if album.secondSubtitle}
-                            <span class="text-muted-foreground/60">•</span>
+                            <span class="text-muted-foreground/40">•</span>
                             <span>{album.secondSubtitle}</span>
+                        {/if}
+                        {#if album.items.length > 0}
+                            <span class="text-muted-foreground/40">•</span>
+                            <span>{album.items.length} {album.items.length === 1 ? 'track' : 'tracks'}</span>
                         {/if}
                     </div>
                 </div>
             </div>
 
             {#if album.description}
-                <div class="max-w-2xl">
+                <div class="max-w-3xl">
                     <p
-                        class="text-sm text-foreground/80 {expanded
+                        class="text-sm leading-relaxed text-foreground/85 {expanded
                             ? ''
                             : 'line-clamp-2'}"
                     >
                         {album.description}
                     </p>
                     <button
-                        class="mt-1 cursor-pointer text-xs font-semibold uppercase text-muted-foreground hover:text-foreground"
+                        class="mt-1 cursor-pointer text-xs font-semibold uppercase text-primary hover:underline"
                         onclick={() => (expanded = !expanded)}
                     >
                         {expanded ? t("common.less") : t("common.more")}
@@ -333,33 +342,29 @@
                 </div>
             {/if}
 
-            <!-- Controls -->
-            <div class="relative flex items-center gap-3">
+            <!-- Action Controls -->
+            <div class="relative flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
                 <button
-                    class="flex cursor-pointer items-center gap-2 rounded-full text-foreground bg-primary px-6 py-2.5 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
+                    class="flex cursor-pointer items-center gap-2.5 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/30 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
                     onclick={() => playAll(null)}
                     disabled={!album.items.length}
                 >
-                    <HugeiconsIcon icon={PlayIcon} class="h-4 w-4" /> {t("player.play")}
+                    <HugeiconsIcon icon={PlayIcon} class="h-5 w-5 fill-current" /> {t("player.play")}
                 </button>
                 <button
-                    class="flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition hover:bg-accent/10 disabled:opacity-50"
+                    class="flex cursor-pointer items-center gap-2 rounded-full border border-border/70 bg-card/60 backdrop-blur-md px-6 py-3 text-sm font-semibold transition-all hover:bg-card hover:border-foreground/30 active:scale-95 disabled:opacity-50"
                     onclick={shuffle}
                     disabled={!album.items.length}
                 >
                     <HugeiconsIcon icon={ShuffleIcon} class="h-4 w-4" /> {t("common.shuffle")}
                 </button>
-                <!-- Local albums are already in the Local tab; everything else is savable, signed
-                     in or not. -->
+
                 {#if !isLocal}
                     <button
-                        class="flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition hover:bg-accent/10 disabled:opacity-50"
-                        class:border-primary={inLibrary}
-                        class:text-primary={inLibrary}
+                        class="flex cursor-pointer items-center gap-2 rounded-full border border-border/70 bg-card/60 backdrop-blur-md px-5 py-3 text-sm font-semibold transition-all hover:bg-card active:scale-95 disabled:opacity-50 {inLibrary ? 'border-primary text-primary bg-primary/10' : ''}"
                         onclick={toggleLibrary}
                         disabled={savingLibrary}
                     >
-                        <!-- altIcon/showAlt, not a ternary: `icon` is read once at mount. -->
                         <HugeiconsIcon
                             icon={BookmarkAdd02Icon}
                             altIcon={BookmarkCheck02Icon}
@@ -369,12 +374,14 @@
                         {inLibrary ? t("library.in_library") : t("library.save_to_library")}
                     </button>
                 {/if}
+
                 <TrackSelectButton
                     {selection}
-                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition hover:bg-accent/10 hover:text-foreground"
+                    class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-border/70 bg-card/60 backdrop-blur-md transition-all hover:bg-card hover:text-foreground active:scale-95"
                 />
+
                 <button
-                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border text-muted-foreground transition hover:bg-accent/10 hover:text-foreground"
+                    class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-border/70 bg-card/60 backdrop-blur-md text-muted-foreground transition-all hover:bg-card hover:text-foreground active:scale-95"
                     onclick={openMenu}
                     aria-label={t("a11y.more_options")}
                 >
