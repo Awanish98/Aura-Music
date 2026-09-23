@@ -143,7 +143,7 @@
 <!-- Full-screen Mobile Now Playing View -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="fixed inset-0 z-40 flex flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none backdrop-blur-3xl md:hidden"
+	class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none backdrop-blur-3xl md:hidden"
 	transition:fly={{ y: '100%', duration: 320, easing: cubicOut }}
 	ontouchstart={handleTouchStart}
 	ontouchmove={handleTouchMove}

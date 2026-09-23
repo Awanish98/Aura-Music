@@ -54,7 +54,7 @@ export function generateAvatarSvg(title: string = 'Aura', kind: string = 'song')
 	return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-// Rewrite a Google/Saavn image URL to the optimal pixel size, with instant SVG fallback.
+// Rewrite a Google, YouTube, or JioSaavn image URL to the optimal pixel size, with instant SVG fallback.
 export function thumb(url: string | undefined | null, px: number = 400, title: string = '', kind: string = 'song'): string {
 	if (!url) {
 		return generateAvatarSvg(title || 'Aura Music', kind);
@@ -62,9 +62,23 @@ export function thumb(url: string | undefined | null, px: number = 400, title: s
 	// Local library artwork
 	if (url.startsWith('/') || /^[A-Za-z]:[\\/]/.test(url)) return convertFileSrc(url);
 
-	// Google & YouTube Image resizing
-	if (/=w\d+-h\d+/.test(url)) return url.replace(/=w\d+-h\d+/, `=w${px}-h${px}`);
-	if (/=s\d+/.test(url)) return url.replace(/=s\d+/, `=s${px}`);
+	// YouTube CDN high-res image upgrades (i.ytimg.com / ytimg.com)
+	if (url.includes('ytimg.com/vi/')) {
+		if (px >= 400) {
+			// Upgrade standard / default thumbnails to maxresdefault or hq720
+			if (url.includes('hqdefault.jpg') || url.includes('mqdefault.jpg') || url.includes('default.jpg') || url.includes('sddefault.jpg')) {
+				return url.replace(/\/(hqdefault|mqdefault|default|sddefault)\.jpg/, '/hq720.jpg');
+			}
+		}
+	}
+
+	// Google & YouTube Image resizing (googleusercontent, ggpht, yt3)
+	if (/=w\d+-h\d+/.test(url)) {
+		return url.replace(/=w\d+-h\d+(-[a-zA-Z0-9_-]+)?/, `=w${px}-h${px}-l90-rj`);
+	}
+	if (/=s\d+/.test(url)) {
+		return url.replace(/=s\d+(-[a-zA-Z0-9_-]+)?/, `=s${px}-l90-rj`);
+	}
 
 	// JioSaavn CDN resizing
 	if (url.includes('saavncdn.com')) {
@@ -74,3 +88,4 @@ export function thumb(url: string | undefined | null, px: number = 400, title: s
 
 	return url;
 }
+

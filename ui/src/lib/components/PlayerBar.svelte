@@ -516,21 +516,13 @@
 					<HugeiconsIcon icon={MinimizeScreenIcon} class="h-5 w-5" />
 				</Button>
 				<Button
-					variant={ui.videoMode !== 'hidden' ? 'secondary' : 'ghost'}
+					variant={ui.theaterOpen ? 'secondary' : 'ghost'}
 					size="icon-sm"
-					onclick={() => {
-						if (ui.videoMode === 'hidden') {
-							ui.videoMode = 'docked';
-						} else if (ui.videoMode === 'docked') {
-							ui.videoMode = 'expanded';
-						} else {
-							ui.videoMode = 'docked';
-						}
-					}}
-					aria-label="Video Player (Mini / Fullscreen)"
-					title="Video Player (Mini / Fullscreen)"
+					onclick={() => (ui.theaterOpen = true)}
+					aria-label={t('player.theater_mode')}
+					title={t('player.theater_mode')}
 				>
-					<HugeiconsIcon icon={MaximizeScreenIcon} class="h-5 w-5 {ui.videoMode !== 'hidden' ? 'text-primary' : ''}" />
+					<HugeiconsIcon icon={MaximizeScreenIcon} class="h-5 w-5 {ui.theaterOpen ? 'text-primary' : ''}" />
 				</Button>
 				<Button
 					variant={showEq ? 'secondary' : 'ghost'}

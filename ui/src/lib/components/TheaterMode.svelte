@@ -75,8 +75,16 @@
 		updateFullscreenStatus();
 		document.addEventListener('fullscreenchange', updateFullscreenStatus);
 
+		// Trigger HTML5 Fullscreen API for true immersive full screen on desktop/laptop
+		if (typeof document !== 'undefined' && !document.fullscreenElement) {
+			document.documentElement.requestFullscreen().catch(() => {});
+		}
+
 		return () => {
 			document.removeEventListener('fullscreenchange', updateFullscreenStatus);
+			if (typeof document !== 'undefined' && document.fullscreenElement) {
+				document.exitFullscreen().catch(() => {});
+			}
 			api.theaterFullscreen(false).catch(() => {});
 		};
 	});
@@ -234,7 +242,7 @@
 	transition:fade={{ duration: 250 }}
 	onwheel={wheelVolume}
 	onpointermove={wake}
-	class="theater fixed inset-0 z-40 flex flex-col overflow-hidden bg-background text-foreground select-none"
+	class="theater fixed inset-0 z-50 flex h-[100dvh] w-[100dvw] flex-col overflow-hidden bg-background text-foreground select-none"
 >
 	<!-- Ambient Multi-Layered Glow Backdrop -->
 	{#if wash}

@@ -486,11 +486,10 @@
         <TrackSelectionBar {selection} from={album.title} />
         {#each shown as item, i (JSON.stringify([item.video_id, i]))}
             <TrackRow
-                song={item}
+                song={{ ...item, thumbnail: item.thumbnail || album.thumbnail }}
                 {selection}
                 selectionKey={selection.visibleKeys[i]}
                 index={i}
-                hideThumb
                 showPlayCount
                 active={item.video_id === nowId}
                 onplay={() => playAll(i)}
