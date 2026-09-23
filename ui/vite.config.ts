@@ -4,6 +4,63 @@ import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import CryptoJS from 'crypto-js';
+
+function decryptSaavnUrl(encryptedUrl: string) {
+	if (!encryptedUrl) return null;
+	try {
+		const key = CryptoJS.enc.Utf8.parse('38346591');
+		const cipherParams = CryptoJS.lib.CipherParams.create({
+			ciphertext: CryptoJS.enc.Base64.parse(encryptedUrl.trim())
+		});
+		const decrypted = CryptoJS.DES.decrypt(
+			cipherParams,
+			key,
+			{ mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 }
+		);
+		const rawUrl = decrypted.toString(CryptoJS.enc.Utf8);
+		if (!rawUrl || !rawUrl.startsWith('http')) return null;
+		return {
+			low: rawUrl.replace(/_[0-9]+\.mp4/, '_96.mp4').replace(/_[0-9]+\.mp3/, '_96.mp3'),
+			medium: rawUrl.replace(/_[0-9]+\.mp4/, '_160.mp4').replace(/_[0-9]+\.mp3/, '_160.mp3'),
+			high: rawUrl.replace(/_[0-9]+\.mp4/, '_320.mp4').replace(/_[0-9]+\.mp3/, '_320.mp3'),
+			raw: rawUrl
+		};
+	} catch {
+		return null;
+	}
+}
+
+function formatSaavnSong(item: any) {
+	const stream = decryptSaavnUrl(item.encrypted_media_url);
+	const durationSec = parseInt(item.duration, 10) || 0;
+	const mins = Math.floor(durationSec / 60);
+	const secs = durationSec % 60;
+	const durationStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+	const clean = (s?: string) =>
+		(s || '')
+			.replace(/&quot;/g, '"')
+			.replace(/&#039;/g, "'")
+			.replace(/&amp;/g, '&');
+
+	return {
+		id: `saavn_${item.id}`,
+		video_id: `saavn_${item.id}`,
+		title: clean(item.song || item.title),
+		artists: clean(item.primary_artists || item.singers || item.artist || item.more_info?.primary_artists),
+		artist_id: item.primary_artists_id || '',
+		album: clean(item.album || item.more_info?.album),
+		album_id: item.album_id || '',
+		thumbnail: (item.image || '').replace('150x150', '500x500').replace('50x50', '500x500'),
+		duration: durationStr,
+		duration_seconds: durationSec,
+		streamUrl: stream?.high || stream?.medium || stream?.raw || item.media_preview_url || null,
+		has_lyrics: item.has_lyrics === 'true' || item.has_lyrics === true,
+		source: 'saavn',
+		quality: '320kbps'
+	};
+}
 
 const fixHugeIconsPlugin = {
 	name: 'fix-hugeicons-case-sensitivity',
@@ -49,6 +106,128 @@ export default defineConfig({
 				});
 
 				server.middlewares.use(async (req: any, res: any, next: any) => {
+					// 1. Saavn Search API
+					if (req.url && req.url.startsWith('/api/saavn/search?')) {
+						const params = new URLSearchParams(req.url.split('?')[1] || '');
+						const query = params.get('q') || params.get('query');
+						if (!query) {
+							res.statusCode = 400;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: 'Missing query' }));
+							return;
+						}
+						const page = parseInt(params.get('p') || params.get('page') || '1', 10);
+						const limit = parseInt(params.get('n') || params.get('limit') || '20', 10);
+
+						try {
+							const searchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&cc=in&p=${page}&n=${limit}&q=${encodeURIComponent(query)}`;
+							const sRes = await fetch(searchUrl, {
+								headers: {
+									'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+									Referer: 'https://www.jiosaavn.com/'
+								}
+							});
+							const data = await sRes.json();
+							const results = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ success: true, total: data.total || results.length, results }));
+						} catch (e) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: String(e) }));
+						}
+						return;
+					}
+
+					// 2. Saavn Trending API
+					if (req.url && req.url.startsWith('/api/saavn/trending')) {
+						try {
+							const chartsUrl = `https://www.jiosaavn.com/api.php?__call=content.getCharts&_format=json&_marker=0&cc=in`;
+							const featuredUrl = `https://www.jiosaavn.com/api.php?__call=content.getFeaturedPlaylists&_format=json&_marker=0&cc=in&p=1&n=15`;
+							const [chartsRes, featRes] = await Promise.all([
+								fetch(chartsUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }),
+								fetch(featuredUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+							]);
+							const charts = await chartsRes.json();
+							const featured = await featRes.json();
+							const formattedCharts = (charts || []).slice(0, 10).map((c: any) => ({
+								id: c.id || c.listid,
+								title: (c.title || c.listname || '').replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+								subtitle: c.count ? `${c.count} Songs` : 'Top Chart',
+								thumbnail: (c.image || '').replace('150x150', '500x500'),
+								type: 'chart'
+							}));
+							const formattedPlaylists = (featured.data || featured || []).slice(0, 15).map((p: any) => ({
+								id: p.id || p.listid,
+								title: (p.title || p.listname || '').replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+								subtitle: (p.subtitle || p.more_info?.firstname || 'Featured Playlist').replace(/&quot;/g, '"'),
+								thumbnail: (p.image || '').replace('150x150', '500x500'),
+								type: 'playlist'
+							}));
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ charts: formattedCharts, featured: formattedPlaylists }));
+						} catch (e) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: String(e) }));
+						}
+						return;
+					}
+
+					// 3. Saavn Playlist Details
+					if (req.url && req.url.startsWith('/api/saavn/playlist?')) {
+						const params = new URLSearchParams(req.url.split('?')[1] || '');
+						const playlistId = params.get('id') || params.get('listid');
+						if (!playlistId) {
+							res.statusCode = 400;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: 'Missing id' }));
+							return;
+						}
+						try {
+							const url = `https://www.jiosaavn.com/api.php?__call=playlist.getDetails&_format=json&_marker=0&cc=in&listid=${encodeURIComponent(playlistId)}`;
+							const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+							const data = await resp.json();
+							const songs = (data.songs || data.list || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({
+								id: data.id || playlistId,
+								title: (data.title || data.listname || '').replace(/&quot;/g, '"'),
+								thumbnail: (data.image || '').replace('150x150', '500x500'),
+								songs
+							}));
+						} catch (e) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: String(e) }));
+						}
+						return;
+					}
+
+					// 4. Unified Search
+					if (req.url && req.url.startsWith('/api/search/unified?')) {
+						const params = new URLSearchParams(req.url.split('?')[1] || '');
+						const query = params.get('q') || params.get('query');
+						if (!query) {
+							res.statusCode = 400;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: 'Missing query' }));
+							return;
+						}
+						try {
+							const searchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&cc=in&p=1&n=20&q=${encodeURIComponent(query)}`;
+							const saavnRes = await fetch(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+							const data = await saavnRes.json();
+							const saavnSongs = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ success: true, songs: saavnSongs, total: saavnSongs.length }));
+						} catch (e) {
+							res.statusCode = 500;
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({ error: String(e) }));
+						}
+						return;
+					}
 					if (req.url && req.url.startsWith('/api/yt-music/')) {
 						const endpoint = req.url.replace('/api/yt-music/', '').split('?')[0];
 						let body = '';

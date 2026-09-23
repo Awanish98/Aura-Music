@@ -952,27 +952,13 @@ export function convertFmhyToSongItem(item: FmhyItem): SongItem {
 	} as SongItem;
 }
 
+import { searchSaavnDirect, fetchSaavnTrendingDirect, fetchSaavnPlaylistDirect } from './saavn';
+
 export async function fetchSaavnSearch(query: string): Promise<SongItem[]> {
 	if (!query) return [];
 	try {
-		const url = getApiUrl(`/api/saavn/search?q=${encodeURIComponent(query)}`);
-		const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-		if (res.ok) {
-			const data = await res.json();
-			return (data.results || []).map((s: any) => ({
-				video_id: s.video_id || `saavn_${s.id}`,
-				title: s.title,
-				artists: s.artists,
-				artist_runs: [{ text: s.artists }],
-				album: s.album,
-				duration: s.duration,
-				thumbnail: s.thumbnail,
-				streamUrl: s.streamUrl,
-				is_video: false,
-				is_upload: false,
-				explicit: false
-			}));
-		}
+		const results = await searchSaavnDirect(query);
+		if (results.length > 0) return results;
 	} catch (e) {
 		console.warn('[fetchSaavnSearch error]', e);
 	}
@@ -986,31 +972,9 @@ export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; feat
 		return cachedTrending;
 	}
 	try {
-		const url = getApiUrl('/api/saavn/trending');
-		const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-		if (res.ok) {
-			const data = await res.json();
-			const charts: BrowseItem[] = (data.charts || []).map((c: any) => ({
-				kind: 'playlist',
-				id: `saavn_${c.id}`,
-				title: c.title,
-				subtitle: `${c.subtitle} • 320kbps Lossless`,
-				thumbnail: c.thumbnail,
-				artistRuns: [{ text: 'JioSaavn' }],
-				isUpload: false,
-				explicit: false
-			}));
-			const featured: BrowseItem[] = (data.featured || []).map((f: any) => ({
-				kind: 'playlist',
-				id: `saavn_${f.id}`,
-				title: f.title,
-				subtitle: `${f.subtitle} • 320kbps Lossless`,
-				thumbnail: f.thumbnail,
-				artistRuns: [{ text: 'Featured' }],
-				isUpload: false,
-				explicit: false
-			}));
-			cachedTrending = { charts, featured };
+		const trending = await fetchSaavnTrendingDirect();
+		if (trending.charts.length > 0) {
+			cachedTrending = trending;
 			return cachedTrending;
 		}
 	} catch (e) {
@@ -1020,26 +984,9 @@ export async function fetchSaavnTrending(): Promise<{ charts: BrowseItem[]; feat
 }
 
 export async function fetchSaavnPlaylist(playlistId: string): Promise<SongItem[]> {
-	const cleanId = playlistId.replace('saavn_', '');
 	try {
-		const url = getApiUrl(`/api/saavn/playlist?id=${encodeURIComponent(cleanId)}`);
-		const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-		if (res.ok) {
-			const data = await res.json();
-			return (data.songs || []).map((s: any) => ({
-				video_id: s.video_id || `saavn_${s.id}`,
-				title: s.title,
-				artists: s.artists,
-				artist_runs: [{ text: s.artists }],
-				album: s.album,
-				duration: s.duration,
-				thumbnail: s.thumbnail,
-				streamUrl: s.streamUrl,
-				is_video: false,
-				is_upload: false,
-				explicit: false
-			}));
-		}
+		const songs = await fetchSaavnPlaylistDirect(playlistId);
+		if (songs.length > 0) return songs;
 	} catch (e) {
 		console.warn('[fetchSaavnPlaylist error]', e);
 	}

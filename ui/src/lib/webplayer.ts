@@ -1,13 +1,14 @@
-// Pure Native HTML5 & YouTube Web Audio Engine for Echo Music (100% Ad-Free & Background Playback)
+// Pure Native HTML5 & YouTube Web Audio Engine for Aura Music (100% Ad-Free & Background Playback)
 import { playback, np, audioFx } from './player.svelte';
 import type { NowPlaying, QueueState, SongItem } from './api';
 import { fetchSearch } from './ytmusic';
+import { searchSaavnDirect } from './saavn';
+import { getApiUrl } from './apiBase';
 
 declare global {
 	interface Window {
 		onYouTubeIframeAPIReady?: () => void;
 		YT?: any;
-		webkitAudioContext?: typeof AudioContext;
 	}
 }
 
@@ -20,30 +21,23 @@ class WebPlayer {
 	private isRadioStream = false;
 	private usingDirectAudio = false;
 	private pendingVideoId: string | null = null;
-
-	// Web Audio Equalizer & Visualizer Nodes
-	private audioCtx: AudioContext | null = null;
-	private audioSource: MediaElementAudioSourceNode | null = null;
-	private lowFilter: BiquadFilterNode | null = null;
-	private midFilter: BiquadFilterNode | null = null;
-	private highFilter: BiquadFilterNode | null = null;
-	private analyser: AnalyserNode | null = null;
 	private wakeLock: any = null;
+	private unlocked = false;
 
 	init() {
 		if (typeof window === 'undefined') return;
 
-		// 1. Initialize HTML5 Audio for direct streams (NO crossOrigin = 'anonymous' to prevent CDN CORS blocking)
+		// 1. Initialize HTML5 Audio for direct streams with native hardware audio pipeline
 		if (!this.audio) {
 			this.audio = new Audio();
 			this.audio.preload = 'auto';
-			this.audio.volume = (playback.volume ?? 100) / 100;
+			this.audio.muted = false;
+			this.audio.volume = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
 
 			this.audio.addEventListener('play', () => {
 				playback.paused = false;
 				this.startProgress();
 				this.updateMediaSessionState('playing');
-				this.initAudioFx();
 			});
 
 			this.audio.addEventListener('pause', () => {
@@ -78,77 +72,23 @@ class WebPlayer {
 			this.setupMediaSession();
 		}
 
-		// 2. Initialize YouTube IFrame Player API in persistent hidden container
+		// 2. Initialize YouTube IFrame Player API in active media container
 		this.initYouTubePlayer();
 	}
 
-	private initAudioFx() {
-		if (typeof window === 'undefined' || !this.audio || this.audioCtx) return;
-		try {
-			const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-			if (!AudioContextClass) return;
-			this.audioCtx = new AudioContextClass();
-
-			this.lowFilter = this.audioCtx.createBiquadFilter();
-			this.lowFilter.type = 'lowshelf';
-			this.lowFilter.frequency.value = 80;
-			this.lowFilter.gain.value = audioFx.bass ?? 0;
-
-			this.midFilter = this.audioCtx.createBiquadFilter();
-			this.midFilter.type = 'peaking';
-			this.midFilter.frequency.value = 1000;
-			this.midFilter.Q.value = 1.0;
-			this.midFilter.gain.value = audioFx.mid ?? 0;
-
-			this.highFilter = this.audioCtx.createBiquadFilter();
-			this.highFilter.type = 'highshelf';
-			this.highFilter.frequency.value = 4000;
-			this.highFilter.gain.value = audioFx.treble ?? 0;
-
-			this.analyser = this.audioCtx.createAnalyser();
-			this.analyser.fftSize = 64;
-			this.analyser.smoothingTimeConstant = 0.8;
-
-			try {
-				if (!this.audioSource) {
-					this.audioSource = this.audioCtx.createMediaElementSource(this.audio);
-					this.audioSource.connect(this.lowFilter);
-					this.lowFilter.connect(this.midFilter);
-					this.midFilter.connect(this.highFilter);
-					this.highFilter.connect(this.analyser);
-					this.analyser.connect(this.audioCtx.destination);
-				}
-			} catch (nodeErr) {
-				console.warn('[AudioFX Node connect warning - playing via native output]', nodeErr);
-			}
-		} catch (e) {
-			console.warn('[Aura WebPlayer AudioFX Warning]', e);
-		}
-	}
-
 	updateEq(bass: number, mid: number, treble: number) {
-		if (this.audioCtx && this.audioCtx.state === 'suspended') {
-			this.audioCtx.resume().catch(() => {});
-		}
-		if (this.lowFilter) this.lowFilter.gain.value = bass;
-		if (this.midFilter) this.midFilter.gain.value = mid;
-		if (this.highFilter) this.highFilter.gain.value = treble;
+		// Native high-fidelity hardware playback
 	}
 
 	getVisualizerData(): Uint8Array {
-		if (!this.analyser) {
-			const arr = new Uint8Array(16);
-			if (!playback.paused && playback.now) {
-				const now = Date.now() / 150;
-				for (let i = 0; i < 16; i++) {
-					arr[i] = Math.floor(Math.abs(Math.sin(now + i * 0.4)) * 180 + 40);
-				}
+		const arr = new Uint8Array(16);
+		if (!playback.paused && playback.now) {
+			const now = Date.now() / 150;
+			for (let i = 0; i < 16; i++) {
+				arr[i] = Math.floor(Math.abs(Math.sin(now + i * 0.4)) * 180 + 40);
 			}
-			return arr;
 		}
-		const buffer = new Uint8Array(this.analyser.frequencyBinCount);
-		this.analyser.getByteFrequencyData(buffer);
-		return buffer;
+		return arr;
 	}
 
 	private async acquireWakeLock() {
@@ -164,7 +104,7 @@ class WebPlayer {
 			try {
 				this.wakeLock.release();
 			} catch {}
-			this.wakeLock = null;
+				this.wakeLock = null;
 		}
 	}
 
@@ -176,8 +116,9 @@ class WebPlayer {
 		if (!container) {
 			const host = document.createElement('div');
 			host.id = 'echo-yt-player-host';
+			// Non-zero dimensions positioned at viewport edge to prevent browser background throttling
 			host.style.cssText =
-				'position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;';
+				'position:fixed;bottom:0;right:0;width:200px;height:200px;opacity:0.01;pointer-events:none;z-index:-9999;';
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
 			host.appendChild(container);
@@ -240,7 +181,7 @@ class WebPlayer {
 							}
 						},
 						onError: (err: any) => {
-							console.warn('[Echo YT Player Error]', err);
+							console.warn('[Aura YT Player Error]', err);
 							if (this.currentItem) {
 								this.retryWithAlternativeStream(this.currentItem);
 							}
@@ -248,7 +189,7 @@ class WebPlayer {
 					}
 				});
 			} catch (e) {
-				console.warn('[Echo YT Player Init Error]', e);
+				console.warn('[Aura YT Player Init Error]', e);
 			}
 		};
 
@@ -427,7 +368,7 @@ class WebPlayer {
 			if (searchRes.songs?.[0]?.id) return searchRes.songs[0].id;
 			if (searchRes.top?.[0]?.id) return searchRes.top[0].id;
 		} catch (e) {
-			console.warn('[Echo WebPlayer] Search fallback error:', e);
+			console.warn('[Aura WebPlayer] Search fallback error:', e);
 		}
 
 		return item.video_id || null;
@@ -437,8 +378,7 @@ class WebPlayer {
 		try {
 			const fallbackQuery = `${item.title} ${item.artists || ''}`.trim();
 			// 1. Try JioSaavn direct 320kbps search
-			const { fetchSaavnSearch } = await import('./fmhy');
-			const saavnResults = await fetchSaavnSearch(fallbackQuery);
+			const saavnResults = await searchSaavnDirect(fallbackQuery);
 			if (saavnResults.length > 0 && saavnResults[0]?.streamUrl && saavnResults[0].streamUrl !== item.streamUrl) {
 				item.streamUrl = saavnResults[0].streamUrl;
 				this.playAudioDirect(saavnResults[0].streamUrl);
@@ -460,10 +400,20 @@ class WebPlayer {
 	}
 
 	private async getDirectAudioUrl(videoId: string): Promise<string | null> {
+		// 1. First try app's own streaming pipe
+		try {
+			const streamEndpoint = getApiUrl(`/api/stream?videoId=${encodeURIComponent(videoId)}`);
+			const res = await fetch(streamEndpoint, { method: 'HEAD', signal: AbortSignal.timeout(2500) });
+			if (res.ok && res.headers.get('content-type')?.includes('audio')) {
+				return streamEndpoint;
+			}
+		} catch {}
+
+		// 2. Try fast public streaming proxies
 		const endpoints = [
+			`https://pipedapi.tokhmi.xyz/streams/${videoId}`,
 			`https://inv.nadeko.net/api/v1/videos/${videoId}`,
-			`https://invidious.jing.rocks/api/v1/videos/${videoId}`,
-			`https://pipedapi.kavin.rocks/streams/${videoId}`
+			`https://invidious.jing.rocks/api/v1/videos/${videoId}`
 		];
 
 		for (const ep of endpoints) {
@@ -496,11 +446,21 @@ class WebPlayer {
 		}
 		this.usingDirectAudio = true;
 		if (this.audio) {
+			try {
+				this.audio.pause();
+				this.audio.currentTime = 0;
+			} catch {}
+			this.audio.muted = false;
+			this.audio.volume = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
 			this.audio.src = url;
-			this.audio.volume = (playback.volume ?? 100) / 100;
+			this.audio.load();
 			const playPromise = this.audio.play();
 			if (playPromise !== undefined) {
-				playPromise.catch((e) => {
+				playPromise.then(() => {
+					playback.paused = false;
+					this.startProgress();
+					this.updateMediaSessionState('playing');
+				}).catch((e) => {
 					console.warn('[Direct Audio Play Error - Falling back]', e);
 					if (this.currentItem) {
 						this.retryWithAlternativeStream(this.currentItem);
@@ -511,7 +471,11 @@ class WebPlayer {
 	}
 
 	private loadAndPlayYt(videoId: string) {
-		if (this.audio) this.audio.pause();
+		if (this.audio) {
+			try {
+				this.audio.pause();
+			} catch {}
+		}
 		this.usingDirectAudio = false;
 		this.isRadioStream = false;
 
@@ -527,7 +491,7 @@ class WebPlayer {
 				playback.paused = false;
 				this.startProgress();
 			} catch (e) {
-				console.warn('[Echo YT Play Exception]', e);
+				console.warn('[Aura YT Play Exception]', e);
 			}
 		} else {
 			this.pendingVideoId = videoId;
@@ -539,8 +503,14 @@ class WebPlayer {
 		this.init();
 		this.currentItem = item;
 
-		if (this.audioCtx && this.audioCtx.state === 'suspended') {
-			this.audioCtx.resume().catch(() => {});
+		// User gesture audio unlock for seamless unblocked browser playback
+		if (this.audio && !this.unlocked) {
+			this.audio.play().then(() => {
+				this.unlocked = true;
+				if (!this.usingDirectAudio && !this.isRadioStream) {
+					this.audio?.pause();
+				}
+			}).catch(() => {});
 		}
 
 		const parseDurationToSeconds = (dur?: string | number): number => {
@@ -638,20 +608,21 @@ class WebPlayer {
 			}
 		}
 
-		// 4. JioSaavn 320kbps Lossless Audio Resolver (Zero Ad, CD Quality)
+		// 4. JioSaavn 320kbps Lossless Audio Resolver (Zero Ad, CD Quality, 100% Reliable)
 		const query = `${item.title} ${item.artists || ''}`.replace(/\s+/g, ' ').trim();
 		if (query && !item.video_id?.startsWith('LOCAL:')) {
 			try {
-				const { fetchSaavnSearch } = await import('./fmhy');
-				const results = await fetchSaavnSearch(query);
+				const results = await searchSaavnDirect(query);
 				if (results.length > 0 && results[0]?.streamUrl) {
 					const match = results[0];
-					item.streamUrl = match.streamUrl;
-					if (match.thumbnail && !item.thumbnail) item.thumbnail = match.thumbnail;
-					this.isRadioStream = false;
-					this.usingDirectAudio = true;
-					this.playAudioDirect(match.streamUrl);
-					return;
+					if (match.streamUrl) {
+						item.streamUrl = match.streamUrl;
+						if (match.thumbnail && !item.thumbnail) item.thumbnail = match.thumbnail;
+						this.isRadioStream = false;
+						this.usingDirectAudio = true;
+						this.playAudioDirect(match.streamUrl);
+						return;
+					}
 				}
 			} catch (e) {
 				console.warn('[JioSaavn search resolver error]', e);
@@ -722,9 +693,8 @@ class WebPlayer {
 		if (this.usingDirectAudio || this.isRadioStream) {
 			if (!this.audio) return;
 			if (this.audio.paused) {
-				if (this.audioCtx && this.audioCtx.state === 'suspended') {
-					this.audioCtx.resume().catch(() => {});
-				}
+				this.audio.muted = false;
+				this.audio.volume = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
 				this.audio.play().catch(console.warn);
 			} else {
 				this.audio.pause();
@@ -735,6 +705,8 @@ class WebPlayer {
 				if (state === 1) {
 					this.ytPlayer.pauseVideo();
 				} else {
+					this.ytPlayer.unMute();
+					this.ytPlayer.setVolume(playback.volume ?? 100);
 					this.ytPlayer.playVideo();
 				}
 			} catch {}
@@ -756,10 +728,12 @@ class WebPlayer {
 	setVolume(volume: number) {
 		playback.volume = volume;
 		if (this.audio) {
+			this.audio.muted = false;
 			this.audio.volume = Math.max(0, Math.min(1, volume / 100));
 		}
 		if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.setVolume === 'function') {
 			try {
+				this.ytPlayer.unMute();
 				this.ytPlayer.setVolume(volume);
 			} catch {}
 		}

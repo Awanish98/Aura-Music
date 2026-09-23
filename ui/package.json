@@ -45,6 +45,8 @@
 		"@tauri-apps/plugin-dialog": "^2.7.2",
 		"@tauri-apps/plugin-process": "^2.3.1",
 		"@tauri-apps/plugin-updater": "^2.10.1",
+		"@types/crypto-js": "^4.2.2",
+		"crypto-js": "^4.2.0",
 		"mode-watcher": "^1.1.0"
 	}
 }

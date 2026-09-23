@@ -482,11 +482,11 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		}
 	}
 
-	// 1. Parallel fetch from JioSaavn 320kbps & FMHY Lossless Engine
+	// 1. Parallel fetch from JioSaavn 320kbps Lossless Engine
 	let saavnSongs: BrowseItem[] = [];
 	try {
-		const { fetchSaavnSearch } = await import('./fmhy');
-		const rawSaavn = await fetchSaavnSearch(query);
+		const { searchSaavnDirect } = await import('./saavn');
+		const rawSaavn = await searchSaavnDirect(query);
 		saavnSongs = rawSaavn.map((s) => ({
 			kind: 'song',
 			id: s.video_id,
