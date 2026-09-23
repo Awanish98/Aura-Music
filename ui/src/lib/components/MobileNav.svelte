@@ -25,7 +25,7 @@
 </script>
 
 <nav
-	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-white/10 bg-background/85 px-2 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] shadow-[0_-10px_30px_rgba(0,0,0,0.3)] backdrop-blur-2xl md:hidden"
+	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around apple-glass-dock px-2 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] select-none md:hidden"
 	aria-label="Mobile Navigation"
 >
 	{#each navItems as item}

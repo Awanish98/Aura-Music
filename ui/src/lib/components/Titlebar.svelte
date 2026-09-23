@@ -129,7 +129,7 @@
 
 <header
 	data-tauri-drag-region
-	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-9 shrink-0 select-none items-center justify-between border-b border-border/40 bg-background/95 backdrop-blur-md px-1"
+	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-9 shrink-0 select-none items-center justify-between border-b border-border/40 bg-background/80 backdrop-blur-2xl px-1"
 >
 	<!-- App Title in Center -->
 	<span

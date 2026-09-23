@@ -169,7 +169,7 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative md:border-t rounded-2xl md:rounded-none bg-card/90 md:bg-card/95 backdrop-blur-2xl border border-white/10 md:border-t-border/50 md:border-x-0 md:border-b-0 shadow-2xl md:shadow-none shadow-black/50 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border-t rounded-2xl md:rounded-none apple-glass-dock border border-white/10 md:border-t-white/15 md:border-x-0 md:border-b-0 shadow-2xl md:shadow-none shadow-black/50 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
 >
 	<!-- Mobile Floating Island Mini Player Capsule (< md) -->
 	<div

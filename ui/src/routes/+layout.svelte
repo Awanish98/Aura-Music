@@ -173,12 +173,15 @@
 	     12px, not `rounded-lg`: that resolves to --radius, which every theme sets differently, so
 	     the window corner used to change with the theme. This is the GNOME/Adwaita value (#65). -->
 	<div
-		class="flex h-screen flex-col overflow-hidden bg-background text-foreground {win.maximized ||
+		class="relative flex h-screen flex-col overflow-hidden bg-background text-foreground {win.maximized ||
 		ui.theaterOpen ||
 		win.chrome !== 'off'
 			? ''
 			: 'rounded-[12px]'}"
 	>
+		<!-- Apple-style Ambient Atmospheric Light Mesh -->
+		<div class="apple-ambient-mesh pointer-events-none absolute inset-0 -z-10 opacity-40 dark:opacity-60 transition-opacity duration-1000"></div>
+
 		<ResizeBorders />
 		<Titlebar />
 		<!-- relative: the queue and lyrics panels are absolute overlays inside it (see QueuePanel). -->

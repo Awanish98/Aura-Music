@@ -229,7 +229,7 @@
 							<div class="absolute -left-1 bottom-0 top-0 z-20 w-0.5 rounded-full bg-primary"></div>
 						{/if}
 						<div
-							class="flex h-16 sm:h-18 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-border/40 bg-card/60 backdrop-blur-md text-left transition-all duration-200 hover:border-primary/40 hover:bg-card hover:shadow-md hover:scale-[1.01]"
+							class="flex h-16 sm:h-18 cursor-pointer items-center gap-3 overflow-hidden rounded-xl apple-glass-card text-left"
 							role="button"
 							tabindex="0"
 							draggable="true"

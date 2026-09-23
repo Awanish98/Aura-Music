@@ -156,10 +156,10 @@
 						activeCategory = cat.id as any;
 						selectedTag = null;
 					}}
-					class="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all {activeCategory ===
+					class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all {activeCategory ===
 					cat.id
-						? 'border-primary bg-primary text-primary-foreground shadow-sm'
-						: 'border-border bg-card/60 text-muted-foreground hover:border-primary/50 hover:text-foreground'}"
+						? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]'
+						: 'apple-glass-pill text-muted-foreground hover:text-foreground'}"
 				>
 					<HugeiconsIcon icon={cat.icon} class="h-4 w-4" />
 					<span>{cat.label}</span>
@@ -202,10 +202,10 @@
 						playFmhyItem(item);
 					}
 				}}
-				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-white/10 bg-card/60 p-3 shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-2xl {isCurrentlyPlaying(
+				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl apple-glass-card p-3 shadow-md transition-all duration-300 {isCurrentlyPlaying(
 					item
 				)
-					? 'border-primary ring-2 ring-primary/60 bg-primary/5'
+					? 'border-primary ring-2 ring-primary/60 bg-primary/10'
 					: ''}"
 			>
 				<!-- Ambient Glow on Hover -->
