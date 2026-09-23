@@ -39,7 +39,7 @@
 		wheelVolume
 	} from '$lib/player.svelte';
 	import * as api from '$lib/api';
-	import { thumb } from '$lib/thumb';
+	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { t } from '$lib/i18n.svelte';
 	import Marquee from './Marquee.svelte';
 	import ArtistLine from './ArtistLine.svelte';
@@ -97,7 +97,7 @@
 	}
 
 	const fmt = (secs: number) => {
-		if (!secs || secs < 0) return '0:00';
+		if (!secs || secs < 0 || !isFinite(secs) || isNaN(secs)) return '0:00';
 		const t = Math.floor(secs);
 		const h = Math.floor(t / 3600);
 		const m = Math.floor((t % 3600) / 60);
@@ -107,7 +107,7 @@
 	};
 
 	const fmtRemaining = (secs: number) => {
-		if (!playback.duration) return '-0:00';
+		if (!playback.duration || !isFinite(playback.duration) || playback.now?.duration === 'LIVE') return 'LIVE';
 		const rem = Math.max(0, playback.duration - secs);
 		return `-${fmt(rem)}`;
 	};
@@ -249,14 +249,20 @@
 				>
 					{#if playback.now?.thumbnail}
 						<img
-							src={thumb(playback.now.thumbnail, 720)}
+							src={thumb(playback.now.thumbnail, 720, playback.now?.title || 'Aura', 'song')}
+							alt=""
+							class="h-full w-full object-cover"
+							onerror={(e) => {
+								const target = e.currentTarget as HTMLImageElement;
+								target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+							}}
+						/>
+					{:else}
+						<img
+							src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
 							alt=""
 							class="h-full w-full object-cover"
 						/>
-					{:else}
-						<div class="flex h-full w-full items-center justify-center bg-card text-muted-foreground">
-							<HugeiconsIcon icon={MusicNote01Icon} size={64} />
-						</div>
 					{/if}
 				</div>
 			</div>

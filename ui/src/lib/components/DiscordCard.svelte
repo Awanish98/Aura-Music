@@ -86,6 +86,7 @@
 	const pct = $derived(duration > 0 ? Math.min(100, (position / duration) * 100) : 0);
 
 	function clock(secs: number) {
+		if (!secs || secs < 0 || !isFinite(secs) || isNaN(secs)) return '0:00';
 		const s = Math.max(0, Math.floor(secs));
 		return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 	}

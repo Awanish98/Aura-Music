@@ -90,7 +90,7 @@
 	}
 
 	const fmt = (secs: number) => {
-		if (!secs || secs < 0) return '0:00';
+		if (!secs || secs < 0 || !isFinite(secs) || isNaN(secs)) return '0:00';
 		const t = Math.floor(secs);
 		const h = Math.floor(t / 3600);
 		const m = Math.floor((t % 3600) / 60);

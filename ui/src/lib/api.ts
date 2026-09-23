@@ -387,7 +387,108 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		playback.queue = { ...q };
 		return undefined as unknown as T;
 	}
-	if (cmd === 'get_account') return { signedIn: false } as unknown as T;
+	if (cmd === 'get_account') {
+		const user = getWebStorage<any>('google_user', null);
+		if (user) {
+			return {
+				signedIn: true,
+				name: user.name,
+				handle: user.email,
+				email: user.email,
+				thumbnail: user.picture || user.thumbnail,
+				canSwitch: true
+			} as unknown as T;
+		}
+		return { signedIn: false } as unknown as T;
+	}
+	if (cmd === 'get_saved_accounts' || cmd === 'get_google_accounts') {
+		return getWebStorage<SavedAccount[]>('saved_google_accounts', []) as unknown as T;
+	}
+	if (cmd === 'login_webview') {
+		try {
+			const { gdrive } = await import('./gdrive');
+			const authState = await gdrive.login();
+			if (authState.connected && authState.user) {
+				const user = authState.user;
+				setWebStorage('google_user', user);
+				const accounts = getWebStorage<SavedAccount[]>('saved_google_accounts', []);
+				const newAcc: SavedAccount = {
+					id: user.id || user.email,
+					name: user.name,
+					email: user.email,
+					handle: user.email,
+					thumbnail: user.picture,
+					active: true
+				};
+				const updatedAccs = [newAcc, ...accounts.filter((a) => a.email !== user.email)];
+				setWebStorage('saved_google_accounts', updatedAccs);
+
+				gdrive.scanAudioFiles().then((files) => {
+					if (files.length > 0) {
+						setWebStorage('gdrive_songs', files);
+					}
+				}).catch(() => {});
+
+				emitWebEvent('auth-changed', {
+					signedIn: true,
+					name: user.name,
+					handle: user.email,
+					email: user.email,
+					thumbnail: user.picture,
+					canSwitch: true
+				});
+			}
+		} catch (e) {
+			console.warn('[login_webview error]', e);
+		}
+		return undefined as unknown as T;
+	}
+	if (cmd === 'sign_out') {
+		try {
+			const { gdrive } = await import('./gdrive');
+			gdrive.logout();
+		} catch {}
+		setWebStorage('google_user', null);
+		emitWebEvent('auth-changed', { signedIn: false });
+		return undefined as unknown as T;
+	}
+	if (cmd === 'switch_google_account') {
+		const id = String(args?.id || '');
+		const accounts = getWebStorage<SavedAccount[]>('saved_google_accounts', []);
+		const target = accounts.find((a) => a.id === id || a.email === id);
+		if (target) {
+			setWebStorage('google_user', target);
+			emitWebEvent('auth-changed', {
+				signedIn: true,
+				name: target.name,
+				handle: target.email,
+				email: target.email,
+				thumbnail: target.thumbnail,
+				canSwitch: true
+			});
+			return {
+				signedIn: true,
+				name: target.name,
+				handle: target.email,
+				email: target.email,
+				thumbnail: target.thumbnail,
+				canSwitch: true
+			} as unknown as T;
+		}
+		return { signedIn: false } as unknown as T;
+	}
+	if (cmd === 'remove_google_account') {
+		const id = String(args?.id || '');
+		const accounts = getWebStorage<SavedAccount[]>('saved_google_accounts', []);
+		const filtered = accounts.filter((a) => a.id !== id && a.email !== id);
+		setWebStorage('saved_google_accounts', filtered);
+		const cur = getWebStorage<any>('google_user', null);
+		if (cur && (cur.id === id || cur.email === id)) {
+			setWebStorage('google_user', null);
+			emitWebEvent('auth-changed', { signedIn: false });
+		}
+		return undefined as unknown as T;
+	}
 	if (cmd === 'get_queue') {
 		return {
 			items: playback.queue.items,
@@ -400,6 +501,7 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 	if (cmd === 'get_library') {
 		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
 		const liked = getWebStorage<SongItem[]>('liked_songs', []);
+		const gdriveSongs = getWebStorage<SongItem[]>('gdrive_songs', []);
 		const items: BrowseItem[] = [];
 		if (liked.length > 0) {
 			items.push({
@@ -408,6 +510,15 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 				title: 'Liked Music',
 				subtitle: `Auto-playlist • ${liked.length} songs`,
 				thumbnail: liked[0]?.thumbnail
+			});
+		}
+		if (gdriveSongs.length > 0) {
+			items.push({
+				kind: 'playlist',
+				id: 'GDRIVE_CLOUD_MUSIC',
+				title: 'Google Drive Music',
+				subtitle: `Personal Cloud • ${gdriveSongs.length} tracks`,
+				thumbnail: gdriveSongs[0]?.thumbnail
 			});
 		}
 		for (const pl of playlists) {
@@ -430,10 +541,10 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 	if (cmd === 'get_upload_albums') return [] as unknown as T;
 	if (cmd === 'get_browse_grid') return [] as unknown as T;
 	if (cmd === 'get_history') {
-		return getWebStorage<SongItem[]>('history', []) as unknown as T;
+		const hist = getWebStorage<SongItem[]>('history', []);
+		if (!hist || hist.length === 0) return [] as unknown as T;
+		return [{ title: 'Recently Played', items: hist }] as unknown as T;
 	}
-	if (cmd === 'get_saved_accounts') return [] as unknown as T;
-	if (cmd === 'get_google_accounts') return [] as unknown as T;
 	if (cmd === 'playlist_index') {
 		const playlists = getWebStorage<WebPlaylist[]>('playlists', []);
 		const map: Record<string, string[]> = {};
@@ -668,6 +779,21 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 	return undefined as unknown as T;
 }
 
+const webEventHandlers = new Map<string, Set<(e: any) => void>>();
+
+export function emitWebEvent<T>(event: string, payload: T) {
+	const handlers = webEventHandlers.get(event);
+	if (handlers) {
+		for (const h of handlers) {
+			try {
+				h({ payload });
+			} catch (e) {
+				console.error('[WebEvent Error]', e);
+			}
+		}
+	}
+}
+
 export async function listen<T>(
 	event: string,
 	handler: (event: { payload: T }) => void
@@ -675,7 +801,14 @@ export async function listen<T>(
 	if (isTauri()) {
 		return tauriListen<T>(event, handler);
 	}
-	return () => {};
+	if (!webEventHandlers.has(event)) {
+		webEventHandlers.set(event, new Set());
+	}
+	const set = webEventHandlers.get(event)!;
+	set.add(handler);
+	return () => {
+		set.delete(handler);
+	};
 }
 
 /** How the signed-in user rated a track (innertube `Rating`). The three states are mutually

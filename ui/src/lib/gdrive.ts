@@ -6,7 +6,7 @@ export const GDRIVE_CONFIG = {
 	get clientId() {
 		return (
 			(typeof window !== 'undefined' && localStorage.getItem('gdrive_client_id')) ||
-			(import.meta.env?.VITE_GDRIVE_CLIENT_ID ?? '')
+			(import.meta.env?.VITE_GDRIVE_CLIENT_ID ?? '438218385617-vluifdatq1v6upaocbfsllpg4j0cmv8t.apps.googleusercontent.com')
 		);
 	},
 	set clientId(val: string) {

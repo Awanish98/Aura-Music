@@ -25,7 +25,7 @@ async function post(endpoint: string, body: Record<string, unknown> = {}): Promi
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body),
-				signal: AbortSignal.timeout(1200)
+				signal: AbortSignal.timeout(8000)
 			});
 			if (res.ok) {
 				const text = await res.text();
@@ -293,74 +293,81 @@ export async function fetchHome(params?: string): Promise<HomePage> {
 	const body: Record<string, unknown> = { browseId: 'FEmusic_home' };
 	if (params) body.params = params;
 
-	const data = await post('browse', body);
-	const secList =
-		data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content
-			?.sectionListRenderer;
-
-	const rawChips = secList?.header?.chipCloudRenderer?.chips || [];
-	const chips: HomeChip[] = rawChips
-		.map((c: any) => {
-			const chip = c.chipCloudChipRenderer;
-			return {
-				title: getText(chip?.text) || '',
-				params: chip?.navigationEndpoint?.browseEndpoint?.params || ''
-			};
-		})
-		.filter((c: HomeChip) => c.title && c.params);
-
+	let chips: HomeChip[] = [];
 	const sections: HomeSection[] = [];
-	const rawSections = secList?.contents || [];
+	let continuation: string | undefined;
 
-	for (const sec of rawSections) {
-		const shelf = sec.musicCarouselShelfRenderer || sec.musicImmersiveCarouselShelfRenderer;
-		if (!shelf) continue;
+	try {
+		const data = await post('browse', body);
+		const secList =
+			data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content
+				?.sectionListRenderer;
 
-		const title = getText(shelf.header?.musicCarouselShelfBasicHeaderRenderer?.title);
-		if (!title) continue;
+		const rawChips = secList?.header?.chipCloudRenderer?.chips || [];
+		chips = rawChips
+			.map((c: any) => {
+				const chip = c.chipCloudChipRenderer;
+				return {
+					title: getText(chip?.text) || '',
+					params: chip?.navigationEndpoint?.browseEndpoint?.params || ''
+				};
+			})
+			.filter((c: HomeChip) => c.title && c.params);
 
-		const items: BrowseItem[] = [];
-		const contents = shelf.contents || [];
+		const rawSections = secList?.contents || [];
 
-		for (const item of contents) {
-			if (item.musicTwoRowItemRenderer) {
-				const card = parseCard(item);
-				if (card) items.push(card);
-			} else if (item.musicResponsiveListItemRenderer) {
-				const song = parseListItem(item);
-				if (song) {
-					items.push({
-						kind: 'song',
-						id: song.video_id,
-						title: song.title,
-						subtitle: song.artists,
-						thumbnail: song.thumbnail,
-						duration: song.duration,
-						artistRuns: song.artist_runs,
-						isUpload: false,
-						explicit: false
-					});
+		for (const sec of rawSections) {
+			const shelf = sec.musicCarouselShelfRenderer || sec.musicImmersiveCarouselShelfRenderer;
+			if (!shelf) continue;
+
+			const title = getText(shelf.header?.musicCarouselShelfBasicHeaderRenderer?.title);
+			if (!title) continue;
+
+			const items: BrowseItem[] = [];
+			const contents = shelf.contents || [];
+
+			for (const item of contents) {
+				if (item.musicTwoRowItemRenderer) {
+					const card = parseCard(item);
+					if (card) items.push(card);
+				} else if (item.musicResponsiveListItemRenderer) {
+					const song = parseListItem(item);
+					if (song) {
+						items.push({
+							kind: 'song',
+							id: song.video_id,
+							title: song.title,
+							subtitle: song.artists,
+							thumbnail: song.thumbnail,
+							duration: song.duration,
+							artistRuns: song.artist_runs,
+							isUpload: false,
+							explicit: false
+						});
+					}
 				}
+			}
+
+			if (items.length) {
+				const moreBrowse = shelf.header?.musicCarouselShelfBasicHeaderRenderer?.moreContentButton;
+				const moreBrowseId = moreBrowse?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
+				const moreParams = moreBrowse?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.params;
+
+				sections.push({
+					title,
+					items,
+					moreBrowseId,
+					moreParams
+				});
 			}
 		}
 
-		if (items.length) {
-			const moreBrowse = shelf.header?.musicCarouselShelfBasicHeaderRenderer?.moreContentButton;
-			const moreBrowseId = moreBrowse?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
-			const moreParams = moreBrowse?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.params;
-
-			sections.push({
-				title,
-				items,
-				moreBrowseId,
-				moreParams
-			});
-		}
+		continuation =
+			secList?.continuations?.[0]?.nextContinuationData?.continuation ||
+			secList?.continuations?.[0]?.reloadContinuationData?.continuation;
+	} catch (e) {
+		console.warn('[YouTube Home fetch error - using FMHY and JioSaavn fallback]', e);
 	}
-
-	const continuation =
-		secList?.continuations?.[0]?.nextContinuationData?.continuation ||
-		secList?.continuations?.[0]?.reloadContinuationData?.continuation;
 
 	// FMHY & JioSaavn 320kbps Curated Sections (Live Radios, Podcasts, Soundscapes, Top Charts)
 	try {
@@ -503,19 +510,20 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		console.warn('[Saavn search integration error]', e);
 	}
 
-	const data = await post('search', { query });
-	const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
-	const secList = tab?.content?.sectionListRenderer?.contents || [];
-
 	const songs: BrowseItem[] = [...saavnSongs];
 	const albums: BrowseItem[] = [];
 	const artists: BrowseItem[] = [];
 	const playlists: BrowseItem[] = [];
 	const top: BrowseItem[] = [];
 
-	const processItem = (c: any) => {
-		const item = c.musicResponsiveListItemRenderer;
-		if (!item) return;
+	try {
+		const data = await post('search', { query });
+		const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
+		const secList = tab?.content?.sectionListRenderer?.contents || [];
+
+		const processItem = (c: any) => {
+			const item = c.musicResponsiveListItemRenderer;
+			if (!item) return;
 
 		const song = parseListItem(c);
 		const flexCols = item.flexColumns || [];
@@ -643,6 +651,9 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 			}
 		}
 	}
+} catch (e) {
+	console.warn('[YouTube Search error - falling back to Saavn]', e);
+}
 
 	// If top result is empty, use the first song or artist
 	if (!top.length && songs.length) {

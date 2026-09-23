@@ -128,6 +128,11 @@
 			onerror={() => (bgFailed = true)}
 			class="pointer-events-none absolute inset-0 h-full w-full art-wash scale-110 object-cover opacity-30 blur-2xl dark:opacity-40"
 		/>
+	{:else if appearance.artworkBackground && !showVideo()}
+		<div
+			class="pointer-events-none absolute inset-0 h-full w-full opacity-25 blur-3xl transition-opacity duration-700 dark:opacity-35"
+			style="background: radial-gradient(circle at 40% 40%, #a855f7 0%, #ec4899 45%, #3b82f6 80%, transparent 100%)"
+		></div>
 	{/if}
 
 	<!-- Capped and centred, so a wide window doesn't park the artwork in the middle of an empty half
@@ -225,7 +230,14 @@
 							<img
 								{src}
 								alt={playback.now?.title || 'Aura'}
-								onerror={imgFailed}
+								onerror={(e) => {
+									if (attempt < srcs.length - 1) {
+										attempt++;
+									} else {
+										const target = e.currentTarget as HTMLImageElement;
+										target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+									}
+								}}
 								style={srcs[2] ? `background-image:url(${srcs[2]})` : undefined}
 								class="aspect-square w-full rounded-2xl bg-cover object-cover shadow-2xl"
 								decoding="async"

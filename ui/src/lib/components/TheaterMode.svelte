@@ -224,7 +224,7 @@
 	const glow = $derived(`radial-gradient(closest-side, hsl(${hue ?? 265} 80% 55% / 0.5), transparent)`);
 
 	const fmt = (secs: number) => {
-		if (!secs || secs < 0) return '0:00';
+		if (!secs || secs < 0 || !isFinite(secs) || isNaN(secs)) return '0:00';
 		const s = Math.floor(secs);
 		const h = Math.floor(s / 3600);
 		const m = Math.floor((s % 3600) / 60);
@@ -504,7 +504,11 @@
 				/>
 				<div class="mt-2 flex justify-between text-xs font-medium tabular-nums text-muted-foreground">
 					<span>{fmt(shownPosition)}</span>
-					<span>{fmt(playback.duration)}</span>
+					{#if playback.now?.duration === 'LIVE' || !playback.duration}
+						<span class="rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/30">LIVE</span>
+					{:else}
+						<span>{fmt(playback.duration)}</span>
+					{/if}
 				</div>
 			</div>
 
