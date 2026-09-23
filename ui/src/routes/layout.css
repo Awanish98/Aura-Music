@@ -42,7 +42,7 @@
 	--secondary: oklch(0.967 0.001 var(--hue));
 	--secondary-foreground: oklch(0.21 0.006 var(--hue));
 	--muted: oklch(0.96 0.003 var(--hue));
-	--muted-foreground: oklch(0.542 0.034 var(--hue));
+	--muted-foreground: oklch(0.40 0.034 var(--hue));
 	--accent: oklch(0.514 0.222 16.935);
 	--accent-foreground: oklch(0.969 0.015 12.422);
 	--destructive: oklch(0.577 0.245 27.325);
@@ -896,4 +896,12 @@ html {
 .skip-to-content:focus {
 	transform: translateY(0);
 }
+
+/* High Contrast Input Placeholders */
+input::placeholder,
+textarea::placeholder {
+	color: var(--muted-foreground);
+	opacity: 0.85;
+}
+
 

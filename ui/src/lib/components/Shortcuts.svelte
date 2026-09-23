@@ -233,6 +233,7 @@
 							role="button"
 							tabindex="0"
 							draggable="true"
+							aria-label={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
 							ondragstart={(e) => setDragItem(e, item)}
 							onclick={() => openItem(item)}
 							onkeydown={(e) => {

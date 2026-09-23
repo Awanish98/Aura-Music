@@ -32,6 +32,7 @@
 		{@const active = isActive(item.href)}
 		<a
 			href={item.href}
+			aria-label={item.label}
 			class="relative flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-all duration-150 select-none {active
 				? 'text-primary scale-105 font-medium'
 				: 'text-muted-foreground hover:text-foreground active:scale-90'}"

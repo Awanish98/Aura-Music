@@ -8,6 +8,7 @@
 	import { ui } from '$lib/player.svelte';
 
 	let visible = $state(false);
+	let acceptButton: HTMLButtonElement | undefined = $state();
 
 	onMount(() => {
 		try {
@@ -21,28 +22,44 @@
 		} catch {}
 	});
 
+	$effect(() => {
+		if (visible && acceptButton) {
+			acceptButton.focus();
+		}
+	});
+
 	function accept() {
 		try {
 			localStorage.setItem('aura_cookie_consent', 'accepted');
 		} catch {}
 		visible = false;
 	}
+
+	function onKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			accept();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={visible ? onKeyDown : undefined} />
 
 {#if visible}
 	<div
 		transition:fly={{ y: 30, duration: 300, easing: cubicOut }}
 		class="fixed bottom-24 left-4 sm:left-6 z-50 max-w-sm sm:max-w-md rounded-2xl border border-white/15 bg-background/95 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl text-foreground"
-		role="region"
-		aria-label="Cookie & Privacy Consent"
+		role="dialog"
+		aria-modal="false"
+		aria-labelledby="cookie-consent-title"
+		aria-describedby="cookie-consent-desc"
 	>
 		<div class="flex items-start gap-3.5">
 			<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
 				<HugeiconsIcon icon={CookieIcon} class="h-5 w-5" />
 			</div>
 			<div class="flex-1 space-y-1">
-				<h3 class="text-sm font-semibold tracking-tight">Privacy & Cookie Choices</h3>
-				<p class="text-xs leading-relaxed text-muted-foreground">
+				<h3 id="cookie-consent-title" class="text-sm font-semibold tracking-tight">Privacy & Cookie Choices</h3>
+				<p id="cookie-consent-desc" class="text-xs leading-relaxed text-muted-foreground">
 					Aura Music uses local storage and essential cookies to save your playback queue, personal playlists, and audio preferences for an uninterrupted listening experience.
 				</p>
 			</div>
@@ -63,7 +80,12 @@
 				<Button size="sm" variant="outline" class="h-8 text-xs" onclick={accept}>
 					Essential Only
 				</Button>
-				<Button size="sm" class="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-md" onclick={accept}>
+				<Button
+					bind:ref={acceptButton}
+					size="sm"
+					class="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+					onclick={accept}
+				>
 					Accept All
 				</Button>
 			</div>

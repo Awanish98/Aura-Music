@@ -79,9 +79,9 @@
 						class="shrink-0 rounded-full object-cover ring-2 ring-border sm:w-11 sm:h-11"
 					/>
 				{/if}
-				<h1 class="truncate font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow">
+				<h2 class="truncate font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow">
 					{daypart}{auth.account?.name ? `, ${auth.account.name.split(' ')[0]}` : ''}
-				</h1>
+				</h2>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
 				<!-- Aura AI DJ Quick Access Button -->

@@ -99,6 +99,7 @@
 		class="block w-full min-w-0 cursor-pointer"
 		role="button"
 		tabindex="0"
+		aria-label={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
 		onclick={open}
 		onkeydown={(e) => {
 			if (e.target !== e.currentTarget) return;
@@ -118,13 +119,13 @@
 			{#if mosaic.length === 4}
 				<div class="grid h-full w-full grid-cols-2 grid-rows-2">
 					{#each mosaic as m (m)}
-						<img src={thumb(m, 200)} alt="" class="h-full w-full object-cover" loading="lazy" />
+						<img src={thumb(m, 200)} alt={item.title} class="h-full w-full object-cover" loading="lazy" />
 					{/each}
 				</div>
 			{:else if cover}
 				<img
 					src={thumb(cover, 400)}
-					alt=""
+					alt={item.title}
 					class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
 					loading="lazy"
 				/>
@@ -150,6 +151,7 @@
 					class="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-lg p-1 text-left transition-colors hover:bg-accent/10"
 					onclick={() => playFrom(item, pl!.items, i, item.id, undefined, pl!.continuation)}
 					title={t.artists ? `${t.title} — ${t.artists}` : t.title}
+					aria-label="Play {t.title}{t.artists ? ` by ${t.artists}` : ''}"
 				>
 					{#if t.thumbnail}
 						<img

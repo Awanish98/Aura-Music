@@ -44,6 +44,7 @@
 				onclick={() => playMood(mood)}
 				role="button"
 				tabindex="0"
+				aria-label="Play {mood.title} mood music"
 				onkeydown={(e) => e.key === 'Enter' && playMood(mood)}
 			>
 				<!-- Background Subtle Graphic / Icon -->

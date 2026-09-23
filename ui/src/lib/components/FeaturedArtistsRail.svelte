@@ -67,6 +67,7 @@
 				onclick={() => exploreArtist(artist)}
 				role="button"
 				tabindex="0"
+				aria-label="Explore {artist.name}"
 				onkeydown={(e) => e.key === 'Enter' && exploreArtist(artist)}
 			>
 				<!-- Avatar Container -->

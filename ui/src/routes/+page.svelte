@@ -91,7 +91,7 @@
 		`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
 			active
 				? 'border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30'
-				: 'border-border/60 bg-card/40 text-muted-foreground hover:border-foreground/25 hover:text-foreground'
+				: 'border-border/80 bg-card/85 text-foreground/85 hover:border-foreground/50 hover:text-foreground'
 		}`;
 
 	// "Forgotten favourites" is pulled out of the feed and rendered as a list above it

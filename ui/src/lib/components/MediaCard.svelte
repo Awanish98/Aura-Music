@@ -69,6 +69,7 @@
 		role="button"
 		tabindex="0"
 		draggable="true"
+		aria-label={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
 		ondragstart={(e) => setDragItem(e, item)}
 		onclick={() => openItem(item)}
 		onkeydown={(e) => {
@@ -133,7 +134,7 @@
 							: 'bottom-2 right-2 h-9 w-9'}"
 						class:animate-pulse={playing}
 						disabled={playing}
-						aria-label={t('player.play')}
+						aria-label="Play {item.title}"
 						onclick={(e) => {
 							e.stopPropagation();
 							playNow();

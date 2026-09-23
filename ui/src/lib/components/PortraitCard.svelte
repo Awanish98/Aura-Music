@@ -33,6 +33,7 @@
 		role="button"
 		tabindex="0"
 		draggable="true"
+		aria-label={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
 		ondragstart={(e) => setDragItem(e, item)}
 		onclick={() => openItem(item)}
 		onkeydown={(e) => {
@@ -47,7 +48,7 @@
 		{#if hasArt}
 			<img
 				{src}
-				alt=""
+				alt={item.title}
 				class="h-full w-full object-cover object-[center_22%] transition-transform duration-500 ease-out group-hover:scale-[1.06]"
 				loading="lazy"
 				draggable="false"

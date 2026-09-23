@@ -37,6 +37,7 @@
 				onclick={() => playRadio(station)}
 				role="button"
 				tabindex="0"
+				aria-label="Play {station.title} Live Radio"
 				onkeydown={(e) => e.key === 'Enter' && playRadio(station)}
 			>
 				<!-- Thumbnail Container -->
