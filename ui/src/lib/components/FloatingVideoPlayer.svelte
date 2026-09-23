@@ -16,7 +16,7 @@
 		VolumeHighIcon,
 		VolumeMute02Icon
 	} from '@hugeicons/core-free-icons';
-	import { playback, ui, toggleMute } from '$lib/player.svelte';
+	import { np, playback, ui, toggleMute } from '$lib/player.svelte';
 	import * as api from '$lib/api';
 
 	let container = $state<HTMLElement>();
@@ -113,54 +113,39 @@
 	});
 </script>
 
-{#if isVideoAvailable}
-	{#if ui.videoMode === 'hidden'}
-		<!-- Floating Collapsed Pill Button to Restore Video -->
-		<button
-			onclick={() => setMode('docked')}
-			transition:scale={{ duration: 200, easing: cubicOut }}
-			class="fixed bottom-32 right-4 md:bottom-24 md:right-8 z-40 flex items-center gap-2 rounded-full border border-white/20 bg-background/90 px-3.5 py-1.5 md:px-4 md:py-2 text-[11px] md:text-xs font-semibold shadow-2xl backdrop-blur-xl transition hover:scale-105 hover:border-primary/50 hover:bg-card hover:text-primary"
-			aria-label="Restore Video Player"
-		>
-			<span class="relative flex h-2 w-2 md:h-2.5 md:w-2.5">
-				<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-				<span class="relative inline-flex h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-primary"></span>
-			</span>
-			<span>🎬 Video</span>
-		</button>
-	{:else}
-		<!-- Main Floating / Expanded / Fullscreen Video Container -->
-		<!-- Backdrop for expanded mode -->
-		{#if ui.videoMode === 'expanded'}
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				class="fixed inset-0 z-50 bg-black/80 backdrop-blur-2xl transition-opacity"
-				transition:fade={{ duration: 200 }}
-				onclick={() => setMode('docked')}
-			></div>
-		{/if}
-
+{#if isVideoAvailable && ui.videoMode !== 'hidden' && (!np.open || ui.videoMode === 'expanded' || ui.videoMode === 'fullscreen')}
+	<!-- Main Floating / Expanded / Fullscreen Video Container -->
+	<!-- Backdrop for expanded mode -->
+	{#if ui.videoMode === 'expanded'}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			bind:this={container}
-			onmousemove={resetControlsTimer}
-			ontouchstart={resetControlsTimer}
-			transition:fly={{ y: 32, duration: 260, easing: cubicOut }}
-			class="group select-none overflow-hidden transition-all duration-300
-				{ui.videoMode === 'expanded'
-					? 'fixed inset-x-4 top-1/2 z-50 mx-auto -translate-y-1/2 max-w-5xl rounded-3xl border border-white/20 bg-black/95 shadow-[0_32px_80px_rgba(0,0,0,0.9)] aspect-video'
-					: ui.videoMode === 'fullscreen' || isFullscreen
-						? 'fixed inset-0 z-[100] h-screen w-screen bg-black rounded-none border-0'
-						: 'fixed bottom-32 right-4 md:bottom-24 md:right-8 z-40 w-64 sm:w-80 md:w-96 rounded-2xl border border-white/15 bg-black/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl aspect-video'}"
-		>
-			<!-- Ambient Artwork Glow Background -->
-			{#if now?.thumbnail}
-				<div
-					class="pointer-events-none absolute -inset-10 z-0 opacity-25 blur-3xl transition-opacity duration-700"
-					style="background-image: url('{now.thumbnail}'); background-size: cover; background-position: center;"
-				></div>
-			{/if}
+			class="fixed inset-0 z-50 bg-black/80 backdrop-blur-2xl transition-opacity"
+			transition:fade={{ duration: 200 }}
+			onclick={() => setMode('docked')}
+		></div>
+	{/if}
+
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		bind:this={container}
+		onmousemove={resetControlsTimer}
+		ontouchstart={resetControlsTimer}
+		transition:fly={{ y: 32, duration: 260, easing: cubicOut }}
+		class="group select-none overflow-hidden transition-all duration-300
+			{ui.videoMode === 'expanded'
+				? 'fixed inset-x-4 top-1/2 z-50 mx-auto -translate-y-1/2 max-w-5xl rounded-3xl border border-white/20 bg-black/95 shadow-[0_32px_80px_rgba(0,0,0,0.9)] aspect-video'
+				: ui.videoMode === 'fullscreen' || isFullscreen
+					? 'fixed inset-0 z-[100] h-screen w-screen bg-black rounded-none border-0'
+					: 'fixed bottom-32 right-4 md:bottom-24 md:right-8 z-40 w-64 sm:w-80 md:w-96 rounded-2xl border border-white/15 bg-black/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl aspect-video'}"
+	>
+		<!-- Ambient Artwork Glow Background -->
+		{#if now?.thumbnail}
+			<div
+				class="pointer-events-none absolute -inset-10 z-0 opacity-25 blur-3xl transition-opacity duration-700"
+				style="background-image: url('{now.thumbnail}'); background-size: cover; background-position: center;"
+			></div>
+		{/if}
 
 			<!-- Mount container where the YouTube Iframe is placed -->
 			<div
@@ -310,7 +295,6 @@
 			</div>
 		</div>
 	{/if}
-{/if}
 
 <style>
 	:global(#echo-yt-iframe-player) {

@@ -274,7 +274,7 @@
 		{/if}
 
 		{#if tabbed}
-			<div class="flex min-h-0 flex-col {big ? 'flex-1' : 'w-full md:w-[22rem] xl:w-[26rem]'}">
+			<div class="flex min-h-0 flex-col {big ? 'flex-1' : 'w-full md:w-[26rem] xl:w-[32rem]'}">
 				<Tabs.Root
 					value={np.tab}
 					onValueChange={(v) => (np.tab = v as typeof np.tab)}

@@ -100,6 +100,18 @@ class WebPlayer {
 				}
 			});
 
+			// Mobile & tab background playback keeper: keep audio alive when phone is locked or app minimized
+			if (typeof document !== 'undefined') {
+				document.addEventListener('visibilitychange', () => {
+					if (document.hidden) {
+						if (this.audio && !playback.paused && this.audio.paused && this.usingDirectAudio) {
+							this.audio.play().catch(() => {});
+						}
+						this.acquireWakeLock();
+					}
+				});
+			}
+
 			this.setupMediaSession();
 		}
 

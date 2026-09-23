@@ -1153,8 +1153,8 @@ export const ui = $state({
 	linkOpen: false, // the "open a pasted link" modal
 	paletteOpen: false, // the Ctrl+K search palette
 	theaterOpen: false, // fullscreen theater view (artwork + lyrics)
-	videoOpen: true, // whether the floating music video player is visible
-	videoMode: 'docked' as 'docked' | 'expanded' | 'fullscreen' | 'hidden',
+	videoOpen: false, // whether the floating music video player is visible
+	videoMode: 'hidden' as 'docked' | 'expanded' | 'fullscreen' | 'hidden',
 	shortcutsOpen: false, // the Ctrl+H (⌘/ on macOS) keyboard-shortcuts list
 	channelPickerOpen: false,
 	channelPickerRequired: false, // true while a multi-channel login is not finalized yet
