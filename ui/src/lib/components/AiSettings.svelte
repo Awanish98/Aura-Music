@@ -9,11 +9,10 @@
 		Refresh03Icon,
 		ViewIcon,
 		ViewOffIcon,
-		CpuIcon
+		ShieldCheckIcon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Switch } from '$lib/components/ui/switch';
 	import { AI_CONFIG, aiAgent } from '$lib/aiAgent';
 	import { toast } from '$lib/player.svelte';
 
@@ -28,13 +27,23 @@
 	let testResults = $state<{
 		gemini?: { ok: boolean; message: string; latency: number };
 		groq?: { ok: boolean; message: string; latency: number };
+		backend?: { ok: boolean; message: string; latency: number };
 	}>({});
 
 	function saveKeys() {
 		AI_CONFIG.geminiApiKey = geminiKey.trim();
 		AI_CONFIG.groqApiKey = groqKey.trim();
 		AI_CONFIG.aiPersona = persona;
-		toast.success('AI Configuration saved successfully');
+		toast.success('AI Configuration updated successfully');
+	}
+
+	function clearKeys() {
+		geminiKey = '';
+		groqKey = '';
+		AI_CONFIG.geminiApiKey = '';
+		AI_CONFIG.groqApiKey = '';
+		testResults = {};
+		toast.success('Custom API keys cleared. Using built-in Aura AI.');
 	}
 
 	async function runTest() {
@@ -43,10 +52,10 @@
 		try {
 			const res = await aiAgent.testProviders();
 			testResults = res;
-			if (res.gemini.ok || res.groq.ok) {
-				toast.success('AI DJ Connection Verified!');
+			if (res.backend?.ok || res.gemini?.ok || res.groq?.ok) {
+				toast.success('Aura AI connection verified!');
 			} else {
-				toast.error('AI Connection Test Failed. Check your keys.');
+				toast.error('AI Connection Test Failed');
 			}
 		} catch (e: any) {
 			toast.error(e.message || 'Test failed');
@@ -54,13 +63,6 @@
 			testing = false;
 		}
 	}
-
-	onMount(() => {
-		// Run a quick silent test if keys exist
-		if (geminiKey || groqKey) {
-			runTest();
-		}
-	});
 
 	const PERSONAS = [
 		{ id: 'Smart Aura DJ', label: '✨ Smart Aura DJ (Balanced, Curated & Dynamic)' },
@@ -87,12 +89,12 @@
 						<HugeiconsIcon icon={SparklesIcon} size={16} />
 					</div>
 					<h3 class="font-heading text-base font-bold text-foreground">
-						Aura AI Intelligence & DJ Engine
+						Aura AI Intelligence & Smart DJ
 					</h3>
 				</div>
 				<p class="text-xs text-muted-foreground leading-relaxed">
-					Powered by Google Gemini 2.5 Flash and Groq Llama 3.3 70B for instant vibe generation,
-					real-time playlist curation, and deep song lyrical analysis.
+					Instant vibe generation, smart playlist curation, and deep song lyrical analysis.
+					Built-in smart curation works out of the box. Adding personal API keys is completely optional.
 				</p>
 			</div>
 
@@ -108,15 +110,27 @@
 					Testing...
 				{:else}
 					<HugeiconsIcon icon={Refresh03Icon} size={14} />
-					Test Status
+					Check Status
 				{/if}
 			</Button>
 		</div>
 
 		<!-- Status Pills -->
-		{#if testResults.gemini || testResults.groq}
+		{#if testResults.backend || testResults.gemini || testResults.groq}
 			<div class="mt-4 flex flex-wrap gap-2 pt-2 border-t border-primary/20">
-				{#if testResults.gemini}
+				{#if testResults.backend}
+					<div
+						class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium {testResults
+							.backend.ok
+							? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+							: 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}"
+					>
+						<HugeiconsIcon icon={ShieldCheckIcon} size={13} />
+						{testResults.backend.message} ({testResults.backend.latency}ms)
+					</div>
+				{/if}
+
+				{#if testResults.gemini && geminiKey}
 					<div
 						class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium {testResults
 							.gemini.ok
@@ -128,12 +142,12 @@
 							Gemini 2.5 Flash ({testResults.gemini.latency}ms)
 						{:else}
 							<HugeiconsIcon icon={Cancel01Icon} size={13} />
-							Gemini Offline
+							Gemini Key Error
 						{/if}
 					</div>
 				{/if}
 
-				{#if testResults.groq}
+				{#if testResults.groq && groqKey}
 					<div
 						class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium {testResults
 							.groq.ok
@@ -145,7 +159,7 @@
 							Groq Llama 3.3 ({testResults.groq.latency}ms)
 						{:else}
 							<HugeiconsIcon icon={Cancel01Icon} size={13} />
-							Groq Offline
+							Groq Key Error
 						{/if}
 					</div>
 				{/if}
@@ -170,15 +184,30 @@
 		</select>
 	</div>
 
-	<!-- API Keys Configuration -->
+	<!-- Optional Custom API Keys Configuration -->
 	<div class="rounded-xl border border-border/60 bg-card divide-y divide-border/60">
+		<div class="px-4 py-3 bg-muted/20 flex items-center justify-between">
+			<span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+				Custom API Keys (Optional)
+			</span>
+			{#if geminiKey || groqKey}
+				<button
+					type="button"
+					onclick={clearKeys}
+					class="text-[11px] text-destructive hover:underline cursor-pointer"
+				>
+					Clear Keys
+				</button>
+			{/if}
+		</div>
+
 		<!-- Gemini Key -->
 		<div class="p-4 space-y-2">
 			<div class="flex items-center justify-between">
 				<div>
 					<div class="text-xs font-semibold text-foreground">Google Gemini API Key</div>
 					<div class="text-[11px] text-muted-foreground">
-						Direct access to Gemini 2.5 Flash for high-speed multi-modal recommendations.
+						Optional personal key for direct Gemini 2.5 Flash access. Stored locally in your browser only.
 					</div>
 				</div>
 			</div>
@@ -187,7 +216,7 @@
 					<Input
 						type={showGeminiKey ? 'text' : 'password'}
 						bind:value={geminiKey}
-						placeholder="AQ.Ab8RN6..."
+						placeholder="Enter your Gemini API key (optional)..."
 						class="pr-9 font-mono text-xs"
 					/>
 					<button
@@ -206,9 +235,9 @@
 		<div class="p-4 space-y-2">
 			<div class="flex items-center justify-between">
 				<div>
-					<div class="text-xs font-semibold text-foreground">Groq API Key (Fallback & Speed)</div>
+					<div class="text-xs font-semibold text-foreground">Groq API Key</div>
 					<div class="text-[11px] text-muted-foreground">
-						Ultra-low latency Llama 3.3 70B inference engine for instant song reasoning.
+						Optional personal key for direct Groq Llama 3.3 inference. Stored locally in your browser only.
 					</div>
 				</div>
 			</div>
@@ -217,7 +246,7 @@
 					<Input
 						type={showGroqKey ? 'text' : 'password'}
 						bind:value={groqKey}
-						placeholder="gsk_..."
+						placeholder="Enter your Groq API key (optional)..."
 						class="pr-9 font-mono text-xs"
 					/>
 					<button

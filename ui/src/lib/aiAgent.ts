@@ -16,34 +16,35 @@ export interface AiMessage {
 	}[];
 }
 
-// Dynamic fallback key assembly for client-side resiliency
-const DEFAULT_GEMINI = ['AQ.Ab8RN6LpmD8', 'I25PZMl6ap9arJ3', 'GG6GhVgVRBg8-Af5X2tMNqKQ'].join('');
-const DEFAULT_GEMINI_SEC = ['AQ.Ab8RN6LnaCL', 'yrz-PV7UBdblK1Om', '3q-G6jJfqi6nUPD4aj4J89g'].join('');
-const DEFAULT_GROQ = ['gsk_', 'Upaye4uPer', 'JYyICwQ9R8', 'WGdyb3FYK8AC', 'tbB60tDebJM9', 'L700glZI'].join('');
-
 export const AI_CONFIG = {
 	get geminiApiKey(): string {
 		if (typeof window !== 'undefined') {
-			const saved = localStorage.getItem('aura_gemini_key');
-			if (saved) return saved;
+			return localStorage.getItem('aura_gemini_key') || '';
 		}
-		return import.meta.env.VITE_GEMINI_API_KEY || DEFAULT_GEMINI;
+		return '';
 	},
 	set geminiApiKey(val: string) {
 		if (typeof window !== 'undefined') {
-			localStorage.setItem('aura_gemini_key', val);
+			if (val && val.trim()) {
+				localStorage.setItem('aura_gemini_key', val.trim());
+			} else {
+				localStorage.removeItem('aura_gemini_key');
+			}
 		}
 	},
 	get groqApiKey(): string {
 		if (typeof window !== 'undefined') {
-			const saved = localStorage.getItem('aura_groq_key');
-			if (saved) return saved;
+			return localStorage.getItem('aura_groq_key') || '';
 		}
-		return import.meta.env.VITE_GROQ_API_KEY || DEFAULT_GROQ;
+		return '';
 	},
 	set groqApiKey(val: string) {
 		if (typeof window !== 'undefined') {
-			localStorage.setItem('aura_groq_key', val);
+			if (val && val.trim()) {
+				localStorage.setItem('aura_groq_key', val.trim());
+			} else {
+				localStorage.removeItem('aura_groq_key');
+			}
 		}
 	},
 	get aiPersona(): string {
@@ -199,31 +200,41 @@ export class AiMusicAgent {
 			results.backend.message = 'Backend sleeping or connecting';
 		}
 
-		// Test Gemini
-		const t0 = performance.now();
-		try {
-			const res = await this.callGeminiWithKey(
-				AI_CONFIG.geminiApiKey,
-				'Reply with only the word "OK"'
-			);
-			results.gemini.ok = res.toLowerCase().includes('ok');
-			results.gemini.latency = Math.round(performance.now() - t0);
-			results.gemini.message = 'Connected to Gemini';
-		} catch (e: any) {
+		// Test Gemini (if user supplied custom key)
+		if (AI_CONFIG.geminiApiKey) {
+			const t0 = performance.now();
+			try {
+				const res = await this.callGeminiWithKey(
+					AI_CONFIG.geminiApiKey,
+					'Reply with only the word "OK"'
+				);
+				results.gemini.ok = res.toLowerCase().includes('ok');
+				results.gemini.latency = Math.round(performance.now() - t0);
+				results.gemini.message = 'Connected to Gemini 2.5 Flash';
+			} catch (e: any) {
+				results.gemini.ok = false;
+				results.gemini.message = e.message || 'Key invalid or API disabled';
+			}
+		} else {
 			results.gemini.ok = false;
-			results.gemini.message = e.message || 'Key invalid or API disabled';
+			results.gemini.message = 'No custom key (using built-in Aura AI)';
 		}
 
-		// Test Groq
-		const t1 = performance.now();
-		try {
-			const res = await this.callGroq('Reply with only the word "OK"');
-			results.groq.ok = res.toLowerCase().includes('ok');
-			results.groq.latency = Math.round(performance.now() - t1);
-			results.groq.message = 'Connected to Groq';
-		} catch (e: any) {
+		// Test Groq (if user supplied custom key)
+		if (AI_CONFIG.groqApiKey) {
+			const t1 = performance.now();
+			try {
+				const res = await this.callGroq('Reply with only the word "OK"');
+				results.groq.ok = res.toLowerCase().includes('ok');
+				results.groq.latency = Math.round(performance.now() - t1);
+				results.groq.message = 'Connected to Groq Llama 3.3';
+			} catch (e: any) {
+				results.groq.ok = false;
+				results.groq.message = e.message || 'Key invalid';
+			}
+		} else {
 			results.groq.ok = false;
-			results.groq.message = e.message || 'Key invalid';
+			results.groq.message = 'No custom key (using built-in Aura AI)';
 		}
 
 		return results;
