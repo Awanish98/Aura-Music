@@ -211,7 +211,7 @@
 	<div class="relative z-10 flex shrink-0 items-center justify-center px-4 py-1.5">
 		<div class="flex items-center gap-1 rounded-full bg-black/30 p-1 border border-white/10 shadow-inner backdrop-blur-md">
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
+				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'player')}
@@ -220,7 +220,7 @@
 				Track
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'lyrics'
+				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'lyrics'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'lyrics')}
@@ -229,7 +229,7 @@
 				Lyrics
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'story'
+				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'story'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'story')}
@@ -238,7 +238,7 @@
 				AI Story
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'queue'
+				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'queue'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'queue')}
@@ -250,8 +250,8 @@
 	</div>
 
 	<!-- Main Content Area based on Tab -->
-	<div class="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 py-2">
-		{#if activeTab === 'player'}
+	{#if activeTab === 'player'}
+		<div class="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 py-2">
 			<!-- Artwork Card -->
 			<div class="flex flex-1 items-center justify-center py-2">
 				<div
@@ -499,23 +499,125 @@
 					</button>
 				{/if}
 			</div>
-		{:else if activeTab === 'lyrics'}
-			<!-- Synced Lyrics View -->
-			<div class="h-full overflow-hidden rounded-2xl bg-card/40 p-2 backdrop-blur-md">
-				<LyricsView />
+		</div>
+	{:else}
+		<!-- Fullscreen Edge-to-Edge Container for Lyrics, AI Story, & Queue with Bottom Transport HUD -->
+		<div class="relative z-10 flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
+			<!-- Scrollable Active View -->
+			<div class="relative min-h-0 flex-1 overflow-hidden {activeTab === 'lyrics' ? 'p-0' : 'p-3'}">
+				{#if activeTab === 'lyrics'}
+					<LyricsView expanded />
+				{:else if activeTab === 'story'}
+					<div class="h-full overflow-y-auto rounded-2xl bg-card/40 p-3 backdrop-blur-md">
+						<AiSongStory />
+					</div>
+				{:else if activeTab === 'queue'}
+					<div class="h-full overflow-hidden rounded-2xl bg-card/40 p-2 backdrop-blur-md">
+						<QueueList />
+					</div>
+				{/if}
 			</div>
-		{:else if activeTab === 'story'}
-			<!-- Deep AI Song Meaning & Backstory View -->
-			<div class="h-full overflow-y-auto rounded-2xl bg-card/40 p-3 backdrop-blur-md">
-				<AiSongStory />
+
+			<!-- Sleek Bottom Glass Transport HUD (Play/Pause, Scrubber, Next/Prev, Track Info) -->
+			<div class="shrink-0 border-t border-white/10 bg-background/85 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] shadow-2xl backdrop-blur-2xl">
+				<!-- Mini Scrubber Bar -->
+				<div class="mb-2 flex items-center gap-2">
+					<span class="text-[10px] font-semibold tabular-nums text-muted-foreground w-8 text-right">
+						{fmt(shownPosition)}
+					</span>
+					<input
+						type="range"
+						class="range h-1.5 flex-1 cursor-pointer accent-primary"
+						style="--pct:{playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
+						min="0"
+						max={playback.duration || 0}
+						value={shownPosition}
+						oninput={onSeekInput}
+						onchange={onSeekCommit}
+						aria-label="Seek"
+					/>
+					<span class="text-[10px] font-semibold tabular-nums text-muted-foreground w-8">
+						{fmtRemaining(shownPosition)}
+					</span>
+				</div>
+
+				<!-- Transport Controls Row -->
+				<div class="flex items-center justify-between gap-2">
+					<!-- Mini Song Info (Tap to switch back to Track tab) -->
+					<button
+						type="button"
+						onclick={() => (activeTab = 'player')}
+						class="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group active:scale-95 transition-transform"
+					>
+						{#if playback.now?.thumbnail}
+							<img
+								src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
+								alt=""
+								class="size-10 rounded-lg object-cover shadow shrink-0"
+							/>
+						{:else}
+							<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+								<HugeiconsIcon icon={MusicNote01Icon} size={18} class="text-primary" />
+							</div>
+						{/if}
+						<div class="min-w-0 flex-1">
+							<p class="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
+								{playback.now?.title ?? 'Not Playing'}
+							</p>
+							<p class="text-[11px] text-muted-foreground truncate">
+								{playback.now?.artists ?? ''}
+							</p>
+						</div>
+					</button>
+
+					<!-- Buttons: Prev, Play/Pause, Next, Like -->
+					<div class="flex items-center gap-1.5 shrink-0">
+						<button
+							class="flex size-9 items-center justify-center rounded-full text-foreground transition hover:bg-white/10 active:scale-90"
+							onclick={() => api.prevTrack()}
+							aria-label="Previous"
+						>
+							<HugeiconsIcon icon={PreviousIcon} size={20} />
+						</button>
+
+						<button
+							class="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-all active:scale-90 hover:scale-105"
+							onclick={() => api.togglePause()}
+							aria-label={playback.paused ? 'Play' : 'Pause'}
+						>
+							<HugeiconsIcon
+								icon={PauseIcon}
+								altIcon={PlayIcon}
+								showAlt={playback.paused}
+								size={22}
+								fill="currentColor"
+							/>
+						</button>
+
+						<button
+							class="flex size-9 items-center justify-center rounded-full text-foreground transition hover:bg-white/10 active:scale-90"
+							onclick={() => api.nextTrack()}
+							aria-label="Next"
+						>
+							<HugeiconsIcon icon={NextIcon} size={20} />
+						</button>
+
+						<button
+							class="flex size-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/10 active:scale-90"
+							onclick={toggleLike}
+							aria-label="Like"
+						>
+							<HugeiconsIcon
+								icon={FavouriteIcon}
+								size={18}
+								class={playback.rating === 'like' ? 'fill-current text-primary' : ''}
+							/>
+						</button>
+					</div>
+				</div>
 			</div>
-		{:else if activeTab === 'queue'}
-			<!-- Up Next Queue View -->
-			<div class="h-full overflow-hidden rounded-2xl bg-card/40 p-2 backdrop-blur-md">
-				<QueueList />
-			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
 
 <SleepTimerModal bind:open={sleepModalOpen} />
