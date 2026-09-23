@@ -478,6 +478,24 @@
 				{/if}
 			{/if}
 		</div>
+
+		<!-- Modern Footer with Quick Links & Copyright -->
+		<footer class="mt-16 border-t border-border/40 pt-8 pb-24 text-center md:pb-12">
+			<div class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
+				<a href="/about" class="transition-colors hover:text-foreground">About Aura</a>
+				<span class="text-border">•</span>
+				<a href="/privacy" class="transition-colors hover:text-foreground">Privacy Policy</a>
+				<span class="text-border">•</span>
+				<a href="/terms" class="transition-colors hover:text-foreground">Terms of Service</a>
+				<span class="text-border">•</span>
+				<a href="/contact" class="transition-colors hover:text-foreground">Contact & Support</a>
+				<span class="text-border">•</span>
+				<a href="https://github.com/Awanish98/Aura-Music" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-foreground">GitHub</a>
+			</div>
+			<p class="mt-4 text-[11px] text-muted-foreground/60">
+				© 2026 Aura Music. High-fidelity audio streaming, real-time lyrics & AI music discovery.
+			</p>
+		</footer>
 	</div>
 </div>
 

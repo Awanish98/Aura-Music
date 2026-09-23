@@ -865,3 +865,35 @@ input[type='range'].range:active::-webkit-slider-thumb {
 		scroll-behavior: auto !important;
 	}
 }
+
+/* UX & Accessibility Enhancements */
+html {
+	scroll-behavior: smooth;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+
+.skip-to-content {
+	position: fixed;
+	top: 1rem;
+	left: 1rem;
+	z-index: 9999;
+	padding: 0.625rem 1.25rem;
+	background: var(--primary);
+	color: var(--primary-foreground);
+	font-weight: 700;
+	border-radius: 0.5rem;
+	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+	transform: translateY(-200%);
+	transition: transform 0.2s ease;
+}
+.skip-to-content:focus {
+	transform: translateY(0);
+}
+
