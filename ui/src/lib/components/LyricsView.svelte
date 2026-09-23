@@ -244,13 +244,12 @@
 							class="group relative block w-full origin-left cursor-pointer rounded-xl text-left font-heading font-extrabold tracking-tight transition-all duration-300 ease-out hover:opacity-100 hover:scale-[1.02]
 								{expanded ? 'my-3 py-3 text-3xl md:text-4xl' : compact ? 'my-1 py-1.5 text-base' : 'my-2 py-2 text-2xl'}
 								{isActive
-								? 'scale-[1.04] text-white opacity-100 drop-shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
+								? 'scale-[1.03] text-white opacity-100 drop-shadow-[0_4px_24px_rgba(255,255,255,0.25)]'
 								: isPast
 									? 'opacity-35 hover:opacity-80'
 									: dist <= 2
 										? 'opacity-55 hover:opacity-90'
 										: 'opacity-30 hover:opacity-75'}"
-							style={!isActive && dist > 1 && !compact ? `filter: blur(${Math.min(1.2, dist * 0.4)}px);` : ''}
 						>
 							{#if line.words && line.words.length > 0}
 								<!-- Apple Music Word-to-Word Karaoke Sweep Rendering -->
