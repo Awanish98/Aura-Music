@@ -946,15 +946,15 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 	// Support JioSaavn Lossless Playlists & Charts
 	if (id.startsWith('saavn_') || /^\d{7,15}$/.test(id)) {
 		try {
-			const { fetchSaavnPlaylist } = await import('./fmhy');
-			const songs = await fetchSaavnPlaylist(id);
-			if (songs.length > 0) {
+			const { fetchSaavnPlaylistDetailsDirect } = await import('./saavn');
+			const pl = await fetchSaavnPlaylistDetailsDirect(id);
+			if (pl.songs.length > 0) {
 				return {
-					title: 'JioSaavn 320kbps Lossless Chart',
-					subtitle: `JioSaavn • ${songs.length} tracks`,
-					thumbnail: songs[0]?.thumbnail,
-					description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
-					items: songs,
+					title: pl.title,
+					subtitle: pl.subtitle,
+					thumbnail: pl.thumbnail,
+					description: pl.description,
+					items: pl.songs,
 					owned: false,
 					collaborative: false
 				};

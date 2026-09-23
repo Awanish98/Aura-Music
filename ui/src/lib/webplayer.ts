@@ -12,6 +12,19 @@ declare global {
 	}
 }
 
+export function cleanSearchQuery(title: string, artists?: string): string {
+	let clean = (title || '')
+		.replace(/\(official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\)/gi, '')
+		.replace(/\[official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\]/gi, '')
+		.replace(/\|\s*[^|]+$/g, '')
+		.replace(/(\(|\[)(feat\.|ft\.|with|prod\.)[^)\]]*(\)|\])/gi, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+	const firstArtist = (artists || '').split(',')[0]?.split('&')[0]?.trim() || '';
+	return `${clean} ${firstArtist}`.trim();
+}
+
 class WebPlayer {
 	private audio: HTMLAudioElement | null = null;
 	private ytPlayer: any = null;
@@ -26,6 +39,24 @@ class WebPlayer {
 
 	init() {
 		if (typeof window === 'undefined') return;
+
+		// Document-wide one-time gesture unlock for unblocked web audio autoplay
+		if (!this.unlocked) {
+			const unlockEngine = () => {
+				this.unlocked = true;
+				if (this.audio && this.audio.paused && this.audio.src) {
+					this.audio.play().catch(() => {});
+				}
+				window.removeEventListener('pointerdown', unlockEngine);
+				window.removeEventListener('click', unlockEngine);
+				window.removeEventListener('keydown', unlockEngine);
+				window.removeEventListener('touchstart', unlockEngine);
+			};
+			window.addEventListener('pointerdown', unlockEngine, { once: true });
+			window.addEventListener('click', unlockEngine, { once: true });
+			window.addEventListener('keydown', unlockEngine, { once: true });
+			window.addEventListener('touchstart', unlockEngine, { once: true });
+		}
 
 		// 1. Initialize HTML5 Audio for direct streams with native hardware audio pipeline
 		if (!this.audio) {
@@ -456,16 +487,32 @@ class WebPlayer {
 			this.audio.load();
 			const playPromise = this.audio.play();
 			if (playPromise !== undefined) {
-				playPromise.then(() => {
-					playback.paused = false;
-					this.startProgress();
-					this.updateMediaSessionState('playing');
-				}).catch((e) => {
-					console.warn('[Direct Audio Play Error - Falling back]', e);
-					if (this.currentItem) {
-						this.retryWithAlternativeStream(this.currentItem);
-					}
-				});
+				playPromise
+					.then(() => {
+						playback.paused = false;
+						this.startProgress();
+						this.updateMediaSessionState('playing');
+					})
+					.catch((e) => {
+						console.warn('[Direct Audio Play Error]', e);
+						if (e.name === 'NotAllowedError') {
+							const resumeOnClick = () => {
+								if (this.audio && this.audio.paused && this.audio.src) {
+									this.audio.play().catch(() => {});
+								}
+								window.removeEventListener('pointerdown', resumeOnClick);
+								window.removeEventListener('click', resumeOnClick);
+								window.removeEventListener('keydown', resumeOnClick);
+								window.removeEventListener('touchstart', resumeOnClick);
+							};
+							window.addEventListener('pointerdown', resumeOnClick, { once: true });
+							window.addEventListener('click', resumeOnClick, { once: true });
+							window.addEventListener('keydown', resumeOnClick, { once: true });
+							window.addEventListener('touchstart', resumeOnClick, { once: true });
+						} else if (this.currentItem) {
+							this.retryWithAlternativeStream(this.currentItem);
+						}
+					});
 			}
 		}
 	}
@@ -502,16 +549,6 @@ class WebPlayer {
 	async play(item: SongItem) {
 		this.init();
 		this.currentItem = item;
-
-		// User gesture audio unlock for seamless unblocked browser playback
-		if (this.audio && !this.unlocked) {
-			this.audio.play().then(() => {
-				this.unlocked = true;
-				if (!this.usingDirectAudio && !this.isRadioStream) {
-					this.audio?.pause();
-				}
-			}).catch(() => {});
-		}
 
 		const parseDurationToSeconds = (dur?: string | number): number => {
 			if (typeof dur === 'number') return dur;
@@ -609,23 +646,29 @@ class WebPlayer {
 		}
 
 		// 4. JioSaavn 320kbps Lossless Audio Resolver (Zero Ad, CD Quality, 100% Reliable)
-		const query = `${item.title} ${item.artists || ''}`.replace(/\s+/g, ' ').trim();
-		if (query && !item.video_id?.startsWith('LOCAL:')) {
-			try {
-				const results = await searchSaavnDirect(query);
-				if (results.length > 0 && results[0]?.streamUrl) {
-					const match = results[0];
-					if (match.streamUrl) {
-						item.streamUrl = match.streamUrl;
-						if (match.thumbnail && !item.thumbnail) item.thumbnail = match.thumbnail;
-						this.isRadioStream = false;
-						this.usingDirectAudio = true;
-						this.playAudioDirect(match.streamUrl);
-						return;
+		if (!item.video_id?.startsWith('LOCAL:')) {
+			const query = cleanSearchQuery(item.title, item.artists);
+			if (query) {
+				try {
+					let results = await searchSaavnDirect(query);
+					if (!results.length) {
+						const titleOnly = cleanSearchQuery(item.title);
+						results = await searchSaavnDirect(titleOnly);
 					}
+					if (results.length > 0 && results[0]?.streamUrl) {
+						const match = results[0];
+						if (match.streamUrl) {
+							item.streamUrl = match.streamUrl;
+							if (match.thumbnail && !item.thumbnail) item.thumbnail = match.thumbnail;
+							this.isRadioStream = false;
+							this.usingDirectAudio = true;
+							this.playAudioDirect(match.streamUrl);
+							return;
+						}
+					}
+				} catch (e) {
+					console.warn('[JioSaavn search resolver error]', e);
 				}
-			} catch (e) {
-				console.warn('[JioSaavn search resolver error]', e);
 			}
 		}
 

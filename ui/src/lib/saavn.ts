@@ -166,7 +166,21 @@ export async function fetchSaavnTrendingDirect(): Promise<{ charts: BrowseItem[]
 	return { charts: [], featured: [] };
 }
 
+export interface SaavnPlaylistDetails {
+	id: string;
+	title: string;
+	subtitle: string;
+	thumbnail: string;
+	description: string;
+	songs: SongItem[];
+}
+
 export async function fetchSaavnPlaylistDirect(playlistId: string): Promise<SongItem[]> {
+	const details = await fetchSaavnPlaylistDetailsDirect(playlistId);
+	return details.songs;
+}
+
+export async function fetchSaavnPlaylistDetailsDirect(playlistId: string): Promise<SaavnPlaylistDetails> {
 	const cleanId = playlistId.replace('saavn_', '');
 
 	// 1. Try local proxy
@@ -175,11 +189,19 @@ export async function fetchSaavnPlaylistDirect(playlistId: string): Promise<Song
 		const res = await fetch(apiUrl, { signal: AbortSignal.timeout(8000) });
 		if (res.ok) {
 			const data = await res.json();
-			return (data.songs || []).map((s: any) => ({
+			const songs = (data.songs || []).map((s: any) => ({
 				...s,
 				video_id: s.video_id || `saavn_${s.id}`,
 				artist_runs: s.artist_runs || [{ text: s.artists }]
 			}));
+			return {
+				id: `saavn_${cleanId}`,
+				title: data.title || 'JioSaavn 320kbps Lossless Chart',
+				subtitle: `JioSaavn • ${songs.length} tracks`,
+				thumbnail: data.thumbnail || songs[0]?.thumbnail || '',
+				description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
+				songs
+			};
 		}
 	} catch {}
 
@@ -193,9 +215,23 @@ export async function fetchSaavnPlaylistDirect(playlistId: string): Promise<Song
 			const songs = (data.songs || data.list || [])
 				.map(formatSaavnSong)
 				.filter((s: SongItem | null): s is SongItem => !!s && !!s.streamUrl);
-			if (songs.length > 0) return songs;
+			return {
+				id: `saavn_${cleanId}`,
+				title: (data.title || data.listname || 'JioSaavn 320kbps Lossless Chart').replace(/&quot;/g, '"'),
+				subtitle: `JioSaavn • ${songs.length} tracks`,
+				thumbnail: (data.image || '').replace('150x150', '500x500') || songs[0]?.thumbnail || '',
+				description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
+				songs
+			};
 		}
 	} catch {}
 
-	return [];
+	return {
+		id: `saavn_${cleanId}`,
+		title: 'JioSaavn Lossless Playlist',
+		subtitle: 'JioSaavn',
+		thumbnail: '',
+		description: '',
+		songs: []
+	};
 }
