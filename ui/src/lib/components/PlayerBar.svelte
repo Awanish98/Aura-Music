@@ -152,7 +152,7 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative md:border-t rounded-2xl md:rounded-none bg-[#0a0d17]/95 backdrop-blur-3xl border border-white/10 md:border-t-white/12 md:border-x-0 md:border-b-0 shadow-2xl shadow-black/80 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border-t rounded-2xl md:rounded-none apple-liquid-dock transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
 >
 	<!-- Mobile Floating Mini Player (< md) -->
 	<div
@@ -211,7 +211,7 @@
 		<!-- Right Mobile Actions -->
 		<div class="flex items-center gap-1.5 shrink-0" onclick={(e) => e.stopPropagation()}>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-tap transition-transform"
 				onclick={(e) => {
 					e.stopPropagation();
 					toggleLike();
@@ -227,7 +227,7 @@
 				</span>
 			</button>
 			<button
-				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/30 active:scale-90 transition-transform"
+				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/40 apple-spring-tap transition-transform"
 				onclick={(e) => {
 					e.stopPropagation();
 					api.togglePause();
@@ -243,7 +243,7 @@
 				/>
 			</button>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-tap transition-transform"
 				onclick={(e) => {
 					e.stopPropagation();
 					api.nextTrack();
@@ -261,20 +261,25 @@
 		<div class="flex min-w-0 w-1/4 max-w-sm items-center gap-3.5" data-ctx>
 			{#key playback.now?.videoId || 'idle'}
 				{#if playback.now?.thumbnail}
-					<img
-						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
-						alt=""
-						style="max-width:none"
-						class="h-13 w-13 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/15"
-						in:fade={{ duration: 250 }}
-						decoding="async"
-					/>
+					<div class="relative group">
+						<img
+							src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
+							alt=""
+							style="max-width:none"
+							class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-white/20 transition-transform duration-300 group-hover:scale-105"
+							in:fade={{ duration: 250 }}
+							decoding="async"
+						/>
+						{#if !playback.paused}
+							<div class="absolute inset-0 rounded-2xl ring-2 ring-primary/60 animate-pulse pointer-events-none"></div>
+						{/if}
+					</div>
 				{:else}
 					<img
 						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
 						alt="Aura Music"
 						style="max-width:none"
-						class="h-13 w-13 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/15"
+						class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-white/20"
 					/>
 				{/if}
 			{/key}
@@ -315,14 +320,14 @@
 			<!-- Like & Menu Actions -->
 			<div class="flex items-center gap-1">
 				<button
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 					onclick={toggleLike}
 					aria-label={t('common.like')}
 				>
 					<HugeiconsIcon
 						icon={FavouriteIcon}
 						size={17}
-						class={playback.rating === 'like' ? 'fill-current text-primary' : ''}
+						class={playback.rating === 'like' ? 'fill-current text-primary drop-shadow-[0_0_8px_#ff2a7a]' : ''}
 					/>
 				</button>
 				{#if currentSong}
@@ -330,7 +335,7 @@
 						song={currentSong}
 						linksOnly
 						onAdd={() => openAddToPlaylist(currentSong!)}
-						triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors"
+						triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white apple-spring-tap transition-colors"
 					/>
 				{/if}
 			</div>
@@ -343,7 +348,7 @@
 				<button
 					onclick={() => api.toggleShuffle()}
 					aria-label={t('player.shuffle')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={ShuffleIcon}
@@ -354,7 +359,7 @@
 				<button
 					onclick={() => api.prevTrack()}
 					aria-label={t('player.previous')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon icon={PreviousIcon} size={20} />
 				</button>
@@ -373,7 +378,7 @@
 						}
 					}}
 					aria-label={playback.paused ? t('player.play') : t('player.pause')}
-					class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 text-white shadow-xl shadow-pink-500/40 hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+					class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 text-white shadow-xl shadow-pink-500/40 apple-spring-hover apple-spring-tap cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={PauseIcon}
@@ -388,7 +393,7 @@
 				<button
 					onclick={() => api.nextTrack()}
 					aria-label={t('player.next')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon icon={NextIcon} size={20} />
 				</button>
@@ -397,7 +402,7 @@
 					aria-label={t('player.repeat_state', {
 						state: repeat === 'off' ? t('player.repeat_off') : repeat === 'one' ? t('player.repeat_one') : t('player.repeat_all')
 					})}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={RepeatIcon}
@@ -432,7 +437,7 @@
 			<!-- Lyrics Frosted Pill Button -->
 			<button
 				onclick={onToggleLyrics}
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-white/10 bg-white/5 hover:bg-white/12 text-foreground transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary' : ''}"
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-white/10 bg-white/5 hover:bg-white/12 text-foreground apple-spring-hover apple-spring-tap transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary shadow-[0_0_12px_rgba(255,42,122,0.3)]' : ''}"
 				title="Toggle Lyrics"
 			>
 				<HugeiconsIcon icon={Mic01Icon} size={14} />

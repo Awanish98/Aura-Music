@@ -63,9 +63,9 @@
 <div class="group relative flex w-full flex-col gap-2" data-ctx>
 	<!-- draggable: every card is a drag source for home's Shortcuts grid (the only drop target). -->
 	<div
-		class="flex flex-col text-left transition-colors hover:bg-accent/10 {compact
-			? 'gap-1.5 rounded-lg p-1.5'
-			: 'gap-2 rounded-xl p-2'}"
+		class="flex flex-col text-left transition-all apple-spring-tap {compact
+			? 'gap-1.5 rounded-2xl p-1.5 apple-liquid-card'
+			: 'gap-2.5 rounded-2xl p-2.5 apple-liquid-card'}"
 		role="button"
 		tabindex="0"
 		draggable="true"
@@ -89,7 +89,7 @@
 		     A wrapper, because the shadow has to paint outside a box that the cover below clips. -->
 		<div class="relative">
 			<div
-				class="pointer-events-none absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100 {round
+				class="pointer-events-none absolute -inset-1.5 rounded-2xl bg-primary/25 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100 {round
 					? 'rounded-full'
 					: 'rounded-2xl'}"
 			></div>
@@ -97,14 +97,14 @@
 			<div
 				class="relative aspect-square w-full overflow-hidden bg-muted glass-sheen {round
 					? 'rounded-full ring-2 ring-border/60'
-					: 'rounded-2xl ring-1 ring-white/10 shadow-sm transition-all duration-300 group-hover:shadow-2xl group-hover:ring-primary/40'}"
+					: 'rounded-2xl ring-1 ring-white/12 shadow-md transition-all duration-300 group-hover:shadow-2xl group-hover:ring-primary/50'}"
 			>
 				{#if item.thumbnail && attempt < 2 && !onRepeat}
 					<img
 						{src}
 						{srcset}
 						alt={item.title}
-						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
 						loading="lazy"
 						decoding="async"
 						draggable="false"
@@ -114,7 +114,7 @@
 					<img
 						src={generateAvatarSvg(item.title, item.kind)}
 						alt={item.title}
-						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
 						loading="lazy"
 						decoding="async"
 						draggable="false"
@@ -122,9 +122,9 @@
 				{/if}
 				{#if item.kind !== 'artist'}
 					<button
-						class="absolute flex translate-y-2 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 shadow-xl shadow-primary/40 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110 active:scale-95 focus-visible:opacity-100 {compact
-							? 'bottom-1.5 right-1.5 h-8 w-8'
-							: 'bottom-2.5 right-2.5 h-11 w-11'}"
+						class="absolute flex translate-y-3 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 to-rose-500 text-white opacity-0 shadow-2xl shadow-pink-500/50 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 apple-spring-hover apple-spring-tap focus-visible:opacity-100 {compact
+							? 'bottom-2 right-2 h-9 w-9'
+							: 'bottom-3 right-3 h-11 w-11'}"
 						class:animate-pulse={playing}
 						disabled={playing}
 						aria-label="Play {item.title}"

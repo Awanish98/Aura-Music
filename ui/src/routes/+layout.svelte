@@ -181,7 +181,8 @@
 			? ''
 			: 'rounded-[12px]'}"
 	>
-		<!-- Apple-style Ambient Atmospheric Light Mesh -->
+		<!-- 21st.dev & Apple-style Atmospheric Ambient Aurora Flow Mesh -->
+		<div class="aurora-flow-bg"></div>
 		<div class="apple-ambient-mesh pointer-events-none absolute inset-0 -z-10 opacity-40 dark:opacity-60 transition-opacity duration-1000"></div>
 
 		<ResizeBorders />

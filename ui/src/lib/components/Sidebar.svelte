@@ -103,7 +103,7 @@
 		<Button
 			variant="ghost"
 			size="icon-xs"
-			class="hidden hover:text-primary lg:inline-flex text-muted-foreground"
+			class="hidden hover:text-primary lg:inline-flex text-muted-foreground apple-spring-hover apple-spring-tap"
 			onclick={toggleSidebar}
 			aria-label={collapsed ? t('a11y.expand_sidebar') : t('a11y.collapse_sidebar')}
 		>
@@ -117,7 +117,7 @@
 	</div>
 
 	<!-- Main Navigation Links -->
-	<nav class="flex flex-col gap-1" aria-label="Main Navigation">
+	<nav class="flex flex-col gap-1.5" aria-label="Main Navigation">
 		{#each navItems as n}
 			{@const active = n.href ? isActive(n.href) : false}
 			{#if n.href}
@@ -125,19 +125,19 @@
 					href={n.href}
 					title={n.label}
 					aria-label={n.label}
-					class="group relative flex items-center justify-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 {wide(
+					class="group relative flex items-center justify-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 apple-spring-tap {wide(
 						'lg:justify-start'
 					)} {active
-						? 'bg-gradient-to-r from-pink-500/25 to-purple-600/15 text-pink-400 border border-pink-500/35 shadow-lg shadow-pink-500/15'
-						: 'text-muted-foreground hover:bg-white/6 hover:text-foreground'}"
+						? 'apple-liquid-glass bg-gradient-to-r from-pink-500/20 via-purple-600/15 to-transparent text-pink-400 border-pink-500/40 shadow-lg shadow-pink-500/20'
+						: 'text-muted-foreground hover:bg-white/6 hover:text-foreground hover:translate-x-0.5'}"
 				>
 					{#if active}
-						<span class="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_8px_#ff2a7a]"></span>
+						<span class="absolute left-0 top-1/2 h-5 w-1.5 -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_#ff2a7a]"></span>
 					{/if}
 					<HugeiconsIcon
 						icon={n.icon}
 						size={19}
-						class="shrink-0 transition-transform duration-200 group-hover:scale-110 {active ? 'text-primary' : ''}"
+						class="shrink-0 transition-transform duration-300 group-hover:scale-115 group-hover:rotate-[-4deg] {active ? 'text-primary drop-shadow-[0_0_8px_#ff2a7a]' : ''}"
 					/>
 					<span class="hidden {wide('lg:inline')}">{n.label}</span>
 				</a>
@@ -147,16 +147,16 @@
 					onclick={n.action}
 					title={n.label}
 					aria-label={n.label}
-					class="group relative flex items-center justify-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer {wide(
+					class="group relative flex items-center justify-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer apple-spring-tap {wide(
 						'lg:justify-start'
 					)} {n.isSpecial
-						? 'text-primary hover:bg-primary/15'
+						? 'text-primary hover:bg-primary/15 hover:border hover:border-primary/30'
 						: 'text-muted-foreground hover:bg-white/6 hover:text-foreground'}"
 				>
 					<HugeiconsIcon
 						icon={n.icon}
 						size={19}
-						class="shrink-0 transition-transform duration-200 group-hover:scale-110 text-primary animate-pulse"
+						class="shrink-0 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-[12deg] text-primary animate-pulse"
 					/>
 					<span class="hidden {wide('lg:inline')}">{n.label}</span>
 				</button>
