@@ -32,6 +32,7 @@
 		cycleRepeat,
 		dragVolume,
 		commitVolume,
+		toggleMute,
 		openAddToPlaylist,
 		openShare,
 		sleepTimer,
@@ -468,30 +469,30 @@
 			<!-- Mobile Native Touch Volume Slider -->
 			<div class="mt-3.5 shrink-0 flex items-center gap-2.5 px-2">
 				<button
-					class="flex size-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground transition active:scale-90"
-					onclick={() => api.toggleMute()}
-					aria-label={playback.muted ? 'Unmute' : 'Mute'}
+					class="flex size-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground transition active:scale-90 cursor-pointer"
+					onclick={() => toggleMute()}
+					aria-label={playback.volume === 0 ? 'Unmute' : 'Mute'}
 				>
 					<HugeiconsIcon
-						icon={playback.muted || playback.volume === 0 ? VolumeMute02Icon : VolumeHighIcon}
+						icon={playback.volume === 0 ? VolumeMute02Icon : VolumeHighIcon}
 						size={16}
-						class={playback.muted ? 'text-rose-400' : ''}
+						class={playback.volume === 0 ? 'text-rose-400' : ''}
 					/>
 				</button>
 				<input
 					type="range"
 					min="0"
-					max="1"
-					step="0.01"
-					value={playback.muted ? 0 : playback.volume}
+					max="100"
+					step="1"
+					value={playback.volume}
 					oninput={(e) => dragVolume(parseFloat((e.currentTarget as HTMLInputElement).value))}
 					onchange={(e) => commitVolume(parseFloat((e.currentTarget as HTMLInputElement).value))}
 					class="range h-1.5 flex-1 cursor-pointer accent-primary"
-					style="--pct:{(playback.muted ? 0 : playback.volume) * 100}%"
+					style="--pct:{playback.volume}%"
 					aria-label="Volume"
 				/>
 				<span class="text-[10px] font-mono font-semibold tabular-nums text-muted-foreground/80 w-7 text-right">
-					{Math.round((playback.muted ? 0 : playback.volume) * 100)}%
+					{Math.round(playback.volume)}%
 				</span>
 			</div>
 
