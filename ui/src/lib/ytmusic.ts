@@ -510,7 +510,7 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		console.warn('[Saavn search integration error]', e);
 	}
 
-	const songs: BrowseItem[] = [...saavnSongs];
+	const songs: BrowseItem[] = [];
 	const versions: BrowseItem[] = [];
 	const albums: BrowseItem[] = [];
 	const artists: BrowseItem[] = [];
@@ -695,6 +695,18 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		}
 	} catch (e) {
 		console.warn('[YouTube Search error - falling back to Saavn]', e);
+	}
+
+	// If no YouTube songs found, use Saavn songs
+	if (songs.length === 0) {
+		songs.push(...saavnSongs);
+	} else {
+		// Otherwise append any unique Saavn songs at the end of the results
+		for (const s of saavnSongs) {
+			if (!songs.some((existing) => existing.title.toLowerCase() === s.title.toLowerCase())) {
+				songs.push(s);
+			}
+		}
 	}
 
 	// Categorize any Saavn songs that are versions

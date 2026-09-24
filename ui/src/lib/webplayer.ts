@@ -182,7 +182,10 @@ class WebPlayer {
 		this.isPreloading = true;
 		try {
 			let streamUrl = next.streamUrl;
-			if (!streamUrl && !next.video_id?.startsWith('LOCAL:')) {
+			if (!streamUrl && next.video_id && next.video_id.length === 11) {
+				streamUrl = (await this.getDirectAudioUrl(next.video_id)) || undefined;
+				if (streamUrl) next.streamUrl = streamUrl;
+			} else if (!streamUrl && ((next as any).source === 'saavn' || next.video_id?.startsWith('saavn_'))) {
 				const query = cleanSearchQuery(next.title, next.artists);
 				if (query) {
 					const results = await searchSaavnDirect(query);
@@ -191,11 +194,6 @@ class WebPlayer {
 						next.streamUrl = streamUrl;
 					}
 				}
-			}
-
-			if (!streamUrl && next.video_id && next.video_id.length === 11) {
-				streamUrl = (await this.getDirectAudioUrl(next.video_id)) || undefined;
-				if (streamUrl) next.streamUrl = streamUrl;
 			}
 
 			if (streamUrl && this.preAudio) {
@@ -614,15 +612,6 @@ class WebPlayer {
 	private async retryWithAlternativeStream(item: SongItem) {
 		try {
 			const fallbackQuery = `${item.title} ${item.artists || ''}`.trim();
-			// 1. Try JioSaavn direct 320kbps search
-			const saavnResults = await searchSaavnDirect(fallbackQuery);
-			if (saavnResults.length > 0 && saavnResults[0]?.streamUrl && saavnResults[0].streamUrl !== item.streamUrl) {
-				item.streamUrl = saavnResults[0].streamUrl;
-				this.playAudioDirect(saavnResults[0].streamUrl);
-				return;
-			}
-
-			// 2. Try alternative YouTube Audio
 			const searchRes = await fetchSearch(`${fallbackQuery} official audio`);
 			if (searchRes.songs?.length) {
 				const match = searchRes.songs.find((s) => s.id && s.id !== item.video_id) || searchRes.songs[0];
@@ -852,8 +841,8 @@ class WebPlayer {
 			}
 		}
 
-		// 4. JioSaavn 320kbps Lossless Audio Resolver (Zero Ad, CD Quality, 100% Reliable)
-		if (!item.video_id?.startsWith('LOCAL:')) {
+		// 4. Explicit JioSaavn Song (when requested directly from Saavn or radio)
+		if (item.video_id?.startsWith('saavn_') || (item as any).source === 'saavn') {
 			const query = cleanSearchQuery(item.title, item.artists);
 			if (query) {
 				try {
@@ -879,7 +868,7 @@ class WebPlayer {
 			}
 		}
 
-		// 5. Backend Direct Audio Stream Extractor Proxy
+		// 5. YouTube & YouTube Music Audio (11-character video ID)
 		const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
 		if (targetVideoId && targetVideoId.length === 11) {
 			try {
@@ -893,10 +882,11 @@ class WebPlayer {
 				}
 			} catch {}
 
-			// 6. YouTube IFrame Fallback
+			// 6. YouTube IFrame Playback Engine (100% authentic original track)
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
 			this.loadAndPlayYt(targetVideoId);
+			return;
 		}
 	}
 
