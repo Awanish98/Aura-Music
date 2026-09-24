@@ -28,6 +28,19 @@ export function cleanSearchQuery(title: string, artists?: string): string {
 class WebPlayer {
 	// Dual-Deck Hardware Audio System (Deck 0 and Deck 1)
 	private decks: [HTMLAudioElement | null, HTMLAudioElement | null] = [null, null];
+	private deckGains: [GainNode | null, GainNode | null] = [null, null];
+	private lowFilter: BiquadFilterNode | null = null;
+	private midFilter: BiquadFilterNode | null = null;
+	private highFilter: BiquadFilterNode | null = null;
+	private masterGain: GainNode | null = null;
+	private audioCtx: AudioContext | null = null;
+	private analyser: AnalyserNode | null = null;
+	private sourceNodes: Map<HTMLAudioElement, MediaElementAudioSourceNode> = new Map();
+	private freqArray: Uint8Array | null = null;
+	private timeArray: Uint8Array | null = null;
+	private prevBass = 0;
+	private beatDecay = 0;
+
 	private activeDeckIndex: 0 | 1 = 0;
 	private ytPlayer: any = null;
 	private ytReady = false;
@@ -49,7 +62,7 @@ class WebPlayer {
 	}
 
 	private get standbyAudio(): HTMLAudioElement | null {
-		return this.decks[1 - this.activeDeckIndex];
+		return this.decks[(1 - this.activeDeckIndex) as 0 | 1];
 	}
 
 	init() {
@@ -59,6 +72,9 @@ class WebPlayer {
 		if (!this.unlocked) {
 			const unlockEngine = () => {
 				this.unlocked = true;
+				if (this.audioCtx && this.audioCtx.state === 'suspended') {
+					this.audioCtx.resume().catch(() => {});
+				}
 				this.decks.forEach((deck) => {
 					if (deck) {
 						const p = deck.play();
@@ -89,7 +105,7 @@ class WebPlayer {
 				if (!deck) return;
 				deck.preload = 'auto';
 				deck.muted = false;
-				deck.volume = deckIdx === 0 ? Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100)) : 0;
+				deck.volume = deckIdx === 0 ? 1 : 0;
 
 				deck.addEventListener('play', () => {
 					if (deckIdx === this.activeDeckIndex) {
@@ -156,7 +172,23 @@ class WebPlayer {
 			}
 
 			this.setupMediaSession();
-			this.setupWebAudioAnalyser();
+			this.setupWebAudioGraph();
+		}
+	}
+
+	private setDeckGain(deckIdx: 0 | 1, normalizedGain: number) {
+		const clamped = Math.max(0, Math.min(1, normalizedGain));
+		const deck = this.decks[deckIdx];
+		if (deck) {
+			try {
+				deck.volume = clamped;
+			} catch {}
+		}
+		const gainNode = this.deckGains[deckIdx];
+		if (gainNode && this.audioCtx) {
+			try {
+				gainNode.gain.setValueAtTime(clamped, this.audioCtx.currentTime);
+			} catch {}
 		}
 	}
 
@@ -168,66 +200,68 @@ class WebPlayer {
 		const rem = dur - curTime;
 		const mode = audioFx.playbackMode;
 
-		// 1. In Gapless or Crossfade mode, preload next track ahead of time (~15s before track ends)
-		if ((mode === 'gapless' || mode === 'crossfade') && rem <= 15 && rem > 0 && !this.isPreloading && !this.preloadedItem) {
+		// 1. In Gapless or Crossfade mode, eager preload next track ahead of time (>3s in or <=35s remaining)
+		if ((mode === 'gapless' || mode === 'crossfade') && (curTime >= 3 || rem <= 35) && rem > 0 && !this.isPreloading && !this.preloadedItem) {
 			this.preloadNextTrack();
 		}
 
 		// 2. Crossfade overlap execution (smooth Equal-Power curve fade out current, fade in next across 3-12 seconds)
 		if (mode === 'crossfade' && this.preloadedItem) {
-			const standby = this.standbyAudio;
+			const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
+			const standby = this.decks[standbyIdx];
 			if (standby) {
 				const xfSecs = Math.max(3, Math.min(12, audioFx.crossfadeDuration || 5));
-				const baseVol = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
 
 				if (rem <= xfSecs && !this.isCrossfading && rem > 0.3) {
 					standby.currentTime = 0;
-					standby.volume = 0;
+					this.setDeckGain(standbyIdx, 0);
 					const playProm = standby.play();
 					if (playProm !== undefined) {
 						playProm
 							.then(() => {
-								this.startCrossfadeTimer(xfSecs, baseVol);
+								this.startCrossfadeTimer(xfSecs);
 							})
 							.catch((e) => console.warn('[Crossfade standby play failed]', e));
 					} else {
-						this.startCrossfadeTimer(xfSecs, baseVol);
+						this.startCrossfadeTimer(xfSecs);
 					}
 				}
 			}
 		}
 
 		// 3. Gapless instantaneous handoff (trigger next exactly as current completes without network stall)
-		if (mode === 'gapless' && this.preloadedItem && rem <= 0.05) {
+		if (mode === 'gapless' && this.preloadedItem && rem <= 0.08) {
 			this.finalizeGapless();
 		}
 	}
 
-	private startCrossfadeTimer(xfSecs: number, baseVol: number) {
+	private startCrossfadeTimer(xfSecs: number) {
 		if (this.crossfadeInterval) clearInterval(this.crossfadeInterval);
 		this.isCrossfading = true;
 		playback.crossfading = true;
 
 		const startTime = performance.now();
 		const totalMs = xfSecs * 1000;
+		const activeIdx = this.activeDeckIndex;
+		const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
 
 		this.crossfadeInterval = setInterval(() => {
 			const elapsed = performance.now() - startTime;
 			const p = Math.max(0, Math.min(1, elapsed / totalMs)); // 0.0 to 1.0
 
-			if (this.activeAudio && this.standbyAudio) {
-				const curBaseVol = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
-				// Equal-Power DJ Curve (Cos / Sin) for constant acoustic energy without perceived volume drop
-				this.activeAudio.volume = Math.max(0, Math.min(1, curBaseVol * Math.cos(p * 0.5 * Math.PI)));
-				this.standbyAudio.volume = Math.max(0, Math.min(1, curBaseVol * Math.sin(p * 0.5 * Math.PI)));
-			}
+			// Equal-Power DJ Curve (Cos / Sin) for constant acoustic energy without perceived volume drop
+			const activeGain = Math.cos(p * 0.5 * Math.PI);
+			const standbyGain = Math.sin(p * 0.5 * Math.PI);
+
+			this.setDeckGain(activeIdx, activeGain);
+			this.setDeckGain(standbyIdx, standbyGain);
 
 			if (p >= 1.0 || (this.activeAudio && (this.activeAudio.ended || this.activeAudio.paused))) {
 				clearInterval(this.crossfadeInterval);
 				this.crossfadeInterval = null;
 				this.finalizeCrossfade();
 			}
-		}, 40);
+		}, 30);
 	}
 
 	private async preloadNextTrack() {
@@ -240,8 +274,10 @@ class WebPlayer {
 		playback.preloading = true;
 		try {
 			const streamUrl = await this.resolveStreamUrl(next);
-			const standby = this.standbyAudio;
+			const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
+			const standby = this.decks[standbyIdx];
 			if (streamUrl && standby) {
+				this.setDeckGain(standbyIdx, 0);
 				standby.src = streamUrl;
 				standby.load();
 				this.preloadedItem = next;
@@ -261,8 +297,10 @@ class WebPlayer {
 			this.crossfadeInterval = null;
 		}
 
-		const outgoing = this.activeAudio;
-		const incoming = this.standbyAudio;
+		const outgoingIdx = this.activeDeckIndex;
+		const incomingIdx = (1 - this.activeDeckIndex) as 0 | 1;
+		const outgoing = this.decks[outgoingIdx];
+		const incoming = this.decks[incomingIdx];
 		if (!outgoing || !incoming || !this.preloadedItem) return;
 
 		this.isCrossfading = false;
@@ -271,19 +309,18 @@ class WebPlayer {
 		try {
 			outgoing.pause();
 			outgoing.currentTime = 0;
-			outgoing.volume = 0;
+			this.setDeckGain(outgoingIdx, 0);
 		} catch {}
 
 		// Flip active deck pointer
-		this.activeDeckIndex = (1 - this.activeDeckIndex) as 0 | 1;
+		this.activeDeckIndex = incomingIdx;
 
 		const nextItem = this.preloadedItem;
 		const nextIdx = this.preloadedIndex ?? playback.queue.currentIndex + 1;
 		this.preloadedItem = null;
 		this.preloadedIndex = null;
 
-		const baseVol = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
-		incoming.volume = baseVol;
+		this.setDeckGain(incomingIdx, 1.0);
 
 		playback.queue.currentIndex = nextIdx;
 		this.currentItem = nextItem;
@@ -305,29 +342,36 @@ class WebPlayer {
 		playback.position = incoming.currentTime || 0;
 		playback.duration = incoming.duration || 0;
 		this.updateMediaSession(now);
+
+		setTimeout(() => {
+			if (!this.isCrossfading && !this.preloadedItem && (audioFx.playbackMode === 'crossfade' || audioFx.playbackMode === 'gapless')) {
+				this.preloadNextTrack();
+			}
+		}, 3000);
 	}
 
 	private finalizeGapless() {
-		const outgoing = this.activeAudio;
-		const incoming = this.standbyAudio;
+		const outgoingIdx = this.activeDeckIndex;
+		const incomingIdx = (1 - this.activeDeckIndex) as 0 | 1;
+		const outgoing = this.decks[outgoingIdx];
+		const incoming = this.decks[incomingIdx];
 		if (!outgoing || !incoming || !this.preloadedItem) return;
 
 		try {
 			outgoing.pause();
 			outgoing.currentTime = 0;
-			outgoing.volume = 0;
+			this.setDeckGain(outgoingIdx, 0);
 		} catch {}
 
 		// Flip active deck pointer
-		this.activeDeckIndex = (1 - this.activeDeckIndex) as 0 | 1;
+		this.activeDeckIndex = incomingIdx;
 
 		const nextItem = this.preloadedItem;
 		const nextIdx = this.preloadedIndex ?? playback.queue.currentIndex + 1;
 		this.preloadedItem = null;
 		this.preloadedIndex = null;
 
-		const baseVol = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
-		incoming.volume = baseVol;
+		this.setDeckGain(incomingIdx, 1.0);
 		incoming.play().catch((e) => console.warn('[Gapless handoff play failed]', e));
 
 		playback.queue.currentIndex = nextIdx;
@@ -350,6 +394,12 @@ class WebPlayer {
 		playback.position = 0;
 		playback.duration = incoming.duration || 0;
 		this.updateMediaSession(now);
+
+		setTimeout(() => {
+			if (!this.isCrossfading && !this.preloadedItem && (audioFx.playbackMode === 'crossfade' || audioFx.playbackMode === 'gapless')) {
+				this.preloadNextTrack();
+			}
+		}, 3000);
 	}
 
 	private cancelCrossfade() {
@@ -364,57 +414,91 @@ class WebPlayer {
 		this.preloadedItem = null;
 		this.preloadedIndex = null;
 
-		const standby = this.standbyAudio;
+		const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
+		const standby = this.decks[standbyIdx];
 		if (standby) {
 			try {
 				standby.pause();
 				standby.src = '';
-				standby.volume = 0;
 			} catch {}
+			this.setDeckGain(standbyIdx, 0);
 		}
-		const active = this.activeAudio;
-		if (active) {
-			const baseVol = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
-			active.volume = baseVol;
-		}
+		this.setDeckGain(this.activeDeckIndex, 1.0);
 	}
-
-	private audioCtx: AudioContext | null = null;
-	private analyser: AnalyserNode | null = null;
-	private sourceNodes: Map<HTMLAudioElement, MediaElementAudioSourceNode> = new Map();
-	private freqArray: Uint8Array | null = null;
-	private timeArray: Uint8Array | null = null;
-	private prevBass = 0;
-	private beatDecay = 0;
 
 	updateEq(bass: number, mid: number, treble: number) {
-		// Native high-fidelity hardware audio pipeline
+		if (!this.audioCtx) return;
+		try {
+			const now = this.audioCtx.currentTime;
+			if (this.lowFilter) this.lowFilter.gain.setTargetAtTime(bass, now, 0.05);
+			if (this.midFilter) this.midFilter.gain.setTargetAtTime(mid, now, 0.05);
+			if (this.highFilter) this.highFilter.gain.setTargetAtTime(treble, now, 0.05);
+		} catch {}
 	}
 
-	private setupWebAudioAnalyser() {
+	private setupWebAudioGraph() {
 		if (typeof window === 'undefined' || this.audioCtx) return;
 		try {
 			const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
 			if (!AudioContextClass) return;
 			this.audioCtx = new AudioContextClass();
+
+			// Equalizer Filter Chain
+			this.lowFilter = this.audioCtx.createBiquadFilter();
+			this.lowFilter.type = 'lowshelf';
+			this.lowFilter.frequency.setValueAtTime(150, this.audioCtx.currentTime);
+			this.lowFilter.gain.setValueAtTime(audioFx.bass || 0, this.audioCtx.currentTime);
+
+			this.midFilter = this.audioCtx.createBiquadFilter();
+			this.midFilter.type = 'peaking';
+			this.midFilter.frequency.setValueAtTime(1200, this.audioCtx.currentTime);
+			this.midFilter.Q.setValueAtTime(1.0, this.audioCtx.currentTime);
+			this.midFilter.gain.setValueAtTime(audioFx.mid || 0, this.audioCtx.currentTime);
+
+			this.highFilter = this.audioCtx.createBiquadFilter();
+			this.highFilter.type = 'highshelf';
+			this.highFilter.frequency.setValueAtTime(6000, this.audioCtx.currentTime);
+			this.highFilter.gain.setValueAtTime(audioFx.treble || 0, this.audioCtx.currentTime);
+
+			// Master Gain Node
+			this.masterGain = this.audioCtx.createGain();
+			const masterVol = Math.max(0.001, Math.min(1, (playback.volume ?? 100) / 100));
+			this.masterGain.gain.setValueAtTime(masterVol, this.audioCtx.currentTime);
+
+			// Visualizer Analyser Node
 			this.analyser = this.audioCtx.createAnalyser();
 			this.analyser.fftSize = 256;
 			this.analyser.smoothingTimeConstant = 0.8;
 			this.freqArray = new Uint8Array(this.analyser.frequencyBinCount);
 			this.timeArray = new Uint8Array(this.analyser.fftSize);
 
-			this.decks.forEach((deck) => {
+			// Connect EQ -> MasterGain -> Analyser -> Destination
+			this.lowFilter.connect(this.midFilter);
+			this.midFilter.connect(this.highFilter);
+			this.highFilter.connect(this.masterGain);
+			this.masterGain.connect(this.analyser);
+			this.analyser.connect(this.audioCtx.destination);
+
+			// Connect Decks to their individual DeckGains -> lowFilter
+			this.decks.forEach((deck, idx) => {
 				if (deck && !this.sourceNodes.has(deck)) {
 					try {
 						const src = this.audioCtx!.createMediaElementSource(deck);
-						src.connect(this.analyser!);
-						this.analyser!.connect(this.audioCtx!.destination);
+						const deckGain = this.audioCtx!.createGain();
+						deckGain.gain.setValueAtTime(idx === this.activeDeckIndex ? 1.0 : 0.0, this.audioCtx!.currentTime);
+
+						src.connect(deckGain);
+						deckGain.connect(this.lowFilter!);
+
+						this.deckGains[idx] = deckGain;
 						this.sourceNodes.set(deck, src);
-					} catch {}
+					} catch (e) {
+						console.warn('[Web Audio Deck Source connect error]', e);
+					}
 				}
 			});
 		} catch (e) {
-			console.warn('[Web Audio Analyser Setup Exception]', e);
+			console.warn('[Web Audio Graph Setup Exception]', e);
 		}
 	}
 
@@ -744,6 +828,7 @@ class WebPlayer {
 					if (active.duration && !isNaN(active.duration) && active.duration > 0) {
 						playback.duration = active.duration;
 					}
+					this.handleTransitionTick();
 				}
 			} else if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.getCurrentTime === 'function') {
 				try {
@@ -756,7 +841,7 @@ class WebPlayer {
 					}
 				} catch {}
 			}
-		}, 250);
+		}, 150);
 	}
 
 	private stopProgress() {
@@ -932,14 +1017,24 @@ class WebPlayer {
 			} catch {}
 		}
 		this.usingDirectAudio = true;
-		const active = this.activeAudio;
+
+		if (this.audioCtx && this.audioCtx.state === 'suspended') {
+			this.audioCtx.resume().catch(() => {});
+		}
+
+		const activeIdx = this.activeDeckIndex;
+		const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
+		const active = this.decks[activeIdx];
+
+		this.setDeckGain(standbyIdx, 0);
+		this.setDeckGain(activeIdx, 1.0);
+
 		if (active) {
 			try {
 				active.pause();
 				active.currentTime = 0;
 			} catch {}
 			active.muted = false;
-			active.volume = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
 			active.src = url;
 			active.load();
 			const playPromise = active.play();
@@ -949,6 +1044,11 @@ class WebPlayer {
 						playback.paused = false;
 						this.startProgress();
 						this.updateMediaSessionState('playing');
+						setTimeout(() => {
+							if (!this.isCrossfading && !this.preloadedItem && (audioFx.playbackMode === 'crossfade' || audioFx.playbackMode === 'gapless')) {
+								this.preloadNextTrack();
+							}
+						}, 3000);
 					})
 					.catch((e) => {
 						console.warn('[Direct Audio Play Error]', e);
@@ -1161,11 +1261,16 @@ class WebPlayer {
 
 	setVolume(volume: number) {
 		playback.volume = volume;
-		const baseVol = Math.max(0.01, Math.min(1, volume / 100));
+		const normVol = Math.max(0.001, Math.min(1, volume / 100));
+		if (this.masterGain && this.audioCtx) {
+			try {
+				this.masterGain.gain.setValueAtTime(normVol, this.audioCtx.currentTime);
+			} catch {}
+		}
 		const active = this.activeAudio;
 		if (active && !this.isCrossfading) {
 			active.muted = false;
-			active.volume = baseVol;
+			active.volume = normVol;
 		}
 		if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.setVolume === 'function') {
 			try {
