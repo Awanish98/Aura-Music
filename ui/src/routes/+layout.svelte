@@ -51,9 +51,10 @@
 	import VideoSurface from '$lib/components/VideoSurface.svelte';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import KeyboardShortcuts from '$lib/components/KeyboardShortcuts.svelte';
-	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import LegalDialog from '$lib/components/LegalDialog.svelte';
+	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import GlassFilter from '$lib/components/ui/GlassFilter.svelte';
+	import CosmicBackgroundAnimation from '$lib/components/CosmicBackgroundAnimation.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
 	import { win, initWin } from '$lib/win.svelte';
@@ -182,9 +183,10 @@
 			? ''
 			: 'rounded-[12px]'}"
 	>
-		<!-- 21st.dev & Apple-style Atmospheric Ambient Aurora Flow Mesh -->
+		<!-- 21st.dev & Apple-style Atmospheric Ambient Cosmic Aurora Animation & Starfield -->
+		<CosmicBackgroundAnimation />
 		<div class="aurora-flow-bg"></div>
-		<div class="apple-ambient-mesh pointer-events-none absolute inset-0 -z-10 opacity-40 dark:opacity-60 transition-opacity duration-1000"></div>
+		<div class="apple-ambient-mesh pointer-events-none absolute inset-0 -z-10 opacity-30 dark:opacity-50 transition-opacity duration-1000"></div>
 
 		<ResizeBorders />
 		<Titlebar />

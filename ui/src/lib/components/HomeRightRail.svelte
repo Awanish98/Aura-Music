@@ -195,4 +195,70 @@
 			{/each}
 		</div>
 	</div>
+
+	<!-- Today's Vibes Section -->
+	<div class="space-y-2.5">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+				<span class="relative flex h-3.5 w-3.5 items-center justify-center">
+					<svg class="h-full w-full -rotate-90" viewBox="0 0 36 36">
+						<path
+							class="text-muted/40"
+							stroke-width="4"
+							stroke="currentColor"
+							fill="none"
+							d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+						/>
+						<path
+							class="text-cyan-400 drop-shadow-[0_0_6px_#22d3ee]"
+							stroke-dasharray="75, 100"
+							stroke-width="4"
+							stroke-linecap="round"
+							stroke="currentColor"
+							fill="none"
+							d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+						/>
+					</svg>
+				</span>
+				<span>Today's Vibes</span>
+			</div>
+		</div>
+
+		<!-- Late Night Drive Card -->
+		<div
+			onclick={() => {
+				toast('Playing Today\'s Vibe: Late Night Drive');
+				api.search('Late Night Synthwave Neon Drive').then((res) => {
+					const songs = Array.isArray(res) ? res : (res as any)?.songs || [];
+					if (songs.length > 0) webPlayer.playPlaylist(songs, 0, 'Late Night Drive');
+				});
+			}}
+			role="button"
+			tabindex="0"
+			onkeydown={(e) => e.key === 'Enter' && goto('/search?q=Late+Night+Drive')}
+			class="group flex items-center justify-between gap-3 rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-card/60 p-3 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-cyan-400/60 hover:shadow-cyan-500/20 cursor-pointer"
+		>
+			<div class="flex items-center gap-3 min-w-0">
+				<div class="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-muted shadow-md">
+					<img
+						src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=160&auto=format&fit=crop&q=80"
+						alt="Late Night Drive"
+						class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+					/>
+				</div>
+				<div class="min-w-0">
+					<h4 class="truncate text-xs font-bold text-foreground group-hover:text-cyan-300 transition-colors">
+						Late Night Drive
+					</h4>
+					<p class="text-[11px] text-muted-foreground mt-0.5 font-medium truncate">
+						Feel the rhythm
+					</p>
+				</div>
+			</div>
+
+			<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-foreground transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-105 shadow-md">
+				<HugeiconsIcon icon={PlayIcon} size={15} fill="currentColor" class="ml-0.5" />
+			</div>
+		</div>
+	</div>
 </aside>

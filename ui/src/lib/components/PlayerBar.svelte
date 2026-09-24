@@ -416,21 +416,63 @@
 				</button>
 			</div>
 
-			<!-- Seek Progress Bar -->
-			<div class="flex w-full items-center gap-2.5 text-[11px] font-medium text-muted-foreground">
-				<span class="tabular-nums font-mono">{fmt(shownPosition)}</span>
-				<input
-					type="range"
-					class="range flex-1"
-					style="--pct:{playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
-					min="0"
-					max={playback.duration || 0}
-					value={shownPosition}
-					oninput={onSeekInput}
-					onchange={onSeekCommit}
+			<!-- Neon Audio Waveform Seek Bar matching Mockup -->
+			<div class="flex w-full items-center gap-3 text-[11px] font-medium text-muted-foreground">
+				<span class="tabular-nums font-mono text-xs text-muted-foreground/90 shrink-0">{fmt(shownPosition)}</span>
+				
+				<!-- Interactive Waveform Timeline Container -->
+				<div
+					class="relative flex-1 h-7 flex items-center group/wave cursor-pointer select-none"
+					role="slider"
+					tabindex="0"
+					aria-valuemin="0"
+					aria-valuemax={playback.duration || 100}
+					aria-valuenow={shownPosition}
 					aria-label={t('player.seek')}
-				/>
-				<span class="tabular-nums font-mono">{fmt(playback.duration)}</span>
+					onclick={(e) => {
+						const rect = e.currentTarget.getBoundingClientRect();
+						const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+						const targetTime = pos * (playback.duration || 0);
+						playback.position = targetTime;
+						api.seek(targetTime);
+					}}
+				>
+					<!-- SVG Glowing Audio Waveform Track -->
+					<div class="w-full h-5 flex items-center justify-between gap-[2px] pointer-events-none overflow-hidden py-1">
+						{#each Array(48) as _, i}
+							{@const pct = (i / 48) * 100}
+							{@const currentPct = playback.duration ? (shownPosition / playback.duration) * 100 : 0}
+							{@const isPlayed = pct <= currentPct}
+							{@const barHeight = Math.max(15, Math.sin(i * 0.45) * 45 + Math.cos(i * 0.9) * 30 + 50)}
+							
+							<div
+								class="flex-1 rounded-full transition-all duration-150 {isPlayed
+									? 'bg-gradient-to-t from-pink-600 via-rose-500 to-fuchsia-400 shadow-[0_0_8px_rgba(255,42,122,0.8)]'
+									: 'bg-white/15 dark:bg-white/10 group-hover/wave:bg-white/25'}"
+								style="height: {barHeight}%; {isPlayed && !playback.paused ? `animation: pulse ${(0.8 + (i % 5) * 0.2).toFixed(1)}s ease-in-out infinite alternate;` : ''}"
+							></div>
+						{/each}
+					</div>
+
+					<!-- Glowing Scrubber Playhead -->
+					<div
+						class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-3.5 w-3.5 rounded-full bg-white border-2 border-pink-500 shadow-[0_0_12px_#ff2a7a] pointer-events-none opacity-0 group-hover/wave:opacity-100 transition-opacity"
+						style="left: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
+					></div>
+
+					<!-- Hidden Native Range for Accessibility and Keyboard navigation -->
+					<input
+						type="range"
+						class="sr-only"
+						min="0"
+						max={playback.duration || 0}
+						value={shownPosition}
+						oninput={onSeekInput}
+						onchange={onSeekCommit}
+					/>
+				</div>
+
+				<span class="tabular-nums font-mono text-xs text-muted-foreground/90 shrink-0">{fmt(playback.duration)}</span>
 			</div>
 		</div>
 

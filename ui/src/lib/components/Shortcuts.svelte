@@ -48,11 +48,11 @@
 			subtitle: 'Auto-playlist • Favorites',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&auto=format&fit=crop&q=80',
-			gradient: 'from-rose-500/20 via-pink-600/10 to-transparent',
-			border: 'border-rose-500/30 hover:border-rose-500/60',
+			gradient: 'from-rose-600/90 via-pink-600/80 to-rose-900/60',
+			border: 'border-rose-400/40 hover:border-rose-400/80',
 			icon: FavouriteIcon,
-			iconColor: 'text-rose-400',
-			iconBg: 'bg-rose-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		},
 		{
 			id: 'curated_chart_hindi_50',
@@ -60,11 +60,11 @@
 			subtitle: 'Top Bollywood Charts',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-cyan-500/20 via-blue-600/10 to-transparent',
-			border: 'border-cyan-500/30 hover:border-cyan-500/60',
+			gradient: 'from-sky-500/90 via-blue-600/80 to-indigo-900/60',
+			border: 'border-sky-400/40 hover:border-sky-400/80',
 			icon: AudioWave02Icon,
-			iconColor: 'text-cyan-400',
-			iconBg: 'bg-cyan-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		},
 		{
 			id: 'daily_mix_01',
@@ -72,11 +72,11 @@
 			subtitle: 'Arijit Singh, Pritam',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-purple-500/20 via-indigo-600/10 to-transparent',
-			border: 'border-purple-500/30 hover:border-purple-500/60',
+			gradient: 'from-purple-600/90 via-violet-600/80 to-indigo-900/60',
+			border: 'border-purple-400/40 hover:border-purple-400/80',
 			icon: ListRestartIcon,
-			iconColor: 'text-purple-400',
-			iconBg: 'bg-purple-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		},
 		{
 			id: 'curated_chart_punjabi_50',
@@ -84,11 +84,11 @@
 			subtitle: 'Diljit, Karan Aujla, Shubh',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-amber-500/20 via-yellow-600/10 to-transparent',
-			border: 'border-amber-500/30 hover:border-amber-500/60',
+			gradient: 'from-amber-500/90 via-orange-600/80 to-amber-900/60',
+			border: 'border-amber-400/40 hover:border-amber-400/80',
 			icon: CrownIcon,
-			iconColor: 'text-amber-400',
-			iconBg: 'bg-amber-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		},
 		{
 			id: 'curated_chart_global_50',
@@ -96,11 +96,11 @@
 			subtitle: 'Top 50 International',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-blue-600/20 via-sky-600/10 to-transparent',
-			border: 'border-blue-500/30 hover:border-blue-500/60',
+			gradient: 'from-cyan-600/90 via-blue-600/80 to-blue-950/60',
+			border: 'border-cyan-400/40 hover:border-cyan-400/80',
 			icon: Globe02Icon,
-			iconColor: 'text-blue-400',
-			iconBg: 'bg-blue-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		},
 		{
 			id: 'artist_diljit_dosanjh',
@@ -108,11 +108,11 @@
 			subtitle: 'Artist Station • Punjabi Pop',
 			kind: 'artist',
 			thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-pink-600/20 via-rose-700/10 to-transparent',
-			border: 'border-pink-500/30 hover:border-pink-500/60',
+			gradient: 'from-fuchsia-600/90 via-pink-600/80 to-rose-900/60',
+			border: 'border-fuchsia-400/40 hover:border-fuchsia-400/80',
 			icon: Radio02Icon,
-			iconColor: 'text-pink-400',
-			iconBg: 'bg-pink-500/20'
+			iconColor: 'text-white',
+			iconBg: 'bg-white/20'
 		}
 	];
 
@@ -281,9 +281,9 @@
 								onerror={() => (failed = { ...failed, [item.thumbnail!]: true })}
 							/>
 
-							<!-- Hover Center Play Button Overlay -->
+							<!-- Center Play Button Overlay -->
 							<button
-								class="absolute inset-0 m-auto flex size-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg opacity-0 transition-all duration-200 hover:scale-110 active:scale-95 group-hover/pick:opacity-100"
+								class="absolute inset-0 m-auto flex size-8 cursor-pointer items-center justify-center rounded-full bg-white text-slate-950 shadow-[0_4px_14px_rgba(0,0,0,0.6)] opacity-90 transition-all duration-200 hover:scale-110 hover:opacity-100 active:scale-95 group-hover/pick:scale-105"
 								class:animate-pulse={busy === item.id}
 								disabled={busy === item.id}
 								aria-label={t('a11y.play_item', { title: item.title })}
