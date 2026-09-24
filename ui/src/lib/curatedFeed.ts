@@ -21,7 +21,7 @@ export const CURATED_DAILY_MIXES: BrowseItem[] = [
 		id: 'daily_mix_01',
 		title: 'Daily Mix 01',
 		subtitle: 'Arijit Singh, Pritam, Mohit Chauhan',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofArijitSingh_20260424083515.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Arijit Singh' }, { text: 'Pritam' }],
 		isUpload: false,
 		explicit: false
@@ -31,7 +31,7 @@ export const CURATED_DAILY_MIXES: BrowseItem[] = [
 		id: 'daily_mix_02',
 		title: 'Daily Mix 02',
 		subtitle: 'Diljit Dosanjh, Karan Aujla, Shubh',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofDiljitDosanjh_20260605051230.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Diljit Dosanjh' }, { text: 'Karan Aujla' }],
 		isUpload: false,
 		explicit: false
@@ -41,7 +41,7 @@ export const CURATED_DAILY_MIXES: BrowseItem[] = [
 		id: 'daily_mix_03',
 		title: 'Daily Mix 03',
 		subtitle: 'The Weeknd, Taylor Swift, Ed Sheeran',
-		thumbnail: 'https://c.saavncdn.com/editorial/InternationalPopHits_20260515082010.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'The Weeknd' }, { text: 'Taylor Swift' }],
 		isUpload: false,
 		explicit: false
@@ -51,7 +51,7 @@ export const CURATED_DAILY_MIXES: BrowseItem[] = [
 		id: 'daily_mix_04',
 		title: 'Daily Mix 04',
 		subtitle: 'Kishore Kumar, Lata Mangeshkar, R.D. Burman',
-		thumbnail: 'https://c.saavncdn.com/editorial/EvergreenBollywood_20260310061245.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Kishore Kumar' }, { text: 'R.D. Burman' }],
 		isUpload: false,
 		explicit: false
@@ -61,7 +61,7 @@ export const CURATED_DAILY_MIXES: BrowseItem[] = [
 		id: 'daily_mix_05',
 		title: 'Daily Mix 05',
 		subtitle: 'Lofi Chill, Ambient Beats, Midnight Study',
-		thumbnail: 'https://c.saavncdn.com/editorial/LofiChillHop_20260412093022.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Lofi Girl' }, { text: 'Chillhop' }],
 		isUpload: false,
 		explicit: false
@@ -75,7 +75,7 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_arijit_singh',
 		title: 'Arijit Singh Radio',
 		subtitle: 'Artist Radio • Romantic & Melodic',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofArijitSingh_20260424083515.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Arijit Singh' }],
 		isUpload: false,
 		explicit: false
@@ -85,7 +85,7 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_diljit_dosanjh',
 		title: 'Diljit Dosanjh Radio',
 		subtitle: 'Artist Radio • Punjabi & Pop',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofDiljitDosanjh_20260605051230.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Diljit Dosanjh' }],
 		isUpload: false,
 		explicit: false
@@ -95,7 +95,7 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_shreya_ghoshal',
 		title: 'Shreya Ghoshal Radio',
 		subtitle: 'Artist Radio • Soulful Hits',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofShreyaGhoshal_20260318074512.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Shreya Ghoshal' }],
 		isUpload: false,
 		explicit: false
@@ -105,7 +105,7 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_pritam',
 		title: 'Pritam Radio',
 		subtitle: 'Artist Radio • Chartbuster Hits',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofPritam_20260214063011.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Pritam' }],
 		isUpload: false,
 		explicit: false
@@ -115,7 +115,7 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_kk',
 		title: 'KK Evergreen Radio',
 		subtitle: 'Artist Radio • Nostalgic 2000s',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofKK_20260531081520.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'KK' }],
 		isUpload: false,
 		explicit: false
@@ -125,21 +125,21 @@ export const CURATED_ARTIST_RADIOS: BrowseItem[] = [
 		id: 'artist_atif_aslam',
 		title: 'Atif Aslam Radio',
 		subtitle: 'Artist Radio • Romantic Ballads',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofAtifAslam_20260119052240.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Atif Aslam' }],
 		isUpload: false,
 		explicit: false
 	}
 ];
 
-// Pre-curated Trending Chart Playlists with 500x500 covers
+// Pre-curated Trending Chart Playlists with 300x300 covers
 export const CURATED_TOP_CHARTS: BrowseItem[] = [
 	{
 		kind: 'playlist',
 		id: 'saavn_1134543272',
 		title: 'Hindi: India Superhits Top 50',
 		subtitle: '50 Songs • Bollywood Top 50',
-		thumbnail: 'https://c.saavncdn.com/editorial/Hindi-IndiaSuperhitsTop50_20260911054516.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'JioSaavn' }],
 		isUpload: false,
 		explicit: false
@@ -149,7 +149,7 @@ export const CURATED_TOP_CHARTS: BrowseItem[] = [
 		id: 'saavn_1074543290',
 		title: 'Punjabi Top 50',
 		subtitle: '50 Songs • Hottest Punjabi Tracks',
-		thumbnail: 'https://c.saavncdn.com/editorial/Punjabi-IndiaSuperhitsTop50_20260905081240.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'JioSaavn' }],
 		isUpload: false,
 		explicit: false
@@ -159,7 +159,7 @@ export const CURATED_TOP_CHARTS: BrowseItem[] = [
 		id: 'saavn_1084543288',
 		title: "Today's Top Global Hits",
 		subtitle: '50 Songs • Billboard Hot 100',
-		thumbnail: 'https://c.saavncdn.com/editorial/InternationalPopHits_20260515082010.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'Billboard' }],
 		isUpload: false,
 		explicit: false
@@ -169,7 +169,7 @@ export const CURATED_TOP_CHARTS: BrowseItem[] = [
 		id: 'saavn_1094543277',
 		title: 'Romantic Rewind 2026',
 		subtitle: '50 Songs • Pure Love & Heart',
-		thumbnail: 'https://c.saavncdn.com/editorial/RomanticHitsHindi_20260814064510.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'JioSaavn' }],
 		isUpload: false,
 		explicit: false
@@ -179,7 +179,7 @@ export const CURATED_TOP_CHARTS: BrowseItem[] = [
 		id: 'saavn_1104543266',
 		title: 'Bollywood Dance & Party Hits',
 		subtitle: '50 Songs • High Energy Party',
-		thumbnail: 'https://c.saavncdn.com/editorial/BollywoodDanceHits_20260720053018.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&auto=format&fit=crop&q=80',
 		artistRuns: [{ text: 'JioSaavn' }],
 		isUpload: false,
 		explicit: false
@@ -194,7 +194,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Jyotica Tangri, Shaarib Toshi',
 		artist_runs: [{ text: 'Jyotica Tangri' }, { text: 'Shaarib Toshi' }],
 		album: 'Fukrey Returns',
-		thumbnail: 'https://c.saavncdn.com/675/Trending-Love-Songs-Hindi-2026-20260506185328-500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 		duration: '4:15',
 		is_video: false,
 		is_upload: false,
@@ -206,7 +206,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Arijit Singh, Pritam, Amitabh Bhattacharya',
 		artist_runs: [{ text: 'Arijit Singh' }, { text: 'Pritam' }],
 		album: 'Brahmāstra',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofArijitSingh_20260424083515.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80',
 		duration: '4:28',
 		is_video: false,
 		is_upload: false,
@@ -218,7 +218,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Mohit Chauhan, Shreya Ghoshal, Pritam',
 		artist_runs: [{ text: 'Mohit Chauhan' }, { text: 'Shreya Ghoshal' }],
 		album: 'Players',
-		thumbnail: 'https://c.saavncdn.com/129/Players-Hindi-2011-20221104051052-500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80',
 		duration: '4:36',
 		is_video: false,
 		is_upload: false,
@@ -230,7 +230,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Karan Aujla',
 		artist_runs: [{ text: 'Karan Aujla' }],
 		album: 'Bad Newz',
-		thumbnail: 'https://c.saavncdn.com/editorial/Punjabi-IndiaSuperhitsTop50_20260905081240.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&auto=format&fit=crop&q=80',
 		duration: '3:27',
 		is_video: false,
 		is_upload: false,
@@ -242,7 +242,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Arijit Singh, Pritam',
 		artist_runs: [{ text: 'Arijit Singh' }, { text: 'Pritam' }],
 		album: 'Dunki',
-		thumbnail: 'https://c.saavncdn.com/editorial/RomanticHitsHindi_20260814064510.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 		duration: '3:53',
 		is_video: false,
 		is_upload: false,
@@ -254,7 +254,7 @@ export const CURATED_TOP_SONGS: SongItem[] = [
 		artists: 'Arijit Singh, Shreya Ghoshal, Pritam',
 		artist_runs: [{ text: 'Arijit Singh' }, { text: 'Shreya Ghoshal' }],
 		album: 'Rocky Aur Rani Kii Prem Kahaani',
-		thumbnail: 'https://c.saavncdn.com/editorial/BestofPritam_20260214063011.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
 		duration: '4:07',
 		is_video: false,
 		is_upload: false,
@@ -386,35 +386,35 @@ export async function getCuratedPlaylist(playlistId: string): Promise<CuratedPla
 				query: 'Arijit Singh Pritam Mohit Chauhan',
 				title: 'Daily Mix 01',
 				subtitle: 'Arijit Singh, Pritam, Mohit Chauhan',
-				thumb: 'https://c.saavncdn.com/editorial/BestofArijitSingh_20260424083515.jpg',
+				thumb: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&auto=format&fit=crop&q=80',
 				desc: 'A personalized mix of heartfelt Hindi romantic songs and soulful melodies.'
 			},
 			'02': {
 				query: 'Diljit Dosanjh Karan Aujla Shubh',
 				title: 'Daily Mix 02',
 				subtitle: 'Diljit Dosanjh, Karan Aujla, Shubh',
-				thumb: 'https://c.saavncdn.com/editorial/BestofDiljitDosanjh_20260605051230.jpg',
+				thumb: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80',
 				desc: 'High energy Punjabi beats, chart toppers, and modern anthems.'
 			},
 			'03': {
 				query: 'The Weeknd Taylor Swift Ed Sheeran',
 				title: 'Daily Mix 03',
 				subtitle: 'The Weeknd, Taylor Swift, Ed Sheeran',
-				thumb: 'https://c.saavncdn.com/editorial/InternationalPopHits_20260515082010.jpg',
+				thumb: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300&auto=format&fit=crop&q=80',
 				desc: 'Global chartbusters, synthwave pop, and billboard record-breakers.'
 			},
 			'04': {
 				query: 'Kishore Kumar RD Burman Lata Mangeshkar',
 				title: 'Daily Mix 04',
 				subtitle: 'Kishore Kumar, Lata Mangeshkar, R.D. Burman',
-				thumb: 'https://c.saavncdn.com/editorial/EvergreenBollywood_20260310061245.jpg',
+				thumb: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=300&auto=format&fit=crop&q=80',
 				desc: 'Golden era Bollywood classics remastered in high fidelity.'
 			},
 			'05': {
 				query: 'Lofi Chillhop Study Beats Relax',
 				title: 'Daily Mix 05',
 				subtitle: 'Lofi Chill, Ambient Beats, Midnight Study',
-				thumb: 'https://c.saavncdn.com/editorial/LofiChillHop_20260412093022.jpg',
+				thumb: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=300&auto=format&fit=crop&q=80',
 				desc: 'Mellow beats, relaxing study vibes, and ambient chillhop.'
 			}
 		};

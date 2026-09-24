@@ -54,49 +54,49 @@
 			id: 'bollywood',
 			name: 'Bollywood',
 			query: 'Bollywood Superhits Top Songs',
-			thumbnail: 'https://c.saavncdn.com/artists/Arijit_Singh_002_20230323062147_500x500.jpg'
+			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'punjabi',
 			name: 'Punjabi',
 			query: 'Punjabi Top 50 Hits',
-			thumbnail: 'https://c.saavncdn.com/artists/Diljit_Dosanjh_004_20221006184542_500x500.jpg'
+			thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'global_pop',
 			name: 'Global Pop',
 			query: 'Today Global Hits Top 50',
-			thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop'
+			thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'indie',
 			name: 'Indie',
 			query: 'Indian Indie Acoustic Melodies',
-			thumbnail: 'https://c.saavncdn.com/artists/Anuv_Jain_001_20211029141738_500x500.jpg'
+			thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'lofi',
 			name: 'Lo-Fi',
 			query: 'Chill Lo-Fi Hip Hop Study Beats',
-			thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=200&h=200&fit=crop'
+			thumbnail: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'edm',
 			name: 'EDM',
 			query: 'Top EDM Festival Dance Hits',
-			thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop'
+			thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'hiphop',
 			name: 'Hip Hop',
 			query: 'Top Hip Hop Rap Hits',
-			thumbnail: 'https://c.saavncdn.com/artists/Karan_Aujla_002_20220909062335_500x500.jpg'
+			thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=160&h=160&fit=crop&q=80'
 		},
 		{
 			id: 'rock',
 			name: 'Rock',
 			query: 'Classic and Modern Rock Hits',
-			thumbnail: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=200&h=200&fit=crop'
+			thumbnail: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=160&h=160&fit=crop&q=80'
 		}
 	];
 </script>

@@ -44,7 +44,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Arijit Singh',
 		subtitle: 'King of Bollywood Romance',
 		followers: '48.5M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Arijit_Singh_002_20230323062147_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=160&h=160&fit=crop&q=80',
 		genre: 'Bollywood / Romance',
 		searchQuery: 'Arijit Singh Top Songs',
 		tags: ['Bollywood', 'Romantic', 'Hindi', 'Melody']
@@ -54,7 +54,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Shreya Ghoshal',
 		subtitle: 'Melody Queen of India',
 		followers: '32.1M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_004_20230323062031_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&q=80',
 		genre: 'Bollywood Melodies',
 		searchQuery: 'Shreya Ghoshal Best Songs',
 		tags: ['Bollywood', 'Melody', 'Classical', 'Hindi']
@@ -64,7 +64,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Diljit Dosanjh',
 		subtitle: 'Global Punjabi Icon & G.O.A.T',
 		followers: '28.4M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Diljit_Dosanjh_004_20221006184542_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=160&h=160&fit=crop&q=80',
 		genre: 'Punjabi Pop',
 		searchQuery: 'Diljit Dosanjh Top Hits',
 		tags: ['Punjabi', 'Bhangra', 'Pop', 'Global']
@@ -74,7 +74,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Karan Aujla',
 		subtitle: 'Geetan Di Machine',
 		followers: '25.7M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Karan_Aujla_002_20220909062335_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=160&h=160&fit=crop&q=80',
 		genre: 'Punjabi Hip-Hop',
 		searchQuery: 'Karan Aujla Latest Hits',
 		tags: ['Punjabi', 'Hip-Hop', 'Rap', 'Urban']
@@ -84,7 +84,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'The Weeknd',
 		subtitle: 'Starboy & Synthpop Legend',
 		followers: '115M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=160&h=160&fit=crop&q=80',
 		genre: 'R&B / Synthpop',
 		searchQuery: 'The Weeknd Top Hits',
 		tags: ['R&B', 'Synthpop', 'Global', 'Pop']
@@ -94,7 +94,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Taylor Swift',
 		subtitle: 'The Eras Icon & Pop Queen',
 		followers: '110M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=160&h=160&fit=crop&q=80',
 		genre: 'Pop / Storyteller',
 		searchQuery: 'Taylor Swift Best Songs',
 		tags: ['Pop', 'Country', 'Hits', 'Acoustic']
@@ -104,7 +104,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Anuv Jain',
 		subtitle: 'Soulful Acoustic & Indie Ballads',
 		followers: '14.2M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Anuv_Jain_001_20211029141738_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=160&h=160&fit=crop&q=80',
 		genre: 'Indie Acoustic',
 		searchQuery: 'Anuv Jain All Songs',
 		tags: ['Indie', 'Acoustic', 'Hindi', 'Chill']
@@ -114,7 +114,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Atif Aslam',
 		subtitle: 'Sufi, Rock & Romantic Legend',
 		followers: '36.8M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Atif_Aslam_002_20221006184542_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&q=80',
 		genre: 'Romantic / Sufi',
 		searchQuery: 'Atif Aslam Superhit Songs',
 		tags: ['Romantic', 'Sufi', 'Bollywood', 'Rock']
@@ -124,7 +124,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'AP Dhillon',
 		subtitle: 'Brown Munde & Modern Wave',
 		followers: '22.3M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/AP_Dhillon_003_20220909062335_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=160&h=160&fit=crop&q=80',
 		genre: 'Punjabi Trap',
 		searchQuery: 'AP Dhillon All Hits',
 		tags: ['Punjabi', 'Trap', 'Party', 'Brown Munde']
@@ -134,7 +134,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Sidhu Moose Wala',
 		subtitle: 'Legendary Pioneer of Desi Rap',
 		followers: '35.1M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Sidhu_Moose_Wala_004_20220909062335_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=160&h=160&fit=crop&q=80',
 		genre: 'Punjabi Hip-Hop',
 		searchQuery: 'Sidhu Moose Wala Top Tracks',
 		tags: ['Punjabi', 'Hip-Hop', 'Rap', 'Legend']
@@ -144,7 +144,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Pritam',
 		subtitle: "Bollywood's #1 Melody Director",
 		followers: '42.0M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Pritam_003_20230323062147_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=160&h=160&fit=crop&q=80',
 		genre: 'Bollywood Composer',
 		searchQuery: 'Pritam Best Bollywood Songs',
 		tags: ['Bollywood', 'Composer', 'Soundtracks', 'Hits']
@@ -154,7 +154,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Billie Eilish',
 		subtitle: 'Alternative Pop & Dark Melodies',
 		followers: '95M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=160&h=160&fit=crop&q=80',
 		genre: 'Alternative Pop',
 		searchQuery: 'Billie Eilish Top Hits',
 		tags: ['Alternative', 'Pop', 'Dark Pop', 'Global']
@@ -164,7 +164,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Drake',
 		subtitle: '6 God & Hip-Hop Titan',
 		followers: '88M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&q=80',
 		genre: 'Hip-Hop / Rap',
 		searchQuery: 'Drake Best Hits',
 		tags: ['Hip-Hop', 'Rap', 'R&B', 'Global']
@@ -174,7 +174,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Bruno Mars',
 		subtitle: 'Funk, Retro Soul & 24K Magic',
 		followers: '82M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&q=80',
 		genre: 'Funk / Pop',
 		searchQuery: 'Bruno Mars Top Songs',
 		tags: ['Funk', 'Pop', 'Soul', 'Retro']
@@ -184,7 +184,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Badshah',
 		subtitle: 'Club & Commercial Rap King',
 		followers: '26.5M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Badshah_005_20230323062031_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=160&h=160&fit=crop&q=80',
 		genre: 'Desi Rap',
 		searchQuery: 'Badshah Party Anthems',
 		tags: ['Rap', 'Party', 'Dance', 'Bollywood']
@@ -194,7 +194,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Neha Kakkar',
 		subtitle: 'Bollywood Party & Dance Queen',
 		followers: '30.2M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Neha_Kakkar_006_20230323062031_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&q=80',
 		genre: 'Bollywood Dance',
 		searchQuery: 'Neha Kakkar Dance Hits',
 		tags: ['Bollywood', 'Dance', 'Party', 'Pop']
@@ -204,7 +204,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Armaan Malik',
 		subtitle: 'Prince of Romance & Pop',
 		followers: '18.7M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Armaan_Malik_004_20230323062031_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&q=80',
 		genre: 'Pop / Romantic',
 		searchQuery: 'Armaan Malik Best Songs',
 		tags: ['Romantic', 'Pop', 'Hindi', 'English']
@@ -214,7 +214,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Darshan Raval',
 		subtitle: 'Monsoon & Indie Romance',
 		followers: '19.5M Listeners',
-		thumbnail: 'https://c.saavncdn.com/artists/Darshan_Raval_005_20230323062031_500x500.jpg',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=160&h=160&fit=crop&q=80',
 		genre: 'Indie Pop',
 		searchQuery: 'Darshan Raval Hits',
 		tags: ['Indie', 'Monsoon', 'Romantic', 'Hindi']
@@ -224,7 +224,7 @@ export const FMHY_TOP_ARTISTS: FmhyArtist[] = [
 		name: 'Ed Sheeran',
 		subtitle: 'Acoustic Pop & Storytelling',
 		followers: '90M Listeners',
-		thumbnail: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=160&h=160&fit=crop&q=80',
 		genre: 'Acoustic Pop',
 		searchQuery: 'Ed Sheeran All Hits',
 		tags: ['Acoustic', 'Pop', 'Singer-Songwriter', 'Global']
@@ -399,7 +399,7 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		title: 'SomaFM: Suburbs of Goa',
 		subtitle: 'Desi-Influenced Chillout • SomaFM',
 		category: 'radio',
-		thumbnail: 'https://images.unsplash.com/photo-1512632570987-d4097435f8a6?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=260&auto=format&fit=crop&q=80',
 		description: 'Desi and Asian-influenced ambient grooves, sitar downtempo, and world chill.',
 		streamUrl: 'https://ice1.somafm.com/suburbsofgoa-128-mp3',
 		tags: ['Desi', 'Goa', 'World', 'Chillout'],
@@ -410,7 +410,7 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		title: 'Nightwave Plaza',
 		subtitle: 'Vaporwave Radio 24/7 • plaza.one',
 		category: 'radio',
-		thumbnail: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&h=500&fit=crop',
+		thumbnail: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=260&auto=format&fit=crop&q=80',
 		description: 'The premier freeform Vaporwave, Future Funk, and Mallsoft internet radio broadcast.',
 		streamUrl: 'https://radio.plaza.one/mp3',
 		tags: ['Vaporwave', 'Future Funk', 'Synth', 'Aesthetic'],
@@ -421,7 +421,7 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		title: 'Lofi Girl - Relax & Study Beats',
 		subtitle: 'Lofi Hip Hop Radio 24/7 • Lofi Girl',
 		category: 'radio',
-		thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg',
+		thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg',
 		description: 'Peaceful lofi hip hop beats to relax, study, and code to.',
 		videoId: 'jfKfPfyJRdk',
 		tags: ['Lofi', 'Study', 'Relax', 'Chill'],
@@ -432,7 +432,7 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		title: 'Synthwave Radio - Chill / Retro Beats',
 		subtitle: 'Retro Electronic & Chillwave • Lofi Girl',
 		category: 'radio',
-		thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/maxresdefault.jpg',
+		thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg',
 		description: 'Retro synthwave and 80s chill electronic beats for deep immersion.',
 		videoId: '4xDzrJKXOOY',
 		tags: ['Synthwave', 'Retro', 'Cyber', 'Night Drive'],
@@ -443,7 +443,7 @@ export const FMHY_RADIO_STATIONS: FmhyItem[] = [
 		title: 'Chillhop Radio - Jazzy & Lofi Beats',
 		subtitle: 'Chillhop Music • 24/7 Stream',
 		category: 'radio',
-		thumbnail: 'https://i.ytimg.com/vi/5yx6BWlEVcY/maxresdefault.jpg',
+		thumbnail: 'https://i.ytimg.com/vi/5yx6BWlEVcY/hqdefault.jpg',
 		description: 'Cozy jazzy hip hop and soothing lofi beats by the Chillhop community.',
 		videoId: '5yx6BWlEVcY',
 		tags: ['Chillhop', 'Jazz', 'Beats', 'Coffee'],

@@ -127,9 +127,6 @@ class WebPlayer {
 
 			this.setupMediaSession();
 		}
-
-		// 2. Initialize YouTube IFrame Player API in active media container
-		this.initYouTubePlayer();
 	}
 
 	private handleTransitionTick() {

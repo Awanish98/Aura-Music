@@ -26,6 +26,8 @@ app.use((req, res, next) => {
 	res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
 	res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 	res.setHeader('X-XSS-Protection', '1; mode=block');
+	res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+	res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
 	// Content Security Policy
 	const csp = [
@@ -43,6 +45,13 @@ app.use((req, res, next) => {
 	res.setHeader('Content-Security-Policy', csp);
 
 	next();
+});
+
+// Standard Security.txt endpoint
+app.get(['/.well-known/security.txt', '/security.txt'], (req, res) => {
+	res.type('text/plain').send(
+		`Contact: mailto:security@auramusic.app\nExpires: 2027-12-31T23:59:59.000Z\nPreferred-Languages: en, hi\nCanonical: https://aura-music-1no9.onrender.com/.well-known/security.txt\nPolicy: https://aura-music-1no9.onrender.com/privacy\n`
+	);
 });
 
 // Health check
