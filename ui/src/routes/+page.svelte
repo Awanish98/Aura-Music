@@ -56,22 +56,6 @@
 
 	const fmhySections = $derived(getFmhyHomeSections());
 
-	// Google Drive Personal Music
-	let gdriveSongs = $state<api.SongItem[]>([]);
-	onMount(() => {
-		gdriveSongs = api.getWebStorage<api.SongItem[]>('gdrive_songs', []);
-	});
-	const gdriveItems = $derived<BrowseItem[]>(
-		gdriveSongs.map((s) => ({
-			id: s.video_id,
-			title: s.title,
-			subtitle: s.artists,
-			kind: 'song',
-			thumbnail: s.thumbnail,
-			duration: s.duration
-		}))
-	);
-
 	const pinned = $derived(new Set(personal.picks.map((p) => p.id)));
 	const recent = $derived(
 		recentItems(personal, 100)
@@ -89,7 +73,6 @@
 	const RECENT = '@recent';
 	const FAMILIAR = '@familiar';
 	const FORGOTTEN = '@forgotten';
-	const GDRIVE = '@gdrive';
 
 	type Block =
 		| { id: string; key: string; title: string; shelf?: undefined }
@@ -101,7 +84,6 @@
 		const local: Block[] = selected
 			? []
 			: [
-					...(gdriveItems.length ? [{ id: GDRIVE, key: GDRIVE, title: 'Google Drive Cloud Music' }] : []),
 					{ id: RECENT, key: RECENT, title: t('home.jump_back_in') },
 					{ id: FAMILIAR, key: FAMILIAR, title: t('home.familiar_artists') },
 					{ id: FORGOTTEN, key: FORGOTTEN, title: t('home.forgotten_favourites') }
@@ -339,15 +321,6 @@
 							community={/community/i.test(block.shelf.title)}
 							onMore={block.shelf.moreBrowseId ? () => showMore(block.shelf!) : undefined}
 						/>
-					{:else if block.key === GDRIVE}
-						{#if gdriveItems.length}
-							<Shelf
-								title="Google Drive Cloud Music"
-								items={gdriveItems}
-								queueAll={true}
-								onMore={() => goto('/drive')}
-							/>
-						{/if}
 					{:else if block.key === RECENT}
 						{#if recent.length}<RecentRail items={recent} />{/if}
 					{:else if block.key === FAMILIAR}

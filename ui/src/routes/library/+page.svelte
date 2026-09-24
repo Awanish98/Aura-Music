@@ -27,7 +27,6 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import LibrarySongs from '$lib/components/LibrarySongs.svelte';
 	import LocalMusic from '$lib/components/LocalMusic.svelte';
-	import DriveMusic from '$lib/components/DriveMusic.svelte';
 	import MediaCard from '$lib/components/MediaCard.svelte';
 	import MediaCardSkeleton from '$lib/components/MediaCardSkeleton.svelte';
 	import ErrorState from '$lib/components/ErrorState.svelte';
@@ -253,9 +252,6 @@
 			<Tabs.Trigger value="uploads" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
 				<HugeiconsIcon icon={CloudUploadIcon} class="h-4 w-4 mr-1.5" /> {t('library.uploads_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="drive" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
-				<HugeiconsIcon icon={CloudIcon} class="h-4 w-4 mr-1.5" /> Google Drive
-			</Tabs.Trigger>
 			<Tabs.Trigger value="local" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
 				<HugeiconsIcon icon={DriveIcon} class="h-4 w-4 mr-1.5" /> {t('library.local_tab')}
 			</Tabs.Trigger>
@@ -332,9 +328,8 @@
 				{/if}
 			{/if}
 		</Tabs.Content>
-		<Tabs.Content value="drive">{#if tab === 'drive'}<DriveMusic />{/if}</Tabs.Content>
 		<Tabs.Content value="local">{#if tab === 'local'}<LocalMusic />{/if}</Tabs.Content>
-		{#if tab === 'local' || tab === 'songs' || tab === 'uploads' || tab === 'drive'}
+		{#if tab === 'local' || tab === 'songs' || tab === 'uploads'}
 			<!-- nothing else: the grid states below have no bearing on these three -->
 		{:else if loading}
 			<div class="card-grid">

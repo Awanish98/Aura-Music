@@ -45,7 +45,6 @@
 	import ColorPicker from '$lib/components/ColorPicker.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
 	import DiscordSettings from '$lib/components/DiscordSettings.svelte';
-	import GoogleDriveSettings from '$lib/components/GoogleDriveSettings.svelte';
 	import AiSettings from '$lib/components/AiSettings.svelte';
 	import {
 		THEMES,
@@ -81,13 +80,12 @@
 	import { t, setLocale, currentLocale, LOCALES, type LocaleId } from '$lib/i18n.svelte';
 	import { appIcon, chooseAppIcon } from '$lib/appicon.svelte';
 
-	type TabId = 'general' | 'ai' | 'themes' | 'playback' | 'gdrive' | 'discord' | 'data' | 'about';
+	type TabId = 'general' | 'ai' | 'themes' | 'playback' | 'discord' | 'data' | 'about';
 	const TABS = $derived<{ id: TabId; label: string; hint: string; icon: typeof Settings02Icon }[]>([
 		{ id: 'general', label: t('settings.tabs.general'), hint: t('settings.tabs.general_hint'), icon: Settings02Icon },
 		{ id: 'ai', label: 'Aura AI & DJ', hint: 'Gemini 2.5 & Groq Llama 3.3 models', icon: SparklesIcon },
 		{ id: 'themes', label: t('settings.tabs.themes'), hint: t('settings.tabs.themes_hint'), icon: PaintBoardIcon },
 		{ id: 'playback', label: t('settings.tabs.playback'), hint: t('settings.tabs.playback_hint'), icon: PlayCircleIcon },
-		{ id: 'gdrive', label: 'Google Drive', hint: 'Cloud backup, sync & music streaming', icon: CloudIcon },
 		{ id: 'discord', label: t('settings.tabs.discord'), hint: t('settings.tabs.discord_hint'), icon: DiscordIcon },
 		{ id: 'data', label: t('settings.tabs.data'), hint: t('settings.tabs.data_hint'), icon: Database02Icon },
 		{ id: 'about', label: t('settings.tabs.about'), hint: t('settings.tabs.about_hint'), icon: InformationCircleIcon }
@@ -825,8 +823,6 @@
 								{@render row({ title: t('settings.general.stream_clients'), below: clientList })}
 							</div>
 						</section>
-					{:else if tab === 'gdrive'}
-						<GoogleDriveSettings />
 					{:else if tab === 'data'}
 						<section class={GROUP}>
 							<h3 class={LABEL}>{t('settings.sections.network')}</h3>

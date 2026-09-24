@@ -42,7 +42,7 @@
 		{ href: '/discover', label: 'Radio', icon: Radio02Icon },
 		{ href: '/library?tab=playlists', label: 'Playlist', icon: Playlist02Icon },
 		{ href: '/library?tab=songs', label: 'Favorites', icon: FavouriteIcon },
-		{ href: '/drive', label: 'Downloads', icon: Download04Icon }
+		{ href: '/library?tab=local', label: 'Local Files', icon: Download04Icon }
 	]);
 
 	const curatedPlaylists = [

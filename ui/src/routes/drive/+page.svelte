@@ -1,12 +1,17 @@
 <script lang="ts">
-	import DriveMusic from '$lib/components/DriveMusic.svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+
+	onMount(() => {
+		goto('/library', { replaceState: true });
+	});
 </script>
 
 <svelte:head>
-	<title>Google Drive Music • Aura Music</title>
+	<title>Library • Aura Music</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-7xl px-4 py-6 md:px-8">
-	<DriveMusic />
+<div class="container mx-auto max-w-7xl px-4 py-12 text-center text-muted-foreground text-sm">
+	Redirecting to Library...
 </div>
 
