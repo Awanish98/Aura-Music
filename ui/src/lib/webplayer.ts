@@ -68,23 +68,13 @@ class WebPlayer {
 	init() {
 		if (typeof window === 'undefined') return;
 
-		// Document-wide one-time gesture unlock for unblocked web audio autoplay on mobile
+		// Document-wide one-time gesture unlock for unblocked web audio autoplay on mobile & desktop
 		if (!this.unlocked) {
 			const unlockEngine = () => {
 				this.unlocked = true;
 				if (this.audioCtx && this.audioCtx.state === 'suspended') {
 					this.audioCtx.resume().catch(() => {});
 				}
-				this.decks.forEach((deck) => {
-					if (deck) {
-						const p = deck.play();
-						if (p !== undefined) {
-							p.then(() => {
-								if (!deck.src) deck.pause();
-							}).catch(() => {});
-						}
-					}
-				});
 				window.removeEventListener('pointerdown', unlockEngine);
 				window.removeEventListener('click', unlockEngine);
 				window.removeEventListener('keydown', unlockEngine);
@@ -104,8 +94,10 @@ class WebPlayer {
 			this.decks.forEach((deck, deckIdx) => {
 				if (!deck) return;
 				deck.preload = 'auto';
+				deck.crossOrigin = 'anonymous';
 				deck.muted = false;
-				deck.volume = deckIdx === 0 ? 1 : 0;
+				const userVol = Math.max(0.001, Math.min(1, (playback.volume ?? 100) / 100));
+				deck.volume = deckIdx === 0 ? userVol : 0;
 
 				deck.addEventListener('play', () => {
 					if (deckIdx === this.activeDeckIndex) {
@@ -172,22 +164,23 @@ class WebPlayer {
 			}
 
 			this.setupMediaSession();
-			this.setupWebAudioGraph();
 		}
 	}
 
 	private setDeckGain(deckIdx: 0 | 1, normalizedGain: number) {
 		const clamped = Math.max(0, Math.min(1, normalizedGain));
+		const userVol = Math.max(0.001, Math.min(1, (playback.volume ?? 100) / 100));
 		const deck = this.decks[deckIdx];
 		if (deck) {
 			try {
-				deck.volume = clamped;
+				deck.muted = false;
+				deck.volume = clamped * userVol;
 			} catch {}
 		}
 		const gainNode = this.deckGains[deckIdx];
 		if (gainNode && this.audioCtx) {
 			try {
-				gainNode.gain.setValueAtTime(clamped, this.audioCtx.currentTime);
+				gainNode.gain.setValueAtTime(clamped * userVol, this.audioCtx.currentTime);
 			} catch {}
 		}
 	}
@@ -639,7 +632,7 @@ class WebPlayer {
 			const host = document.createElement('div');
 			host.id = 'echo-yt-player-host';
 			host.style.cssText =
-				'position:fixed;bottom:0;right:0;width:200px;height:200px;opacity:0.01;pointer-events:none;z-index:-9999;';
+				'position:fixed;bottom:10px;right:10px;width:200px;height:120px;opacity:0.001;pointer-events:none;z-index:1;overflow:hidden;';
 			container = document.createElement('div');
 			container.id = 'echo-yt-iframe-player';
 			host.appendChild(container);
@@ -1025,6 +1018,7 @@ class WebPlayer {
 		const activeIdx = this.activeDeckIndex;
 		const standbyIdx = (1 - this.activeDeckIndex) as 0 | 1;
 		const active = this.decks[activeIdx];
+		const userVol = Math.max(0.001, Math.min(1, (playback.volume ?? 100) / 100));
 
 		this.setDeckGain(standbyIdx, 0);
 		this.setDeckGain(activeIdx, 1.0);
@@ -1034,7 +1028,9 @@ class WebPlayer {
 				active.pause();
 				active.currentTime = 0;
 			} catch {}
+			active.crossOrigin = 'anonymous';
 			active.muted = false;
+			active.volume = userVol;
 			active.src = url;
 			active.load();
 			const playPromise = active.play();
@@ -1055,6 +1051,8 @@ class WebPlayer {
 						if (e.name === 'NotAllowedError') {
 							const resumeOnClick = () => {
 								if (active && active.paused && active.src) {
+									active.muted = false;
+									active.volume = userVol;
 									active.play().catch(() => {});
 								}
 								window.removeEventListener('pointerdown', resumeOnClick);
@@ -1221,12 +1219,16 @@ class WebPlayer {
 	}
 
 	togglePause() {
+		if (this.audioCtx && this.audioCtx.state === 'suspended') {
+			this.audioCtx.resume().catch(() => {});
+		}
+		const userVol = Math.max(0.001, Math.min(1, (playback.volume ?? 100) / 100));
 		if (this.usingDirectAudio || this.isRadioStream) {
 			const active = this.activeAudio;
 			if (!active) return;
 			if (active.paused) {
 				active.muted = false;
-				active.volume = Math.max(0.01, Math.min(1, (playback.volume ?? 100) / 100));
+				active.volume = userVol;
 				active.play().catch(console.warn);
 			} else {
 				active.pause();
@@ -1267,10 +1269,17 @@ class WebPlayer {
 				this.masterGain.gain.setValueAtTime(normVol, this.audioCtx.currentTime);
 			} catch {}
 		}
-		const active = this.activeAudio;
-		if (active && !this.isCrossfading) {
-			active.muted = false;
-			active.volume = normVol;
+		if (this.decks[0]) {
+			this.decks[0].muted = false;
+			if (this.activeDeckIndex === 0 && !this.isCrossfading) {
+				this.decks[0].volume = normVol;
+			}
+		}
+		if (this.decks[1]) {
+			this.decks[1].muted = false;
+			if (this.activeDeckIndex === 1 && !this.isCrossfading) {
+				this.decks[1].volume = normVol;
+			}
 		}
 		if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.setVolume === 'function') {
 			try {
