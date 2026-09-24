@@ -125,7 +125,18 @@ export const EQ_PRESETS: Record<EqPreset, { name: string; bass: number; mid: num
 	flat: { name: 'Flat / Studio Direct', bass: 0, mid: 0, treble: 0, desc: 'Pure uncolored audio reproduction' }
 };
 
-export type VisualizerPreset = 'mesh_grid' | 'cosmic_galaxy' | 'radial_ring' | 'neon_bars' | 'aurora_wave' | 'quantum_sphere';
+export type VisualizerPreset =
+	| 'silk_waves'
+	| 'minimal_bars'
+	| 'radial_halo'
+	| 'laser_scope'
+	| 'cosmic_aura'
+	| 'mesh_grid'
+	| 'cosmic_galaxy'
+	| 'radial_ring'
+	| 'neon_bars'
+	| 'aurora_wave'
+	| 'quantum_sphere';
 export type VisualizerColorTheme = 'cyberpunk' | 'sunset' | 'emerald' | 'violet' | 'rainbow' | 'artwork';
 
 export const audioFx = $state({
@@ -137,9 +148,9 @@ export const audioFx = $state({
 	audioQuality: (browser ? localStorage.getItem('aura_audio_quality') || '320k' : '320k') as '320k' | '160k' | '128k' | '64k',
 	visualizerEnabled: true,
 	visualizerModalOpen: false,
-	visualizerPreset: (browser ? (localStorage.getItem('aura_visualizer_preset') as VisualizerPreset) || 'mesh_grid' : 'mesh_grid') as VisualizerPreset,
+	visualizerPreset: (browser ? (localStorage.getItem('aura_visualizer_preset') as VisualizerPreset) || 'silk_waves' : 'silk_waves') as VisualizerPreset,
 	visualizerTheme: (browser ? (localStorage.getItem('aura_visualizer_theme') as VisualizerColorTheme) || 'cyberpunk' : 'cyberpunk') as VisualizerColorTheme,
-	visualizerSensitivity: 1.2,
+	visualizerSensitivity: 1.1,
 	visualizerGlow: true,
 	playbackMode: (browser ? (localStorage.getItem('aura_playback_mode') as PlaybackMode) || 'crossfade' : 'crossfade') as PlaybackMode,
 	crossfadeDuration: (browser ? Number(localStorage.getItem('aura_crossfade_duration')) || 5 : 5)

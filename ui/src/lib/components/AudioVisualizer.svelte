@@ -10,7 +10,6 @@
 	let lastTime = 0;
 
 	function tick(now: number) {
-		// Throttle visualizer to ~30 FPS to keep CPU usage at 0%
 		if (now - lastTime > 32) {
 			lastTime = now;
 			if (containerEl && !playback.paused && playback.now && audioFx.visualizerEnabled) {
@@ -20,11 +19,11 @@
 				const children = containerEl.children;
 				for (let i = 0; i < count && i < children.length; i++) {
 					const val = data[i * step] || 0;
-					const pct = Math.max(15, Math.min(100, Math.floor((val / 255) * 100)));
+					const pct = Math.max(18, Math.min(100, Math.floor((val / 255) * 100)));
 					const bar = children[i] as HTMLElement;
 					if (bar) {
 						bar.style.height = `${pct}%`;
-						bar.style.opacity = `${0.4 + (pct / 100) * 0.6}`;
+						bar.style.opacity = `${0.5 + (pct / 100) * 0.5}`;
 					}
 				}
 			} else if (containerEl) {
@@ -32,7 +31,7 @@
 				for (let i = 0; i < children.length; i++) {
 					const bar = children[i] as HTMLElement;
 					if (bar) {
-						bar.style.height = '15%';
+						bar.style.height = '18%';
 						bar.style.opacity = '0.4';
 					}
 				}
@@ -53,8 +52,8 @@
 <div bind:this={containerEl} class="flex items-end gap-[2px] {className}" style="height: {height}px;" aria-hidden="true">
 	{#each Array(barsCount || 6) as _, i (i)}
 		<div
-			class="w-[3px] rounded-full bg-primary transition-all duration-100 ease-out"
-			style="height: 15%; opacity: 0.4;"
+			class="w-[2.5px] rounded-full bg-gradient-to-t from-pink-500 to-cyan-400 transition-all duration-100 ease-out"
+			style="height: 18%; opacity: 0.4;"
 		></div>
 	{/each}
 </div>

@@ -20,6 +20,7 @@
 	import * as api from '$lib/api';
 	import { webPlayer } from '$lib/webplayer';
 	import { playback, audioFx, toast } from '$lib/player.svelte';
+	import MinimalAudioSpectrum from './MinimalAudioSpectrum.svelte';
 
 	// Active tab switch
 	let activeTab = $state<'vibe' | 'charts' | 'visualizer'>('vibe');
@@ -447,25 +448,12 @@
 				</span>
 			</div>
 
-			<!-- Dynamic 26-Bar Equalizer Wave Spectrum -->
-			<div class="relative overflow-hidden rounded-2xl border border-pink-500/30 bg-gradient-to-b from-purple-950/40 via-black/70 to-black/80 p-4 backdrop-blur-2xl shadow-xl">
-				<div class="h-28 flex items-end justify-between gap-[3px] py-1">
-					{#each Array(26) as _, i}
-						{@const isPlaying = !playback.paused && !!playback.now}
-						{@const heightPercent = isPlaying
-							? Math.max(12, Math.sin(i * 0.45 + (i % 3)) * 45 + Math.cos(i * 0.8) * 35 + 45)
-							: Math.max(10, Math.sin(i * 0.3) * 20 + 25)}
-						<div
-							class="flex-1 rounded-full transition-all duration-100 {isPlaying
-								? 'bg-gradient-to-t from-pink-600 via-rose-500 to-cyan-400 shadow-[0_0_10px_rgba(255,42,122,0.8)]'
-								: 'bg-white/20'}"
-							style="height: {heightPercent}%; {isPlaying ? `animation: pulse ${(0.6 + (i % 6) * 0.15).toFixed(2)}s ease-in-out infinite alternate;` : ''}"
-						></div>
-					{/each}
-				</div>
+			<!-- Minimalist 60FPS Real-Time FFT Audio Spectrum -->
+			<div class="relative overflow-hidden rounded-2xl border border-pink-500/20 bg-gradient-to-b from-purple-950/30 via-black/60 to-black/80 p-3.5 backdrop-blur-2xl shadow-xl">
+				<MinimalAudioSpectrum height={115} barsCount={26} />
 
 				<!-- Frequency Band Scale Labels -->
-				<div class="flex justify-between text-[9px] font-mono text-muted-foreground/70 mt-2 border-t border-white/10 pt-1.5">
+				<div class="flex justify-between text-[9px] font-mono text-muted-foreground/70 mt-1.5 border-t border-white/10 pt-1.5 px-1">
 					<span>32Hz</span>
 					<span>250Hz</span>
 					<span>1kHz</span>
