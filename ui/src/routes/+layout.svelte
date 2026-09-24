@@ -53,6 +53,7 @@
 	import KeyboardShortcuts from '$lib/components/KeyboardShortcuts.svelte';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import LegalDialog from '$lib/components/LegalDialog.svelte';
+	import GlassFilter from '$lib/components/ui/GlassFilter.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
 	import { win, initWin } from '$lib/win.svelte';
@@ -269,6 +270,7 @@
 	<LinkDialog />
 	<CookieConsent />
 	<LegalDialog />
+	<GlassFilter />
 
 	<!-- The two notification banners below run at z-[100]. Dialogs and menus sit at z-50 and portal to
 	     <body>, so a z-50 banner loses the tie on DOM order and hides behind an open modal. -->

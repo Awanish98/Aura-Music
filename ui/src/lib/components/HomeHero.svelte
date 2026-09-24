@@ -75,19 +75,19 @@
 		</div>
 	</div>
 
-	<!-- Horizontal Mood Filter Chips -->
-	<div class="relative z-10 mt-6 flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1">
+	<!-- Horizontal Mood Filter Chips with Liquid Glass Effect -->
+	<div class="relative z-10 mt-6 flex gap-2.5 overflow-x-auto no-scrollbar pb-1 pt-1">
 		{#each moodChips as chip}
 			{@const active = (activeMood === null && chip.id === null) || activeMood === chip.id}
 			<button
 				type="button"
 				onclick={() => handleMoodClick(chip)}
-				class="shrink-0 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer {active
-					? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30 border border-pink-400/50 scale-[1.02]'
-					: 'border border-white/10 bg-white/6 text-muted-foreground hover:bg-white/12 hover:text-foreground hover:border-white/20 active:scale-95'}"
+				class="shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-200 cursor-pointer apple-spring-tap {active
+					? 'bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white shadow-xl shadow-pink-500/40 border border-pink-400/60 scale-[1.03] drop-shadow-[0_0_8px_rgba(255,42,122,0.5)]'
+					: 'liquid-glass-fx text-white/80 hover:text-white hover:border-white/30 apple-spring-hover active:scale-95'}"
 			>
-				<span>{chip.icon}</span>
-				<span>{chip.label}</span>
+				<span class="text-sm">{chip.icon}</span>
+				<span class="font-medium tracking-wide">{chip.label}</span>
 			</button>
 		{/each}
 	</div>

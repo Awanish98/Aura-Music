@@ -28,6 +28,7 @@
 	import DiscordIcon from './DiscordIcon.svelte';
 	import AccountMenu from './AccountMenu.svelte';
 	import CyberTimeHud from './CyberTimeHud.svelte';
+	import LiquidButton from '$lib/components/ui/LiquidButton.svelte';
 	import * as api from '$lib/api';
 	import { auth, playback, prefs, refreshView, toast, ui } from '$lib/player.svelte';
 	import { win } from '$lib/win.svelte';
@@ -185,7 +186,7 @@
 		<!-- Search Button (Mobile Only) -->
 		<a
 			href="/search"
-			class="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/80 transition-all hover:bg-white/10 hover:text-primary active:scale-95 shadow-sm"
+			class="md:hidden flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm"
 			title="Search Music"
 			aria-label="Search Music"
 		>
@@ -194,7 +195,7 @@
 
 		<!-- Notification Bell with Glowing Alert Dot -->
 		<button
-			class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/80 transition-all hover:bg-white/10 hover:text-primary active:scale-95 shadow-sm"
+			class="relative flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm"
 			title="Notifications"
 			aria-label="Notifications"
 			onclick={() => toast('No new notifications')}
@@ -205,7 +206,7 @@
 
 		<!-- Dark / Light Theme Toggle -->
 		<button
-			class="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/80 transition-all hover:bg-white/10 hover:text-primary active:scale-95 shadow-sm"
+			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm"
 			onclick={toggleMode}
 			title={t('a11y.toggle_theme')}
 			aria-label={t('a11y.toggle_theme')}
@@ -214,16 +215,18 @@
 			<HugeiconsIcon icon={Moon02Icon} size={17} class="hidden dark:block" />
 		</button>
 
-		<!-- Song Identifier / Shazam Audio Quick Button -->
-		<button
-			class="hidden sm:flex h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 text-xs font-semibold text-primary transition-all hover:bg-primary/20 active:scale-95 shadow-sm"
+		<!-- Song Identifier / Shazam Audio Liquid Button -->
+		<LiquidButton
+			variant="primary"
+			size="sm"
+			class="hidden sm:inline-flex"
 			onclick={() => (ui.shazamOpen = true)}
 			title="Identify Playing Song (Shazam)"
 			aria-label="Identify Playing Song"
 		>
-			<HugeiconsIcon icon={SparklesIcon} size={14} class="animate-pulse" />
-			<span class="hidden lg:inline">Shazam</span>
-		</button>
+			<HugeiconsIcon icon={SparklesIcon} size={14} class="animate-pulse text-primary" />
+			<span class="hidden lg:inline text-xs font-bold">Shazam</span>
+		</LiquidButton>
 
 		<!-- User Account Profile Avatar -->
 		<div class="relative">
@@ -232,7 +235,7 @@
 
 		<!-- Quick Tools Dropdown Button -->
 		<button
-			class="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-muted-foreground transition-colors hover:text-foreground apple-spring-hover apple-spring-tap"
 			onclick={openToolsMenu}
 			title="Integrations & Tools"
 			aria-label="Integrations & Tools"
