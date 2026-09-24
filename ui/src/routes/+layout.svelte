@@ -56,6 +56,7 @@
 	import LegalDialog from '$lib/components/LegalDialog.svelte';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import GlassFilter from '$lib/components/ui/GlassFilter.svelte';
+	import AuraAmbientBackground from '$lib/components/AuraAmbientBackground.svelte';
 	import CosmicBackgroundAnimation from '$lib/components/CosmicBackgroundAnimation.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
@@ -195,10 +196,10 @@
 			? ''
 			: 'rounded-[12px]'}"
 	>
-		<!-- 21st.dev & Apple-style Atmospheric Ambient Cosmic Aurora Animation & Starfield -->
+		<!-- Premium Centralized Aura Ambient Animated Gradient System -->
+		<AuraAmbientBackground variant="auto" intensity="medium" reactiveToArtwork={true} interactive={true} />
+		<!-- Atmospheric Starfield & Interactive Constellation Laser Network -->
 		<CosmicBackgroundAnimation />
-		<div class="aurora-flow-bg"></div>
-		<div class="apple-ambient-mesh pointer-events-none absolute inset-0 -z-10 opacity-30 dark:opacity-50 transition-opacity duration-1000"></div>
 
 		<ResizeBorders />
 		<Titlebar />
@@ -207,7 +208,7 @@
 			<Sidebar />
 			<!-- dragScroll: dragging a card up to home's Shortcuts grid has to be possible from anywhere in
 			     the feed, so aiming at the top edge scrolls this container while the drag is in flight. -->
-			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-36" {@attach dragScroll}>
+			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+8.5rem)] md:pb-28" {@attach dragScroll}>
 				<!-- Remount the current page on sign-in/out so it refetches with the new account, and on
 				     a refresh (titlebar button / F5), which drops the browse cache first. -->
 				{#key `${auth.epoch}:${ui.epoch}`}

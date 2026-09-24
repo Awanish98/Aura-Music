@@ -16,7 +16,8 @@
 		VolumeHighIcon,
 		VolumeMute02Icon,
 		SparklesIcon,
-		AudioWave01Icon
+		AudioWave01Icon,
+		ArrowDown01Icon
 	} from '@hugeicons/core-free-icons';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as api from '$lib/api';
@@ -266,24 +267,32 @@
 						</button>
 					</div>
 
-					{#if canVideo()}
-						<!-- Both directions, or there is no way back to the video. On a plate, since it sits
-						     over whatever frame happens to be showing. -->
+					<div class="absolute right-3 top-3 z-10 flex items-center gap-1.5">
+						{#if canVideo()}
+							<button
+								type="button"
+								onclick={() => (video.want = !video.want)}
+								aria-label={showVideo() ? t('a11y.show_artwork') : t('a11y.show_video')}
+								class="cursor-pointer rounded-full bg-black/60 p-2 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10"
+							>
+								<HugeiconsIcon
+									icon={Video01Icon}
+									altIcon={VideoOffIcon}
+									showAlt={showVideo()}
+									class="h-4 w-4"
+								/>
+							</button>
+						{/if}
 						<button
 							type="button"
-							onclick={() => (video.want = !video.want)}
-							aria-label={showVideo() ? t('a11y.show_artwork') : t('a11y.show_video')}
-							class="absolute right-3 top-3 z-10 cursor-pointer rounded-md bg-black/40 p-1.5 text-white/70 transition-colors hover:text-white"
+							onclick={() => (np.open = false)}
+							aria-label="Collapse Player"
+							class="cursor-pointer rounded-full bg-black/60 p-2 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10 hover:scale-105"
+							title="Minimize Now Playing"
 						>
-							<!-- icon swap via altIcon/showAlt: `icon` is frozen at mount -->
-							<HugeiconsIcon
-								icon={Video01Icon}
-								altIcon={VideoOffIcon}
-								showAlt={showVideo()}
-								class="h-4 w-4"
-							/>
+							<HugeiconsIcon icon={ArrowDown01Icon} class="h-4 w-4" />
 						</button>
-					{/if}
+					</div>
 				</div>
 			</div>
 		{/if}
