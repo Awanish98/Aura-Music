@@ -493,7 +493,7 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 	let saavnSongs: BrowseItem[] = [];
 	try {
 		const { searchSaavnDirect } = await import('./saavn');
-		const rawSaavn = await searchSaavnDirect(query);
+		const rawSaavn = await searchSaavnDirect(query, 1, 30);
 		saavnSongs = rawSaavn.map((s) => ({
 			kind: 'song',
 			id: s.video_id,
@@ -511,13 +511,33 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 	}
 
 	const songs: BrowseItem[] = [...saavnSongs];
+	const versions: BrowseItem[] = [];
 	const albums: BrowseItem[] = [];
 	const artists: BrowseItem[] = [];
 	const playlists: BrowseItem[] = [];
 	const top: BrowseItem[] = [];
 
+	const VERSION_KEYWORDS = [
+		'remix', 'acoustic', 'unplugged', 'lofi', 'lo-fi', 'slowed', 'reverb',
+		'live', 'cover', 'mashup', 'female', 'male', 'duet', 'reprise',
+		'instrumental', 'orchestral', '8d', 'club mix', 'edm', 'karaoke'
+	];
+
+	const isVersionTrack = (title: string, subtitle?: string) => {
+		const str = `${title} ${subtitle || ''}`.toLowerCase();
+		return VERSION_KEYWORDS.some((kw) => str.includes(kw));
+	};
+
 	try {
-		const data = await post('search', { query });
+		// Parallel fetch: Standard search + Songs Filtered search (Eg-KAQwIABAAGAEgACgAMABqChAEEAMQCRAFEAo%3D)
+		const [data, songsData] = await Promise.all([
+			post('search', { query }),
+			post('search', {
+				query,
+				params: 'Eg-KAQwIABAAGAEgACgAMABqChAEEAMQCRAFEAo%3D'
+			}).catch(() => null)
+		]);
+
 		const tab = data.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
 		const secList = tab?.content?.sectionListRenderer?.contents || [];
 
@@ -525,64 +545,63 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 			const item = c.musicResponsiveListItemRenderer;
 			if (!item) return;
 
-		const song = parseListItem(c);
-		const flexCols = item.flexColumns || [];
-		const nav =
-			flexCols[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]
-				?.navigationEndpoint;
-		const bid = nav?.browseEndpoint?.browseId;
+			const song = parseListItem(c);
+			const flexCols = item.flexColumns || [];
+			const nav =
+				flexCols[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]
+					?.navigationEndpoint;
+			const bid = nav?.browseEndpoint?.browseId;
 
-		if (bid) {
-			const title = getText(flexCols[0]?.musicResponsiveListItemFlexColumnRenderer?.text) || '';
-			const subtitle =
-				getText(flexCols[1]?.musicResponsiveListItemFlexColumnRenderer?.text) || '';
-			const thumbnail = getThumb(item.thumbnail?.musicThumbnailRenderer?.thumbnail);
+			if (bid) {
+				const title = getText(flexCols[0]?.musicResponsiveListItemFlexColumnRenderer?.text) || '';
+				const subtitle =
+					getText(flexCols[1]?.musicResponsiveListItemFlexColumnRenderer?.text) || '';
+				const thumbnail = getThumb(item.thumbnail?.musicThumbnailRenderer?.thumbnail);
 
-			if (bid.startsWith('UC')) {
-				if (!artists.some((a) => a.id === bid)) {
-					artists.push({
-						kind: 'artist',
-						id: bid,
-						title,
-						subtitle,
-						thumbnail,
-						artistRuns: [],
-						isUpload: false,
-						explicit: false
-					});
-				}
-			} else if (bid.startsWith('MPRE') || bid.startsWith('FEmusic_album')) {
-				if (!albums.some((a) => a.id === bid)) {
-					albums.push({
-						kind: 'album',
-						id: bid,
-						title,
-						subtitle,
-						thumbnail,
-						artistRuns: [],
-						isUpload: false,
-						explicit: false
-					});
-				}
-			} else {
-				if (!playlists.some((p) => p.id === bid)) {
-					playlists.push({
-						kind: 'playlist',
-						id: bid,
-						title,
-						subtitle,
-						thumbnail,
-						artistRuns: [],
-						isUpload: false,
-						explicit: false
-					});
+				if (bid.startsWith('UC')) {
+					if (!artists.some((a) => a.id === bid)) {
+						artists.push({
+							kind: 'artist',
+							id: bid,
+							title,
+							subtitle,
+							thumbnail,
+							artistRuns: [],
+							isUpload: false,
+							explicit: false
+						});
+					}
+				} else if (bid.startsWith('MPRE') || bid.startsWith('FEmusic_album')) {
+					if (!albums.some((a) => a.id === bid)) {
+						albums.push({
+							kind: 'album',
+							id: bid,
+							title,
+							subtitle,
+							thumbnail,
+							artistRuns: [],
+							isUpload: false,
+							explicit: false
+						});
+					}
+				} else {
+					if (!playlists.some((p) => p.id === bid)) {
+						playlists.push({
+							kind: 'playlist',
+							id: bid,
+							title,
+							subtitle,
+							thumbnail,
+							artistRuns: [],
+							isUpload: false,
+							explicit: false
+						});
+					}
 				}
 			}
-		}
 
-		if (song && song.video_id) {
-			if (!songs.some((s) => s.id === song.video_id)) {
-				songs.push({
+			if (song && song.video_id) {
+				const songItem: BrowseItem = {
 					kind: 'song',
 					id: song.video_id,
 					title: song.title,
@@ -592,75 +611,107 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 					artistRuns: song.artist_runs,
 					isUpload: false,
 					explicit: false
-				});
+				};
+
+				if (isVersionTrack(song.title, song.artists)) {
+					if (!versions.some((v) => v.id === song.video_id)) {
+						versions.push(songItem);
+					}
+				}
+
+				if (!songs.some((s) => s.id === song.video_id)) {
+					songs.push(songItem);
+				}
+			}
+		};
+
+		for (const sec of secList) {
+			// 1. Top result card shelf
+			const card = sec.musicCardShelfRenderer;
+			if (card) {
+				const title = getText(card.title);
+				const subtitle = getText(card.subtitle);
+				const thumbnail = getThumb(card.thumbnail?.musicThumbnailRenderer?.thumbnail);
+				const nav = card.title?.runs?.[0]?.navigationEndpoint;
+				const browseId = nav?.browseEndpoint?.browseId;
+				const videoId = nav?.watchEndpoint?.videoId;
+
+				let kind: 'song' | 'playlist' | 'album' | 'artist' = 'song';
+				let id = videoId || browseId || '';
+
+				if (browseId) {
+					if (browseId.startsWith('UC')) kind = 'artist';
+					else if (browseId.startsWith('MPRE') || browseId.startsWith('FEmusic_album')) kind = 'album';
+					else kind = 'playlist';
+				}
+
+				if (title) {
+					top.push({
+						kind,
+						id,
+						title,
+						subtitle,
+						thumbnail,
+						artistRuns: [],
+						isUpload: false,
+						explicit: false
+					});
+				}
+
+				for (const c of card.contents || []) {
+					processItem(c);
+				}
+			}
+
+			// 2. Standard Music Shelf
+			const shelf = sec.musicShelfRenderer;
+			if (shelf) {
+				for (const c of shelf.contents || []) {
+					processItem(c);
+				}
+			}
+
+			// 3. Item Section Renderer (Modern Search Format)
+			const isr = sec.itemSectionRenderer;
+			if (isr) {
+				for (const c of isr.contents || []) {
+					processItem(c);
+				}
 			}
 		}
-	};
 
-	for (const sec of secList) {
-		// 1. Top result card shelf
-		const card = sec.musicCardShelfRenderer;
-		if (card) {
-			const title = getText(card.title);
-			const subtitle = getText(card.subtitle);
-			const thumbnail = getThumb(card.thumbnail?.musicThumbnailRenderer?.thumbnail);
-			const nav = card.title?.runs?.[0]?.navigationEndpoint;
-			const browseId = nav?.browseEndpoint?.browseId;
-			const videoId = nav?.watchEndpoint?.videoId;
-
-			let kind: 'song' | 'playlist' | 'album' | 'artist' = 'song';
-			let id = videoId || browseId || '';
-
-			if (browseId) {
-				if (browseId.startsWith('UC')) kind = 'artist';
-				else if (browseId.startsWith('MPRE') || browseId.startsWith('FEmusic_album')) kind = 'album';
-				else kind = 'playlist';
-			}
-
-			if (title) {
-				top.push({
-					kind,
-					id,
-					title,
-					subtitle,
-					thumbnail,
-					artistRuns: [],
-					isUpload: false,
-					explicit: false
-				});
-			}
-
-			for (const c of card.contents || []) {
-				processItem(c);
+		// Process filtered songs list if available
+		if (songsData) {
+			const sTab = songsData.contents?.tabbedSearchResultsRenderer?.tabs?.[0]?.tabRenderer;
+			const sSecList = sTab?.content?.sectionListRenderer?.contents || [];
+			for (const sec of sSecList) {
+				const shelf = sec.musicShelfRenderer || sec.itemSectionRenderer;
+				if (shelf) {
+					for (const c of shelf.contents || []) {
+						processItem(c);
+					}
+				}
 			}
 		}
+	} catch (e) {
+		console.warn('[YouTube Search error - falling back to Saavn]', e);
+	}
 
-		// 2. Standard Music Shelf
-		const shelf = sec.musicShelfRenderer;
-		if (shelf) {
-			for (const c of shelf.contents || []) {
-				processItem(c);
-			}
-		}
-
-		// 3. Item Section Renderer (Modern Search Format)
-		const isr = sec.itemSectionRenderer;
-		if (isr) {
-			for (const c of isr.contents || []) {
-				processItem(c);
+	// Categorize any Saavn songs that are versions
+	for (const s of saavnSongs) {
+		if (isVersionTrack(s.title, s.subtitle)) {
+			if (!versions.some((v) => v.id === s.id)) {
+				versions.push(s);
 			}
 		}
 	}
-} catch (e) {
-	console.warn('[YouTube Search error - falling back to Saavn]', e);
-}
 
 	// If top result is empty, use the first song or artist
 	if (!top.length && songs.length) {
 		top.push(songs[0]);
 	}
 
-	return { top, songs, albums, artists, playlists };
+	return { top, songs, versions, albums, artists, playlists };
 }
 
 export async function fetchSearchAll(query: string): Promise<SearchResults> {

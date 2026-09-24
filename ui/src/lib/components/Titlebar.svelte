@@ -185,6 +185,17 @@
 			<span class="hidden sm:inline">AI DJ</span>
 		</button>
 
+		<!-- Aura Shazam Song Identifier Button -->
+		<button
+			class="flex h-7 items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 text-xs font-semibold text-blue-400 transition-all hover:bg-blue-500/20 active:scale-95 shadow-sm"
+			onclick={() => (ui.shazamOpen = true)}
+			title="Identify Playing Song or Humming (Shazam)"
+			aria-label="Identify Song (Shazam)"
+		>
+			<HugeiconsIcon icon={SparklesIcon} size={14} class="text-blue-400" />
+			<span class="hidden md:inline">Shazam</span>
+		</button>
+
 		<!-- Account Menu -->
 		<AccountMenu />
 

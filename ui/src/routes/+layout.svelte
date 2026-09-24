@@ -36,6 +36,7 @@
 	import AddToPlaylist from '$lib/components/AddToPlaylist.svelte';
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import AiDjDialog from '$lib/components/AiDjDialog.svelte';
+	import SongIdentifierModal from '$lib/components/SongIdentifierModal.svelte';
 	import ShareDialog from '$lib/components/ShareDialog.svelte';
 	import ChannelPicker from '$lib/components/ChannelPicker.svelte';
 	import ListenTogether from '$lib/components/ListenTogether.svelte';
@@ -251,6 +252,7 @@
 	<ShareDialog />
 	<SettingsDialog />
 	<AiDjDialog bind:open={ui.aiDjOpen} />
+	<SongIdentifierModal />
 	<ChannelPicker />
 	<ListenTogether />
 	<LinkDialog />

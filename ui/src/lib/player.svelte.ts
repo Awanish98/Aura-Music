@@ -1149,6 +1149,7 @@ export const ui = $state({
 	toast: null as Toast | null,
 	settingsOpen: false, // the settings modal
 	aiDjOpen: false, // Aura AI Smart DJ Dialog
+	shazamOpen: false, // Aura Shazam / Song Identifier
 	ltOpen: false, // the Listen Together modal
 	linkOpen: false, // the "open a pasted link" modal
 	paletteOpen: false, // the Ctrl+K search palette

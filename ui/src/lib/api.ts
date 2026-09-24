@@ -1143,6 +1143,7 @@ export interface ArtistCarousel {
 export interface SearchResults {
 	top: BrowseItem[];
 	songs: BrowseItem[];
+	versions?: BrowseItem[];
 	albums: BrowseItem[];
 	artists: BrowseItem[];
 	playlists: BrowseItem[];

@@ -183,6 +183,22 @@
 			<span class="hidden {wide('lg:inline')} font-semibold">Aura AI DJ</span>
 		</button>
 
+		<!-- Aura Shazam Song Identifier Link -->
+		<button
+			onclick={() => (ui.shazamOpen = true)}
+			title="Identify Playing Song or Humming (Shazam)"
+			aria-label="Identify Playing Song or Humming (Shazam)"
+			class="group flex items-center justify-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 transition-colors {wide(
+				'lg:justify-start'
+			)}"
+		>
+			<HugeiconsIcon
+				icon={SparklesIcon}
+				class="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110 text-blue-400"
+			/>
+			<span class="hidden {wide('lg:inline')} font-semibold">Aura Shazam</span>
+		</button>
+
 		<button
 			onclick={() => (ui.settingsOpen = true)}
 			title={t('nav.settings')}
