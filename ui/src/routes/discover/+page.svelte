@@ -144,7 +144,7 @@
 		</div>
 
 		<!-- Category Tabs -->
-		<div class="flex flex-wrap items-center gap-2">
+		<div class="flex overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap items-center gap-2 pb-1">
 			{#each categories as cat}
 				<button
 					type="button"
@@ -152,7 +152,7 @@
 						activeCategory = cat.id as any;
 						selectedTag = null;
 					}}
-					class="flex items-center gap-2 rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer {activeCategory ===
+					class="shrink-0 flex items-center gap-2 rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer {activeCategory ===
 					cat.id
 						? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30 scale-[1.02]'
 						: 'border border-white/10 bg-white/6 text-muted-foreground hover:bg-white/12 hover:text-white'}"
@@ -164,8 +164,8 @@
 		</div>
 
 		<!-- Tags Filter Chips -->
-		<div class="flex flex-wrap items-center gap-1.5 pt-1">
-			<span class="text-xs font-bold uppercase tracking-wider text-muted-foreground/70 mr-1">
+		<div class="flex overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap items-center gap-1.5 pt-1 pb-1">
+			<span class="shrink-0 text-xs font-bold uppercase tracking-wider text-muted-foreground/70 mr-1">
 				Filter tags:
 			</span>
 			{#each allTags.slice(0, 16) as tag}

@@ -233,7 +233,7 @@
 
 	<!-- The tabs always render: Local music needs neither an account nor a connection. -->
 	<Tabs.Root bind:value={tab}>
-		<Tabs.List class="mb-6 flex flex-wrap gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/8 backdrop-blur-xl">
+		<Tabs.List class="mb-6 flex overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/8 backdrop-blur-xl">
 			<Tabs.Trigger value="all" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
 				<HugeiconsIcon icon={SquareStackIcon} class="h-4 w-4 mr-1.5" /> {t('common.all')}
 			</Tabs.Trigger>

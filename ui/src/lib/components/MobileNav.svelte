@@ -26,7 +26,7 @@
 </script>
 
 <nav
-	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-card/85 dark:bg-[#07090e]/95 backdrop-blur-3xl border-t border-border/40 text-foreground px-3 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] select-none md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.8)] transition-colors duration-300"
+	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-[#04060f]/90 dark:bg-[#04060f]/90 backdrop-blur-3xl border-t border-white/[0.08] text-foreground px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom,0px),6px)] select-none md:hidden shadow-[0_-10px_35px_rgba(0,0,0,0.85)] touch-manipulation"
 	aria-label="Mobile Navigation"
 >
 	{#each navItems as item}
@@ -35,29 +35,30 @@
 			<button
 				onclick={item.action}
 				aria-label="Aura AI DJ"
-				class="relative -top-3 flex flex-col items-center justify-center transition-transform active:scale-90 cursor-pointer"
+				class="relative -top-3.5 flex flex-col items-center justify-center transition-transform active:scale-90 cursor-pointer group"
 			>
-				<div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 text-white shadow-lg shadow-pink-500/40 border-2 border-white/20">
+				<div class="relative flex size-12 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-rose-500 to-violet-600 text-white shadow-[0_4px_20px_rgba(255,10,120,0.5)] border-2 border-white/25">
+					<span class="absolute inset-0 rounded-full bg-pink-500/30 animate-ping pointer-events-none"></span>
 					<HugeiconsIcon icon={SparklesIcon} size={22} class="animate-pulse" />
 				</div>
-				<span class="text-[10px] font-bold text-pink-400 mt-0.5 tracking-tight">AI DJ</span>
+				<span class="text-[10px] font-black text-pink-400 mt-0.5 tracking-tight uppercase">AI DJ</span>
 			</button>
 		{:else}
 			{@const active = isActive(item.href)}
 			<a
 				href={item.href}
 				aria-label={item.label}
-				class="relative flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-all duration-150 select-none {active
+				class="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-1 transition-all duration-150 select-none {active
 					? 'text-primary scale-105 font-bold'
-					: 'text-muted-foreground hover:text-foreground active:scale-90'}"
+					: 'text-muted-foreground/80 hover:text-foreground active:scale-90'}"
 			>
 				{#if active}
 					<div
-						class="absolute -top-2 h-1 w-8 rounded-full bg-primary shadow-[0_0_12px_#ff2a7a] animate-pulse"
+						class="absolute -top-1.5 h-1 w-6 rounded-full bg-gradient-to-r from-pink-500 to-cyan-400 shadow-[0_0_10px_#ff0a78]"
 					></div>
 				{/if}
-				<HugeiconsIcon icon={item.icon} size={20} strokeWidth={active ? 2.4 : 1.7} />
-				<span class="text-[10px] tracking-tight {active ? 'font-bold text-primary' : 'font-medium'}">
+				<HugeiconsIcon icon={item.icon} size={21} strokeWidth={active ? 2.5 : 1.7} />
+				<span class="text-[10px] tracking-tight {active ? 'font-black text-primary' : 'font-medium'}">
 					{item.label}
 				</span>
 			</a>

@@ -465,8 +465,38 @@
 				</button>
 			</div>
 
+			<!-- Mobile Native Touch Volume Slider -->
+			<div class="mt-3.5 shrink-0 flex items-center gap-2.5 px-2">
+				<button
+					class="flex size-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground transition active:scale-90"
+					onclick={() => api.toggleMute()}
+					aria-label={playback.muted ? 'Unmute' : 'Mute'}
+				>
+					<HugeiconsIcon
+						icon={playback.muted || playback.volume === 0 ? VolumeMute02Icon : VolumeHighIcon}
+						size={16}
+						class={playback.muted ? 'text-rose-400' : ''}
+					/>
+				</button>
+				<input
+					type="range"
+					min="0"
+					max="1"
+					step="0.01"
+					value={playback.muted ? 0 : playback.volume}
+					oninput={(e) => dragVolume(parseFloat((e.currentTarget as HTMLInputElement).value))}
+					onchange={(e) => commitVolume(parseFloat((e.currentTarget as HTMLInputElement).value))}
+					class="range h-1.5 flex-1 cursor-pointer accent-primary"
+					style="--pct:{(playback.muted ? 0 : playback.volume) * 100}%"
+					aria-label="Volume"
+				/>
+				<span class="text-[10px] font-mono font-semibold tabular-nums text-muted-foreground/80 w-7 text-right">
+					{Math.round((playback.muted ? 0 : playback.volume) * 100)}%
+				</span>
+			</div>
+
 			<!-- Quick Utilities Bar (Speed, Sleep Timer, EQ & Audio FX, Share) -->
-			<div class="mt-4 shrink-0 flex items-center justify-between border-t border-white/5 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] text-xs text-muted-foreground">
+			<div class="mt-3.5 shrink-0 flex items-center justify-between border-t border-white/5 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] text-xs text-muted-foreground">
 				<!-- Sleep Timer -->
 				<button
 					class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {sleepTimer.active

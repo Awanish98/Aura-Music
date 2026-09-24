@@ -25,6 +25,37 @@
    regardless of the pointer heuristic. (This is a desktop app; hover always applies.) */
 @custom-variant hover (&:hover);
 
+/* Mobile & Touch Native Feel Optimizations */
+html, body {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	overscroll-behavior-y: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* iOS Safe-Area and Smooth Momentum Scrolling */
+.smooth-scroll-mobile {
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
+}
+
+/* Mobile Carousel Snap */
+.carousel-snap-mobile {
+	display: flex;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+}
+.carousel-snap-mobile::-webkit-scrollbar {
+	display: none;
+}
+.carousel-snap-item {
+	scroll-snap-align: start;
+	flex-shrink: 0;
+}
+
 :root {
 	/* Hue of the neutrals (greys, borders, muted surfaces, dark-mode backgrounds). Every tinted
 	   neutral below reads it, so the Themes tab can reshade the whole default palette from one
