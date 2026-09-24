@@ -81,6 +81,56 @@ export function formatSaavnSong(item: any): SongItem | null {
 	} as SongItem;
 }
 
+// Fetch single song details with decrypted 320kbps stream URL
+export async function fetchSaavnSongDetailsDirect(songId: string): Promise<SongItem | null> {
+	if (!songId) return null;
+	const cleanId = songId.replace(/^saavn_/, '');
+
+	// 1. Try local dev / backend proxy
+	try {
+		const apiUrl = getApiUrl(`/api/saavn/song?id=${encodeURIComponent(cleanId)}`);
+		const res = await fetch(apiUrl, { signal: AbortSignal.timeout(6000) });
+		if (res.ok) {
+			const data = await res.json();
+			if (data.success && data.song && data.song.streamUrl) {
+				return {
+					...data.song,
+					video_id: `saavn_${data.song.id || cleanId}`,
+					artist_runs: data.song.artist_runs || [{ text: data.song.artists }]
+				};
+			}
+		}
+	} catch {}
+
+	// 2. Direct CORS fallback
+	const directEndpoints = [
+		`https://www.jiosaavn.com/api.php?__call=song.getDetails&_format=json&_marker=0&cc=in&pids=${encodeURIComponent(cleanId)}`,
+		`https://corsproxy.io/?url=${encodeURIComponent(`https://www.jiosaavn.com/api.php?__call=song.getDetails&_format=json&_marker=0&cc=in&pids=${encodeURIComponent(cleanId)}`)}`,
+		`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.jiosaavn.com/api.php?__call=song.getDetails&_format=json&_marker=0&cc=in&pids=${encodeURIComponent(cleanId)}`)}`
+	];
+
+	for (const ep of directEndpoints) {
+		try {
+			const res = await fetch(ep, {
+				headers: { 'User-Agent': 'Mozilla/5.0' },
+				signal: AbortSignal.timeout(4000)
+			});
+			if (res.ok) {
+				const text = await res.text();
+				if (!text.includes('{')) continue;
+				const data = JSON.parse(text);
+				const rawSong = data[cleanId] || (data.songs && data.songs[0]) || Object.values(data)[0];
+				if (rawSong && typeof rawSong === 'object' && rawSong.id) {
+					const formatted = formatSaavnSong(rawSong);
+					if (formatted && formatted.streamUrl) return formatted;
+				}
+			}
+		} catch {}
+	}
+
+	return null;
+}
+
 // Multi-endpoint search proxy & direct fallback
 export async function searchSaavnDirect(query: string, page = 1, limit = 20): Promise<SongItem[]> {
 	if (!query || !query.trim()) return [];

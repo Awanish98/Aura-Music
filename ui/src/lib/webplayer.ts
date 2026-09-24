@@ -13,7 +13,7 @@ declare global {
 }
 
 export function cleanSearchQuery(title: string, artists?: string): string {
-	let clean = (title || '')
+	let cleanTitle = (title || '')
 		.replace(/\(official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\)/gi, '')
 		.replace(/\[official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\]/gi, '')
 		.replace(/\|\s*[^|]+$/g, '')
@@ -21,8 +21,15 @@ export function cleanSearchQuery(title: string, artists?: string): string {
 		.replace(/\s+/g, ' ')
 		.trim();
 
-	const firstArtist = (artists || '').split(',')[0]?.split('&')[0]?.trim() || '';
-	return `${clean} ${firstArtist}`.trim();
+	let cleanArtists = (artists || '')
+		.replace(/^(video|song|album|artist|single|ep)\s*[•·|-]\s*/gi, '')
+		.replace(/\s*[•·|-]\s*(\d+(\.\d+)?[KMB]?\s*(views|plays|subscribers)?|[\d:]+).*$/gi, '')
+		.replace(/•.*$/g, '')
+		.replace(/·.*$/g, '')
+		.trim();
+
+	const firstArtist = cleanArtists.split(/[,&/]/)[0]?.trim() || '';
+	return `${cleanTitle} ${firstArtist}`.trim();
 }
 
 class WebPlayer {
@@ -878,18 +885,32 @@ class WebPlayer {
 
 	private async retryWithAlternativeStream(item: SongItem) {
 		try {
-			const fallbackQuery = `${item.title} ${item.artists || ''}`.trim();
-			const searchRes = await fetchSearch(`${fallbackQuery} official audio`);
-			if (searchRes.songs?.length) {
-				const match = searchRes.songs.find((s) => s.id && s.id !== item.video_id) || searchRes.songs[0];
-				if (match?.id) {
-					item.video_id = match.id;
-					if (playback.now) playback.now.videoId = match.id;
-					this.loadAndPlayYt(match.id);
+			// 1. Try finding official 320kbps audio from JioSaavn
+			const query = cleanSearchQuery(item.title, item.artists);
+			if (query) {
+				const results = await searchSaavnDirect(query, 1, 10);
+				const VERSION_KWS = ['cover', 'karaoke', 'remix', 'acoustic', 'lofi', 'slowed', 'reverb', 'tribute'];
+				const officialMatch = results.find(
+					(r) => r.streamUrl && !VERSION_KWS.some((kw) => `${r.title} ${r.artists}`.toLowerCase().includes(kw))
+				) || results[0];
+
+				if (officialMatch?.streamUrl) {
+					item.streamUrl = officialMatch.streamUrl;
+					this.playAudioDirect(officialMatch.streamUrl);
 					return;
 				}
 			}
-		} catch {}
+
+			// 2. Direct fallback to YouTube player with exact video ID
+			const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
+			if (targetVideoId && targetVideoId.length === 11) {
+				item.video_id = targetVideoId;
+				if (playback.now) playback.now.videoId = targetVideoId;
+				this.loadAndPlayYt(targetVideoId);
+			}
+		} catch (e) {
+			console.warn('[Alternative stream retry error]', e);
+		}
 	}
 
 	private async getDirectAudioUrl(videoId: string): Promise<string | null> {
@@ -938,7 +959,22 @@ class WebPlayer {
 	async resolveStreamUrl(item: SongItem): Promise<string | null> {
 		if (item.streamUrl) return item.streamUrl;
 
-		// 1. Google Drive Audio file
+		// 1. If JioSaavn ID (e.g. saavn_Wa2ECpqQ): fetch direct 320kbps stream URL
+		if (item.video_id?.startsWith('saavn_')) {
+			try {
+				const { fetchSaavnSongDetailsDirect } = await import('./saavn');
+				const saavnDetails = await fetchSaavnSongDetailsDirect(item.video_id);
+				if (saavnDetails?.streamUrl) {
+					item.streamUrl = saavnDetails.streamUrl;
+					if (saavnDetails.thumbnail && !item.thumbnail) item.thumbnail = saavnDetails.thumbnail;
+					return saavnDetails.streamUrl;
+				}
+			} catch (e) {
+				console.warn('[Saavn ID stream resolution error]', e);
+			}
+		}
+
+		// 2. Google Drive Audio file
 		if (item.video_id?.startsWith('gdrive:')) {
 			const fileId = item.video_id.replace('gdrive:', '');
 			try {
@@ -958,29 +994,44 @@ class WebPlayer {
 			}
 		}
 
-		// 2. FMHY Item Lookup
+		// 3. FMHY Item Lookup
 		if (item.video_id && (item.video_id.startsWith('fmhy_') || item.video_id.startsWith('radio_'))) {
 			const { findFmhyItem } = await import('./fmhy');
 			const fmItem = findFmhyItem(item.video_id);
 			if (fmItem?.streamUrl) return fmItem.streamUrl;
 		}
 
-		// 3. JioSaavn 320kbps Lossless Direct Stream (Check for any track with title/artists)
+		// 4. JioSaavn 320kbps Lossless Direct Stream (Check for any track with title/artists)
 		if (item.title && item.duration !== 'LIVE' && !item.video_id?.startsWith('fmhy_') && !item.video_id?.startsWith('radio_')) {
 			const query = cleanSearchQuery(item.title, item.artists);
 			if (query) {
 				try {
-					let results = await searchSaavnDirect(query);
+					let results = await searchSaavnDirect(query, 1, 10);
 					if (!results.length) {
 						const titleOnly = cleanSearchQuery(item.title);
 						if (titleOnly && titleOnly !== query) {
-							results = await searchSaavnDirect(titleOnly);
+							results = await searchSaavnDirect(titleOnly, 1, 10);
 						}
 					}
-					if (results.length > 0 && results[0]?.streamUrl) {
-						item.streamUrl = results[0].streamUrl;
-						if (results[0].thumbnail && !item.thumbnail) item.thumbnail = results[0].thumbnail;
-						return results[0].streamUrl;
+
+					// Discard covers and remixes when resolving original studio tracks
+					if (results.length > 0) {
+						const VERSION_KWS = ['cover', 'karaoke', 'remix', 'acoustic', 'lofi', 'slowed', 'reverb', 'mashup', 'tribute'];
+						const isRequestingVersion = VERSION_KWS.some((kw) => `${item.title} ${item.artists || ''}`.toLowerCase().includes(kw));
+
+						let bestMatch = results[0];
+						if (!isRequestingVersion) {
+							const official = results.find(
+								(r) => r.streamUrl && !VERSION_KWS.some((kw) => `${r.title} ${r.artists}`.toLowerCase().includes(kw))
+							);
+							if (official) bestMatch = official;
+						}
+
+						if (bestMatch?.streamUrl) {
+							item.streamUrl = bestMatch.streamUrl;
+							if (bestMatch.thumbnail && !item.thumbnail) item.thumbnail = bestMatch.thumbnail;
+							return bestMatch.streamUrl;
+						}
 					}
 				} catch (e) {
 					console.warn('[JioSaavn stream resolution error]', e);
@@ -988,7 +1039,7 @@ class WebPlayer {
 			}
 		}
 
-		// 4. YouTube Music direct stream via audio extractor
+		// 5. YouTube Music direct stream via audio extractor
 		const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
 		if (targetVideoId && targetVideoId.length === 11) {
 			try {

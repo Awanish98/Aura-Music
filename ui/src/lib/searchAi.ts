@@ -237,27 +237,39 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 			if (data && data.success) {
 				gotBackendSuggestions = true;
 
-				// Add top song match for 1-click play
+				// Add top verified original song matches for 1-click play
 				if (Array.isArray(data.songs)) {
-					for (const s of data.songs.slice(0, 2)) {
-						if (s && !seenQueries.has((s.title || '').toLowerCase())) {
-							seenQueries.add((s.title || '').toLowerCase());
+					for (const s of data.songs.slice(0, 3)) {
+						const songKey = `${s.title} ${s.artists}`.toLowerCase();
+						if (s && !seenQueries.has(songKey)) {
+							seenQueries.add(songKey);
 							results.push({
 								id: `song_match_${s.id}`,
-								query: s.title,
+								query: `${s.title} ${s.artists}`,
 								title: s.title,
-								subtitle: `${s.artists || 'Song'} • Direct Match`,
+								subtitle: `${s.artists} • Original Track`,
 								type: 'song',
-								badge: 'Top Match',
-								item: s
+								badge: 'Original Song',
+								item: {
+									video_id: s.video_id || s.id,
+									id: s.id,
+									title: s.title,
+									subtitle: s.artists,
+									artists: s.artists,
+									artist_runs: [{ text: s.artists }],
+									thumbnail: s.thumbnail,
+									album: s.album,
+									duration: s.duration,
+									kind: 'song'
+								} as any
 							});
 						}
 					}
 				}
 
-				// Add top artist match
+				// Add verified artist matches
 				if (Array.isArray(data.artists)) {
-					for (const a of data.artists.slice(0, 1)) {
+					for (const a of data.artists.slice(0, 2)) {
 						if (a && !seenQueries.has((a.title || '').toLowerCase())) {
 							seenQueries.add((a.title || '').toLowerCase());
 							results.push({
@@ -273,9 +285,9 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 					}
 				}
 
-				// Add YouTube Autocomplete queries
+				// Add search suggestions
 				if (Array.isArray(data.queries)) {
-					for (const q of data.queries.slice(0, 7)) {
+					for (const q of data.queries.slice(0, 6)) {
 						if (q && !seenQueries.has(q.toLowerCase())) {
 							seenQueries.add(q.toLowerCase());
 							results.push({
@@ -294,7 +306,7 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 		// Fallback to client-side suggest
 	}
 
-	// 3. Fallback to direct client YouTube / Invidious suggest if backend wasn't reached
+	// 3. Fallback to direct client suggest if backend wasn't reached
 	if (!gotBackendSuggestions) {
 		try {
 			// Direct YouTube suggest query
@@ -338,28 +350,6 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 					}
 				}
 			} catch {}
-		}
-	}
-
-	// 4. Add smart AI variation cards (Lofi, Slowed + Reverb, Acoustic)
-	const smartVariations = [
-		{ suffix: 'Lofi Remix', badge: 'Lofi', type: 'version' as const },
-		{ suffix: 'Slowed + Reverb', badge: 'Slowed', type: 'version' as const },
-		{ suffix: 'Acoustic Cover', badge: 'Acoustic', type: 'version' as const }
-	];
-
-	for (const v of smartVariations) {
-		const expandedQuery = `${clean} ${v.suffix}`;
-		if (!seenQueries.has(expandedQuery.toLowerCase())) {
-			seenQueries.add(expandedQuery.toLowerCase());
-			results.push({
-				id: `ai_exp_${v.suffix}_${clean}`,
-				query: expandedQuery,
-				title: expandedQuery,
-				subtitle: `AI Version Suggestion`,
-				type: v.type,
-				badge: v.badge
-			});
 		}
 	}
 

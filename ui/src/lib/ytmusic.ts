@@ -507,26 +507,37 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 			streamUrl: s.streamUrl
 		} as BrowseItem));
 	} catch (e) {
-		console.warn('[Saavn search integration error]', e);
+		console.warn('[Saavn search error]', e);
 	}
-
-	const songs: BrowseItem[] = [];
-	const versions: BrowseItem[] = [];
-	const albums: BrowseItem[] = [];
-	const artists: BrowseItem[] = [];
-	const playlists: BrowseItem[] = [];
-	const top: BrowseItem[] = [];
 
 	const VERSION_KEYWORDS = [
 		'remix', 'acoustic', 'unplugged', 'lofi', 'lo-fi', 'slowed', 'reverb',
 		'live', 'cover', 'mashup', 'female', 'male', 'duet', 'reprise',
-		'instrumental', 'orchestral', '8d', 'club mix', 'edm', 'karaoke'
+		'instrumental', 'orchestral', '8d', 'club mix', 'edm', 'karaoke',
+		'tribute', 'dance mix', 'version'
 	];
 
 	const isVersionTrack = (title: string, subtitle?: string) => {
 		const str = `${title} ${subtitle || ''}`.toLowerCase();
 		return VERSION_KEYWORDS.some((kw) => str.includes(kw));
 	};
+
+	const saavnOfficial: BrowseItem[] = [];
+	const saavnVersions: BrowseItem[] = [];
+	for (const s of saavnSongs) {
+		if (isVersionTrack(s.title, s.subtitle)) {
+			saavnVersions.push(s);
+		} else {
+			saavnOfficial.push(s);
+		}
+	}
+
+	const ytSongs: BrowseItem[] = [];
+	const ytVersions: BrowseItem[] = [];
+	const albums: BrowseItem[] = [];
+	const artists: BrowseItem[] = [];
+	const playlists: BrowseItem[] = [];
+	const top: BrowseItem[] = [];
 
 	try {
 		// Parallel fetch: Standard search + Songs Filtered search (Eg-KAQwIABAAGAEgACgAMABqChAEEAMQCRAFEAo%3D)
@@ -601,26 +612,31 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 			}
 
 			if (song && song.video_id) {
+				const matchingSaavn = saavnOfficial.find(
+					(s) => s.title.toLowerCase() === song.title.toLowerCase()
+				);
+
 				const songItem: BrowseItem = {
 					kind: 'song',
-					id: song.video_id,
+					id: matchingSaavn?.id || song.video_id,
 					title: song.title,
 					subtitle: song.artists,
-					thumbnail: song.thumbnail,
-					duration: song.duration,
+					thumbnail: song.thumbnail || matchingSaavn?.thumbnail,
+					duration: song.duration || matchingSaavn?.duration,
 					artistRuns: song.artist_runs,
 					isUpload: false,
-					explicit: false
+					explicit: false,
+					streamUrl: matchingSaavn?.streamUrl
 				};
 
 				if (isVersionTrack(song.title, song.artists)) {
-					if (!versions.some((v) => v.id === song.video_id)) {
-						versions.push(songItem);
+					if (!ytVersions.some((v) => v.id === song.video_id)) {
+						ytVersions.push(songItem);
 					}
-				}
-
-				if (!songs.some((s) => s.id === song.video_id)) {
-					songs.push(songItem);
+				} else {
+					if (!ytSongs.some((s) => s.id === songItem.id || s.title.toLowerCase() === song.title.toLowerCase())) {
+						ytSongs.push(songItem);
+					}
 				}
 			}
 		};
@@ -646,16 +662,18 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 				}
 
 				if (title) {
-					top.push({
-						kind,
-						id,
-						title,
-						subtitle,
-						thumbnail,
-						artistRuns: [],
-						isUpload: false,
-						explicit: false
-					});
+					if (kind === 'artist' || kind === 'album' || kind === 'playlist') {
+						top.push({
+							kind,
+							id,
+							title,
+							subtitle,
+							thumbnail,
+							artistRuns: [],
+							isUpload: false,
+							explicit: false
+						});
+					}
 				}
 
 				for (const c of card.contents || []) {
@@ -697,30 +715,31 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 		console.warn('[YouTube Search error - falling back to Saavn]', e);
 	}
 
-	// If no YouTube songs found, use Saavn songs
-	if (songs.length === 0) {
-		songs.push(...saavnSongs);
-	} else {
-		// Otherwise append any unique Saavn songs at the end of the results
-		for (const s of saavnSongs) {
-			if (!songs.some((existing) => existing.title.toLowerCase() === s.title.toLowerCase())) {
-				songs.push(s);
-			}
+	// Construct final songs list with verified 320kbps lossless tracks FIRST
+	const songs: BrowseItem[] = [...saavnOfficial];
+
+	// Append any additional YouTube official songs that aren't already included
+	for (const s of ytSongs) {
+		if (!songs.some((existing) => existing.title.toLowerCase() === s.title.toLowerCase())) {
+			songs.push(s);
 		}
 	}
 
-	// Categorize any Saavn songs that are versions
-	for (const s of saavnSongs) {
-		if (isVersionTrack(s.title, s.subtitle)) {
-			if (!versions.some((v) => v.id === s.id)) {
-				versions.push(s);
-			}
+	// Combine all versions/covers cleanly into versions array
+	const versions: BrowseItem[] = [];
+	const seenVersionIds = new Set<string>();
+	for (const v of [...saavnVersions, ...ytVersions]) {
+		if (!seenVersionIds.has(v.id)) {
+			seenVersionIds.add(v.id);
+			versions.push(v);
 		}
 	}
 
-	// If top result is empty, use the first song or artist
+	// Top result selection: prioritize the best official song if top isn't an artist/album
 	if (!top.length && songs.length) {
 		top.push(songs[0]);
+	} else if (top.length && top[0].kind === 'song' && songs.length) {
+		top[0] = songs[0];
 	}
 
 	return { top, songs, versions, albums, artists, playlists };
