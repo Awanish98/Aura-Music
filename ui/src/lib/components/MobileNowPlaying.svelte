@@ -50,8 +50,9 @@
 	import EqualizerDialog from './EqualizerDialog.svelte';
 	import TrackMenu from './TrackMenu.svelte';
 	import AiSongStory from './AiSongStory.svelte';
+	import VisualizerStudio from './VisualizerStudio.svelte';
 
-	let activeTab = $state<'player' | 'lyrics' | 'story' | 'queue'>('player');
+	let activeTab = $state<'player' | 'visualizer' | 'lyrics' | 'story' | 'queue'>('player');
 	let sleepModalOpen = $state(false);
 	let eqModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
@@ -233,43 +234,52 @@
 		</div>
 	</header>
 
-	<!-- Segmented Glass Tab Switcher (Track, Lyrics, AI Story, Queue) -->
-	<div class="relative z-10 flex shrink-0 items-center justify-center px-4 py-1.5">
-		<div class="flex items-center gap-1 rounded-full bg-black/30 p-1 border border-white/10 shadow-inner backdrop-blur-md">
+	<!-- Segmented Glass Tab Switcher (Track, Visualizer, Lyrics, AI Story, Queue) -->
+	<div class="relative z-10 flex shrink-0 items-center justify-center px-2 py-1.5 overflow-x-auto no-scrollbar">
+		<div class="flex items-center gap-1 rounded-full bg-black/40 p-1 border border-white/10 shadow-inner backdrop-blur-md">
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'player')}
 			>
-				<HugeiconsIcon icon={MusicNote01Icon} size={14} />
+				<HugeiconsIcon icon={MusicNote01Icon} size={13} />
 				Track
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'lyrics'
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'visualizer'
+					? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/30 scale-100'
+					: 'text-muted-foreground hover:text-foreground'}"
+				onclick={() => (activeTab = 'visualizer')}
+			>
+				<HugeiconsIcon icon={AudioWave01Icon} size={13} />
+				Visualizer
+			</button>
+			<button
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'lyrics'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'lyrics')}
 			>
-				<HugeiconsIcon icon={Mic01Icon} size={14} />
+				<HugeiconsIcon icon={Mic01Icon} size={13} />
 				Lyrics
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'story'
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'story'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'story')}
 			>
-				<HugeiconsIcon icon={SparklesIcon} size={14} />
-				AI Story
+				<HugeiconsIcon icon={SparklesIcon} size={13} />
+				Story
 			</button>
 			<button
-				class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab === 'queue'
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'queue'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
 					: 'text-muted-foreground hover:text-foreground'}"
 				onclick={() => (activeTab = 'queue')}
 			>
-				<HugeiconsIcon icon={Queue01Icon} size={14} />
+				<HugeiconsIcon icon={Queue01Icon} size={13} />
 				Queue
 			</button>
 		</div>
@@ -557,7 +567,11 @@
 		<div class="relative z-10 flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
 			<!-- Scrollable Active View -->
 			<div class="relative min-h-0 flex-1 overflow-hidden {activeTab === 'lyrics' ? 'p-0' : 'p-3'}">
-				{#if activeTab === 'lyrics'}
+				{#if activeTab === 'visualizer'}
+					<div class="h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl p-1 relative">
+						<VisualizerStudio inline />
+					</div>
+				{:else if activeTab === 'lyrics'}
 					<LyricsView expanded />
 				{:else if activeTab === 'story'}
 					<div class="h-full overflow-y-auto rounded-2xl bg-card/40 p-3 backdrop-blur-md">

@@ -487,12 +487,22 @@
 				</span>
 			{/if}
 
+			<!-- 60FPS Audio Visualizer Studio (vizz.fm) -->
+			<button
+				onclick={() => (audioFx.visualizerModalOpen = !audioFx.visualizerModalOpen)}
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer relative {audioFx.visualizerModalOpen ? 'bg-pink-500/20 text-pink-400' : ''}"
+				title="60FPS Audio Visualizer Studio (vizz.fm)"
+				aria-label="Audio Visualizer Studio"
+			>
+				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.visualizerModalOpen ? 'text-pink-400 animate-pulse' : ''} />
+			</button>
+
 			<button
 				onclick={() => (showEq = !showEq)}
 				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer relative"
 				title="Equalizer, Gapless & DJ Crossfade"
 			>
-				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
+				<HugeiconsIcon icon={SparklesIcon} size={17} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
 				{#if audioFx.playbackMode === 'crossfade'}
 					<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-pink-500 shadow-[0_0_6px_#ec4899]"></span>
 				{:else if audioFx.playbackMode === 'gapless'}

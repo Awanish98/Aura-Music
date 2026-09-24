@@ -15,11 +15,12 @@
 		VideoOffIcon,
 		VolumeHighIcon,
 		VolumeMute02Icon,
-		SparklesIcon
+		SparklesIcon,
+		AudioWave01Icon
 	} from '@hugeicons/core-free-icons';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as api from '$lib/api';
-	import { np, playback, ui, wheelVolume } from '$lib/player.svelte';
+	import { np, playback, ui, wheelVolume, audioFx } from '$lib/player.svelte';
 	import { canVideo, claimVideo, parkVideo, showVideo, video } from '$lib/video.svelte';
 	import { appearance } from '$lib/theme.svelte';
 	import { t } from '$lib/i18n.svelte';
@@ -28,6 +29,7 @@
 	import type { QueueScrollMemory } from '$lib/queue-history';
 	import LyricsView from './LyricsView.svelte';
 	import AiSongStory from './AiSongStory.svelte';
+	import VisualizerStudio from './VisualizerStudio.svelte';
 
 	// Off in settings, this view drops its tabs and the queue/lyrics panels stay in charge of both
 	// (see +layout): they paint above this (z-30 over z-20), so all this needs is to hand back the
@@ -251,6 +253,19 @@
 							/>
 						{/if}
 					</button>
+					<!-- Artwork Launch Buttons: Video & Visualizer Studio -->
+					<div class="absolute left-3 top-3 z-10 flex items-center gap-1.5">
+						<button
+							type="button"
+							onclick={() => (audioFx.visualizerModalOpen = true)}
+							aria-label="Launch Fullscreen Visualizer Studio"
+							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10"
+						>
+							<HugeiconsIcon icon={AudioWave01Icon} class="h-3.5 w-3.5 text-pink-400" />
+							<span>Visualizer</span>
+						</button>
+					</div>
+
 					{#if canVideo()}
 						<!-- Both directions, or there is no way back to the video. On a plate, since it sits
 						     over whatever frame happens to be showing. -->
@@ -286,6 +301,9 @@
 							<Tabs.Trigger value="queue" class="gap-2.5">
 								<HugeiconsIcon icon={Queue01Icon} class="h-4 w-4" /> {t('player.queue')}
 							</Tabs.Trigger>
+							<Tabs.Trigger value="visualizer" class="gap-2.5">
+								<HugeiconsIcon icon={AudioWave01Icon} class="h-4 w-4 text-pink-400" /> Visualizer
+							</Tabs.Trigger>
 							<Tabs.Trigger value="lyrics" class="gap-2.5">
 								<HugeiconsIcon icon={Mic01Icon} class="h-4 w-4" /> {t('player.lyrics')}
 							</Tabs.Trigger>
@@ -314,6 +332,10 @@
 					{#if np.tab === 'queue'}
 						<Tabs.Content value="queue" class="flex min-h-0 flex-col">
 							<QueueList scrollMemory={queueScrollMemory} />
+						</Tabs.Content>
+					{:else if np.tab === 'visualizer'}
+						<Tabs.Content value="visualizer" class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl relative p-1">
+							<VisualizerStudio inline />
 						</Tabs.Content>
 					{:else if np.tab === 'lyrics'}
 						<Tabs.Content value="lyrics" class="flex min-h-0 flex-col">

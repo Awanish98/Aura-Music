@@ -44,6 +44,7 @@
 	import MiniPlayer from '$lib/components/MiniPlayer.svelte';
 	import NowPlaying from '$lib/components/NowPlaying.svelte';
 	import MobileNowPlaying from '$lib/components/MobileNowPlaying.svelte';
+	import VisualizerStudio from '$lib/components/VisualizerStudio.svelte';
 	import MobileNav from '$lib/components/MobileNav.svelte';
 	import TheaterMode from '$lib/components/TheaterMode.svelte';
 	import FloatingVideoPlayer from '$lib/components/FloatingVideoPlayer.svelte';
@@ -53,7 +54,7 @@
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import LegalDialog from '$lib/components/LegalDialog.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { auth, initApp, np, playback, ui } from '$lib/player.svelte';
+	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
 	import { win, initWin } from '$lib/win.svelte';
 	import { initZoom } from '$lib/zoom.svelte';
 	import { initShortcuts } from '$lib/shortcuts';
@@ -242,6 +243,11 @@
 	<!-- Fullscreen Mobile Now Playing Screen (< md) -->
 	{#if np.open && playback.now}
 		<MobileNowPlaying />
+	{/if}
+
+	<!-- Fullscreen 60FPS Audio Visualizer Studio (vizz.fm Style) -->
+	{#if audioFx.visualizerModalOpen && playback.now}
+		<VisualizerStudio onClose={() => (audioFx.visualizerModalOpen = false)} />
 	{/if}
 
 	<!-- Theater mode covers everything, titlebar included, and puts the window in fullscreen for as
