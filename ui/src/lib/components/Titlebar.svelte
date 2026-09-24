@@ -218,6 +218,16 @@
 			</span>
 		</div>
 
+		<!-- Search Button (Mobile Only) -->
+		<a
+			href="/search"
+			class="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/80 transition-all hover:bg-white/10 hover:text-primary active:scale-95 shadow-sm"
+			title="Search Music"
+			aria-label="Search Music"
+		>
+			<HugeiconsIcon icon={Search01Icon} size={17} />
+		</a>
+
 		<!-- Notification Bell with Glowing Alert Dot -->
 		<button
 			class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/80 transition-all hover:bg-white/10 hover:text-primary active:scale-95 shadow-sm"

@@ -3,19 +3,19 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		Home01Icon,
+		Search01Icon,
 		Compass01Icon,
 		SparklesIcon,
-		LibraryIcon,
-		Radio02Icon
+		LibraryIcon
 	} from '@hugeicons/core-free-icons';
 	import { ui } from '$lib/player.svelte';
 
 	const navItems = [
 		{ href: '/', label: 'Home', icon: Home01Icon },
-		{ href: '/discover', label: 'Explore', icon: Compass01Icon },
+		{ href: '/search', label: 'Search', icon: Search01Icon },
 		{ action: () => (ui.aiDjOpen = true), label: 'AI DJ', icon: SparklesIcon, isCenter: true },
-		{ href: '/library', label: 'Library', icon: LibraryIcon },
-		{ href: '/discover?cat=radio', label: 'Radio', icon: Radio02Icon }
+		{ href: '/discover', label: 'Explore', icon: Compass01Icon },
+		{ href: '/library', label: 'Library', icon: LibraryIcon }
 	];
 
 	const isActive = (href?: string) => {

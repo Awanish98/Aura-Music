@@ -1,28 +1,40 @@
 <script lang="ts">
-	// The search field plus its typeahead preview: type, wait 500ms, get a handful of real results
-	// under the input. Runs the same `search_all` the search page runs and writes the same page-cache
-	// key, so submitting a previewed query paints from cache instead of searching twice.
-	//
-	// Must live inside a <form>: Enter with nothing highlighted, and the "All results" row, fall
-	// through to that form's onsubmit, which is where each caller decides what a full search means
-	// (run it in place, or navigate to /search).
+	// High-Performance AI-Powered Search Suggestion & Predictive Autocomplete Component
 	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { Search01Icon, MusicNote01Icon, UserIcon } from '@hugeicons/core-free-icons';
+	import {
+		Search01Icon,
+		MusicNote01Icon,
+		UserIcon,
+		SparklesIcon,
+		Clock01Icon,
+		Cancel01Icon,
+		FireIcon,
+		PlayIcon,
+		Mic01Icon
+	} from '@hugeicons/core-free-icons';
 	import { Input } from '$lib/components/ui/input';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import ExplicitIcon from './ExplicitIcon.svelte';
 	import ItemMenu from './ItemMenu.svelte';
-	import type { BrowseItem } from '$lib/api';
-	import { openItem, searchPreview } from '$lib/browse';
+	import type { BrowseItem, SongItem } from '$lib/api';
+	import { openItem, asSong } from '$lib/browse';
+	import { playSong, ui } from '$lib/player.svelte';
 	import { MOD } from '$lib/shortcuts';
 	import { thumb } from '$lib/thumb';
 	import { t } from '$lib/i18n.svelte';
+	import {
+		fetchSmartSuggestions,
+		saveRecentSearch,
+		removeRecentSearch,
+		clearRecentSearches,
+		AI_MOOD_TAGS,
+		type SmartSuggestion
+	} from '$lib/searchAi';
 
 	let {
 		value = $bindable(''),
-		placeholder = 'Search',
+		placeholder = 'Search songs, multiple versions, artists, albums, lyrics...',
 		inputClass = '',
-		/** Panel geometry. Default matches the field; a narrow field wants its own width. */
 		panelClass = 'left-0 right-0',
 		onpick
 	}: {
@@ -30,75 +42,105 @@
 		placeholder?: string;
 		inputClass?: string;
 		panelClass?: string;
-		/** Fired after a row is taken (played or navigated) — for callers that dismiss themselves. */
 		onpick?: () => void;
 	} = $props();
 
 	let open = $state(false);
-	let items = $state<BrowseItem[]>([]);
+	let suggestions = $state<SmartSuggestion[]>([]);
 	let loading = $state(false);
-	let active = $state(-1); // keyboard-highlighted row, -1 = none (Enter submits the form)
-	let loadedFor = ''; // query `items` belongs to, so a stale response can't land
-	// The row the right-click menu belongs to: whatever the pointer last entered. It lives outside
-	// the panel and outlives it, because taking a menu action moves focus and closes the panel, and
-	// a menu unmounted mid-click is a menu that does nothing.
+	let active = $state(-1);
+	let loadedFor = '';
 	let ctxItem = $state<BrowseItem | null>(null);
-	let debounce: ReturnType<typeof setTimeout> | undefined;
+	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+	let inputEl = $state<HTMLInputElement | null>(null);
 
-	const KIND: Record<string, string> = $derived({
-		song: t('common.song_singular'),
-		album: t('common.album_singular'),
-		artist: t('common.artist_singular'),
-		playlist: t('common.playlist_singular')
-	});
-
-	async function load(q: string) {
+	async function loadSuggestions(q: string) {
 		loadedFor = q;
 		active = -1;
 		loading = true;
 		try {
-			const next = await searchPreview(q);
-			if (loadedFor === q) items = next;
-		} catch {
-			if (loadedFor === q) items = [];
+			const res = await fetchSmartSuggestions(q);
+			if (loadedFor === q) {
+				suggestions = res;
+			}
+		} catch (e) {
+			if (loadedFor === q) suggestions = [];
 		} finally {
 			if (loadedFor === q) loading = false;
 		}
 	}
 
-	// Reads the element, not `value`: the binding lands on this same event and the order of the two
-	// listeners is not ours to assume.
 	function onType(e: Event & { currentTarget: HTMLInputElement }) {
-		clearTimeout(debounce);
-		const q = e.currentTarget.value.trim();
-		if (q.length < 2) {
-			close();
-			return;
-		}
+		clearTimeout(debounceTimer);
+		const q = e.currentTarget.value;
 		open = true;
 		if (q !== loadedFor) {
-			// Loading starts now, not when the timer fires: otherwise the empty panel reads as
-			// "no results" for the whole debounce, on every query.
-			items = [];
 			loading = true;
 		}
-		debounce = setTimeout(() => load(q), 500);
+		debounceTimer = setTimeout(() => {
+			loadSuggestions(q);
+		}, 160);
 	}
 
-	// Deliberately no reopen-on-focus: rows preventDefault on mousedown, so the input keeps focus
-	// after a row is taken, and the focus the window restores on regaining it would repaint the panel
-	// over whatever is on screen by then, the now-playing view included (#124). Typing reopens it.
+	function onFocus() {
+		open = true;
+		loadSuggestions(value);
+	}
+
 	function close() {
-		clearTimeout(debounce);
+		clearTimeout(debounceTimer);
 		open = false;
 		loading = false;
 		active = -1;
 	}
 
-	function choose(item: BrowseItem) {
+	function selectSuggestion(s: SmartSuggestion, e?: Event) {
+		if (e) e.preventDefault();
+		saveRecentSearch(s.query || s.title);
+
+		if (s.item) {
+			if (s.type === 'song') {
+				playSong(asSong(s.item as BrowseItem));
+				close();
+				onpick?.();
+				return;
+			}
+			openItem(s.item as BrowseItem);
+			close();
+			onpick?.();
+			return;
+		}
+
+		value = s.query || s.title;
 		close();
-		openItem(item); // a song plays, everything else opens its page
 		onpick?.();
+
+		// Submit the parent form
+		if (inputEl && inputEl.form) {
+			inputEl.form.requestSubmit();
+		}
+	}
+
+	function handleRemoveHistory(query: string, e: MouseEvent) {
+		e.stopPropagation();
+		e.preventDefault();
+		removeRecentSearch(query);
+		suggestions = suggestions.filter((s) => !(s.type === 'history' && s.query.toLowerCase() === query.toLowerCase()));
+	}
+
+	function handleClearAllHistory(e: MouseEvent) {
+		e.stopPropagation();
+		e.preventDefault();
+		clearRecentSearches();
+		suggestions = suggestions.filter((s) => s.type !== 'history');
+	}
+
+	function handleClearInput(e: MouseEvent) {
+		e.stopPropagation();
+		e.preventDefault();
+		value = '';
+		inputEl?.focus();
+		loadSuggestions('');
 	}
 
 	function onKeydown(e: KeyboardEvent) {
@@ -106,159 +148,266 @@
 			e.preventDefault();
 			close();
 		} else if (e.key === 'Enter') {
-			// Only a highlighted row is ours; a bare Enter is the caller's form submit.
-			if (active >= 0 && items[active]) {
+			if (active >= 0 && suggestions[active]) {
 				e.preventDefault();
-				choose(items[active]);
+				selectSuggestion(suggestions[active]);
 			} else {
+				if (value.trim()) {
+					saveRecentSearch(value.trim());
+				}
 				close();
 			}
-		} else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && items.length) {
+		} else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && suggestions.length) {
 			e.preventDefault();
 			open = true;
-			const n = items.length;
+			const n = suggestions.length;
 			active = e.key === 'ArrowDown' ? (active + 1) % n : (active <= 0 ? n : active) - 1;
 		}
 	}
 </script>
 
-<!-- Rows preventDefault on mousedown, so focus never leaves the input while one is being clicked:
-     anything that reaches focusout is a real move away from the field. -->
-<!-- data-ctx: right-clicking a row opens that item's menu at the pointer (see `ctxHost`). The host
-     is this whole block, but the input inside it keeps WebKit's own menu (`wantsNative`). -->
 <div
 	class="relative w-full min-w-0"
 	data-ctx
 	onfocusout={(e) => {
-		if (!e.currentTarget.contains(e.relatedTarget as Node | null)) close();
+		if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+			// Delay closing slightly so click events on suggestions register on mobile
+			setTimeout(() => {
+				close();
+			}, 180);
+		}
 	}}
 >
-	<Input
-		bind:value
-		{placeholder}
-		class="pr-16 {inputClass}"
-		autocomplete="off"
-		role="combobox"
-		aria-expanded={open}
-		aria-controls="search-suggest"
-		oninput={onType}
-		onkeydown={onKeydown}
-	/>
-	<!-- Advertises the palette, which searches the same thing from anywhere in the app
-	     (shortcuts.ts). Out of the way once there is a query to read, and never a click target:
-	     the field behind it is the target. -->
-	{#if !value}
-		<kbd
-			class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 hidden sm:block rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.625rem] font-medium tracking-wide text-muted-foreground"
-		>
-			{MOD}K
-		</kbd>
-	{/if}
+	<!-- Search Input Container -->
+	<div class="relative flex items-center w-full">
+		<div class="absolute left-3.5 flex items-center pointer-events-none text-muted-foreground">
+			<HugeiconsIcon icon={Search01Icon} size={18} />
+		</div>
+
+		<Input
+			bind:ref={inputEl}
+			bind:value
+			{placeholder}
+			class="pl-10 pr-20 h-11 text-xs sm:text-sm rounded-2xl bg-card/60 backdrop-blur-xl border-white/10 hover:border-white/20 focus:border-primary/50 focus:bg-card/90 transition-all shadow-inner {inputClass}"
+			autocomplete="off"
+			role="combobox"
+			aria-expanded={open}
+			aria-controls="search-suggest"
+			onfocus={onFocus}
+			oninput={onType}
+			onkeydown={onKeydown}
+		/>
+
+		<!-- Right Quick Actions: Clear Button & Mic/Shortcut -->
+		<div class="absolute right-2.5 flex items-center gap-1.5">
+			{#if value}
+				<button
+					type="button"
+					onclick={handleClearInput}
+					class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-muted-foreground hover:bg-white/20 hover:text-foreground transition-colors cursor-pointer"
+					title="Clear text"
+					aria-label="Clear search text"
+				>
+					<HugeiconsIcon icon={Cancel01Icon} size={13} />
+				</button>
+			{:else}
+				<kbd
+					class="pointer-events-none hidden sm:inline-flex items-center rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[0.625rem] font-semibold text-muted-foreground/80"
+				>
+					{MOD}K
+				</kbd>
+			{/if}
+		</div>
+	</div>
+
+	<!-- Suggestion Dropdown Panel -->
 	{#if open}
 		<div
 			id="search-suggest"
 			role="listbox"
-			aria-label={t('a11y.search_preview')}
-			class="absolute top-full z-50 mt-2 overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-xl animate-in fade-in-0 zoom-in-95 duration-150 {panelClass}"
+			aria-label="Smart AI Search Suggestions"
+			class="absolute top-full z-50 mt-2 max-h-[75vh] sm:max-h-[480px] overflow-y-auto rounded-2xl border border-white/12 bg-[#0d101d]/98 text-popover-foreground shadow-2xl backdrop-blur-3xl animate-in fade-in-0 zoom-in-95 duration-150 {panelClass} divide-y divide-white/6"
 		>
-			{#if loading && !items.length}
-				{#each Array(4) as _, i (i)}
-					<div class="flex items-center gap-3 px-3 py-2">
-						<Skeleton class="h-10 w-10 shrink-0 rounded-md" />
-						<div class="min-w-0 flex-1">
-							<Skeleton class="h-3 w-40 rounded" />
-							<Skeleton class="mt-2 h-2.5 w-24 rounded" />
-						</div>
+			<!-- Quick Mood / AI Chips Strip (When input is empty or has room) -->
+			{#if !value.trim()}
+				<div class="p-3 bg-white/[0.02]">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+							<HugeiconsIcon icon={SparklesIcon} size={13} class="text-primary animate-pulse" />
+							AI Recommended Moods & Vibes
+						</span>
 					</div>
-				{/each}
-			{:else if !items.length}
-				<div class="px-4 py-3 text-sm text-muted-foreground">{t('common.nothing_quick')}</div>
-			{:else}
-				{#each items as item, i (item.id)}
-					{@const hero = i === 0}
-					<!-- A div, not a button: `ctxHost` treats a nested <button> as its own thing and would
-					     leave every row without a right-click menu. -->
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<!-- The keyboard never reaches a row: the input owns arrow keys and Enter (onKeydown). -->
-					<div
-						role="option"
-						tabindex="-1"
-						aria-selected={i === active}
-						class="flex w-full cursor-pointer items-center gap-3 px-3 text-left transition-colors {i ===
-						active
-							? 'bg-accent/60'
-							: 'hover:bg-accent/40'} {hero ? 'border-b py-2.5' : 'py-1.5'}"
-						onmousedown={(e) => e.preventDefault()}
-						onmouseenter={() => {
-							active = i;
-							ctxItem = item;
-						}}
-						onclick={() => choose(item)}
-					>
-						{#if item.thumbnail}
-							<!-- 400, the same size the cards ask for: the CDN doesn't serve every rewritten size,
-							     that one is verified, and the row lands on an image the grid already fetched. -->
-							<img
-								src={thumb(item.thumbnail, 400)}
-								alt=""
-								class="shrink-0 object-cover {item.kind === 'artist'
-									? 'rounded-full'
-									: 'rounded-md'} {hero ? 'h-12 w-12' : 'h-10 w-10'}"
-							/>
-						{:else}
-							<div
-								class="flex shrink-0 items-center justify-center bg-muted text-muted-foreground/50 {item.kind ===
-								'artist'
-									? 'rounded-full'
-									: 'rounded-md'} {hero ? 'h-12 w-12' : 'h-10 w-10'}"
+					<div class="flex flex-wrap gap-1.5">
+						{#each AI_MOOD_TAGS as tag}
+							<button
+								type="button"
+								onmousedown={(e) => e.preventDefault()}
+								onclick={() => selectSuggestion({ id: tag.query, query: tag.query, title: tag.label, type: 'ai_vibe' })}
+								class="rounded-full bg-white/5 border border-white/10 px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-primary/20 hover:border-primary/40 hover:text-primary transition-all active:scale-95"
 							>
-								<HugeiconsIcon
-									icon={item.kind === 'artist' ? UserIcon : MusicNote01Icon}
-									class="h-5 w-5"
-								/>
-							</div>
-						{/if}
-						<div class="min-w-0 flex-1">
-							<div class="truncate {hero ? 'font-semibold' : 'text-sm'}">{item.title}</div>
-							<div class="flex items-center gap-1 text-xs text-muted-foreground">
-								{#if item.explicit}
-									<ExplicitIcon class="h-3 w-3 shrink-0" />
-								{/if}
-								<span class="truncate">
-									{KIND[item.kind]}{item.subtitle ? ` • ${item.subtitle}` : ''}
-								</span>
-							</div>
-						</div>
-						{#if hero}
-							<span
-								class="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-primary"
-							>
-								{t('common.top_result')}
-							</span>
-						{/if}
+								{tag.label}
+							</button>
+						{/each}
 					</div>
-				{/each}
+				</div>
 			{/if}
-			<!-- Submits the enclosing form, which is where each caller decides what "all results" does.
-			     Explicitly, not type="submit": closing the panel unmounts this button mid-click, and a
-			     submit button removed from the DOM before the click completes never submits (#125). -->
-			<button
-				type="button"
-				class="flex w-full cursor-pointer items-center gap-2 border-t bg-muted/30 px-3 py-2 text-left text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-				onmousedown={(e) => e.preventDefault()}
-				onmouseenter={() => (active = -1)}
-				onclick={(e) => {
-					e.currentTarget.form?.requestSubmit();
-					close();
-				}}
-			>
-				<HugeiconsIcon icon={Search01Icon} class="h-3.5 w-3.5" />
-				{t('common.all_results_for', { query: value.trim() })}
-			</button>
+
+			<!-- History Header Bar if history items exist -->
+			{#if suggestions.some((s) => s.type === 'history') && !value.trim()}
+				<div class="flex items-center justify-between px-3.5 py-2 bg-white/[0.01]">
+					<span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+						<HugeiconsIcon icon={Clock01Icon} size={13} />
+						Recent Searches
+					</span>
+					<button
+						type="button"
+						onmousedown={(e) => e.preventDefault()}
+						onclick={handleClearAllHistory}
+						class="text-[10px] font-medium text-muted-foreground/80 hover:text-rose-400 transition-colors"
+					>
+						Clear All
+					</button>
+				</div>
+			{/if}
+
+			<!-- Suggestions List -->
+			{#if loading && !suggestions.length}
+				<div class="p-3 space-y-2">
+					{#each Array(4) as _, i (i)}
+						<div class="flex items-center gap-3 px-2 py-1.5">
+							<Skeleton class="h-9 w-9 shrink-0 rounded-xl" />
+							<div class="min-w-0 flex-1 space-y-1.5">
+								<Skeleton class="h-3 w-44 rounded" />
+								<Skeleton class="h-2.5 w-24 rounded" />
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else if !suggestions.length}
+				<div class="px-4 py-4 text-center text-xs text-muted-foreground">
+					No instant suggestions found. Press Enter to perform full search.
+				</div>
+			{:else}
+				<div class="py-1">
+					{#each suggestions as s, i (s.id || s.query)}
+						{@const isSelected = i === active}
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<div
+							role="option"
+							tabindex="-1"
+							aria-selected={isSelected}
+							class="group flex w-full cursor-pointer items-center justify-between gap-3 px-3.5 py-2 text-left transition-colors {isSelected
+								? 'bg-primary/20 text-foreground'
+								: 'hover:bg-white/8 text-foreground/90'}"
+							onmousedown={(e) => e.preventDefault()}
+							onmouseenter={() => {
+								active = i;
+								if (s.item) ctxItem = s.item as BrowseItem;
+							}}
+							onclick={(e) => selectSuggestion(s, e)}
+						>
+							<div class="flex items-center gap-3 min-w-0 flex-1">
+								<!-- Left Icon / Avatar / Thumbnail -->
+								{#if s.item && (s.item as BrowseItem).thumbnail}
+									<img
+										src={thumb((s.item as BrowseItem).thumbnail!, 120)}
+										alt=""
+										class="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-white/15"
+									/>
+								{:else if s.type === 'history'}
+									<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/5 text-muted-foreground">
+										<HugeiconsIcon icon={Clock01Icon} size={15} />
+									</div>
+								{:else if s.type === 'ai_vibe' || s.type === 'version'}
+									<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+										<HugeiconsIcon icon={SparklesIcon} size={15} class="animate-pulse" />
+									</div>
+								{:else if s.type === 'trending'}
+									<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+										<HugeiconsIcon icon={FireIcon} size={15} />
+									</div>
+								{:else if s.type === 'artist'}
+									<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400">
+										<HugeiconsIcon icon={UserIcon} size={15} />
+									</div>
+								{:else}
+									<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/5 text-muted-foreground">
+										<HugeiconsIcon icon={Search01Icon} size={15} />
+									</div>
+								{/if}
+
+								<!-- Text Details -->
+								<div class="min-w-0 flex-1">
+									<div class="flex items-center gap-2">
+										<span class="truncate text-xs sm:text-sm font-medium {s.type === 'song' ? 'font-semibold text-foreground' : ''}">
+											{s.title}
+										</span>
+										{#if s.badge}
+											<span class="shrink-0 rounded-full px-2 py-0.2 text-[9px] font-bold uppercase tracking-wider {s.badge === 'Top Match' ? 'bg-primary/20 text-primary border border-primary/30' : s.badge === 'For You' ? 'bg-purple-500/20 text-purple-300' : 'bg-white/10 text-muted-foreground'}">
+												{s.badge}
+											</span>
+										{/if}
+									</div>
+									{#if s.subtitle}
+										<div class="truncate text-[11px] text-muted-foreground mt-0.5">
+											{s.subtitle}
+										</div>
+									{/if}
+								</div>
+							</div>
+
+							<!-- Right Side: 1-Tap Play or History Remove Button -->
+							<div class="flex items-center gap-1.5 shrink-0">
+								{#if s.type === 'song'}
+									<button
+										type="button"
+										onclick={(e) => selectSuggestion(s, e)}
+										class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:scale-110 active:scale-95 transition-transform"
+										title="Play now"
+									>
+										<HugeiconsIcon icon={PlayIcon} size={13} fill="currentColor" class="ml-0.5" />
+									</button>
+								{:else if s.type === 'history'}
+									<button
+										type="button"
+										onclick={(e) => handleRemoveHistory(s.query, e)}
+										class="opacity-60 hover:opacity-100 p-1 text-muted-foreground hover:text-rose-400 transition-all rounded-full hover:bg-white/10"
+										title="Remove from history"
+									>
+										<HugeiconsIcon icon={Cancel01Icon} size={13} />
+									</button>
+								{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
+
+			<!-- Bottom "All Results" Action -->
+			{#if value.trim()}
+				<button
+					type="button"
+					class="flex w-full cursor-pointer items-center justify-between border-t border-white/8 bg-white/[0.03] px-4 py-2.5 text-left text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+					onmousedown={(e) => e.preventDefault()}
+					onclick={() => {
+						if (value.trim()) saveRecentSearch(value.trim());
+						close();
+						onpick?.();
+						inputEl?.form?.requestSubmit();
+					}}
+				>
+					<span class="flex items-center gap-2">
+						<HugeiconsIcon icon={Search01Icon} size={14} />
+						Search all for "{value.trim()}"
+					</span>
+					<span class="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+						Press Enter ↵
+					</span>
+				</button>
+			{/if}
 		</div>
 	{/if}
-	<!-- Outside the panel, and with no visible trigger: a row is too small for a hover-only ⋯, and
-	     this one only ever opens from a right-click. -->
+
 	{#if ctxItem}
 		<ItemMenu item={ctxItem} triggerClass="hidden" />
 	{/if}

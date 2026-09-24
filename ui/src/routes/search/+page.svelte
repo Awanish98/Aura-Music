@@ -17,7 +17,11 @@
 		PlayIcon,
 		MusicNote01Icon,
 		FavouriteIcon,
-		Mic01Icon
+		Mic01Icon,
+		FireIcon,
+		Clock01Icon,
+		UserIcon,
+		Cancel01Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -37,12 +41,24 @@
 	import { asSong } from '$lib/browse';
 	import { thumb, generateAvatarSvg } from '$lib/thumb';
 	import { t } from '$lib/i18n.svelte';
+	import {
+		TRENDING_SEARCHES,
+		AI_MOOD_TAGS,
+		getRecentSearches,
+		getPersonalizedAiSuggestions,
+		saveRecentSearch,
+		removeRecentSearch,
+		clearRecentSearches,
+		type SmartSuggestion
+	} from '$lib/searchAi';
 
 	type Cached = { res: SearchResults; songs: SongItem[] };
 	type SearchTab = 'all' | 'songs' | 'versions' | 'albums' | 'artists' | 'playlists';
 
 	let query = $state(lastQuery);
 	let res = $state<SearchResults | null>(null);
+	let recentSearches = $state<string[]>([]);
+	let personalAi = $state<SmartSuggestion[]>([]);
 	let songs = $state<SongItem[]>([]);
 	let searched = $state('');
 	let searching = $state(false);
@@ -53,11 +69,37 @@
 	// The query of the most recent runSearch call, so an older in-flight one can't clobber it.
 	let latest = '';
 
+	function refreshDiscovery() {
+		recentSearches = getRecentSearches();
+		personalAi = getPersonalizedAiSuggestions();
+	}
+
+	function triggerSearch(q: string) {
+		query = q;
+		saveRecentSearch(q);
+		refreshDiscovery();
+		runSearch();
+	}
+
+	function handleRemoveRecent(q: string, e: MouseEvent) {
+		e.stopPropagation();
+		removeRecentSearch(q);
+		recentSearches = getRecentSearches();
+	}
+
+	function handleClearAllRecents(e: MouseEvent) {
+		e.stopPropagation();
+		clearRecentSearches();
+		recentSearches = [];
+	}
+
 	async function runSearch() {
 		if (!query.trim()) return;
 		const q = query.trim();
 		latest = q;
 		lastQuery = q;
+		saveRecentSearch(q);
+		refreshDiscovery();
 		const key = `search:${q}`;
 		const hit = getCached<Cached>(key);
 		if (hit) {
@@ -102,6 +144,7 @@
 	});
 
 	onMount(() => {
+		refreshDiscovery();
 		if (!urlQuery && query) runSearch();
 	});
 
@@ -302,15 +345,143 @@
 				</section>
 			</div>
 		{:else if !res}
-			<!-- Empty / Welcome Prompt -->
-			<div class="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
-				<div class="flex size-16 items-center justify-center rounded-3xl bg-card/60 border border-white/10 shadow-lg mb-4 text-primary">
-					<HugeiconsIcon icon={Search01Icon} size={32} />
-				</div>
-				<h3 class="font-heading text-lg font-semibold text-foreground">Explore Music & Multiple Versions</h3>
-				<p class="text-sm max-w-md mt-1">
-					Search for your favorite songs, acoustic covers, lofi mixes, Punjabi superhits, or tap Shazam to identify music.
-				</p>
+			<!-- Rich AI-Powered Suggestions & Discovery Grid (Mobile & Desktop) -->
+			<div class="flex flex-col gap-8 max-w-6xl pb-12" in:fade>
+				<!-- Personalized "Mere Anusar AI" Suggestions -->
+				{#if personalAi.length > 0}
+					<section>
+						<div class="flex items-center justify-between mb-3">
+							<h2 class="font-heading text-lg font-bold flex items-center gap-2 text-foreground">
+								<HugeiconsIcon icon={SparklesIcon} size={18} class="text-primary animate-pulse" />
+								<span>Recommended For You (AI Personalised)</span>
+							</h2>
+							<span class="text-xs text-muted-foreground font-medium">Based on your taste & history</span>
+						</div>
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+							{#each personalAi as p}
+								<button
+									type="button"
+									onclick={() => triggerSearch(p.query)}
+									class="flex items-center justify-between p-3.5 rounded-2xl bg-card/60 hover:bg-card border border-white/10 hover:border-primary/40 transition-all text-left group cursor-pointer active:scale-98 shadow-md"
+								>
+									<div class="flex items-center gap-3 min-w-0">
+										<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary group-hover:scale-105 transition-transform">
+											<HugeiconsIcon icon={SparklesIcon} size={18} />
+										</div>
+										<div class="min-w-0 flex-1">
+											<div class="font-semibold text-sm truncate text-foreground group-hover:text-primary transition-colors">
+												{p.title}
+											</div>
+											<div class="text-xs text-muted-foreground truncate mt-0.5">
+												{p.subtitle}
+											</div>
+										</div>
+									</div>
+									<span class="rounded-full bg-primary/10 border border-primary/25 px-2 py-0.5 text-[10px] font-bold text-primary shrink-0 ml-2">
+										{p.badge || 'AI Vibe'}
+									</span>
+								</button>
+							{/each}
+						</div>
+					</section>
+				{/if}
+
+				<!-- Recent Searches -->
+				{#if recentSearches.length > 0}
+					<section>
+						<div class="flex items-center justify-between mb-3">
+							<h2 class="font-heading text-lg font-bold flex items-center gap-2 text-foreground">
+								<HugeiconsIcon icon={Clock01Icon} size={18} class="text-muted-foreground" />
+								<span>Recent Searches</span>
+							</h2>
+							<button
+								type="button"
+								onclick={handleClearAllRecents}
+								class="text-xs font-semibold text-muted-foreground hover:text-rose-400 transition-colors"
+							>
+								Clear All
+							</button>
+						</div>
+						<div class="flex flex-wrap gap-2">
+							{#each recentSearches as r}
+								<div
+									class="group flex items-center gap-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-1.5 text-xs font-medium text-foreground transition-all cursor-pointer active:scale-95"
+								>
+									<button
+										type="button"
+										onclick={() => triggerSearch(r)}
+										class="flex items-center gap-1.5 truncate text-left"
+									>
+										<HugeiconsIcon icon={Clock01Icon} size={13} class="text-muted-foreground" />
+										<span class="truncate">{r}</span>
+									</button>
+									<button
+										type="button"
+										onclick={(e) => handleRemoveRecent(r, e)}
+										class="opacity-60 hover:opacity-100 p-0.5 hover:text-rose-400 transition-colors"
+										title="Remove"
+									>
+										<HugeiconsIcon icon={Cancel01Icon} size={12} />
+									</button>
+								</div>
+							{/each}
+						</div>
+					</section>
+				{/if}
+
+				<!-- AI Moods & Vibes -->
+				<section>
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="font-heading text-lg font-bold flex items-center gap-2 text-foreground">
+							<span>Explore Moods & Genres</span>
+						</h2>
+					</div>
+					<div class="flex flex-wrap gap-2">
+						{#each AI_MOOD_TAGS as tag}
+							<button
+								type="button"
+								onclick={() => triggerSearch(tag.query)}
+								class="rounded-full bg-card/70 hover:bg-primary/20 border border-white/10 hover:border-primary/40 px-3.5 py-1.5 text-xs font-semibold text-foreground hover:text-primary transition-all active:scale-95 shadow-sm"
+							>
+								{tag.label}
+							</button>
+						{/each}
+					</div>
+				</section>
+
+				<!-- Trending Indian & Global Hits -->
+				<section>
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="font-heading text-lg font-bold flex items-center gap-2 text-foreground">
+							<HugeiconsIcon icon={FireIcon} size={18} class="text-amber-400" />
+							<span>Trending Hits & Superhits</span>
+						</h2>
+					</div>
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+						{#each TRENDING_SEARCHES as t}
+							<button
+								type="button"
+								onclick={() => triggerSearch(t.query)}
+								class="flex items-center justify-between p-3.5 rounded-2xl bg-card/60 hover:bg-card border border-white/10 hover:border-amber-400/40 transition-all text-left group cursor-pointer active:scale-98 shadow-md"
+							>
+								<div class="flex items-center gap-3 min-w-0">
+									<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 group-hover:scale-105 transition-transform">
+										<HugeiconsIcon icon={FireIcon} size={16} />
+									</div>
+									<div class="min-w-0 flex-1">
+										<div class="font-semibold text-sm truncate text-foreground group-hover:text-amber-300 transition-colors">
+											{t.label}
+										</div>
+										<div class="text-xs text-muted-foreground truncate mt-0.5">
+											{t.category}
+										</div>
+									</div>
+								</div>
+								<HugeiconsIcon icon={PlayIcon} size={15} class="text-muted-foreground group-hover:text-primary shrink-0 ml-2" />
+							</button>
+						{/each}
+					</div>
+				</section>
 			</div>
 		{:else if !songRows.length && !res.albums?.length && !res.artists?.length && !res.playlists?.length}
 			<div class="py-12 text-center text-sm text-muted-foreground">

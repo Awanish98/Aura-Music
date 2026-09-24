@@ -1202,6 +1202,8 @@ export const searchAll = (query: string, recordHistory = false) =>
 /** Filtered "Show more" card search for one category (albums / artists / playlists). */
 export const searchCards = (query: string, category: 'albums' | 'artists' | 'playlists') =>
 	invoke<BrowseItem[]>('search_cards', { query, category });
+export const searchSuggest = (input: string) =>
+	invoke<string[]>('search_suggest', { input });
 export const play = (item: SongItem) => invoke<void>('play', { item });
 export const playIndex = (index: number) => invoke<void>('play_index', { index });
 /** Remove an upcoming track from the queue (host/local only — guests are add-only). */

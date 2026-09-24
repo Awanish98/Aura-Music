@@ -4,6 +4,7 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		Home01Icon,
+		Search01Icon,
 		Compass01Icon,
 		LibraryIcon,
 		SparklesIcon,
@@ -36,6 +37,7 @@
 
 	const navItems = $derived([
 		{ href: '/', label: 'Home', icon: Home01Icon },
+		{ href: '/search', label: 'Search', icon: Search01Icon },
 		{ href: '/discover', label: 'Explore', icon: Compass01Icon },
 		{ href: '/library', label: 'Library', icon: LibraryIcon },
 		{ action: () => (ui.aiDjOpen = true), label: 'AI DJ', icon: SparklesIcon, isSpecial: true },
