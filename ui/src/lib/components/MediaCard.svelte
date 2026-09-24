@@ -95,16 +95,16 @@
 			></div>
 			
 			<div
-				class="relative aspect-square w-full overflow-hidden bg-muted {round
+				class="relative aspect-square w-full overflow-hidden bg-muted glass-sheen {round
 					? 'rounded-full ring-2 ring-border/60'
-					: 'rounded-xl ring-1 ring-white/10 shadow-sm transition-all duration-300 group-hover:shadow-xl'}"
+					: 'rounded-2xl ring-1 ring-white/10 shadow-sm transition-all duration-300 group-hover:shadow-2xl group-hover:ring-primary/40'}"
 			>
 				{#if item.thumbnail && attempt < 2 && !onRepeat}
 					<img
 						{src}
 						{srcset}
 						alt={item.title}
-						class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
 						loading="lazy"
 						decoding="async"
 						draggable="false"
@@ -114,7 +114,7 @@
 					<img
 						src={generateAvatarSvg(item.title, item.kind)}
 						alt={item.title}
-						class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
 						loading="lazy"
 						decoding="async"
 						draggable="false"
@@ -122,9 +122,9 @@
 				{/if}
 				{#if item.kind !== 'artist'}
 					<button
-						class="absolute flex translate-y-1 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 shadow-xl transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110 active:scale-95 focus-visible:opacity-100 {compact
-							? 'bottom-1.5 right-1.5 h-7 w-7'
-							: 'bottom-2.5 right-2.5 h-10 w-10'}"
+						class="absolute flex translate-y-2 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 shadow-xl shadow-primary/40 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110 active:scale-95 focus-visible:opacity-100 {compact
+							? 'bottom-1.5 right-1.5 h-8 w-8'
+							: 'bottom-2.5 right-2.5 h-11 w-11'}"
 						class:animate-pulse={playing}
 						disabled={playing}
 						aria-label="Play {item.title}"
@@ -133,7 +133,7 @@
 							playNow();
 						}}
 					>
-						<HugeiconsIcon icon={PlayIcon} class={compact ? 'h-3.5 w-3.5 fill-current' : 'h-4 w-4 fill-current'} />
+						<HugeiconsIcon icon={PlayIcon} class={compact ? 'h-4 w-4 fill-current ml-0.5' : 'h-5 w-5 fill-current ml-0.5'} />
 					</button>
 				{/if}
 			</div>

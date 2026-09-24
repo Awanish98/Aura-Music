@@ -1,10 +1,13 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 @import "shadcn-svelte/tailwind.css";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/syne";
+@import "@fontsource-variable/outfit";
+@import "@fontsource/jetbrains-mono";
 @import "@fontsource-variable/oxanium";
 @import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/montserrat";
-@import "@fontsource-variable/outfit";
 @import "@fontsource-variable/dm-sans";
 
 @custom-variant dark (&:is(.dark *));
@@ -62,10 +65,10 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 8%);
 	--sidebar-ring: oklch(0.65 0.28 355);
-	--font-sans: 'Outfit Variable', 'Oxanium Variable', sans-serif;
-	--font-heading: 'Outfit Variable', 'Montserrat Variable', sans-serif;
+	--font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'Outfit Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-heading: 'Syne Variable', 'Syne', 'Outfit Variable', 'Plus Jakarta Sans Variable', sans-serif;
 	--font-serif: ui-serif, Georgia, serif;
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	--shadow-2xs: 0 1px rgb(0 0 0 / 0.1);
 	--shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.15);
 	--shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
@@ -1006,4 +1009,155 @@ textarea::placeholder {
 }
 .artist-ring-violet {
 	box-shadow: 0 0 0 2.5px #a855f7, 0 0 16px rgba(168, 85, 247, 0.6);
+}
+
+/* ==========================================================================
+   PREMIUM MICRO-ANIMATIONS & ADVANCED INTERACTIVITY
+   ========================================================================== */
+
+/* Typography & Subpixel Font Smoothing */
+html, body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "ss02", "tnum";
+}
+
+.font-heading {
+	font-family: var(--font-heading);
+	letter-spacing: -0.028em;
+}
+
+.font-mono {
+	font-family: var(--font-mono);
+	font-feature-settings: "tnum", "zero";
+}
+
+/* Tactile Active Press Feedback */
+.active-press, button:active, [role="button"]:active {
+	transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.active-press:active {
+	transform: scale(0.95);
+}
+
+/* 4-Bar Dancing Live Equalizer Animation for Playing Tracks */
+@keyframes eq-bounce-1 {
+	0%, 100% { height: 25%; }
+	50% { height: 95%; }
+}
+@keyframes eq-bounce-2 {
+	0%, 100% { height: 85%; }
+	50% { height: 30%; }
+}
+@keyframes eq-bounce-3 {
+	0%, 100% { height: 40%; }
+	50% { height: 100%; }
+}
+@keyframes eq-bounce-4 {
+	0%, 100% { height: 90%; }
+	50% { height: 20%; }
+}
+
+.animate-eq-1 {
+	animation: eq-bounce-1 0.85s ease-in-out infinite alternate;
+}
+.animate-eq-2 {
+	animation: eq-bounce-2 0.75s ease-in-out infinite alternate 0.15s;
+}
+.animate-eq-3 {
+	animation: eq-bounce-3 0.95s ease-in-out infinite alternate 0.3s;
+}
+.animate-eq-4 {
+	animation: eq-bounce-4 0.65s ease-in-out infinite alternate 0.1s;
+}
+
+/* Ambient Floating Animation */
+@keyframes float-gentle {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-4px); }
+}
+.animate-float {
+	animation: float-gentle 4s ease-in-out infinite;
+}
+
+/* Iridescent Text Shimmer */
+@keyframes shimmer-text {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+.text-shimmer {
+	background: linear-gradient(90deg, #ff2a7a, #a855f7, #38bdf8, #ff2a7a);
+	background-size: 300% 300%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: shimmer-text 6s ease infinite;
+}
+
+/* Glass Light Sweep Sheen on Cards */
+.glass-sheen {
+	position: relative;
+	overflow: hidden;
+}
+.glass-sheen::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: linear-gradient(
+		60deg,
+		transparent 40%,
+		rgba(255, 255, 255, 0.08) 50%,
+		transparent 60%
+	);
+	transform: translateX(-100%) rotate(25deg);
+	transition: transform 0.75s ease;
+	pointer-events: none;
+}
+.glass-sheen:hover::after {
+	transform: translateX(100%) rotate(25deg);
+}
+
+/* Radiating Pulse Halo */
+@keyframes pulse-halo {
+	0% {
+		box-shadow: 0 0 0 0 rgba(255, 42, 122, 0.6);
+	}
+	70% {
+		box-shadow: 0 0 0 10px rgba(255, 42, 122, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(255, 42, 122, 0);
+	}
+}
+.pulse-halo {
+	animation: pulse-halo 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Spring Hover Lift */
+.hover-spring {
+	transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.hover-spring:hover {
+	transform: translateY(-2px) scale(1.02);
+}
+
+/* Ultra-Refined Minimal Scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.14);
+	border-radius: 9999px;
+	transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 42, 122, 0.5);
 }

@@ -180,10 +180,10 @@
 	data-selected={selectable ? selected : undefined}
 	aria-describedby={selectable ? selectionDescriptionId : undefined}
 	aria-label={selectable ? t(guestAdd ? 'selection.track_guest' : 'selection.track', { title: song.title }) : guestAdd ? `Add ${song.title} to the session queue` : `Play ${song.title}`}
-	class="group flex w-full cursor-pointer items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent/10 active:bg-accent/15 select-none {selected
+	class="group flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 transition-all duration-200 hover:bg-white/[0.06] active:scale-[0.99] select-none {selected
 		? 'bg-primary/15'
 		: active
-		? 'bg-accent/10'
+		? 'bg-primary/10 border-l-2 border-primary pl-2.5'
 		: ''} {compact ? '' : '[content-visibility:auto] [contain-intrinsic-size:auto_3.5rem]'}"
 >
 	{#if selectable}
@@ -216,11 +216,20 @@
 		<div class="flex min-w-0 shrink-0 items-center gap-3">
 			{#if index !== undefined}
 				<span
-					class="relative w-5 shrink-0 text-center text-xs {active
-						? 'text-primary'
+					class="relative flex h-5 w-5 shrink-0 items-center justify-center text-center text-xs {active
+						? 'text-primary font-bold'
 						: 'text-muted-foreground'}"
 				>
-					<span class={selectable ? '' : 'group-hover:opacity-0'}>{index + 1}</span>
+					{#if active}
+						<div class="flex items-end justify-center gap-0.5 h-3.5 w-3.5 shrink-0 {selectable ? '' : 'group-hover:opacity-0'}" aria-label="Playing">
+							<span class="w-0.5 bg-primary rounded-full animate-eq-1"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-2"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-3"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-4"></span>
+						</div>
+					{:else}
+						<span class={selectable ? '' : 'group-hover:opacity-0'}>{index + 1}</span>
+					{/if}
 					<HugeiconsIcon
 						icon={guestAdd ? PlayListAddIcon : PlayIcon}
 						class="absolute inset-0 m-auto h-3.5 w-3.5 opacity-0 {selectable ? '' : 'group-hover:opacity-100'}"
