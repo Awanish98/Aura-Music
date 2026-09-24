@@ -15,8 +15,11 @@
 		setEqPreset,
 		setEqBands,
 		setAudioQuality,
+		setPlaybackMode,
+		setCrossfadeDuration,
 		EQ_PRESETS,
 		type EqPreset,
+		type PlaybackMode,
 		playback
 	} from '$lib/player.svelte';
 	import SleepTimerModal from './SleepTimerModal.svelte';
@@ -85,6 +88,88 @@
 			</div>
 
 			<div class="mt-5 space-y-6">
+				<!-- Section: Playback Mode -->
+				<div>
+					<div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center justify-between">
+						<span>Playback Mode</span>
+						<span class="text-[10px] font-mono text-primary font-bold lowercase">
+							{audioFx.playbackMode === 'crossfade' ? `crossfade (${audioFx.crossfadeDuration}s)` : audioFx.playbackMode}
+						</span>
+					</div>
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+						<!-- Normal -->
+						<button
+							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'normal'
+								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							onclick={() => setPlaybackMode('normal')}
+						>
+							<div class="flex items-center justify-between w-full">
+								<span class="text-xs font-bold">Normal</span>
+								{#if audioFx.playbackMode === 'normal'}
+									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
+								{/if}
+							</div>
+							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Standard song transition</span>
+						</button>
+
+						<!-- Gapless -->
+						<button
+							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'gapless'
+								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							onclick={() => setPlaybackMode('gapless')}
+						>
+							<div class="flex items-center justify-between w-full">
+								<span class="text-xs font-bold">Gapless</span>
+								{#if audioFx.playbackMode === 'gapless'}
+									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
+								{/if}
+							</div>
+							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Preload next & zero gap</span>
+						</button>
+
+						<!-- Crossfade -->
+						<button
+							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'crossfade'
+								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							onclick={() => setPlaybackMode('crossfade')}
+						>
+							<div class="flex items-center justify-between w-full">
+								<span class="text-xs font-bold">Crossfade</span>
+								{#if audioFx.playbackMode === 'crossfade'}
+									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
+								{/if}
+							</div>
+							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Overlap 3–12s</span>
+						</button>
+					</div>
+
+					<!-- Crossfade Duration Slider -->
+					{#if audioFx.playbackMode === 'crossfade'}
+						<div class="mt-2 rounded-xl border border-primary/20 bg-primary/5 p-3 flex flex-col gap-2">
+							<div class="flex items-center justify-between text-xs">
+								<span class="font-medium text-foreground">Crossfade Overlap</span>
+								<span class="font-mono font-bold text-primary px-2 py-0.5 rounded-md bg-primary/15">{audioFx.crossfadeDuration}s</span>
+							</div>
+							<div class="flex items-center gap-2">
+								<span class="text-[10px] text-muted-foreground font-mono">3s</span>
+								<input
+									type="range"
+									min="3"
+									max="12"
+									step="1"
+									value={audioFx.crossfadeDuration}
+									oninput={(e) => setCrossfadeDuration(Number(e.currentTarget.value))}
+									class="w-full accent-primary h-1.5 cursor-pointer bg-muted rounded-lg"
+								/>
+								<span class="text-[10px] text-muted-foreground font-mono">12s</span>
+							</div>
+						</div>
+					{/if}
+				</div>
+
 				<!-- Section 1: Presets -->
 				<div>
 					<div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 block">

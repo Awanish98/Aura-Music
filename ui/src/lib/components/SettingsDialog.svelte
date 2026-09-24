@@ -15,7 +15,9 @@
 		Coffee02Icon,
 		DiscordIcon,
 		CloudIcon,
-		SparklesIcon
+		SparklesIcon,
+		CheckmarkCircle01Icon,
+		AudioWave02Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -28,7 +30,17 @@
 	import { HELP_COMBO } from '$lib/shortcuts';
 	import { copyText } from '$lib/clipboard';
 	import * as api from '$lib/api';
-	import { blocked, prefs, ui, toast, unblockArtist } from '$lib/player.svelte';
+	import {
+		blocked,
+		prefs,
+		ui,
+		toast,
+		unblockArtist,
+		audioFx,
+		setPlaybackMode,
+		setCrossfadeDuration,
+		type PlaybackMode
+	} from '$lib/player.svelte';
 	import { win } from '$lib/win.svelte';
 	import ColorPicker from '$lib/components/ColorPicker.svelte';
 	import Changelog from '$lib/components/Changelog.svelte';
@@ -713,6 +725,16 @@
 						</section>
 					{:else if tab === 'playback'}
 						<section class={GROUP}>
+							<h3 class={LABEL}>Playback Transition</h3>
+							<div class={CARD}>
+								{@render row({
+									title: 'Playback Mode',
+									desc: 'Choose how Aura transitions between upcoming queue tracks.',
+									below: playbackModeSection
+								})}
+							</div>
+						</section>
+						<section class={GROUP}>
 							<h3 class={LABEL}>{t('settings.sections.audio')}</h3>
 							<div class={CARD}>
 								{@render row({
@@ -1171,6 +1193,101 @@
 	>
 		{t('common.reset')}
 	</Button>
+{/snippet}
+
+{#snippet playbackModeSection()}
+	<div class="flex flex-col gap-3 pt-1">
+		<!-- 3 Modes Grid -->
+		<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+			<!-- Normal -->
+			<button
+				type="button"
+				onclick={() => setPlaybackMode('normal')}
+				class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'normal'
+					? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary shadow-sm'
+					: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-muted-foreground hover:text-foreground'}"
+			>
+				<div class="flex items-center justify-between w-full mb-1">
+					<span class="text-xs font-bold text-foreground">Normal</span>
+					{#if audioFx.playbackMode === 'normal'}
+						<HugeiconsIcon icon={CheckmarkCircle01Icon} size={15} class="text-primary" />
+					{/if}
+				</div>
+				<span class="text-[11px] leading-snug opacity-80">Standard song transition</span>
+			</button>
+
+			<!-- Gapless -->
+			<button
+				type="button"
+				onclick={() => setPlaybackMode('gapless')}
+				class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'gapless'
+					? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary shadow-sm'
+					: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-muted-foreground hover:text-foreground'}"
+			>
+				<div class="flex items-center justify-between w-full mb-1">
+					<span class="text-xs font-bold text-foreground">Gapless</span>
+					{#if audioFx.playbackMode === 'gapless'}
+						<HugeiconsIcon icon={CheckmarkCircle01Icon} size={15} class="text-primary" />
+					{/if}
+				</div>
+				<span class="text-[11px] leading-snug opacity-80">Preload next track and eliminate transition gap</span>
+			</button>
+
+			<!-- Crossfade -->
+			<button
+				type="button"
+				onclick={() => setPlaybackMode('crossfade')}
+				class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'crossfade'
+					? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary shadow-sm'
+					: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-muted-foreground hover:text-foreground'}"
+			>
+				<div class="flex items-center justify-between w-full mb-1">
+					<span class="text-xs font-bold text-foreground">Crossfade</span>
+					{#if audioFx.playbackMode === 'crossfade'}
+						<HugeiconsIcon icon={CheckmarkCircle01Icon} size={15} class="text-primary" />
+					{/if}
+				</div>
+				<span class="text-[11px] leading-snug opacity-80">Overlap current + next track by 3–12 seconds</span>
+			</button>
+		</div>
+
+		<!-- Crossfade Duration Slider (if crossfade active) -->
+		{#if audioFx.playbackMode === 'crossfade'}
+			<div class="mt-1 rounded-xl border border-primary/20 bg-primary/5 p-3.5 flex flex-col gap-2 transition-all">
+				<div class="flex items-center justify-between text-xs">
+					<span class="font-medium text-foreground">Crossfade Duration</span>
+					<span class="font-mono font-bold text-primary px-2 py-0.5 rounded-md bg-primary/15">{audioFx.crossfadeDuration}s</span>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="text-[11px] text-muted-foreground font-mono">3s</span>
+					<input
+						type="range"
+						min="3"
+						max="12"
+						step="1"
+						value={audioFx.crossfadeDuration}
+						oninput={(e) => setCrossfadeDuration(Number(e.currentTarget.value))}
+						class="w-full accent-primary h-1.5 cursor-pointer bg-muted rounded-lg"
+					/>
+					<span class="text-[11px] text-muted-foreground font-mono">12s</span>
+				</div>
+				<div class="flex items-center justify-between text-[10px] text-muted-foreground pt-1">
+					<span>Quick presets:</span>
+					<div class="flex items-center gap-1.5">
+						{#each [3, 5, 8, 10, 12] as s}
+							<button
+								type="button"
+								onclick={() => setCrossfadeDuration(s)}
+								class="px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer {audioFx.crossfadeDuration === s ? 'bg-primary text-primary-foreground font-bold' : 'bg-muted hover:bg-muted-foreground/20 text-foreground'}"
+							>
+								{s}s
+							</button>
+						{/each}
+					</div>
+				</div>
+			</div>
+		{/if}
+	</div>
 {/snippet}
 
 <!-- Segmented, not three buttons: the options are one exclusive choice and should look like it. -->

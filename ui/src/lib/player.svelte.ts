@@ -109,6 +109,7 @@ export function setSleepTimer(minutes: number | 'end' | null) {
 }
 
 export type EqPreset = 'flat' | 'bass_boost' | 'vocal' | 'treble' | 'acoustic' | 'electronic' | 'rock' | 'classical';
+export type PlaybackMode = 'normal' | 'gapless' | 'crossfade';
 
 export const EQ_PRESETS: Record<EqPreset, { name: string; bass: number; mid: number; treble: number; desc: string }> = {
 	bass_boost: { name: 'Bass Boost', bass: 8, mid: -1, treble: 2, desc: 'Deep punchy sub-bass & enhanced low end' },
@@ -128,8 +129,34 @@ export const audioFx = $state({
 	mid: -1,
 	treble: 2,
 	audioQuality: (browser ? localStorage.getItem('aura_audio_quality') || '320k' : '320k') as '320k' | '160k' | '128k' | '64k',
-	visualizerEnabled: true
+	visualizerEnabled: true,
+	playbackMode: (browser ? (localStorage.getItem('aura_playback_mode') as PlaybackMode) || 'crossfade' : 'crossfade') as PlaybackMode,
+	crossfadeDuration: (browser ? Number(localStorage.getItem('aura_crossfade_duration')) || 5 : 5)
 });
+
+export function setPlaybackMode(mode: PlaybackMode) {
+	audioFx.playbackMode = mode;
+	if (browser) {
+		localStorage.setItem('aura_playback_mode', mode);
+		toast.success(
+			`Playback mode: ${
+				mode === 'normal'
+					? 'Normal (Standard transition)'
+					: mode === 'gapless'
+						? 'Gapless (Preload zero-gap)'
+						: `Crossfade (${audioFx.crossfadeDuration}s overlap)`
+			}`
+		);
+	}
+}
+
+export function setCrossfadeDuration(secs: number) {
+	const clamped = Math.max(3, Math.min(12, Math.round(secs)));
+	audioFx.crossfadeDuration = clamped;
+	if (browser) {
+		localStorage.setItem('aura_crossfade_duration', String(clamped));
+	}
+}
 
 export function setEqPreset(preset: EqPreset) {
 	const p = EQ_PRESETS[preset];
