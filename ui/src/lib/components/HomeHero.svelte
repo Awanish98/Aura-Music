@@ -62,11 +62,11 @@
 	<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 		<!-- Left: Big Greeting + Subtitle -->
 		<div class="flex-1 space-y-1.5 max-w-lg">
-			<h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+			<h2 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
 				{prefix} <span class="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,42,122,0.6)]">{part}</span>
-			</h1>
+			</h2>
 			<p class="text-sm sm:text-base text-purple-200/90 font-medium tracking-wide">
-				What's your vibe today?
+				What's your vibe today? Stream high-fidelity music and explore curated charts.
 			</p>
 		</div>
 

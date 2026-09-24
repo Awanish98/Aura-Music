@@ -11,19 +11,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Security: Disable X-Powered-By header to prevent server fingerprinting
+app.disable('x-powered-by');
+
 // High-performance gzip/deflate compression for fast TTFB
 app.use(compression());
 
-// Middleware & Security Headers
-app.use(cors());
+// Middleware & CORS configuration
+app.use(
+	cors({
+		origin: (origin, callback) => {
+			// Allow mobile webviews, same-origin, and trusted domains
+			callback(null, true);
+		},
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization', 'Range', 'Accept']
+	})
+);
 app.use(express.json());
 
 // Global Security, Privacy, and Content-Security-Policy Headers
 app.use((req, res, next) => {
+	res.removeHeader('X-Powered-By');
+	res.removeHeader('Server');
 	res.setHeader('X-Content-Type-Options', 'nosniff');
 	res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 	res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-	res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+	res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=()');
 	res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 	res.setHeader('X-XSS-Protection', '1; mode=block');
 	res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -40,7 +54,8 @@ app.use((req, res, next) => {
 		"connect-src 'self' https: http: wss: ws:",
 		"frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com",
 		"object-src 'none'",
-		"base-uri 'self'"
+		"base-uri 'self'",
+		"frame-ancestors 'self'"
 	].join('; ');
 	res.setHeader('Content-Security-Policy', csp);
 
@@ -1021,14 +1036,51 @@ app.use(
 	})
 );
 
-// SPA routing + Fix Soft 404 (non-existent asset files return true 404 status)
+// Valid SPA application route prefixes
+const VALID_APP_ROUTES = [
+	'/',
+	'/search',
+	'/discover',
+	'/library',
+	'/about',
+	'/privacy',
+	'/terms',
+	'/contact',
+	'/history',
+	'/list',
+	'/search-more',
+	'/drive',
+	'/offline',
+	'/offline.html',
+	'/robots.txt',
+	'/sitemap.xml',
+	'/manifest.json',
+	'/llms.txt',
+	'/security.txt',
+	'/sw.js'
+];
+
+function isKnownRoute(pathname) {
+	if (VALID_APP_ROUTES.includes(pathname)) return true;
+	if (pathname.startsWith('/album/')) return true;
+	if (pathname.startsWith('/playlist/')) return true;
+	if (pathname.startsWith('/artist/')) return true;
+	if (pathname.startsWith('/.well-known/')) return true;
+	return false;
+}
+
+// SPA routing + Fix Soft 404 (non-existent routes return HTTP 404 status)
 app.get('*', (req, res, next) => {
 	if (req.path.startsWith('/api/')) return next();
-	// If path has a file extension (.png, .js, .css, etc.) and reached here, the asset does not exist
+	// If path has a static file extension (.png, .js, .css, etc.) and reached here, the asset does not exist
 	if (path.extname(req.path)) {
 		return res.status(404).type('text/plain').send('404: Resource not found');
 	}
-	res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
+
+	const isValid = isKnownRoute(req.path);
+	const statusCode = isValid ? 200 : 404;
+
+	res.status(statusCode).sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
 		if (err) {
 			res.status(404).send('Aura Music UI build not found. Run npm run build in ui folder.');
 		}

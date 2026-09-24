@@ -18,6 +18,7 @@ import * as pl from './personal';
 import type { Personal } from './personal';
 import { appearance } from './theme.svelte';
 import { t } from './i18n.svelte';
+import { analytics } from './analytics';
 
 export const playback = $state({
 	now: null as NowPlaying | null,
@@ -271,6 +272,9 @@ export const openPlayer = () => {
 /** Play one track (a search row, a song card, a shelf), and show it. */
 export function playSong(song: SongItem) {
 	openPlayer();
+	if (song) {
+		analytics.trackPlay(song.title, song.artists, song.video_id);
+	}
 	return api.play(song);
 }
 

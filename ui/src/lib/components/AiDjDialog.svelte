@@ -19,6 +19,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { aiAgent, type AiMessage } from '$lib/aiAgent';
 	import { playback, toast } from '$lib/player.svelte';
+	import { analytics } from '$lib/analytics';
 	import * as api from '$lib/api';
 	import type { SongItem } from '$lib/api';
 	import { thumb } from '$lib/thumb';
@@ -111,6 +112,7 @@
 
 		messages = [...messages, userMsg];
 		loading = true;
+		analytics.trackAiDj(prompt);
 		scrollToBottom();
 
 		try {

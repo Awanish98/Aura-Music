@@ -21,6 +21,7 @@
 	import type { BrowseItem, SongItem } from '$lib/api';
 	import { openItem, asSong } from '$lib/browse';
 	import { playSong, ui } from '$lib/player.svelte';
+	import { analytics } from '$lib/analytics';
 	import { MOD } from '$lib/shortcuts';
 	import { thumb } from '$lib/thumb';
 	import { t } from '$lib/i18n.svelte';
@@ -115,7 +116,10 @@
 	function selectSuggestion(s: SmartSuggestion, e?: Event) {
 		if (e) e.preventDefault();
 		const finalQuery = (s.query || s.title || '').trim();
-		if (finalQuery) saveRecentSearch(finalQuery);
+		if (finalQuery) {
+			saveRecentSearch(finalQuery);
+			analytics.trackSearch(finalQuery);
+		}
 
 		if (s.item) {
 			if (s.type === 'song') {
@@ -184,10 +188,12 @@
 				selectSuggestion(suggestions[active]);
 			} else if (value.trim()) {
 				e.preventDefault();
-				saveRecentSearch(value.trim());
+				const q = value.trim();
+				saveRecentSearch(q);
+				analytics.trackSearch(q);
 				close();
 				onpick?.();
-				goto(`/search?q=${encodeURIComponent(value.trim())}`);
+				goto(`/search?q=${encodeURIComponent(q)}`);
 			}
 		} else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && suggestions.length) {
 			e.preventDefault();
@@ -209,8 +215,21 @@
 		}
 	}}
 >
-	<!-- Search Input Container -->
-	<div class="relative flex items-center w-full">
+	<!-- Search Form with Accessible Semantics -->
+	<form
+		role="search"
+		aria-label="Music Search"
+		class="relative flex items-center w-full"
+		onsubmit={(e) => {
+			e.preventDefault();
+			if (value.trim()) {
+				saveRecentSearch(value.trim());
+				goto(`/search?q=${encodeURIComponent(value.trim())}`);
+				close();
+			}
+		}}
+	>
+		<label for="global-music-search" class="sr-only">Search songs, artists, albums, moods</label>
 		<div class="absolute left-3.5 flex items-center pointer-events-none text-muted-foreground/80">
 			<HugeiconsIcon icon={Search01Icon} size={17} />
 		</div>
@@ -218,9 +237,13 @@
 		<Input
 			bind:ref={inputEl}
 			bind:value
+			id="global-music-search"
+			name="search"
+			aria-label="Search songs, artists, albums, moods"
 			{placeholder}
 			class="pl-10 pr-20 h-10 text-xs sm:text-sm rounded-full bg-white/40 dark:bg-white/6 backdrop-blur-md border border-black/10 dark:border-white/10 text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-card/90 transition-all shadow-inner {inputClass}"
 			autocomplete="off"
+			spellcheck="false"
 			role="combobox"
 			aria-expanded={open}
 			aria-controls="search-suggest"
@@ -249,7 +272,7 @@
 				</kbd>
 			{/if}
 		</div>
-	</div>
+	</form>
 
 	<!-- Suggestion Dropdown Panel (Apple macOS Liquid Glass Style) -->
 	{#if open}

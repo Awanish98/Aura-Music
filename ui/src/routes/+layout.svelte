@@ -10,8 +10,10 @@
 	} from '@hugeicons/core-free-icons';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { isTauri } from '$lib/api';
+	import { analytics } from '$lib/analytics';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import {
@@ -134,6 +136,10 @@
 		const teardownWin = initWin();
 		if (!isTauri()) {
 			webPlayer.init();
+			analytics.init();
+			if ('serviceWorker' in navigator && import.meta.env.PROD) {
+				navigator.serviceWorker.register('/sw.js').catch(() => {});
+			}
 		}
 		checkForUpdatesQuiet();
 		// Repeat while the app stays open: ✕ hides to tray by default, so this component can stay
@@ -149,6 +155,12 @@
 			teardownZoom();
 			teardownShortcuts();
 		};
+	});
+
+	afterNavigate((nav) => {
+		if (browser && !isTauri()) {
+			analytics.trackPageView(nav.to?.url?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '/'));
+		}
 	});
 </script>
 
