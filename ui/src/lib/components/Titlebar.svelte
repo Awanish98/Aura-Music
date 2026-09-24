@@ -27,6 +27,7 @@
 	import LastFmIcon from './LastFmIcon.svelte';
 	import DiscordIcon from './DiscordIcon.svelte';
 	import AccountMenu from './AccountMenu.svelte';
+	import CyberTimeHud from './CyberTimeHud.svelte';
 	import * as api from '$lib/api';
 	import { auth, playback, prefs, refreshView, toast, ui } from '$lib/player.svelte';
 	import { win } from '$lib/win.svelte';
@@ -55,32 +56,7 @@
 
 	let searchQuery = $state('');
 
-	// Real-time live date & time clock
-	let timeStr = $state('');
-	let dateStr = $state('');
-	let isDaytime = $state(true);
-
-	function updateLiveClock() {
-		const now = new Date();
-		const hours24 = now.getHours();
-		isDaytime = hours24 >= 6 && hours24 < 18;
-
-		// 12-hour formatted time: e.g. "09:41 PM"
-		const hours12 = hours24 % 12 || 12;
-		const minutes = now.getMinutes().toString().padStart(2, '0');
-		const ampm = hours24 >= 12 ? 'PM' : 'AM';
-		timeStr = `${hours12.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-
-		// Date formatted: e.g. "Thu, 24 Sep"
-		const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-		dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
-	}
-
 	onMount(() => {
-		updateLiveClock();
-		const clockInterval = setInterval(updateLiveClock, 1000);
-
 		api.lastfmStatus()
 			.then((s) => {
 				connected = s.connected;
@@ -97,7 +73,6 @@
 			else if (!wasConnecting) toast.success(t('integrations.lastfm_disconnected'));
 		});
 		return () => {
-			clearInterval(clockInterval);
 			sub.then((u) => u());
 		};
 	});
@@ -202,21 +177,10 @@
 		</form>
 	</div>
 
-	<!-- Right: Live Clock & Quote Widget + Action Buttons + Profile -->
+	<!-- Right: Cyber Time HUD Widget + Action Buttons + Profile -->
 	<div class="flex items-center gap-3">
-		<!-- Live Date/Time & Mood Quote Widget (Desktop) -->
-		<div class="hidden xl:flex flex-col items-end text-right pr-2">
-			<div class="flex items-center gap-2">
-				<span class="text-[11px] font-medium text-muted-foreground/80">{dateStr}</span>
-				<span class="text-xs font-bold text-foreground flex items-center gap-1">
-					{timeStr}
-					<span>{isDaytime ? '☀️' : '🌙'}</span>
-				</span>
-			</div>
-			<span class="text-[10px] italic text-muted-foreground/60 font-serif leading-tight">
-				"The right song can change your whole mood."
-			</span>
-		</div>
+		<!-- 21st.dev Cyber Time & Date HUD with World Matrix & Quick Sleep Timer -->
+		<CyberTimeHud />
 
 		<!-- Search Button (Mobile Only) -->
 		<a

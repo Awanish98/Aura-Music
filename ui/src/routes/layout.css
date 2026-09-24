@@ -1161,3 +1161,98 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
 	background: rgba(255, 42, 122, 0.5);
 }
+
+/* --- 21st.dev Futuristic & Cyber Design System Utilities --- */
+
+/* 21st.dev Rotating Border Beam */
+@keyframes beam-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.border-beam-container {
+	position: relative;
+	overflow: hidden;
+	border-radius: inherit;
+}
+.border-beam-container::before {
+	content: '';
+	position: absolute;
+	inset: -150%;
+	background: conic-gradient(
+		from 0deg at 50% 50%,
+		transparent 0deg,
+		rgba(255, 42, 122, 0.8) 60deg,
+		rgba(168, 85, 247, 0.9) 120deg,
+		rgba(56, 189, 248, 0.9) 180deg,
+		transparent 240deg
+	);
+	animation: beam-spin 4s linear infinite;
+	pointer-events: none;
+	opacity: 0.8;
+}
+
+/* Cyber HUD Glass Capsule */
+.cyber-hud-glass {
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+	backdrop-filter: blur(24px) saturate(180%);
+	-webkit-backdrop-filter: blur(24px) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cyber-hud-glass:hover {
+	border-color: rgba(255, 42, 122, 0.4);
+	box-shadow: 0 12px 40px 0 rgba(255, 42, 122, 0.18), inset 0 1px 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Neon Text Glows */
+.text-cyber-glow {
+	text-shadow: 0 0 12px rgba(255, 42, 122, 0.6), 0 0 24px rgba(255, 42, 122, 0.3);
+}
+.text-cyan-glow {
+	text-shadow: 0 0 12px rgba(56, 189, 248, 0.6), 0 0 24px rgba(56, 189, 248, 0.3);
+}
+.text-violet-glow {
+	text-shadow: 0 0 12px rgba(168, 85, 247, 0.6), 0 0 24px rgba(168, 85, 247, 0.3);
+}
+
+/* Pulsing Clock Colon */
+@keyframes neon-pulse-colon {
+	0%, 100% {
+		opacity: 1;
+		text-shadow: 0 0 8px rgba(255, 42, 122, 0.9), 0 0 16px rgba(255, 42, 122, 0.5);
+	}
+	50% {
+		opacity: 0.25;
+		text-shadow: none;
+	}
+}
+.animate-neon-colon {
+	animation: neon-pulse-colon 1.5s ease-in-out infinite;
+}
+
+/* Card Spotlight Sheen on Hover */
+.card-spotlight {
+	position: relative;
+	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.card-spotlight::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: radial-gradient(
+		600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+		rgba(255, 42, 122, 0.12),
+		transparent 40%
+	);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+	z-index: 1;
+}
+.card-spotlight:hover::before {
+	opacity: 1;
+}
+
