@@ -109,7 +109,7 @@
 
 <header
 	data-tauri-drag-region
-	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-border/40 bg-card/80 dark:bg-[#07090e]/90 backdrop-blur-3xl px-4 sm:px-6 transition-colors duration-300"
+	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-border/30 bg-white/45 dark:bg-[#070912]/50 backdrop-blur-2xl px-4 sm:px-6 transition-colors duration-300"
 >
 	<!-- Left: Brand Logo & History Navigation -->
 	<div class="flex items-center gap-3">
@@ -168,7 +168,7 @@
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Search songs, artists, albums, moods..."
-				class="w-full h-10 pl-10 pr-24 rounded-full bg-muted/40 dark:bg-white/5 border border-border/40 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-card transition-all shadow-inner"
+				class="w-full h-10 pl-10 pr-24 rounded-full bg-white/40 dark:bg-white/6 backdrop-blur-md border border-black/10 dark:border-white/10 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-card/90 transition-all shadow-inner"
 			/>
 			<div class="absolute right-2.5 flex items-center gap-1.5 pointer-events-none">
 				<kbd class="hidden lg:inline-flex items-center gap-0.5 rounded-full border border-border/50 bg-muted/60 px-2 py-0.5 text-[10px] font-mono text-muted-foreground font-semibold">

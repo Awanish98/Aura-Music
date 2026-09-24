@@ -193,7 +193,7 @@
 			<Sidebar />
 			<!-- dragScroll: dragging a card up to home's Shortcuts grid has to be possible from anywhere in
 			     the feed, so aiming at the top edge scrolls this container while the drag is in flight. -->
-			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-0" {@attach dragScroll}>
+			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-28" {@attach dragScroll}>
 				<!-- Remount the current page on sign-in/out so it refetches with the new account, and on
 				     a refresh (titlebar button / F5), which drops the browse cache first. -->
 				{#key `${auth.epoch}:${ui.epoch}`}
@@ -213,13 +213,13 @@
 			{#if lyricsOpen}<LyricsPanel onClose={() => (lyricsOpen = false)} {queueOpen} />{/if}
 			{#if queueOpen}<QueuePanel onClose={() => (queueOpen = false)} />{/if}
 		</div>
-		<!-- Persistent Player Bar (floating liquid glass dock on desktop & mobile) -->
+		<!-- Persistent Player Bar (floating macOS liquid glass dock) -->
 		{#if playback.now}
 			<div
-				class="fixed md:relative bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-auto inset-x-0 z-20 px-2.5 sm:px-3 md:px-4 md:py-2 pointer-events-none md:pointer-events-auto"
+				class="fixed md:absolute bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-3.5 inset-x-0 z-20 px-2.5 sm:px-3 md:px-6 pointer-events-none"
 				in:fly={{ y: 64, duration: 250, easing: cubicOut }}
 			>
-				<div class="pointer-events-auto max-w-lg md:max-w-none mx-auto w-full">
+				<div class="pointer-events-auto max-w-lg md:max-w-7xl mx-auto w-full">
 					<PlayerBar
 						onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
 						queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
@@ -229,13 +229,15 @@
 				</div>
 			</div>
 		{:else}
-			<div class="hidden md:block relative inset-x-0 z-20 px-4 py-2">
-				<PlayerBar
-					onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
-					queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
-					onToggleLyrics={() => (tabbed ? (np.tab = 'lyrics') : (lyricsOpen = !lyricsOpen))}
-					lyricsOpen={tabbed ? np.tab === 'lyrics' : lyricsOpen}
-				/>
+			<div class="hidden md:block absolute bottom-3.5 inset-x-0 z-20 px-6 pointer-events-none">
+				<div class="pointer-events-auto max-w-7xl mx-auto w-full">
+					<PlayerBar
+						onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
+						queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
+						onToggleLyrics={() => (tabbed ? (np.tab = 'lyrics') : (lyricsOpen = !lyricsOpen))}
+						lyricsOpen={tabbed ? np.tab === 'lyrics' : lyricsOpen}
+					/>
+				</div>
 			</div>
 		{/if}
 		<!-- Mobile Bottom Navigation Bar (< md) -->
