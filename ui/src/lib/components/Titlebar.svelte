@@ -28,6 +28,7 @@
 	import DiscordIcon from './DiscordIcon.svelte';
 	import AccountMenu from './AccountMenu.svelte';
 	import CyberTimeHud from './CyberTimeHud.svelte';
+	import SearchSuggest from './SearchSuggest.svelte';
 	import LiquidButton from '$lib/components/ui/LiquidButton.svelte';
 	import * as api from '$lib/api';
 	import { auth, playback, prefs, refreshView, toast, ui } from '$lib/player.svelte';
@@ -152,30 +153,14 @@
 		</div>
 	</div>
 
-	<!-- Center: Rounded Frosted Glass Search Bar with Ctrl+K Pill -->
+	<!-- Center: Rounded Frosted Glass Search Bar with YouTube-Style Live Predictive Suggestions -->
 	<div class="flex-1 max-w-xl mx-4 hidden md:block">
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleSearchSubmit();
-			}}
-			class="relative flex items-center w-full"
-		>
-			<div class="absolute left-3.5 flex items-center pointer-events-none text-muted-foreground">
-				<HugeiconsIcon icon={Search01Icon} size={17} />
-			</div>
-			<input
-				type="text"
-				bind:value={searchQuery}
-				placeholder="Search songs, artists, albums, moods..."
-				class="w-full h-10 pl-10 pr-24 rounded-full bg-white/40 dark:bg-white/6 backdrop-blur-md border border-black/10 dark:border-white/10 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-card/90 transition-all shadow-inner"
-			/>
-			<div class="absolute right-2.5 flex items-center gap-1.5 pointer-events-none">
-				<kbd class="hidden lg:inline-flex items-center gap-0.5 rounded-full border border-border/50 bg-muted/60 px-2 py-0.5 text-[10px] font-mono text-muted-foreground font-semibold">
-					Ctrl K
-				</kbd>
-			</div>
-		</form>
+		<SearchSuggest
+			bind:value={searchQuery}
+			placeholder="Search songs, artists, albums, moods..."
+			panelClass="left-0 right-0 w-full"
+			onpick={() => {}}
+		/>
 	</div>
 
 	<!-- Right: Cyber Time HUD Widget + Action Buttons + Profile -->

@@ -246,6 +246,81 @@ app.get('/api/search/unified', async (req, res) => {
 	}
 });
 
+// 4.5. Live Predictive Search Autocomplete & Suggestions (YouTube + JioSaavn)
+app.get('/api/suggest', async (req, res) => {
+	const query = (req.query.q || req.query.input || req.query.query || '').trim();
+	if (!query) {
+		return res.json({ success: true, queries: [], songs: [], artists: [] });
+	}
+
+	try {
+		const [ytRes, saavnRes] = await Promise.allSettled([
+			fetch(
+				`https://suggestqueries-clients6.youtube.com/complete/search?client=firefox&ds=yt&hl=en&gl=in&q=${encodeURIComponent(query)}`,
+				{
+					headers: {
+						'User-Agent':
+							'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+					},
+					signal: AbortSignal.timeout(2500)
+				}
+			).then((r) => r.json()),
+			fetch(
+				`https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&query=${encodeURIComponent(query)}`,
+				{
+					headers: {
+						'User-Agent':
+							'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+					},
+					signal: AbortSignal.timeout(2500)
+				}
+			).then((r) => r.json())
+		]);
+
+		const queries =
+			ytRes.status === 'fulfilled' && Array.isArray(ytRes.value?.[1])
+				? ytRes.value[1].map((s) => String(s).trim()).filter(Boolean)
+				: [];
+
+		let songs = [];
+		let artists = [];
+
+		if (saavnRes.status === 'fulfilled' && saavnRes.value) {
+			const rawSongs = saavnRes.value.songs?.data || [];
+			songs = rawSongs.slice(0, 4).map((s) => ({
+				id: `saavn_${s.id}`,
+				video_id: `saavn_${s.id}`,
+				title: (s.title || '').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&'),
+				artists: (s.description || s.more_info?.primary_artists || s.more_info?.singers || 'Artist')
+					.replace(/&quot;/g, '"')
+					.replace(/&#039;/g, "'")
+					.replace(/&amp;/g, '&'),
+				thumbnail: (s.image || '').replace('50x50', '500x500').replace('150x150', '500x500'),
+				duration: s.more_info?.duration ? `${Math.floor(s.more_info.duration / 60)}:${String(s.more_info.duration % 60).padStart(2, '0')}` : undefined,
+				album: s.album || undefined
+			}));
+
+			const rawArtists = saavnRes.value.artists?.data || [];
+			artists = rawArtists.slice(0, 2).map((a) => ({
+				id: a.id || a.name,
+				title: (a.title || a.name || '').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&'),
+				subtitle: (a.description || 'Artist').replace(/&quot;/g, '"').replace(/&#039;/g, "'"),
+				thumbnail: (a.image || '').replace('50x50', '500x500').replace('150x150', '500x500'),
+				kind: 'artist'
+			}));
+		}
+
+		res.json({
+			success: true,
+			queries,
+			songs,
+			artists
+		});
+	} catch (e) {
+		res.status(500).json({ error: String(e), queries: [], songs: [], artists: [] });
+	}
+});
+
 // 5. YouTube Music InnerTube API Proxy
 app.post('/api/yt-music/:endpoint', async (req, res) => {
 	const endpoint = req.params.endpoint;

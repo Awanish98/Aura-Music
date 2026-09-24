@@ -212,34 +212,142 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 	}
 
 	// When user is typing a query:
-	// A. AI Smart Query Expansions (e.g. Lofi, Remix, Acoustic, Slowed)
-	const smartVariations = [
-		{ suffix: 'Lofi Remix', badge: 'Lofi', type: 'version' as const },
-		{ suffix: 'Slowed + Reverb', badge: 'Slowed', type: 'version' as const },
-		{ suffix: 'Acoustic Cover', badge: 'Acoustic', type: 'version' as const },
-		{ suffix: 'Live Concert', badge: 'Live', type: 'ai_vibe' as const }
-	];
+	// 1. Add matching recent history first
+	const recent = getRecentSearches();
+	for (const r of recent) {
+		if (r.toLowerCase().includes(clean.toLowerCase()) && !seenQueries.has(r.toLowerCase())) {
+			seenQueries.add(r.toLowerCase());
+			results.push({
+				id: `history_match_${r}`,
+				query: r,
+				title: r,
+				subtitle: 'Recent Search',
+				type: 'history'
+			});
+		}
+	}
 
-	// B. Query YouTube Music / Invidious search suggestions
+	// 2. Try fetching live suggestions from /api/suggest
+	let gotBackendSuggestions = false;
 	try {
-		const ytmSuggestions = await api.searchSuggest(clean).catch(() => [] as string[]);
-		if (Array.isArray(ytmSuggestions)) {
-			for (const s of ytmSuggestions.slice(0, 6)) {
-				if (s && !seenQueries.has(s.toLowerCase())) {
-					seenQueries.add(s.toLowerCase());
-					results.push({
-						id: `suggest_${s}`,
-						query: s,
-						title: s,
-						subtitle: 'Suggested Search',
-						type: 'suggest'
-					});
+		const suggestUrl = getApiUrl(`/api/suggest?q=${encodeURIComponent(clean)}`);
+		const resp = await fetch(suggestUrl, { signal: AbortSignal.timeout(2200) });
+		if (resp.ok) {
+			const data = await resp.json();
+			if (data && data.success) {
+				gotBackendSuggestions = true;
+
+				// Add top song match for 1-click play
+				if (Array.isArray(data.songs)) {
+					for (const s of data.songs.slice(0, 2)) {
+						if (s && !seenQueries.has((s.title || '').toLowerCase())) {
+							seenQueries.add((s.title || '').toLowerCase());
+							results.push({
+								id: `song_match_${s.id}`,
+								query: s.title,
+								title: s.title,
+								subtitle: `${s.artists || 'Song'} • Direct Match`,
+								type: 'song',
+								badge: 'Top Match',
+								item: s
+							});
+						}
+					}
+				}
+
+				// Add top artist match
+				if (Array.isArray(data.artists)) {
+					for (const a of data.artists.slice(0, 1)) {
+						if (a && !seenQueries.has((a.title || '').toLowerCase())) {
+							seenQueries.add((a.title || '').toLowerCase());
+							results.push({
+								id: `artist_match_${a.id}`,
+								query: a.title,
+								title: a.title,
+								subtitle: `Artist • ${a.subtitle || 'Verified'}`,
+								type: 'artist',
+								badge: 'Artist',
+								item: a
+							});
+						}
+					}
+				}
+
+				// Add YouTube Autocomplete queries
+				if (Array.isArray(data.queries)) {
+					for (const q of data.queries.slice(0, 7)) {
+						if (q && !seenQueries.has(q.toLowerCase())) {
+							seenQueries.add(q.toLowerCase());
+							results.push({
+								id: `suggest_${q}`,
+								query: q,
+								title: q,
+								subtitle: 'Suggested Search',
+								type: 'suggest'
+							});
+						}
+					}
 				}
 			}
 		}
-	} catch {}
+	} catch (e) {
+		// Fallback to client-side suggest
+	}
 
-	// C. Add direct AI query smart expansion variations
+	// 3. Fallback to direct client YouTube / Invidious suggest if backend wasn't reached
+	if (!gotBackendSuggestions) {
+		try {
+			// Direct YouTube suggest query
+			const ytSuggestUrl = `https://suggestqueries-clients6.youtube.com/complete/search?client=firefox&ds=yt&hl=en&gl=in&q=${encodeURIComponent(clean)}`;
+			const yRes = await fetch(ytSuggestUrl, { signal: AbortSignal.timeout(1800) });
+			if (yRes.ok) {
+				const yData = await yRes.json();
+				if (Array.isArray(yData?.[1])) {
+					for (const s of yData[1].slice(0, 7)) {
+						if (s && !seenQueries.has(String(s).toLowerCase())) {
+							seenQueries.add(String(s).toLowerCase());
+							results.push({
+								id: `suggest_direct_${s}`,
+								query: String(s),
+								title: String(s),
+								subtitle: 'Suggested Search',
+								type: 'suggest'
+							});
+						}
+					}
+				}
+			}
+		} catch {}
+
+		// Also try api.searchSuggest
+		if (results.filter((r) => r.type === 'suggest').length === 0) {
+			try {
+				const ytmSuggestions = await api.searchSuggest(clean).catch(() => [] as string[]);
+				if (Array.isArray(ytmSuggestions)) {
+					for (const s of ytmSuggestions.slice(0, 6)) {
+						if (s && !seenQueries.has(s.toLowerCase())) {
+							seenQueries.add(s.toLowerCase());
+							results.push({
+								id: `suggest_${s}`,
+								query: s,
+								title: s,
+								subtitle: 'Suggested Search',
+								type: 'suggest'
+							});
+						}
+					}
+				}
+			} catch {}
+		}
+	}
+
+	// 4. Add smart AI variation cards (Lofi, Slowed + Reverb, Acoustic)
+	const smartVariations = [
+		{ suffix: 'Lofi Remix', badge: 'Lofi', type: 'version' as const },
+		{ suffix: 'Slowed + Reverb', badge: 'Slowed', type: 'version' as const },
+		{ suffix: 'Acoustic Cover', badge: 'Acoustic', type: 'version' as const }
+	];
+
 	for (const v of smartVariations) {
 		const expandedQuery = `${clean} ${v.suffix}`;
 		if (!seenQueries.has(expandedQuery.toLowerCase())) {
@@ -254,40 +362,6 @@ export async function fetchSmartSuggestions(query: string): Promise<SmartSuggest
 			});
 		}
 	}
-
-	// D. Fetch quick direct preview match for instant 1-tap playback
-	try {
-		const previewRes = await api.searchAll(clean).catch(() => null);
-		if (previewRes) {
-			// Top artist match
-			if (previewRes.artists && previewRes.artists.length > 0) {
-				const artist = previewRes.artists[0];
-				results.unshift({
-					id: `artist_match_${artist.id}`,
-					query: artist.title,
-					title: artist.title,
-					subtitle: `Artist • ${artist.subtitle || 'Verified'}`,
-					type: 'artist',
-					badge: 'Artist',
-					item: artist
-				});
-			}
-
-			// Top song match for 1-tap play
-			if (previewRes.songs && previewRes.songs.length > 0) {
-				const song = previewRes.songs[0];
-				results.unshift({
-					id: `song_match_${song.id}`,
-					query: song.title,
-					title: song.title,
-					subtitle: `${song.subtitle || 'Song'} • Direct Match`,
-					type: 'song',
-					badge: 'Top Match',
-					item: song
-				});
-			}
-		}
-	} catch {}
 
 	return results.slice(0, 10);
 }
