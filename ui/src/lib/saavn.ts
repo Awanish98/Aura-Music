@@ -313,3 +313,57 @@ export async function fetchSaavnAlbumDetailsDirect(albumId: string): Promise<{
 	};
 }
 
+export async function fetchSaavnLyrics(queryOrSongId: string, artist?: string): Promise<{ lyrics: string; snippet?: string } | null> {
+	if (!queryOrSongId) return null;
+	const isDirectId = !queryOrSongId.includes(' ') && queryOrSongId.length <= 16;
+
+	try {
+		let songId = isDirectId ? queryOrSongId.replace('saavn_', '') : null;
+		if (!songId) {
+			const q = artist ? `${queryOrSongId} ${artist}`.trim() : queryOrSongId.trim();
+			const searchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(q)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+			const res = await fetch(searchUrl, { signal: AbortSignal.timeout(4000) });
+			if (res.ok) {
+				const text = await res.text();
+				const clean = text.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+				if (clean.includes('{')) {
+					const data = JSON.parse(clean);
+					if (Array.isArray(data.results) && data.results.length > 0) {
+						const match = data.results.find((r: any) => r.more_info?.has_lyrics === 'true') || data.results[0];
+						if (match?.more_info?.has_lyrics === 'true') {
+							songId = match.id;
+						}
+					}
+				}
+			}
+		}
+
+		if (songId) {
+			const lyrUrl = `https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&lyrics_id=${encodeURIComponent(songId)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+			const lyrRes = await fetch(lyrUrl, { signal: AbortSignal.timeout(4000) });
+			if (lyrRes.ok) {
+				const text = await lyrRes.text();
+				const clean = text.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+				if (clean.includes('{')) {
+					const lyrData = JSON.parse(clean);
+					if (lyrData && lyrData.lyrics) {
+						const cleanLyr = lyrData.lyrics
+							.replace(/<br\s*\/?>/gi, '\n')
+							.replace(/&quot;/g, '"')
+							.replace(/&#039;/g, "'")
+							.replace(/&amp;/g, '&')
+							.trim();
+						if (cleanLyr.length > 10) {
+							return { lyrics: cleanLyr, snippet: lyrData.snippet };
+						}
+					}
+				}
+			}
+		}
+	} catch (e) {
+		console.warn('[Saavn Lyrics Fetch Error]', e);
+	}
+
+	return null;
+}
+

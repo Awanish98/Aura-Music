@@ -367,13 +367,63 @@ app.get('/api/stream', async (req, res) => {
 	}
 });
 
-// 7. Word-to-Word Apple Music Synced Lyrics Engine (LRCLIB + Natural Timing Synthesizer)
+// 7. Word-to-Word Apple Music Synced Lyrics Engine (LRCLIB + JioSaavn + Natural Timing Synthesizer)
 function cleanLyricString(str) {
 	if (!str || typeof str !== 'string') return '';
 	return str
 		.replace(/(\(|\[)(Official|Lyric|Audio|Video|Visualizer|HD|4K|Remastered|feat\.?|ft\.?|From\s*".*?").*?(\)|\])/gi, '')
 		.replace(/[-–|].*$/g, '')
 		.trim();
+}
+
+function normalizeString(str) {
+	return (str || '')
+		.toLowerCase()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/\(official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\)/gi, '')
+		.replace(/\[official\s*(music\s*)?(video|audio|lyric|visualizer|hd|4k|remastered)?\]/gi, '')
+		.replace(/(\(|\[)(feat\.|ft\.|with|prod\.)[^)\]]*(\)|\])/gi, '')
+		.replace(/[^\p{L}\p{N}\s]/gu, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function computeTokenSimilarity(a, b) {
+	const na = normalizeString(a);
+	const nb = normalizeString(b);
+	if (!na || !nb) return 0;
+	if (na === nb) return 1.0;
+	if (na.includes(nb) || nb.includes(na)) return 0.85;
+
+	const setA = new Set(na.split(' ').filter((x) => x.length > 0));
+	const setB = new Set(nb.split(' ').filter((x) => x.length > 0));
+	let intersection = 0;
+	for (const item of setA) {
+		if (setB.has(item)) intersection++;
+	}
+	return (2 * intersection) / (setA.size + setB.size);
+}
+
+function scoreCandidate(cand, targetTitle, targetArtist, targetDur) {
+	const candTitle = cand.trackName || cand.name || cand.title || '';
+	const candArtist = cand.artistName || cand.artist || cand.artists || '';
+	const titleSim = computeTokenSimilarity(candTitle, targetTitle);
+	const artistSim = targetArtist ? computeTokenSimilarity(candArtist, targetArtist) : 0.8;
+
+	// Strict disqualification: if artist was specified and has 0 match, or title has low match
+	if (targetArtist && artistSim < 0.25) return 0;
+	if (titleSim < 0.35) return 0;
+
+	let durScore = 1.0;
+	if (targetDur && cand.duration) {
+		const diff = Math.abs(cand.duration - targetDur);
+		if (diff > 45) return 0;
+		durScore = Math.max(0, 1 - diff / 45);
+	}
+
+	const syncedBonus = cand.syncedLyrics ? 0.15 : 0;
+	return titleSim * 0.45 + artistSim * 0.40 + durScore * 0.15 + syncedBonus;
 }
 
 function parseAndEnrichLrc(syncedLyrics) {
@@ -493,69 +543,118 @@ app.get('/api/lyrics', async (req, res) => {
 			if (getRes.ok) {
 				const json = await getRes.json();
 				if (json && (json.syncedLyrics || json.plainLyrics)) {
-					lrcData = json;
+					const score = scoreCandidate(json, cleanTitle, cleanArtist, songDur);
+					if (score >= 0.6) {
+						lrcData = json;
+					}
 				}
 			}
 		} catch {}
 
-		// 2. Try Search on LRCLIB if exact didn't return synced lyrics
+		// 2. Try Search on LRCLIB with Strict Multi-Candidate Scoring
 		if (!lrcData || !lrcData.syncedLyrics) {
-			const queries = [
-				`${cleanTitle} ${cleanArtist}`.trim(),
-				cleanTitle,
-				songTitle
-			];
+			const query = cleanArtist ? `${cleanTitle} ${cleanArtist}`.trim() : cleanTitle;
+			try {
+				const sRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`, {
+					headers: { 'User-Agent': 'AuraMusic/1.2.0' },
+					signal: AbortSignal.timeout(4000)
+				});
+				if (sRes.ok) {
+					const items = await sRes.json();
+					if (Array.isArray(items) && items.length > 0) {
+						const scored = items
+							.map((item) => ({ item, score: scoreCandidate(item, cleanTitle, cleanArtist, songDur) }))
+							.filter((x) => x.score >= 0.55)
+							.sort((a, b) => b.score - a.score);
 
-			for (const q of queries) {
-				if (!q) continue;
-				try {
-					const sRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
-						headers: { 'User-Agent': 'AuraMusic/1.2.0' },
-						signal: AbortSignal.timeout(3500)
-					});
-					if (sRes.ok) {
-						const items = await sRes.json();
-						if (Array.isArray(items) && items.length > 0) {
-							// Prefer synced items
-							const synced = items.filter((x) => x.syncedLyrics);
-							if (synced.length > 0) {
-								if (songDur && songDur > 0) {
-									lrcData = synced.reduce((prev, curr) => {
-										const prevDiff = Math.abs((prev.duration || 0) - songDur);
-										const currDiff = Math.abs((curr.duration || 0) - songDur);
-										return currDiff < prevDiff ? curr : prev;
-									}, synced[0]);
-								} else {
-									lrcData = synced[0];
-								}
-								break;
-							} else if (!lrcData && items[0]?.plainLyrics) {
-								lrcData = items[0];
+						if (scored.length > 0) {
+							if (scored[0].item.syncedLyrics || !lrcData) {
+								lrcData = scored[0].item;
 							}
 						}
 					}
-				} catch {}
-			}
+				}
+			} catch {}
 		}
 
-		if (lrcData) {
-			if (lrcData.syncedLyrics) {
-				const lines = parseAndEnrichLrc(lrcData.syncedLyrics);
-				return res.json({
-					source: 'LRCLIB (Apple Music Synced)',
-					synced: true,
-					instrumental: !!lrcData.instrumental,
-					lines
-				});
-			} else if (lrcData.plainLyrics) {
-				const lines = lrcData.plainLyrics.split('\n').map((text) => ({ text }));
-				return res.json({
-					source: 'LRCLIB',
-					synced: false,
-					instrumental: false,
-					lines
-				});
+		// 3. If LRCLIB gave synced lyrics from a verified candidate, return it
+		if (lrcData && lrcData.syncedLyrics) {
+			const lines = parseAndEnrichLrc(lrcData.syncedLyrics);
+			return res.json({
+				source: 'LRCLIB (Apple Music Synced)',
+				synced: true,
+				instrumental: !!lrcData.instrumental,
+				lines
+			});
+		}
+
+		// 4. Try JioSaavn Official Lyrics (Highly accurate for Bollywood / Hindi / Punjabi / Regional songs)
+		try {
+			const saavnQuery = cleanArtist ? `${cleanTitle} ${cleanArtist}`.trim() : cleanTitle;
+			const saavnSearchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(saavnQuery)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+			const saavnRes = await fetch(saavnSearchUrl, { signal: AbortSignal.timeout(3500) });
+			if (saavnRes.ok) {
+				const rawText = await saavnRes.text();
+				const cleanJson = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+				if (cleanJson.includes('{')) {
+					const sData = JSON.parse(cleanJson);
+					if (Array.isArray(sData.results) && sData.results.length > 0) {
+						const validResults = sData.results.filter((r) => {
+							const sim = computeTokenSimilarity(r.title || '', cleanTitle);
+							return sim >= 0.35;
+						});
+						const matchedSong = validResults.find((r) => r.more_info?.has_lyrics === 'true') || validResults[0];
+
+						if (matchedSong && matchedSong.more_info?.has_lyrics === 'true') {
+							const lyrUrl = `https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&lyrics_id=${encodeURIComponent(matchedSong.id)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+							const lyrRes = await fetch(lyrUrl, { signal: AbortSignal.timeout(3500) });
+							if (lyrRes.ok) {
+								const lyrRaw = await lyrRes.text();
+								const lyrClean = lyrRaw.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+								if (lyrClean.includes('{')) {
+									const lyrData = JSON.parse(lyrClean);
+									if (lyrData && lyrData.lyrics) {
+										const cleanLyrics = lyrData.lyrics
+											.replace(/<br\s*\/?>/gi, '\n')
+											.replace(/&quot;/g, '"')
+											.replace(/&#039;/g, "'")
+											.replace(/&amp;/g, '&')
+											.trim();
+										const lines = cleanLyrics
+											.split('\n')
+											.map((text) => ({ text: text.trim() }))
+											.filter((l) => l.text.length > 0);
+										if (lines.length > 0) {
+											return res.json({
+												source: 'JioSaavn (Official)',
+												synced: false,
+												instrumental: false,
+												lines
+											});
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
+		} catch (e) {
+			console.warn('[JioSaavn Lyrics fetch fallback error]', e);
+		}
+
+		// 5. Fallback to Verified Plain Lyrics from LRCLIB
+		if (lrcData && lrcData.plainLyrics) {
+			const lines = lrcData.plainLyrics
+				.split('\n')
+				.map((text) => ({ text: text.trim() }))
+				.filter((l) => l.text.length > 0);
+			return res.json({
+				source: 'LRCLIB (Official)',
+				synced: false,
+				instrumental: !!lrcData.instrumental,
+				lines
+			});
 		}
 
 		res.status(404).json({ error: 'Lyrics not found' });
