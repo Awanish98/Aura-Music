@@ -117,7 +117,11 @@
 
 	function onBarClick(e: MouseEvent) {
 		if (pressedControl || isControl(e.target)) return;
-		np.open = !np.open;
+		if (typeof window !== 'undefined' && window.innerWidth < 768) {
+			np.open = true;
+		} else {
+			np.open = !np.open;
+		}
 	}
 
 	let miniTouchStartX = 0;
@@ -152,12 +156,17 @@
 >
 	<!-- Mobile Floating Mini Player (< md) -->
 	<div
-		class="flex md:hidden w-full items-center justify-between gap-3 px-3.5 py-2.5 relative"
+		class="flex md:hidden w-full items-center justify-between gap-3 px-3.5 py-2.5 relative cursor-pointer"
 		ontouchstart={onMiniTouchStart}
 		ontouchend={onMiniTouchEnd}
+		onclick={(e) => {
+			if (isControl(e.target)) return;
+			e.stopPropagation();
+			np.open = true;
+		}}
 	>
 		<!-- Top Micro Progress Line -->
-		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-white/10 overflow-hidden">
+		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-white/10 overflow-hidden pointer-events-none">
 			<div
 				class="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-150 shadow-[0_0_8px_#ff2a7a]"
 				style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
@@ -165,7 +174,13 @@
 		</div>
 
 		<!-- Left Info -->
-		<div class="flex min-w-0 flex-1 items-center gap-2.5 cursor-pointer" onclick={() => (np.open = true)}>
+		<div
+			class="flex min-w-0 flex-1 items-center gap-2.5 cursor-pointer"
+			onclick={(e) => {
+				e.stopPropagation();
+				np.open = true;
+			}}
+		>
 			{#key playback.now?.videoId}
 				{#if playback.now?.thumbnail}
 					<img
@@ -197,7 +212,10 @@
 		<div class="flex items-center gap-1.5 shrink-0" onclick={(e) => e.stopPropagation()}>
 			<button
 				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
-				onclick={toggleLike}
+				onclick={(e) => {
+					e.stopPropagation();
+					toggleLike();
+				}}
 				aria-label={t('common.like')}
 			>
 				<span class:animate-heart-pop={justLiked} onanimationend={() => (justLiked = false)}>
@@ -210,7 +228,10 @@
 			</button>
 			<button
 				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/30 active:scale-90 transition-transform"
-				onclick={() => api.togglePause()}
+				onclick={(e) => {
+					e.stopPropagation();
+					api.togglePause();
+				}}
 				aria-label={playback.paused ? t('player.play') : t('player.pause')}
 			>
 				<HugeiconsIcon
@@ -223,7 +244,10 @@
 			</button>
 			<button
 				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
-				onclick={() => api.nextTrack()}
+				onclick={(e) => {
+					e.stopPropagation();
+					api.nextTrack();
+				}}
 				aria-label={t('player.next')}
 			>
 				<HugeiconsIcon icon={NextIcon} size={18} />

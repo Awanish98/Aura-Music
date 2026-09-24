@@ -202,7 +202,6 @@
 			     parking container until the view borrows the picture. -->
 			<VideoSurface />
 			{#if np.open && playback.now}
-				<MobileNowPlaying />
 				<div class="hidden md:contents">
 					<NowPlaying {queueOpen} {lyricsOpen} />
 				</div>
@@ -239,6 +238,11 @@
 		<!-- Mobile Bottom Navigation Bar (< md) -->
 		<MobileNav />
 	</div>
+
+	<!-- Fullscreen Mobile Now Playing Screen (< md) -->
+	{#if np.open && playback.now}
+		<MobileNowPlaying />
+	{/if}
 
 	<!-- Theater mode covers everything, titlebar included, and puts the window in fullscreen for as
 	     long as it is mounted. Nothing playing means nothing to show, and that guard is also what

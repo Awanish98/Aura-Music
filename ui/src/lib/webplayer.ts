@@ -55,23 +55,29 @@ class WebPlayer {
 	init() {
 		if (typeof window === 'undefined') return;
 
-		// Document-wide one-time gesture unlock for unblocked web audio autoplay
+		// Document-wide one-time gesture unlock for unblocked web audio autoplay on mobile
 		if (!this.unlocked) {
 			const unlockEngine = () => {
 				this.unlocked = true;
-				const active = this.activeAudio;
-				if (active && active.paused && active.src) {
-					active.play().catch(() => {});
-				}
+				this.decks.forEach((deck) => {
+					if (deck) {
+						const p = deck.play();
+						if (p !== undefined) {
+							p.then(() => {
+								if (!deck.src) deck.pause();
+							}).catch(() => {});
+						}
+					}
+				});
 				window.removeEventListener('pointerdown', unlockEngine);
 				window.removeEventListener('click', unlockEngine);
 				window.removeEventListener('keydown', unlockEngine);
 				window.removeEventListener('touchstart', unlockEngine);
 			};
-			window.addEventListener('pointerdown', unlockEngine, { once: true });
+			window.addEventListener('pointerdown', unlockEngine, { once: true, passive: true });
 			window.addEventListener('click', unlockEngine, { once: true });
 			window.addEventListener('keydown', unlockEngine, { once: true });
-			window.addEventListener('touchstart', unlockEngine, { once: true });
+			window.addEventListener('touchstart', unlockEngine, { once: true, passive: true });
 		}
 
 		// 1. Initialize Dual-Deck HTML5 Audio with native hardware audio pipeline
@@ -141,6 +147,10 @@ class WebPlayer {
 							active.play().catch(() => {});
 						}
 						this.acquireWakeLock();
+					} else {
+						if (!playback.paused) {
+							this.acquireWakeLock();
+						}
 					}
 				});
 			}
@@ -669,11 +679,13 @@ class WebPlayer {
 	}
 
 	private async getDirectAudioUrl(videoId: string): Promise<string | null> {
-		// 1. First try app's own streaming pipe
+		if (!videoId || videoId.length !== 11) return null;
+
+		// 1. First try app's own streaming pipe endpoint
+		const streamEndpoint = getApiUrl(`/api/stream?videoId=${encodeURIComponent(videoId)}`);
 		try {
-			const streamEndpoint = getApiUrl(`/api/stream?videoId=${encodeURIComponent(videoId)}`);
-			const res = await fetch(streamEndpoint, { method: 'HEAD', signal: AbortSignal.timeout(2500) });
-			if (res.ok && res.headers.get('content-type')?.includes('audio')) {
+			const res = await fetch(streamEndpoint, { method: 'HEAD', signal: AbortSignal.timeout(2000) });
+			if (res.ok) {
 				return streamEndpoint;
 			}
 		} catch {}
@@ -704,7 +716,9 @@ class WebPlayer {
 				}
 			} catch {}
 		}
-		return null;
+
+		// Fallback to streaming pipe for native HTML5 audio streaming
+		return streamEndpoint;
 	}
 
 	async resolveStreamUrl(item: SongItem): Promise<string | null> {
@@ -737,15 +751,17 @@ class WebPlayer {
 			if (fmItem?.streamUrl) return fmItem.streamUrl;
 		}
 
-		// 3. JioSaavn Song direct resolution
-		if (item.video_id?.startsWith('saavn_') || (item as any).source === 'saavn') {
+		// 3. JioSaavn 320kbps Lossless Direct Stream (Check for any track with title/artists)
+		if (item.title && item.duration !== 'LIVE' && !item.video_id?.startsWith('fmhy_') && !item.video_id?.startsWith('radio_')) {
 			const query = cleanSearchQuery(item.title, item.artists);
 			if (query) {
 				try {
 					let results = await searchSaavnDirect(query);
 					if (!results.length) {
 						const titleOnly = cleanSearchQuery(item.title);
-						results = await searchSaavnDirect(titleOnly);
+						if (titleOnly && titleOnly !== query) {
+							results = await searchSaavnDirect(titleOnly);
+						}
 					}
 					if (results.length > 0 && results[0]?.streamUrl) {
 						item.streamUrl = results[0].streamUrl;
@@ -758,7 +774,7 @@ class WebPlayer {
 			}
 		}
 
-		// 4. YouTube Music direct stream
+		// 4. YouTube Music direct stream via audio extractor
 		const targetVideoId = (await this.resolveBestVideoId(item)) || item.video_id;
 		if (targetVideoId && targetVideoId.length === 11) {
 			try {

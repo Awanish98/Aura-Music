@@ -57,41 +57,56 @@
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
 
-	// Touch swipe down to dismiss
-	let startY = 0;
-	let currentY = 0;
-	let startX = 0;
+	// Header touch swipe down to dismiss
+	let headerStartY = 0;
+	let headerCurrentY = 0;
 
-	function handleTouchStart(e: TouchEvent) {
-		startY = e.touches[0].clientY;
-		startX = e.touches[0].clientX;
+	function handleHeaderTouchStart(e: TouchEvent) {
+		headerStartY = e.touches[0].clientY;
+		headerCurrentY = headerStartY;
 	}
 
-	function handleTouchMove(e: TouchEvent) {
-		currentY = e.touches[0].clientY;
+	function handleHeaderTouchMove(e: TouchEvent) {
+		headerCurrentY = e.touches[0].clientY;
 	}
 
-	function handleTouchEnd(e: TouchEvent) {
-		const diffY = currentY - startY;
-		const diffX = e.changedTouches[0].clientX - startX;
-
-		// Swipe down on top header to dismiss
-		if (diffY > 120 && startY < 200) {
+	function handleHeaderTouchEnd(e: TouchEvent) {
+		const diffY = headerCurrentY - headerStartY;
+		if (diffY > 80) {
 			np.open = false;
 		}
+		headerStartY = 0;
+		headerCurrentY = 0;
+	}
 
-		// Swipe left/right on artwork to skip track
-		if (activeTab === 'player' && Math.abs(diffX) > 80 && Math.abs(diffY) < 60) {
+	// Artwork horizontal swipe to skip track
+	let artStartX = 0;
+	let artCurrentX = 0;
+	let artStartY = 0;
+
+	function handleArtTouchStart(e: TouchEvent) {
+		artStartX = e.touches[0].clientX;
+		artCurrentX = artStartX;
+		artStartY = e.touches[0].clientY;
+	}
+
+	function handleArtTouchMove(e: TouchEvent) {
+		artCurrentX = e.touches[0].clientX;
+	}
+
+	function handleArtTouchEnd(e: TouchEvent) {
+		const diffX = artCurrentX - artStartX;
+		const diffY = Math.abs(e.changedTouches[0].clientY - artStartY);
+		if (Math.abs(diffX) > 70 && diffY < 50) {
 			if (diffX < 0) {
 				api.nextTrack();
 			} else {
 				api.prevTrack();
 			}
 		}
-
-		startY = 0;
-		currentY = 0;
-		startX = 0;
+		artStartX = 0;
+		artCurrentX = 0;
+		artStartY = 0;
 	}
 
 	function toggleLike() {
@@ -146,11 +161,8 @@
 <!-- Full-screen Mobile Now Playing View -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none backdrop-blur-3xl md:hidden"
+	class="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none backdrop-blur-3xl md:hidden"
 	transition:fly={{ y: '100%', duration: 320, easing: cubicOut }}
-	ontouchstart={handleTouchStart}
-	ontouchmove={handleTouchMove}
-	ontouchend={handleTouchEnd}
 >
 	<!-- Ambient Animated Artwork Backdrop -->
 	{#if playback.now?.thumbnail}
@@ -163,19 +175,30 @@
 	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background"></div>
 
 	<!-- Top Drag Handle & Bar -->
-	<header class="relative z-10 flex shrink-0 flex-col px-4 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] pb-1">
+	<header
+		class="relative z-10 flex shrink-0 flex-col px-4 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] pb-1 touch-none"
+		ontouchstart={handleHeaderTouchStart}
+		ontouchmove={handleHeaderTouchMove}
+		ontouchend={handleHeaderTouchEnd}
+	>
 		<!-- Drag-to-dismiss handle bar -->
 		<button
 			type="button"
 			aria-label="Dismiss player"
 			class="w-12 h-1.5 rounded-full bg-white/25 mx-auto mb-2 hover:bg-white/40 cursor-pointer active:scale-95 transition-transform"
-			onclick={() => (np.open = false)}
+			onclick={(e) => {
+				e.stopPropagation();
+				np.open = false;
+			}}
 		></button>
 
 		<div class="flex items-center justify-between">
 			<button
-				class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
-				onclick={() => (np.open = false)}
+				class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
+				onclick={(e) => {
+					e.stopPropagation();
+					np.open = false;
+				}}
 				aria-label="Minimize"
 			>
 				<HugeiconsIcon icon={ArrowDown01Icon} size={22} />
@@ -258,9 +281,12 @@
 			<!-- Artwork Card -->
 			<div class="flex flex-1 items-center justify-center py-2">
 				<div
-					class="relative aspect-square w-full max-w-[340px] max-h-[340px] overflow-hidden rounded-3xl shadow-2xl transition-all duration-300 {playback.paused
+					class="relative aspect-square w-full max-w-[340px] max-h-[340px] overflow-hidden rounded-3xl shadow-2xl transition-all duration-300 touch-pan-y {playback.paused
 						? 'scale-95 shadow-black/40 opacity-90'
 						: 'scale-100 shadow-[0_20px_60px_-15px_var(--primary)]'}"
+					ontouchstart={handleArtTouchStart}
+					ontouchmove={handleArtTouchMove}
+					ontouchend={handleArtTouchEnd}
 				>
 					{#if playback.now?.thumbnail}
 						<img
