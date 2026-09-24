@@ -17,10 +17,8 @@
 		InfinityIcon,
 		MinimizeScreenIcon,
 		MaximizeScreenIcon,
-		MusicNote01Icon,
-		ArrowUp01Icon,
-		ArrowDown01Icon,
-		AudioWave02Icon
+		AudioWave02Icon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -62,8 +60,6 @@
 		lyricsOpen: boolean;
 	} = $props();
 
-	// Pop the heart once when the user favourites (not when un-favouriting). Reset on animation end
-	// so the next like can replay it.
 	let justLiked = $state(false);
 
 	function toggleLike() {
@@ -84,29 +80,20 @@
 	const shuffleOn = $derived(playback.queue.shuffle ?? false);
 	const repeat = $derived(playback.queue.repeat ?? 'off');
 
-	// The current track was appended by autoplay → show the subtle ∞ badge next to the title.
-	// Matched against the now-playing videoId so a transient queue/now-playing mismatch (mid
-	// gapless advance) can't flash the badge on the wrong song.
 	const autoplayTrack = $derived.by(() => {
 		const cur = playback.queue.items[playback.queue.currentIndex];
 		return !!cur?.autoplay && cur.video_id === playback.now?.videoId;
 	});
 
-	// The ⋮ menu needs the full SongItem — NowPlaying carries no album_id. Take it from the queue
-	// row, matched on videoId so a mid-advance mismatch can't point the menu at the wrong song.
 	const currentSong = $derived.by(() => {
 		const cur = playback.queue.items[playback.queue.currentIndex];
 		return cur?.video_id === playback.now?.videoId ? cur : null;
 	});
 
-	// The title links to the song's album (there is no per-song page). Local files carry no
-	// album_id, so their title stays plain text.
 	const albumId = $derived(
 		currentSong && !api.isLocalId(currentSong.video_id) ? currentSong.album_id : undefined
 	);
 
-	// Seek: while dragging, hold a local value so incoming mpv position ticks can't yank the thumb
-	// back under the pointer; only invoke the (expensive) seek on release.
 	let seekDrag = $state<number | null>(null);
 	const shownPosition = $derived(seekDrag ?? playback.position);
 
@@ -126,20 +113,13 @@
 	const isControl = (t: EventTarget | null) =>
 		!!(t as HTMLElement | null)?.closest?.('button, a, input, [role="button"]');
 
-	// Dragging a slider past its end and releasing outside it retargets the click at the bar (the
-	// click lands on the common ancestor of press and release), which used to toggle the view.
-	// So judge by where the press started, not where the release happened.
 	let pressedControl = false;
 
-	// Anywhere on the bar that isn't a control opens (or closes) the now-playing view: the bar is
-	// what's left of it once it's minimised, so it's the way back in. Deliberately no pointer
-	// cursor, because this is the whole bar, not a button, and every real button keeps its own click.
 	function onBarClick(e: MouseEvent) {
 		if (pressedControl || isControl(e.target)) return;
 		np.open = !np.open;
 	}
 
-	// Mobile mini player swipe gestures to skip
 	let miniTouchStartX = 0;
 	let miniTouchStartY = 0;
 
@@ -163,29 +143,28 @@
 	}
 </script>
 
-<!-- The chevron button below is the keyboard equivalent of clicking the bar, so the bar itself
-     stays a plain region rather than becoming a focusable control wrapping every other control. -->
+<!-- Footer Dock -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions, a11y_no_noninteractive_element_interactions -->
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative md:border-t rounded-2xl md:rounded-none apple-glass-dock border border-white/10 md:border-t-white/15 md:border-x-0 md:border-b-0 shadow-2xl md:shadow-none shadow-black/50 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border-t rounded-2xl md:rounded-none bg-[#0a0d17]/95 backdrop-blur-3xl border border-white/10 md:border-t-white/12 md:border-x-0 md:border-b-0 shadow-2xl shadow-black/80 transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
 >
-	<!-- Mobile Floating Island Mini Player Capsule (< md) -->
+	<!-- Mobile Floating Mini Player (< md) -->
 	<div
-		class="flex md:hidden w-full items-center justify-between gap-3 px-3 py-2 relative"
+		class="flex md:hidden w-full items-center justify-between gap-3 px-3.5 py-2.5 relative"
 		ontouchstart={onMiniTouchStart}
 		ontouchend={onMiniTouchEnd}
 	>
 		<!-- Top Micro Progress Line -->
-		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-primary/20 overflow-hidden">
+		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-white/10 overflow-hidden">
 			<div
-				class="h-full bg-primary transition-all duration-150"
+				class="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-150 shadow-[0_0_8px_#ff2a7a]"
 				style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
 			></div>
 		</div>
 
-		<!-- Left Info (Artwork + Marquee Title + Artist) -->
+		<!-- Left Info -->
 		<div class="flex min-w-0 flex-1 items-center gap-2.5 cursor-pointer" onclick={() => (np.open = true)}>
 			{#key playback.now?.videoId}
 				{#if playback.now?.thumbnail}
@@ -193,53 +172,44 @@
 						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/15"
 						in:fade={{ duration: 250 }}
 						decoding="async"
-						onerror={(e) => {
-							const target = e.currentTarget as HTMLImageElement;
-							target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
-						}}
 					/>
 				{:else}
 					<img
-						src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
-						alt=""
+						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
+						alt="Aura Music"
 						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10"
-						in:fade={{ duration: 250 }}
-						decoding="async"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/15"
 					/>
 				{/if}
 			{/key}
 			<div class="min-w-0 flex-1 pr-1">
-				<Marquee text={playback.now?.title ?? t('player.not_playing')} class="text-xs font-semibold text-foreground" />
+				<Marquee text={playback.now?.title ?? 'Aura Music • Ready'} class="text-xs font-bold text-white" />
 				<div class="truncate text-[11px] font-medium text-muted-foreground">
-					{playback.now?.artists ?? ''}
+					{playback.now?.artists ?? 'Tap to browse songs'}
 				</div>
 			</div>
 		</div>
 
-		<!-- Right Mobile Quick Actions -->
-		<div class="flex items-center gap-1 shrink-0" onclick={(e) => e.stopPropagation()}>
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				class="h-8 w-8 text-muted-foreground hover:text-foreground active:scale-90"
+		<!-- Right Mobile Actions -->
+		<div class="flex items-center gap-1.5 shrink-0" onclick={(e) => e.stopPropagation()}>
+			<button
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
 				onclick={toggleLike}
 				aria-label={t('common.like')}
 			>
 				<span class:animate-heart-pop={justLiked} onanimationend={() => (justLiked = false)}>
 					<HugeiconsIcon
 						icon={FavouriteIcon}
-						class="h-4 w-4 {playback.rating === 'like' ? 'fill-current text-primary' : ''}"
+						size={18}
+						class={playback.rating === 'like' ? 'fill-current text-primary' : ''}
 					/>
 				</span>
-			</Button>
-			<Button
-				variant="default"
-				size="icon-sm"
-				class="h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 active:scale-90 transition-transform"
+			</button>
+			<button
+				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/30 active:scale-90 transition-transform"
 				onclick={() => api.togglePause()}
 				aria-label={playback.paused ? t('player.play') : t('player.pause')}
 			>
@@ -247,57 +217,49 @@
 					icon={PauseIcon}
 					altIcon={PlayIcon}
 					showAlt={playback.paused}
-					class="h-4 w-4"
+					size={18}
 					fill="currentColor"
 				/>
-			</Button>
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				class="h-8 w-8 text-muted-foreground hover:text-foreground active:scale-90"
+			</button>
+			<button
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white active:scale-90 transition-transform"
 				onclick={() => api.nextTrack()}
 				aria-label={t('player.next')}
 			>
-				<HugeiconsIcon icon={NextIcon} class="h-4 w-4" />
-			</Button>
+				<HugeiconsIcon icon={NextIcon} size={18} />
+			</button>
 		</div>
 	</div>
 
-	<!-- Desktop Player Bar (>= md) -->
-	<div class="hidden md:flex w-full items-center gap-2 px-2 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
-		<!-- Now playing -->
-		<div class="flex min-w-0 flex-1 items-center gap-3" data-ctx>
+	<!-- Desktop Player Dock (>= md) -->
+	<div class="hidden md:flex w-full items-center justify-between gap-4 px-6 py-3">
+		<!-- Left: Track Info -->
+		<div class="flex min-w-0 w-1/4 max-w-sm items-center gap-3.5" data-ctx>
 			{#key playback.now?.videoId || 'idle'}
 				{#if playback.now?.thumbnail}
 					<img
 						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 						alt=""
 						style="max-width:none"
-						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm ring-1 ring-white/10"
+						class="h-13 w-13 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/15"
 						in:fade={{ duration: 250 }}
 						decoding="async"
-						onerror={(e) => {
-							const target = e.currentTarget as HTMLImageElement;
-							target.src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80';
-						}}
 					/>
 				{:else}
 					<img
-						src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80"
+						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
 						alt="Aura Music"
 						style="max-width:none"
-						class="h-12 w-12 shrink-0 rounded-lg object-cover shadow-sm ring-1 ring-white/10"
-						in:fade={{ duration: 250 }}
-						decoding="async"
+						class="h-13 w-13 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/15"
 					/>
 				{/if}
 			{/key}
-			<div class="min-w-0">
+			<div class="min-w-0 flex-1">
 				<div class="flex items-center gap-1.5">
 					{#snippet title()}
 						<Marquee
 							text={playback.now?.title ?? 'Aura Music • Ready'}
-							class="text-sm font-semibold text-foreground"
+							class="text-sm font-bold text-white tracking-tight"
 						/>
 					{/snippet}
 					{#if albumId}
@@ -311,114 +273,70 @@
 						{@render title()}
 					{/if}
 					{#if autoplayTrack}
-						<span
-							class="shrink-0 text-muted-foreground"
-							title={t('player.autoplay_notice')}
-							in:fade={{ duration: 200 }}
-						>
-							<HugeiconsIcon icon={InfinityIcon} class="h-3.5 w-3.5" />
+						<span class="shrink-0 text-muted-foreground" title={t('player.autoplay_notice')}>
+							<HugeiconsIcon icon={InfinityIcon} size={14} />
 						</span>
 					{/if}
 				</div>
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-2 mt-0.5">
 					<ArtistLine
 						runs={playback.now?.artistRuns}
 						text={playback.now?.artists ?? 'Select any song to start playback'}
 						marquee
-						class="block max-w-full text-xs text-muted-foreground"
+						class="block max-w-full text-xs text-muted-foreground/80 font-medium"
 					/>
-					{#if playback.now}
-						{@const id = playback.now.videoId || ''}
-						{@const isCloud = id.startsWith('gdrive:')}
-						{@const isLive = playback.now.duration === 'LIVE' || id.startsWith('fmhy:')}
-						<span
-							class="hidden xl:inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.2 text-[9px] font-bold tracking-wider uppercase {isCloud
-								? 'bg-blue-500/15 text-blue-400 border border-blue-500/25'
-								: isLive
-									? 'bg-red-500/15 text-red-400 border border-red-500/25'
-									: 'bg-primary/15 text-primary border border-primary/25'}"
-						>
-							{isCloud ? 'Cloud' : isLive ? 'Live' : 'Lossless'}
-						</span>
-						<AudioVisualizer height={14} barsCount={6} class="hidden 2xl:flex ml-1 text-primary" />
-					{/if}
 				</div>
 			</div>
-			{#if playback.now}
-				<div class="flex items-center">
-					{#if !api.isLocalId(playback.now.videoId)}
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							class="hidden lg:inline-flex"
-							onclick={toggleLike}
-							aria-label={t('common.like')}
-						>
-							<span
-								class="inline-flex"
-								class:animate-heart-pop={justLiked}
-								onanimationend={() => (justLiked = false)}
-							>
-								<HugeiconsIcon
-									icon={FavouriteIcon}
-									class="h-4 w-4 {playback.rating === 'like' ? 'fill-current text-primary' : 'text-muted-foreground'}"
-								/>
-							</span>
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							class="hidden lg:inline-flex"
-							onclick={() => {
-								const now = playback.now!;
-								openAddToPlaylist({
-									video_id: now.videoId,
-									title: now.title,
-									artists: now.artists,
-									artist_id: now.artistId,
-									thumbnail: now.thumbnail,
-									duration: now.duration
-								});
-							}}
-							aria-label={t('player.save_to_playlist')}
-						>
-							<HugeiconsIcon icon={Add01Icon} class="h-4 w-4 text-muted-foreground" />
-						</Button>
-					{/if}
-					{#if currentSong}
-						<TrackMenu
-							song={currentSong}
-							linksOnly
-							onAdd={() => openAddToPlaylist(currentSong!)}
-							triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-						/>
-					{/if}
-				</div>
-			{/if}
+
+			<!-- Like & Menu Actions -->
+			<div class="flex items-center gap-1">
+				<button
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
+					onclick={toggleLike}
+					aria-label={t('common.like')}
+				>
+					<HugeiconsIcon
+						icon={FavouriteIcon}
+						size={17}
+						class={playback.rating === 'like' ? 'fill-current text-primary' : ''}
+					/>
+				</button>
+				{#if currentSong}
+					<TrackMenu
+						song={currentSong}
+						linksOnly
+						onAdd={() => openAddToPlaylist(currentSong!)}
+						triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors"
+					/>
+				{/if}
+			</div>
 		</div>
 
-		<!-- Transport -->
-		<div class="flex flex-[1.5] flex-col items-center gap-1">
-			<div class="flex items-center gap-1">
-				<Button
-					variant="ghost"
-					size="icon-sm"
+		<!-- Center: Transport & Sleek Progress Bar -->
+		<div class="flex flex-1 max-w-xl flex-col items-center gap-1.5">
+			<!-- Controls Buttons Row -->
+			<div class="flex items-center gap-3">
+				<button
 					onclick={() => api.toggleShuffle()}
 					aria-label={t('player.shuffle')}
-					aria-pressed={shuffleOn}
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={ShuffleIcon}
-						class="h-4 w-4 {shuffleOn ? 'text-primary' : 'text-muted-foreground'}"
+						size={16}
+						class={shuffleOn ? 'text-primary' : ''}
 					/>
-				</Button>
-				<Button variant="ghost" size="icon-sm" onclick={() => api.prevTrack()} aria-label={t('player.previous')}>
-					<HugeiconsIcon icon={PreviousIcon} class="h-5 w-5" />
-				</Button>
-				<Button
-					variant="default"
-					size="icon"
-					class="rounded-full shadow-lg h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-transform"
+				</button>
+				<button
+					onclick={() => api.prevTrack()}
+					aria-label={t('player.previous')}
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white transition-colors cursor-pointer"
+				>
+					<HugeiconsIcon icon={PreviousIcon} size={20} />
+				</button>
+
+				<!-- Center Glowing Neon Pink Play Button -->
+				<button
 					onclick={() => {
 						if (!playback.now && playback.queue.items.length === 0) {
 							import('$lib/curatedFeed').then(({ CURATED_TOP_SONGS }) => {
@@ -431,36 +349,44 @@
 						}
 					}}
 					aria-label={playback.paused ? t('player.play') : t('player.pause')}
+					class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 text-white shadow-xl shadow-pink-500/40 hover:scale-105 active:scale-95 transition-transform cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={PauseIcon}
 						altIcon={PlayIcon}
 						showAlt={!playback.now || playback.paused}
-						class="h-5 w-5"
+						size={22}
 						fill="currentColor"
+						class={!playback.now || playback.paused ? 'ml-0.5' : ''}
 					/>
-				</Button>
-				<Button variant="ghost" size="icon-sm" onclick={() => api.nextTrack()} aria-label={t('player.next')}>
-					<HugeiconsIcon icon={NextIcon} class="h-5 w-5" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
+				</button>
+
+				<button
+					onclick={() => api.nextTrack()}
+					aria-label={t('player.next')}
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white transition-colors cursor-pointer"
+				>
+					<HugeiconsIcon icon={NextIcon} size={20} />
+				</button>
+				<button
 					onclick={cycleRepeat}
 					aria-label={t('player.repeat_state', {
 						state: repeat === 'off' ? t('player.repeat_off') : repeat === 'one' ? t('player.repeat_one') : t('player.repeat_all')
 					})}
-					aria-pressed={repeat !== 'off'}
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={RepeatIcon}
 						altIcon={RepeatOne01Icon}
 						showAlt={repeat === 'one'}
-						class="h-4 w-4 {repeat !== 'off' ? 'text-primary' : 'text-muted-foreground'}"
+						size={16}
+						class={repeat !== 'off' ? 'text-primary' : ''}
 					/>
-				</Button>
+				</button>
 			</div>
-			<div class="flex w-full max-w-md items-center gap-2 text-xs text-muted-foreground">
+
+			<!-- Seek Progress Bar -->
+			<div class="flex w-full items-center gap-2.5 text-[11px] font-medium text-muted-foreground/80">
 				<span class="tabular-nums">{fmt(shownPosition)}</span>
 				<input
 					type="range"
@@ -473,34 +399,39 @@
 					onchange={onSeekCommit}
 					aria-label={t('player.seek')}
 				/>
-				{#if playback.now?.duration === 'LIVE' || !playback.duration}
-					<span class="rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/30">LIVE</span>
-				{:else}
-					<span class="tabular-nums">{fmt(playback.duration)}</span>
-				{/if}
+				<span class="tabular-nums">{fmt(playback.duration)}</span>
 			</div>
 		</div>
 
-		<!-- Volume + queue -->
-		<div class="flex flex-1 items-center justify-end gap-2">
-			<div class="hidden items-center gap-1 md:flex">
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					class="text-muted-foreground"
+		<!-- Right: Lyrics Pill + Volume + Tools -->
+		<div class="flex w-1/4 max-w-xs items-center justify-end gap-2">
+			<!-- Lyrics Frosted Pill Button -->
+			<button
+				onclick={onToggleLyrics}
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-white/10 bg-white/5 hover:bg-white/12 text-foreground transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary' : ''}"
+				title="Toggle Lyrics"
+			>
+				<HugeiconsIcon icon={Mic01Icon} size={14} />
+				<span>Lyrics</span>
+			</button>
+
+			<!-- Volume Controls -->
+			<div class="hidden xl:flex items-center gap-1.5 pl-2">
+				<button
 					onclick={toggleMute}
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
 					aria-label={playback.volume === 0 ? t('player.unmute') : t('player.mute')}
 				>
 					<HugeiconsIcon
 						icon={VolumeHighIcon}
 						altIcon={VolumeMute02Icon}
 						showAlt={playback.volume === 0}
-						class="h-4 w-4"
+						size={17}
 					/>
-				</Button>
+				</button>
 				<input
 					type="range"
-					class="range w-24"
+					class="range w-20"
 					style="--pct:{playback.volume}%"
 					min="0"
 					max="100"
@@ -511,64 +442,35 @@
 					aria-label={t('player.volume')}
 				/>
 			</div>
-			<div class="flex items-center gap-0.5">
-				<Button variant="ghost" size="icon-sm" onclick={openMiniPlayer} aria-label={t('player.mini_player')}>
-					<HugeiconsIcon icon={MinimizeScreenIcon} class="h-5 w-5" />
-				</Button>
-				<Button
-					variant={ui.theaterOpen ? 'secondary' : 'ghost'}
-					size="icon-sm"
-					onclick={() => (ui.theaterOpen = true)}
-					aria-label={t('player.theater_mode')}
-					title={t('player.theater_mode')}
-				>
-					<HugeiconsIcon icon={MaximizeScreenIcon} class="h-5 w-5 {ui.theaterOpen ? 'text-primary' : ''}" />
-				</Button>
-				<Button
-					variant={showEq ? 'secondary' : 'ghost'}
-					size="icon-sm"
-					onclick={() => (showEq = !showEq)}
-					aria-label="Sound Equalizer & Audio FX"
-					title="Sound Equalizer & Audio FX"
-				>
-					<HugeiconsIcon icon={AudioWave02Icon} class="h-5 w-5 {audioFx.eqPreset !== 'flat' ? 'text-primary' : ''}" />
-				</Button>
 
-				<Button
-					variant={lyricsOpen ? 'secondary' : 'ghost'}
-					size="icon-sm"
-					onclick={onToggleLyrics}
-					aria-label={t('player.lyrics')}
-				>
-					<HugeiconsIcon icon={Mic01Icon} class="h-5 w-5" />
-				</Button>
+			<!-- Audio Visualizer / EQ -->
+			<button
+				onclick={() => (showEq = !showEq)}
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+				title="Equalizer & Audio FX"
+			>
+				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
+			</button>
 
-				<Button
-					variant={queueOpen ? 'secondary' : 'ghost'}
-					size="icon-sm"
-					onclick={onToggleQueue}
-					aria-label={t('player.queue')}
-				>
-					<HugeiconsIcon icon={Queue01Icon} class="h-5 w-5" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onclick={() => (np.open = !np.open)}
-					aria-label={np.open ? t('player.minimize_player') : t('player.open_player')}
-					aria-expanded={np.open}
-				>
-					<HugeiconsIcon
-						icon={ArrowUp01Icon}
-						altIcon={ArrowDown01Icon}
-						showAlt={np.open}
-						class="h-5 w-5"
-					/>
-				</Button>
-			</div>
+			<!-- Queue -->
+			<button
+				onclick={onToggleQueue}
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer {queueOpen ? 'text-primary' : ''}"
+				title="Queue"
+			>
+				<HugeiconsIcon icon={Queue01Icon} size={17} />
+			</button>
+
+			<!-- Theater Fullscreen -->
+			<button
+				onclick={() => (ui.theaterOpen = true)}
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+				title="Fullscreen Mode"
+			>
+				<HugeiconsIcon icon={MaximizeScreenIcon} size={17} />
+			</button>
 		</div>
 	</div>
 </footer>
 
 <EqualizerDialog bind:open={showEq} />
-

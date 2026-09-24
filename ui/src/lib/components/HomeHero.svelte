@@ -1,124 +1,94 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { HistoryIcon, Search01Icon, SparklesIcon } from '@hugeicons/core-free-icons';
-	import SearchSuggest from '$lib/components/SearchSuggest.svelte';
+	import { SparklesIcon } from '@hugeicons/core-free-icons';
 	import { auth, playback, ui } from '$lib/player.svelte';
-	import { thumb } from '$lib/thumb';
-	import { t, type TranslationKey } from '$lib/i18n.svelte';
+	import { t } from '$lib/i18n.svelte';
 
-	// Fixed at mount — a greeting that flips mid-session is uncanny.
+	let { onSelectMood, activeMood }: { onSelectMood?: (mood: string | null) => void; activeMood?: string | null } = $props();
+
+	// Dynamic Daypart Greeting
 	const hour = new Date().getHours();
-	const daypartKey: TranslationKey =
+	const daypart =
 		hour < 5
-			? 'home.good_night'
+			? 'Good night'
 			: hour < 12
-				? 'home.good_morning'
+				? 'Good morning'
 				: hour < 18
-					? 'home.good_afternoon'
-					: 'home.good_evening';
-	const daypart = $derived(t(daypartKey));
+					? 'Good afternoon'
+					: 'Good evening';
 
-	let searchQuery = $state('');
+	const moodChips = [
+		{ id: null, label: 'All', icon: '✨' },
+		{ id: 'relax', label: 'Relax', icon: '☕', query: 'Relaxing Acoustic Hindi Indie Calm' },
+		{ id: 'workout', label: 'Workout', icon: '⚡', query: 'Gym Workout Energy Phonk Electronic' },
+		{ id: 'focus', label: 'Focus', icon: '🎯', query: 'Deep Focus Coding Ambient Lofi' },
+		{ id: 'energize', label: 'Energize', icon: '⚡', query: 'High Energy Bollywood Party EDM' },
+		{ id: 'commute', label: 'Commute', icon: '🚗', query: 'Road Trip Drive Hits Acoustic' },
+		{ id: 'romance', label: 'Romance', icon: '💖', query: 'Romantic Bollywood Love Melodies' },
+		{ id: 'party', label: 'Party', icon: '🎉', query: 'Top Party Anthems Dance Punjabi' },
+		{ id: 'sad', label: 'Sad', icon: '☁️', query: 'Heartbreak Soulful Sad Melodies' },
+		{ id: 'sleep', label: 'Sleep', icon: '🌙', query: 'Deep Sleep Ambient Soundscapes' }
+	];
 
-	function goSearch() {
-		if (!searchQuery.trim()) return;
-		goto(`/search?${new URLSearchParams({ q: searchQuery }).toString()}`);
+	function handleMoodClick(chip: typeof moodChips[0]) {
+		if (onSelectMood) {
+			onSelectMood(chip.id);
+		} else if (chip.query) {
+			goto(`/search?q=${encodeURIComponent(chip.query)}`);
+		}
 	}
-
-	// Google's CDN doesn't serve every rewritten size, so a 404'd backdrop must degrade to nothing
-	// rendered, never a broken-image glyph. Re-arm whenever the track changes, mirroring MediaCard.
-	let artFailed = $state(false);
-	$effect(() => {
-		playback.now?.thumbnail; // re-arm when the track changes
-		artFailed = false;
-	});
 </script>
 
-<!-- overflow-hidden lives on the backdrop wrapper, not the hero: the scaled blur has to be clipped,
-     but the search preview below has to hang out past the bottom edge. -->
-<div class="relative border-b">
-	<div class="pointer-events-none absolute inset-0 overflow-hidden">
-		{#if playback.now?.thumbnail && !artFailed}
-			<!-- 96px, not display size: blur-2xl is a 40px blur, so every detail above a handful of
-			     pixels is thrown away anyway. The old 1200px source decoded to 5.7 MiB for this, and
-			     re-decoded on every track change. -->
-			<img
-				src={thumb(playback.now.thumbnail, 96)}
-				alt=""
-				class="pointer-events-none absolute inset-0 h-full w-full art-wash scale-110 object-cover opacity-60 blur-2xl"
-				onerror={() => (artFailed = true)}
-			/>
-		{:else}
-			<!-- Nothing playing: without this the header is a bare strip with a greeting in it. An accent
-			     wash keeps it a header. Inline style so it can't be lost to a stale dev stylesheet, and it
-			     rides --primary so every preset theme gets its own. -->
-			<div
-				class="pointer-events-none absolute inset-0 opacity-[0.18]"
-				style="background:radial-gradient(120% 130% at 12% 0%, var(--primary) 0%, transparent 58%)"
-			></div>
-		{/if}
-		<div
-			class="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40"
-		></div>
-		<div
-			class="absolute inset-0 bg-gradient-to-r from-background/80 via-background/30 to-transparent"
-		></div>
-	</div>
-	<div class="relative p-4 sm:p-6 pt-6 sm:pt-8">
-		<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
-			<div class="flex min-w-0 items-center gap-3">
-				{#if auth.account?.signedIn && auth.account.thumbnail}
-					<!-- max-width:none defeats Tailwind Preflight's `img{max-width:100%}`, which in a tight box
-					     clamps width to the content-box while height stays fixed → a vertical oval. Inline so
-					     it's immune to Preflight and to stale dev CSS. -->
-					<img
-						src={thumb(auth.account.thumbnail, 128)}
-						alt=""
-						style="width:2.5rem;height:2.5rem;max-width:none"
-						class="shrink-0 rounded-full object-cover ring-2 ring-border sm:w-11 sm:h-11"
-					/>
-				{/if}
-				<h2 class="truncate font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow">
-					{daypart}{auth.account?.name ? `, ${auth.account.name.split(' ')[0]}` : ''}
-				</h2>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
-				<!-- Aura AI DJ Quick Access Button -->
-				<button
-					onclick={() => (ui.aiDjOpen = true)}
-					title="Open Aura AI DJ"
-					aria-label="Open Aura AI DJ"
-					class="flex h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 text-xs font-semibold text-primary transition-all hover:bg-primary/20 active:scale-95 shadow-sm"
-				>
-					<HugeiconsIcon icon={SparklesIcon} size={15} class="animate-pulse" />
-					<span class="font-medium">AI DJ</span>
-				</button>
+<div class="relative overflow-hidden rounded-3xl border border-white/8 bg-gradient-to-r from-[#0d101d] via-[#16122a] to-[#250d24] p-5 sm:p-8 shadow-2xl mb-8 select-none">
+	<!-- Cosmic Nebula Background Ambient Glow -->
+	<div class="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-pink-600/25 blur-3xl"></div>
+	<div class="pointer-events-none absolute -left-16 -bottom-16 h-72 w-72 rounded-full bg-purple-600/25 blur-3xl"></div>
+	<div class="pointer-events-none absolute left-1/3 top-1/4 h-56 w-56 rounded-full bg-blue-600/15 blur-3xl"></div>
 
-				<!-- History Quick Button -->
-				<button
-					onclick={() => goto('/history')}
-					title={t('nav.history')}
-					aria-label={t('nav.history')}
-					class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-				>
-					<HugeiconsIcon icon={HistoryIcon} class="h-4 w-4" />
-				</button>
-				<form class="hidden md:block relative w-full max-w-xs" onsubmit={(e) => { e.preventDefault(); goSearch(); }}>
-					<HugeiconsIcon
-						icon={Search01Icon}
-						class="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-					/>
-					<!-- The panel is wider than this field and hangs off its right edge: the rows carry
-					     artwork and two lines of text, which 20rem can't hold. -->
-					<SearchSuggest
-						bind:value={searchQuery}
-						placeholder={t('common.search')}
-						inputClass="rounded-full pl-9"
-						panelClass="right-0 w-[26rem]"
-					/>
-				</form>
+	<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+		<!-- Left: Big Greeting + Subtitle -->
+		<div class="flex-1 space-y-1">
+			<h1 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white drop-shadow-md">
+				{daypart}
+			</h1>
+			<p class="text-sm sm:text-base text-muted-foreground font-medium">
+				What's your vibe today?
+			</p>
+		</div>
+
+		<!-- Right: Cosmic Headphones Artwork with Cursive Quote -->
+		<div class="relative hidden sm:flex items-center gap-4 shrink-0 rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur-xl shadow-lg">
+			<div class="relative h-20 w-28 overflow-hidden rounded-xl bg-purple-950">
+				<img
+					src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&auto=format&fit=crop&q=80"
+					alt="Cosmic Music"
+					class="h-full w-full object-cover opacity-85"
+				/>
+				<div class="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/20 to-purple-900/60"></div>
+			</div>
+			<div class="pr-2">
+				<p class="font-serif italic text-sm sm:text-base text-pink-200/90 leading-tight">
+					"Music heals<br />what words can't."
+				</p>
 			</div>
 		</div>
+	</div>
+
+	<!-- Horizontal Mood Filter Chips -->
+	<div class="relative z-10 mt-6 flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1">
+		{#each moodChips as chip}
+			{@const active = (activeMood === null && chip.id === null) || activeMood === chip.id}
+			<button
+				type="button"
+				onclick={() => handleMoodClick(chip)}
+				class="shrink-0 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer {active
+					? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30 border border-pink-400/50 scale-[1.02]'
+					: 'border border-white/10 bg-white/6 text-muted-foreground hover:bg-white/12 hover:text-foreground hover:border-white/20 active:scale-95'}"
+			>
+				<span>{chip.icon}</span>
+				<span>{chip.label}</span>
+			</button>
+		{/each}
 	</div>
 </div>

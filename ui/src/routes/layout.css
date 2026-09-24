@@ -28,88 +28,80 @@
 	   number. Tokens at chroma 0 are pure white/black by design and stay that way. Preset palettes
 	   hardcode their own oklch values, so the tint only applies to this default set. */
 	--hue: 326;
-	/* Hue of the artwork tint, written by theme.svelte.ts. Only the `.art-tint` rules read it; the
-	   default here just keeps those rules valid if the class ever outlives the variable. */
+	/* Hue of the artwork tint, written by theme.svelte.ts */
 	--art-h: 326;
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.145 0.008 var(--hue));
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.145 0.008 var(--hue));
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.145 0.008 var(--hue));
-	--primary: oklch(0.514 0.222 16.935);
-	--primary-foreground: oklch(0.969 0.015 12.422);
-	--secondary: oklch(0.967 0.001 var(--hue));
-	--secondary-foreground: oklch(0.21 0.006 var(--hue));
-	--muted: oklch(0.96 0.003 var(--hue));
-	--muted-foreground: oklch(0.40 0.034 var(--hue));
-	--accent: oklch(0.514 0.222 16.935);
-	--accent-foreground: oklch(0.969 0.015 12.422);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0.005 var(--hue));
-	--input: oklch(0.922 0.005 var(--hue));
-	--ring: oklch(0.711 0.019 var(--hue));
-	--chart-1: oklch(0.828 0.111 230.318);
-	--chart-2: oklch(0.685 0.169 237.323);
-	--chart-3: oklch(0.588 0.158 241.966);
-	--chart-4: oklch(0.5 0.134 242.749);
-	--chart-5: oklch(0.443 0.11 240.79);
-	--radius: 0.45rem;
-	--sidebar: oklch(0.985 0 0);
-	--sidebar-foreground: oklch(0.145 0.008 var(--hue));
-	--sidebar-primary: oklch(0.586 0.253 17.585);
-	--sidebar-primary-foreground: oklch(0.969 0.015 12.422);
-	--sidebar-accent: oklch(0.96 0.003 var(--hue));
-	--sidebar-accent-foreground: oklch(0.212 0.019 var(--hue));
-	--sidebar-border: oklch(0.922 0.005 var(--hue));
-	--sidebar-ring: oklch(0.711 0.019 var(--hue));
-	--font-sans: 'Oxanium Variable', sans-serif;
-	--font-heading: 'IBM Plex Sans Variable', sans-serif;
+	--background: oklch(0.08 0.015 285);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.14 0.025 285 / 75%);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.14 0.025 285 / 90%);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.65 0.28 355);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.22 0.035 285);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.18 0.02 285);
+	--muted-foreground: oklch(0.68 0.03 285);
+	--accent: oklch(0.62 0.26 315);
+	--accent-foreground: oklch(1 0 0);
+	--destructive: oklch(0.65 0.24 25);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 12%);
+	--ring: oklch(0.65 0.28 355);
+	--chart-1: oklch(0.65 0.28 355);
+	--chart-2: oklch(0.72 0.18 200);
+	--chart-3: oklch(0.65 0.26 300);
+	--chart-4: oklch(0.75 0.20 80);
+	--chart-5: oklch(0.68 0.22 150);
+	--radius: 0.65rem;
+	--sidebar: oklch(0.09 0.018 285);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.65 0.28 355);
+	--sidebar-primary-foreground: oklch(1 0 0);
+	--sidebar-accent: oklch(0.18 0.03 285);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 8%);
+	--sidebar-ring: oklch(0.65 0.28 355);
+	--font-sans: 'Outfit Variable', 'Oxanium Variable', sans-serif;
+	--font-heading: 'Outfit Variable', 'Montserrat Variable', sans-serif;
 	--font-serif: ui-serif, Georgia, serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	/* Tailwind's stock shadow scale. Restated here because @theme inline maps the shadow
-	   utilities onto these vars, so a palette theme can replace them. */
-	--shadow-2xs: 0 1px rgb(0 0 0 / 0.05);
-	--shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-	--shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-	--shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+	--shadow-2xs: 0 1px rgb(0 0 0 / 0.1);
+	--shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.15);
+	--shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+	--shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.6);
 }
 
 .dark {
-	--background: oklch(0.145 0.008 var(--hue));
+	--background: #07090e;
 	--foreground: oklch(0.985 0 0);
-	--card: oklch(0.212 0.019 var(--hue));
+	--card: rgba(18, 20, 32, 0.7);
 	--card-foreground: oklch(0.985 0 0);
-	--popover: oklch(0.212 0.019 var(--hue));
+	--popover: rgba(18, 20, 32, 0.95);
 	--popover-foreground: oklch(0.985 0 0);
-	--primary: oklch(0.455 0.188 13.697);
-	--primary-foreground: oklch(0.969 0.015 12.422);
-	--secondary: oklch(0.274 0.006 var(--hue));
+	--primary: #ff2a7a;
+	--primary-foreground: #ffffff;
+	--secondary: rgba(30, 34, 54, 0.8);
 	--secondary-foreground: oklch(0.985 0 0);
-	--muted: oklch(0.263 0.024 var(--hue));
-	--muted-foreground: oklch(0.711 0.019 var(--hue));
-	--accent: oklch(0.455 0.188 13.697);
-	--accent-foreground: oklch(0.969 0.015 12.422);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.542 0.034 var(--hue));
-	--chart-1: oklch(0.828 0.111 230.318);
-	--chart-2: oklch(0.685 0.169 237.323);
-	--chart-3: oklch(0.588 0.158 241.966);
-	--chart-4: oklch(0.5 0.134 242.749);
-	--chart-5: oklch(0.443 0.11 240.79);
-	--sidebar: oklch(0.21 0.006 var(--hue));
+	--muted: rgba(255, 255, 255, 0.06);
+	--muted-foreground: rgba(255, 255, 255, 0.6);
+	--accent: #a855f7;
+	--accent-foreground: #ffffff;
+	--destructive: #f43f5e;
+	--border: rgba(255, 255, 255, 0.08);
+	--input: rgba(255, 255, 255, 0.1);
+	--ring: #ff2a7a;
+	--sidebar: #090c14;
 	--sidebar-foreground: oklch(0.985 0 0);
-	--sidebar-primary: oklch(0.645 0.246 16.439);
-	--sidebar-primary-foreground: oklch(0.969 0.015 12.422);
-	--sidebar-accent: oklch(0.263 0.024 var(--hue));
-	--sidebar-accent-foreground: oklch(0.985 0 0);
-	--sidebar-border: oklch(1 0 0 / 10%);
-	--sidebar-ring: oklch(0.542 0.034 var(--hue));
+	--sidebar-primary: #ff2a7a;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: rgba(255, 255, 255, 0.06);
+	--sidebar-accent-foreground: #ffffff;
+	--sidebar-border: rgba(255, 255, 255, 0.07);
+	--sidebar-ring: #ff2a7a;
 }
 
 /* --- Full-palette preset themes ---
@@ -971,11 +963,47 @@ textarea::placeholder {
 
 /* Apple Ambient Mesh Lighting Behind Content */
 .apple-ambient-mesh {
-	background: radial-gradient(at 0% 0%, hsla(270, 75%, 45%, 0.18) 0px, transparent 50%),
-		radial-gradient(at 100% 0%, hsla(200, 85%, 48%, 0.15) 0px, transparent 50%),
-		radial-gradient(at 50% 100%, hsla(330, 80%, 45%, 0.14) 0px, transparent 55%);
+	background: radial-gradient(at 0% 0%, hsla(320, 85%, 45%, 0.16) 0px, transparent 45%),
+		radial-gradient(at 100% 0%, hsla(270, 85%, 50%, 0.14) 0px, transparent 50%),
+		radial-gradient(at 50% 100%, hsla(200, 90%, 45%, 0.12) 0px, transparent 55%);
 }
 
+/* Neon Glow Utilities */
+.neon-glow-pink {
+	box-shadow: 0 0 20px -3px rgba(255, 42, 122, 0.45), inset 0 0 12px -2px rgba(255, 42, 122, 0.25);
+}
 
+.neon-glow-purple {
+	box-shadow: 0 0 20px -3px rgba(168, 85, 247, 0.45), inset 0 0 12px -2px rgba(168, 85, 247, 0.25);
+}
 
+.neon-glow-cyan {
+	box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.45), inset 0 0 12px -2px rgba(6, 182, 212, 0.25);
+}
 
+.neon-glow-amber {
+	box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.45), inset 0 0 12px -2px rgba(245, 158, 11, 0.25);
+}
+
+/* Artist Avatar Glowing Rings */
+.artist-ring-gold {
+	box-shadow: 0 0 0 2.5px #f59e0b, 0 0 16px rgba(245, 158, 11, 0.6);
+}
+.artist-ring-pink {
+	box-shadow: 0 0 0 2.5px #ff2a7a, 0 0 16px rgba(255, 42, 122, 0.6);
+}
+.artist-ring-rose {
+	box-shadow: 0 0 0 2.5px #fb7185, 0 0 16px rgba(251, 113, 133, 0.6);
+}
+.artist-ring-amber {
+	box-shadow: 0 0 0 2.5px #f97316, 0 0 16px rgba(249, 115, 22, 0.6);
+}
+.artist-ring-cyan {
+	box-shadow: 0 0 0 2.5px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.6);
+}
+.artist-ring-blue {
+	box-shadow: 0 0 0 2.5px #3b82f6, 0 0 16px rgba(59, 130, 246, 0.6);
+}
+.artist-ring-violet {
+	box-shadow: 0 0 0 2.5px #a855f7, 0 0 16px rgba(168, 85, 247, 0.6);
+}

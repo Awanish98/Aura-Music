@@ -3,8 +3,6 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		PlayIcon,
-		CheckmarkBadge01Icon,
-		UserGroupIcon,
 		ArrowRight01Icon
 	} from '@hugeicons/core-free-icons';
 	import { FMHY_TOP_ARTISTS, type FmhyArtist } from '$lib/fmhy';
@@ -12,7 +10,15 @@
 	import { webPlayer } from '$lib/webplayer';
 	import * as api from '$lib/api';
 
-	let scrollContainer: HTMLElement | null = $state(null);
+	const neonRings = [
+		'artist-ring-gold',
+		'artist-ring-pink',
+		'artist-ring-rose',
+		'artist-ring-amber',
+		'artist-ring-cyan',
+		'artist-ring-blue',
+		'artist-ring-violet'
+	];
 
 	function exploreArtist(artist: FmhyArtist) {
 		goto(`/search?q=${encodeURIComponent(artist.name)}`);
@@ -34,54 +40,47 @@
 	}
 </script>
 
-<section class="space-y-3.5">
+<section class="space-y-4 select-none">
 	<div class="flex items-center justify-between">
 		<div>
-			<h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-				<span>⭐ Popular Artists & Vocalists</span>
-				<span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+			<div class="flex items-center gap-2">
+				<span class="text-amber-400 text-lg">⭐</span>
+				<h2 class="text-xl font-bold tracking-tight text-white">Popular Artists & Vocalists</h2>
+				<span class="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/15 text-pink-400 border border-pink-500/30 font-bold">
 					Top 20
 				</span>
-			</h2>
-			<p class="text-xs text-muted-foreground mt-0.5">
+			</div>
+			<p class="text-xs text-muted-foreground/80 mt-0.5">
 				Bollywood, Punjabi, Global Pop & Indie legends. Tap to explore discography or play top hits.
 			</p>
 		</div>
 		<button
 			onclick={() => goto('/search?q=top+artists')}
-			class="hidden sm:flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+			class="hidden sm:flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
 		>
 			<span>View All</span>
 			<HugeiconsIcon icon={ArrowRight01Icon} size={14} />
 		</button>
 	</div>
 
-	<!-- Horizontal Scrollable Artists Rail -->
-	<div
-		bind:this={scrollContainer}
-		class="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-none scroll-smooth snap-x"
-	>
+	<!-- Horizontal Scrollable Artists Rail with Glowing Neon Rings -->
+	<div class="flex gap-5 sm:gap-6 overflow-x-auto pb-4 pt-2 no-scrollbar scroll-smooth">
 		{#each FMHY_TOP_ARTISTS as artist, i (artist.id)}
+			{@const ringClass = neonRings[i % neonRings.length]}
 			<div
-				class="group flex flex-col items-center text-center shrink-0 w-28 sm:w-32 cursor-pointer snap-start transition-all duration-200 hover:-translate-y-1"
+				class="group flex flex-col items-center text-center shrink-0 w-24 sm:w-28 cursor-pointer transition-all duration-300 hover:-translate-y-1.5"
 				onclick={() => exploreArtist(artist)}
 				role="button"
 				tabindex="0"
 				aria-label="Explore {artist.name}"
 				onkeydown={(e) => e.key === 'Enter' && exploreArtist(artist)}
 			>
-				<!-- Avatar Container -->
-				<div class="relative mb-2.5 size-24 sm:size-28">
-					<!-- Glow Ring -->
-					<div
-						class="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary/40 to-accent/40 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-100"
-					></div>
-					
-					<!-- Image -->
+				<!-- Avatar Container with Glowing Neon Ring -->
+				<div class="relative mb-2.5 size-20 sm:size-24 rounded-full">
 					<img
 						src={artist.thumbnail}
 						alt={artist.name}
-						class="relative size-full rounded-full object-cover shadow-md border-2 border-border/60 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary"
+						class="relative size-full rounded-full object-cover shadow-2xl {ringClass} transition-transform duration-300 group-hover:scale-105"
 						loading="lazy"
 						decoding="async"
 						onerror={(e) => {
@@ -90,18 +89,10 @@
 						}}
 					/>
 
-					<!-- Verified Badge -->
-					<div
-						class="absolute bottom-0 right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md ring-2 ring-background"
-						title="Verified Artist"
-					>
-						<HugeiconsIcon icon={CheckmarkBadge01Icon} size={12} />
-					</div>
-
 					<!-- Hover Quick Play Button -->
 					<button
 						onclick={(e) => playArtistTopTracks(e, artist)}
-						class="absolute inset-0 m-auto flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl opacity-0 scale-75 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 hover:scale-110 active:scale-95"
+						class="absolute inset-0 m-auto flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl opacity-0 scale-75 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 hover:scale-110 active:scale-95"
 						title="Play {artist.name} Top Hits"
 						aria-label="Play {artist.name} Top Hits"
 					>
@@ -110,14 +101,11 @@
 				</div>
 
 				<!-- Artist Details -->
-				<h3 class="w-full truncate text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+				<h3 class="w-full truncate text-xs sm:text-sm font-bold text-white group-hover:text-primary transition-colors">
 					{artist.name}
 				</h3>
-				<span class="text-[11px] text-muted-foreground/80 truncate w-full mt-0.5">
+				<span class="text-[11px] text-muted-foreground/70 truncate w-full mt-0.5">
 					{artist.genre}
-				</span>
-				<span class="text-[10px] text-muted-foreground/60 font-mono mt-0.5">
-					{artist.followers}
 				</span>
 			</div>
 		{/each}

@@ -20,6 +20,7 @@
 	import FeaturedArtistsRail from '$lib/components/FeaturedArtistsRail.svelte';
 	import LiveRadiosShelf from '$lib/components/LiveRadiosShelf.svelte';
 	import MoodsGrid from '$lib/components/MoodsGrid.svelte';
+	import HomeRightRail from '$lib/components/HomeRightRail.svelte';
 	import { getFmhyHomeSections } from '$lib/fmhy';
 	import * as api from '$lib/api';
 	import type { BrowseItem, HomeChip, HomePage, HomeSection } from '$lib/api';
@@ -48,8 +49,6 @@
 	let home = $state<HomePage | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	// The mood chips + which one is active. Kept out of `home` so the row survives a filter switch's
-	// loading state (every home response carries the same chips anyway).
 	let chips = $state<HomeChip[]>([]);
 	let selected = $state<string | null>(null);
 	let loadingMore = $state(false);
@@ -73,12 +72,7 @@
 		}))
 	);
 
-	// Anything already on the Shortcuts grid is dropped: a shortcut is something you play, so the two
-	// lists otherwise converge on the same handful of items and the top of home shows them twice in
-	// two different shapes.
 	const pinned = $derived(new Set(personal.picks.map((p) => p.id)));
-	// Same snapshot problem as the Shortcuts tiles: the stored card is what it looked like when it
-	// was last played from, so the live library row wins where there is one (#67).
 	const recent = $derived(
 		recentItems(personal, 100)
 			.filter((r) => !pinned.has(r.id))
@@ -86,22 +80,12 @@
 			.map((r) => freshen(r, library.items))
 	);
 
-	// Outlined at rest, filled with the accent when on.
-	const chipClass = (active: boolean) =>
-		`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-			active
-				? 'border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30'
-				: 'border-border/80 bg-card/85 text-foreground/85 hover:border-foreground/50 hover:text-foreground'
-		}`;
-
-	// "Forgotten favourites" is pulled out of the feed and rendered as a list above it
 	const isForgotten = (s: HomeSection) =>
 		/forgotten/i.test(s.title) && s.items.some((i) => i.kind === 'song');
 	let forgotten = $state<HomeSection | null>(null);
 	let seeking = $state(false);
 	const feed = $derived(home?.sections.filter((s) => !isForgotten(s)) ?? []);
 
-	// --- the arrangement the user set in the Edit modal (personal.ts) ---------------------------
 	const RECENT = '@recent';
 	const FAMILIAR = '@familiar';
 	const FORGOTTEN = '@forgotten';
@@ -115,7 +99,7 @@
 
 	const blocks = $derived.by(() => {
 		const local: Block[] = selected
-			? [] // a mood feed is the chip's: neither of ours belongs in it
+			? []
 			: [
 					...(gdriveItems.length ? [{ id: GDRIVE, key: GDRIVE, title: 'Google Drive Cloud Music' }] : []),
 					{ id: RECENT, key: RECENT, title: t('home.jump_back_in') },
@@ -131,19 +115,9 @@
 		return arrangeSections([...local, ...shelves], personal);
 	});
 	const visible = $derived(blocks.filter((b) => !hidden.has(b.key)));
-	/**
-	 * What the Edit modal lists. Not `blocks`: the feed arrives a page at a time, so `blocks` holds
-	 * only the shelves scrolled to so far, and the modal showed five rows before a scroll and
-	 * fifteen after one. Every shelf home has ever rendered is remembered (`noteSections`), and the
-	 * ones this visit hasn't fetched yet are listed alongside the loaded ones — a section can be
-	 * hidden or moved before the page has got to it, which is the whole point of the modal.
-	 *
-	 * Kept apart from `blocks` deliberately: these carry no shelf, so they must never reach the
-	 * feed's renderer. Unranked ones sort to the end, since where they belong is exactly what
-	 * hasn't loaded.
-	 */
+
 	const known = $derived.by(() => {
-		if (selected) return blocks; // a mood feed is the chip's, and its shelves aren't home's
+		if (selected) return blocks;
 		const have = new Set(blocks.map((b) => b.key));
 		const unloaded: Block[] = personal.home.seen
 			.filter((t) => !have.has(t))
@@ -151,15 +125,12 @@
 		return unloaded.length ? arrangeSections([...blocks, ...unloaded], personal) : blocks;
 	});
 
-	// Every page of the feed adds to that memory. Only the unfiltered feed: a mood chip's shelves
-	// belong to the chip, not to home's arrangement.
 	$effect(() => {
 		if (selected) return;
 		const titles = feed.map((s) => s.title);
 		if (titles.length) noteHomeSections(titles);
 	});
 
-	/** Latch the shelf whenever a page turns out to carry it. Called after every `home` change. */
 	function noteForgotten() {
 		const found = home?.sections.find(isForgotten);
 		if (found) {
@@ -169,15 +140,8 @@
 		return !!found;
 	}
 
-	/** Forgotten favourites renders at the top but arrives deep in the feed. */
 	const wantForgotten = () => !forgotten && !hidden.has(FORGOTTEN);
 
-	/**
-	 * A custom arrangement can only be honoured for the shelves that have loaded, so a section the
-	 * user dragged upwards stayed missing until they scrolled to wherever YouTube actually put it.
-	 * True while some section ranked *above* one already on screen hasn't arrived yet — the ones
-	 * ranked below it land at the bottom regardless, which is what scrolling is for.
-	 */
 	function missingRanked() {
 		const order = personal.home.order;
 		if (!order.length) return false;
@@ -189,19 +153,15 @@
 		return false;
 	}
 
-	/**
-	 * Walk a few continuations up front rather than leaving those slots empty until the reader
-	 * happens to scroll past them. Bounded — the feed is long and this is a nicety.
-	 */
 	async function seekForgotten(params: string | null) {
-		if (params) return; // a mood feed is the chip's, and its shelves aren't home's
+		if (params) return;
 		seeking = true;
 		try {
 			for (let i = 0; i < 6; i++) {
 				if (moreError || loadingMore) return;
 				if (!wantForgotten() && !missingRanked()) return;
 				if (selected !== params || !home?.continuation) return;
-				await loadMore(); // latches the forgotten shelf itself if the page carries it
+				await loadMore();
 			}
 		} finally {
 			seeking = false;
@@ -230,13 +190,12 @@
 		error = null;
 		try {
 			const fresh = await api.getHome(params ?? undefined);
-			// A stale response from a chip the user already clicked away from must not win.
 			if (selected !== params) return;
 			home = fresh;
 			putCached(key, fresh);
 			noteForgotten();
 			cater(fresh, params);
-			seekForgotten(params); // background: the feed is already on screen
+			seekForgotten(params);
 		} catch (e) {
 			if (!hit) error = String(e);
 		} finally {
@@ -249,19 +208,17 @@
 		if (!token || loadingMore) return;
 		loadingMore = true;
 		moreError = false;
-		const params = selected; // guard against chip switches mid-flight
+		const params = selected;
 		try {
 			const more = await api.getHomeMore(token);
-			if (selected !== params || home?.continuation !== token) return; // stale
+			if (selected !== params || home?.continuation !== token) return;
 			home = {
 				...home!,
 				sections: [...home!.sections, ...more.sections],
-				// An empty page would leave the sentinel in view with nothing to show — treat it as the end.
 				continuation: more.sections.length ? more.continuation : undefined
 			};
 			noteForgotten();
 		} catch (e) {
-			// Stop auto-loading and offer a retry — auto-retrying a visible sentinel would spin.
 			moreError = true;
 			toast.error(t('toasts.could_not_load_more'));
 		} finally {
@@ -269,8 +226,6 @@
 		}
 	}
 
-	// Home doesn't scroll itself — <main> in the layout is the scroller, so the back-to-top button
-	// has to watch the ancestor rather than the window.
 	let scroller = $state<HTMLElement | null>(null);
 	let scrolled = $state(false);
 	function watchScroll(node: HTMLElement) {
@@ -282,9 +237,6 @@
 		return () => el.removeEventListener('scroll', onScroll);
 	}
 
-	// One page per approach to the bottom: the observer only fires when the sentinel *enters* view, so
-	// an appended page that pushes it back out is required before the next fetch. rootMargin starts
-	// the fetch early enough that the content is usually there by the time you scroll to it.
 	function sentinel(node: HTMLElement) {
 		const io = new IntersectionObserver(([e]) => e.isIntersecting && loadMore(), {
 			rootMargin: '400px 0px'
@@ -293,15 +245,8 @@
 		return () => io.disconnect();
 	}
 
-	/**
-	 * YouTube's "From the community" shelf is already account-personalized, but it isn't tied to what
-	 * the user actually plays *in Limusic*. Swap its items for community playlists searched from
-	 * their top artists, keeping the shelf's title and position. With no listening signal yet — or if
-	 * the searches fail — YouTube's own items are left exactly as they came. Best-effort: this can
-	 * never fail the page.
-	 */
 	async function cater(page: HomePage, params: string | null) {
-		if (params) return; // a mood-filtered feed is the chip's, not the user's
+		if (params) return;
 		if (!page.sections.some((s) => /community/i.test(s.title))) return;
 		const artists = topArtists(personal, 3);
 		if (!artists.length) return;
@@ -315,197 +260,183 @@
 			if (!items.length) return;
 			putCached(key, items);
 		}
-		if (selected !== params) return; // the user clicked away to a mood feed
-		// Re-locate the shelf instead of patching the page we were handed: `home` has very likely moved
-		// on while the searches ran (a revalidation, or the Forgotten favourites crawl appending pages).
+		if (selected !== params) return;
 		const idx = home?.sections.findIndex((s) => /community/i.test(s.title)) ?? -1;
 		if (idx < 0) return;
 		home = { ...home!, sections: home!.sections.map((s, i) => (i === idx ? { ...s, items } : s)) };
 	}
 
-	// Chips only refresh when a response actually carries them (never blank the row mid-switch).
 	$effect(() => {
 		if (home?.chips?.length) chips = home.chips.filter((c) => c.title !== 'Podcasts');
 	});
 
 	onMount(() => load(null));
 
-	// On Repeat crosses its threshold while you listen, so re-check on every track change rather
-	// than once per visit: sitting on home through your fifth song should be enough to see the tile.
-	// The check is a local SQLite read, and `seedPick` is what actually decides.
 	$effect(() => {
 		playback.now?.videoId;
 		seedOnRepeatPick();
 	});
 </script>
 
-<div {@attach watchScroll}>
-	<h1 class="sr-only">Aura Music – Free High-Fidelity Music Streaming, Synced Lyrics & Personalized Charts</h1>
-	<HomeHero />
-	<!-- Mood chips filter the whole feed, so they're page-level controls: sticky, they stay reachable
-	     while the feed scrolls under them instead of leaving with the header they were pinned to.
-	     Opaque rather than blurred — a backdrop-filter repainting on every scroll frame is the one
-	     thing WebKitGTK reliably chokes on. -->
-	{#if chips.length}
-		<div class="sticky top-0 z-20 border-b border-border/40 bg-background/90 backdrop-blur-xl px-4 sm:px-6 pt-2.5">
-			<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-				<!-- An explicit "All" is the way out of a filter. Clicking the active chip again also
-				     clears it, but nobody discovers that, and nothing else on screen says you're filtered. -->
-				<button onclick={() => load(null)} class={chipClass(!selected)}>{t('common.all')}</button>
-				{#each chips as chip, i (chip.title + ':' + i)}
-					<button
-						onclick={() => load(selected === chip.params ? null : chip.params)}
-						class={chipClass(selected === chip.params)}
-					>
-						{chip.title}
-					</button>
-				{/each}
-			</div>
-		</div>
-	{:else if loading}
-		<!-- Hold the bar's height on a cold load: chips arrive with the feed, and popping them in
-		     afterwards shoves the whole page down under the cursor. -->
-		<div class="sticky top-0 z-20 border-b border-border/40 bg-background/90 backdrop-blur-xl px-4 sm:px-6 pt-2.5" aria-hidden="true">
-			<div class="flex gap-2 overflow-hidden pb-2">
-				{#each ['w-10', 'w-16', 'w-20', 'w-14', 'w-24', 'w-16'] as w, i (i)}
-					<Skeleton class="h-8 shrink-0 rounded-full {w}" />
-				{/each}
-			</div>
-		</div>
-	{/if}
-	<div class="px-4 sm:px-6 pb-6 pt-4 sm:pt-6">
-		<!-- Zone one: what's yours + curated rich music content -->
-		{#if !selected}
-			<div class="mb-10 border-b pb-8 space-y-10">
+<div {@attach watchScroll} class="p-4 sm:p-6 pb-12">
+	<h1 class="sr-only">Aura Music – Premium Futuristic Music Streaming & AI DJ</h1>
+
+	<!-- Main Multi-Column Layout for Desktop (Hero + Left Column Feed & Right Widget Rail) -->
+	<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+		<!-- Main Center / Left Content Stream (Span 12 on mobile/tablet, Span 9 on xl+) -->
+		<div class="xl:col-span-9 space-y-8 min-w-0">
+			<!-- Home Hero Section with Greeting, Cosmic Headphones Banner & Mood Pills -->
+			<HomeHero
+				activeMood={selected}
+				onSelectMood={(mood) => {
+					if (!mood) {
+						load(null);
+					} else {
+						const chip = chips.find((c) => c.title.toLowerCase().includes(mood));
+						load(chip?.params ?? null);
+					}
+				}}
+			/>
+
+			{#if !selected}
+				<!-- Shortcuts 6 Gradient Liquid Glass Cards -->
 				<Shortcuts onEdit={() => (editing = true)} />
+
+				<!-- Aura AI Vibe Station Card with 3D Mascot -->
 				<AiVibeGenerator />
+
+				<!-- Popular Artists & Vocalists (Top 20 with Neon Rings) -->
 				<FeaturedArtistsRail />
+
+				<!-- Categorized Moods & Genres Grid -->
 				<MoodsGrid />
+
+				<!-- 24/7 Live Internet Radios -->
 				<LiveRadiosShelf />
-			</div>
-		{/if}
-		{#snippet shelfSkeletons(n: number)}
-			{#each Array(n) as _, s (s)}
-				<section aria-hidden="true">
-					<Skeleton class="mb-3 h-5 w-40 rounded" />
-					<div class="flex gap-2 overflow-hidden pb-2">
-						{#each Array(6) as _, i (i)}
-							<div class="w-40 shrink-0"><MediaCardSkeleton /></div>
-						{/each}
-					</div>
-				</section>
-			{/each}
-		{/snippet}
-		<!-- One ordered column, so the two sections the app builds itself sit among YouTube's shelves
-		     instead of above them, and a drag in the Edit modal can put any of them anywhere.
-		     gap-10, not gap-8: with a heading, a row of cards and no rule between them, shelves any
-		     closer than this stop reading as separate sections. -->
-		<div class="content-in flex flex-col gap-10">
-			{#each visible as block, i (block.id + ':' + i)}
-				{#if block.shelf}
-					<Shelf
-						title={block.shelf.title}
-						items={block.shelf.items}
-						queueAll={false}
-						community={/community/i.test(block.shelf.title)}
-						onMore={block.shelf.moreBrowseId ? () => showMore(block.shelf!) : undefined}
-					/>
-				{:else if block.key === GDRIVE}
-					{#if gdriveItems.length}
-						<Shelf
-							title="Google Drive Cloud Music"
-							items={gdriveItems}
-							queueAll={true}
-							onMore={() => goto('/drive')}
-						/>
-					{/if}
-				{:else if block.key === RECENT}
-					{#if recent.length}<RecentRail items={recent} />{/if}
-				{:else if block.key === FAMILIAR}
-					<FamiliarArtists />
-				{:else if forgotten}
-					<ForgottenFavourites
-						section={forgotten}
-						onMore={forgotten.moreBrowseId ? () => showMore(forgotten!) : undefined}
-					/>
-				{:else if seeking}
-					<!-- Hold the slot open while the crawl runs, so landing the shelf doesn't shove the feed
-					     down under the reader's cursor. -->
-					<div aria-hidden="true">
-						<Skeleton class="mb-3 h-5 w-48 rounded" />
-						<div class="columns-1 gap-x-6 md:columns-2 xl:columns-3">
-							{#each Array(15) as _, i (i)}
-								<div class="break-inside-avoid"><TrackRowSkeleton /></div>
+			{/if}
+
+			{#snippet shelfSkeletons(n: number)}
+				{#each Array(n) as _, s (s)}
+					<section aria-hidden="true" class="space-y-3">
+						<Skeleton class="h-6 w-40 rounded" />
+						<div class="flex gap-3 overflow-hidden pb-2">
+							{#each Array(6) as _, i (i)}
+								<div class="w-40 shrink-0"><MediaCardSkeleton /></div>
 							{/each}
 						</div>
+					</section>
+				{/each}
+			{/snippet}
+
+			<!-- Shelves & Dynamic Feeds -->
+			<div class="content-in flex flex-col gap-10">
+				{#each visible as block, i (block.id + ':' + i)}
+					{#if block.shelf}
+						<Shelf
+							title={block.shelf.title}
+							items={block.shelf.items}
+							queueAll={false}
+							community={/community/i.test(block.shelf.title)}
+							onMore={block.shelf.moreBrowseId ? () => showMore(block.shelf!) : undefined}
+						/>
+					{:else if block.key === GDRIVE}
+						{#if gdriveItems.length}
+							<Shelf
+								title="Google Drive Cloud Music"
+								items={gdriveItems}
+								queueAll={true}
+								onMore={() => goto('/drive')}
+							/>
+						{/if}
+					{:else if block.key === RECENT}
+						{#if recent.length}<RecentRail items={recent} />{/if}
+					{:else if block.key === FAMILIAR}
+						<FamiliarArtists />
+					{:else if forgotten}
+						<ForgottenFavourites
+							section={forgotten}
+							onMore={forgotten.moreBrowseId ? () => showMore(forgotten!) : undefined}
+						/>
+					{:else if seeking}
+						<div aria-hidden="true" class="space-y-3">
+							<Skeleton class="h-6 w-48 rounded" />
+							<div class="columns-1 gap-x-6 md:columns-2 xl:columns-3">
+								{#each Array(15) as _, i (i)}
+									<div class="break-inside-avoid"><TrackRowSkeleton /></div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				{/each}
+
+				{#if loading}
+					{@render shelfSkeletons(3)}
+				{:else if error}
+					<ErrorState message={error} onRetry={() => load(selected)} />
+				{:else if !home?.sections.length}
+					<!-- FMHY Curated Shelves fallback when signed out or empty feed -->
+					<div class="space-y-10">
+						{#each fmhySections as sec}
+							<Shelf title={sec.title} items={sec.items} queueAll={false} />
+						{/each}
 					</div>
+					{#if !auth.account?.signedIn}
+						<div class="flex flex-col items-center gap-3 py-10 text-center border-t border-white/10 mt-6">
+							<HugeiconsIcon icon={MusicNote01Icon} class="h-8 w-8 text-muted-foreground/40" />
+							<p class="max-w-sm text-sm text-muted-foreground">
+								{t('home.signed_out_hint')}
+							</p>
+							<Button size="sm" onclick={() => api.loginWebview()}>{t('common.sign_in_google')}</Button>
+						</div>
+					{/if}
+				{:else if home.continuation}
+					{#if moreError}
+						<div class="p-3 text-center">
+							<Button variant="outline" size="sm" onclick={loadMore} disabled={loadingMore}>
+								{loadingMore ? t('common.loading') : t('common.try_again')}
+							</Button>
+						</div>
+					{:else}
+						<div class="flex flex-col gap-10" aria-busy={loadingMore}>
+							<div {@attach sentinel}></div>
+							{#if loadingMore}{@render shelfSkeletons(2)}{/if}
+						</div>
+					{/if}
 				{/if}
-			{/each}
-			{#if loading}
-				{@render shelfSkeletons(3)}
-			{:else if error}
-				<ErrorState message={error} onRetry={() => load(selected)} />
-			{:else if !home?.sections.length}
-				<!-- FMHY Curated Shelves fallback when signed out or empty YouTube feed -->
-				<div class="space-y-10">
-					{#each fmhySections as sec}
-						<Shelf title={sec.title} items={sec.items} queueAll={false} />
-					{/each}
-				</div>
-				{#if !auth.account?.signedIn}
-					<div class="flex flex-col items-center gap-3 py-10 text-center border-t border-border/40 mt-6">
-						<HugeiconsIcon icon={MusicNote01Icon} class="h-8 w-8 text-muted-foreground/40" />
-						<p class="max-w-sm text-sm text-muted-foreground">
-							{t('home.signed_out_hint')}
-						</p>
-						<Button size="sm" onclick={() => api.loginWebview()}>{t('common.sign_in_google')}</Button>
-					</div>
-				{/if}
-			{:else if home.continuation}
-				{#if moreError}
-					<div class="p-3 text-center">
-						<Button variant="outline" size="sm" onclick={loadMore} disabled={loadingMore}>
-							{loadingMore ? t('common.loading') : t('common.try_again')}
-						</Button>
-					</div>
-				{:else}
-					<!-- Skeletons only while a page is actually in flight; the sentinel above them is what
-					     triggers the fetch when it scrolls into range. -->
-					<div class="flex flex-col gap-10" aria-busy={loadingMore}>
-						<div {@attach sentinel}></div>
-						{#if loadingMore}{@render shelfSkeletons(2)}{/if}
-					</div>
-				{/if}
-			{/if}
+			</div>
 		</div>
 
-		<!-- Modern Footer with Quick Links & Copyright -->
-		<footer class="mt-16 border-t border-border/40 pt-8 pb-24 text-center md:pb-12">
-			<div class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
-				<a href="/about" class="transition-colors hover:text-foreground">About Aura</a>
-				<span class="text-border">•</span>
-				<a href="/privacy" class="transition-colors hover:text-foreground">Privacy Policy</a>
-				<span class="text-border">•</span>
-				<a href="/terms" class="transition-colors hover:text-foreground">Terms of Service</a>
-				<span class="text-border">•</span>
-				<a href="/contact" class="transition-colors hover:text-foreground">Contact & Support</a>
-				<span class="text-border">•</span>
-				<a href="https://github.com/Awanish98/Aura-Music" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-foreground">GitHub</a>
-			</div>
-			<p class="mt-4 text-[11px] text-muted-foreground/60">
-				© 2026 Aura Music. High-fidelity audio streaming, real-time lyrics & AI music discovery.
-			</p>
-		</footer>
+		<!-- Right Side Widget Rail (Visible on >= xl screens, matches Reference UI) -->
+		<div class="hidden xl:block xl:col-span-3 sticky top-6">
+			<HomeRightRail />
+		</div>
 	</div>
+
+	<!-- Modern Footer -->
+	<footer class="mt-16 border-t border-white/8 pt-8 pb-24 text-center md:pb-12">
+		<div class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
+			<a href="/about" class="transition-colors hover:text-white">About Aura</a>
+			<span class="text-white/20">•</span>
+			<a href="/privacy" class="transition-colors hover:text-white">Privacy Policy</a>
+			<span class="text-white/20">•</span>
+			<a href="/terms" class="transition-colors hover:text-white">Terms of Service</a>
+			<span class="text-white/20">•</span>
+			<a href="/contact" class="transition-colors hover:text-white">Contact & Support</a>
+			<span class="text-white/20">•</span>
+			<a href="https://github.com/Awanish98/Aura-Music" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-white">GitHub</a>
+		</div>
+		<p class="mt-4 text-[11px] text-muted-foreground/60">
+			© 2026 Aura Music. High-fidelity audio streaming, real-time lyrics & AI music discovery.
+		</p>
+	</footer>
 </div>
 
 {#if scrolled}
-	<!-- Clears the player bar when there is one. z-10 keeps it under the queue/lyrics overlays. -->
 	<button
 		transition:fade={{ duration: 150 }}
 		onclick={() => scroller?.scrollTo({ top: 0, behavior: 'smooth' })}
 		aria-label={t('a11y.back_to_top')}
-		class="fixed right-6 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 {playback.now
+		class="fixed right-6 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-transform hover:scale-110 {playback.now
 			? 'bottom-24'
 			: 'bottom-6'}"
 	>

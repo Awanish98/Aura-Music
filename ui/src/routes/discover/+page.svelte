@@ -1,27 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { page } from '$app/state';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		PlayIcon,
 		Search01Icon,
 		MusicNote01Icon,
-		Mic01Icon,
 		VolumeHighIcon,
 		InfinityIcon,
 		FavouriteIcon,
-		ShuffleIcon
+		Compass01Icon,
+		SparklesIcon,
+		Mic01Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
 	import {
 		ALL_FMHY_ITEMS,
-		FMHY_RADIO_STATIONS,
-		FMHY_PODCASTS,
-		FMHY_SOUNDSCAPES,
-		FMHY_GAME_SOUNDTRACKS,
-		FMHY_CHARTS,
-		FMHY_DISCOVERY_TOOLS,
 		convertFmhyToSongItem,
 		type FmhyItem
 	} from '$lib/fmhy';
@@ -33,20 +28,22 @@
 	let searchQuery = $state('');
 	let selectedTag = $state<string | null>(null);
 
-	// Use FavouriteIcon or Sparkles equivalent
-	const SparklesIconFixed = FavouriteIcon;
+	onMount(() => {
+		const cat = page.url.searchParams.get('cat');
+		if (cat && ['all', 'radio', 'podcast', 'ambient', 'soundtrack', 'chart', 'tool'].includes(cat)) {
+			activeCategory = cat as any;
+		}
+	});
 
 	const categories = [
-		{ id: 'all', label: 'All Items', icon: SparklesIconFixed },
+		{ id: 'all', label: 'All Explore', icon: Compass01Icon },
 		{ id: 'radio', label: '24/7 Live Radio', icon: VolumeHighIcon },
 		{ id: 'podcast', label: 'Podcasts', icon: Mic01Icon },
 		{ id: 'ambient', label: 'Ambient & Sleep', icon: InfinityIcon },
-		{ id: 'soundtrack', label: 'Game Soundtracks', icon: MusicNote01Icon },
-		{ id: 'chart', label: 'Top Charts', icon: FavouriteIcon },
-		{ id: 'tool', label: 'Audio Tools', icon: Search01Icon }
+		{ id: 'soundtrack', label: 'Game OSTs', icon: MusicNote01Icon },
+		{ id: 'chart', label: 'Top Charts', icon: FavouriteIcon }
 	];
 
-	// Extract unique tags
 	const allTags = Array.from(
 		new Set(ALL_FMHY_ITEMS.flatMap((item) => item.tags))
 	).sort();
@@ -106,28 +103,28 @@
 </script>
 
 <svelte:head>
-	<title>Discover FMHY Audio • Echo Music</title>
+	<title>Explore Music, Radio & Podcasts • Aura Music</title>
 </svelte:head>
 
-<div class="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-8">
+<div class="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8 select-none">
 	<!-- Hero Banner -->
 	<div
-		class="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/15 via-background to-secondary/15 p-6 md:p-10 shadow-lg"
+		class="relative overflow-hidden rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-pink-950/30 to-black/50 p-6 sm:p-10 shadow-2xl backdrop-blur-3xl"
 	>
 		<div class="relative z-10 flex flex-col gap-3">
-			<div class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-				<HugeiconsIcon icon={SparklesIconFixed} class="h-3.5 w-3.5" />
-				<span>Curated from FreeMediaHeckYeah</span>
+			<div class="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/15 px-3 py-1 text-xs font-bold text-pink-400 w-fit">
+				<HugeiconsIcon icon={SparklesIcon} size={14} class="animate-pulse" />
+				<span>Curated Discovery & 24/7 Streams</span>
 			</div>
-			<h1 class="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
-				Discover Music, Radios & Podcasts
+			<h1 class="font-heading text-3xl font-extrabold tracking-tight md:text-5xl text-white">
+				Explore & Radios
 			</h1>
-			<p class="max-w-2xl text-sm text-muted-foreground md:text-base">
-				Stream 24/7 commercial-free live internet radio, top-tier tech and story podcasts, deep sleep soundscapes, retro video game soundtracks, and global charts.
+			<p class="max-w-2xl text-xs sm:text-sm text-muted-foreground/90 leading-relaxed">
+				Stream commercial-free 24/7 internet radio, cyber & science podcasts, deep focus ambient soundscapes, video game soundtracks, and global charts.
 			</p>
 		</div>
 		<div
-			class="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl"
+			class="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-pink-600/25 blur-3xl"
 		></div>
 	</div>
 
@@ -135,15 +132,14 @@
 	<div class="flex flex-col gap-4">
 		<!-- Search Input -->
 		<div class="relative w-full max-w-md">
-			<HugeiconsIcon
-				icon={Search01Icon}
-				class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-			/>
-			<Input
+			<div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+				<HugeiconsIcon icon={Search01Icon} size={17} />
+			</div>
+			<input
 				type="search"
-				placeholder="Search FMHY stations, podcasts, soundscapes..."
+				placeholder="Search stations, podcasts, soundscapes..."
 				bind:value={searchQuery}
-				class="pl-10"
+				class="w-full h-11 pl-10 pr-4 rounded-full bg-white/6 border border-white/10 text-xs sm:text-sm text-white placeholder:text-muted-foreground/70 focus:outline-none focus:border-pink-500/60 focus:bg-white/10 transition-all shadow-inner"
 			/>
 		</div>
 
@@ -156,20 +152,20 @@
 						activeCategory = cat.id as any;
 						selectedTag = null;
 					}}
-					class="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all {activeCategory ===
+					class="flex items-center gap-2 rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer {activeCategory ===
 					cat.id
-						? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]'
-						: 'apple-glass-pill text-muted-foreground hover:text-foreground'}"
+						? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30 scale-[1.02]'
+						: 'border border-white/10 bg-white/6 text-muted-foreground hover:bg-white/12 hover:text-white'}"
 				>
-					<HugeiconsIcon icon={cat.icon} class="h-4 w-4" />
+					<HugeiconsIcon icon={cat.icon} size={16} />
 					<span>{cat.label}</span>
 				</button>
 			{/each}
 		</div>
 
-		<!-- Tags Chips -->
+		<!-- Tags Filter Chips -->
 		<div class="flex flex-wrap items-center gap-1.5 pt-1">
-			<span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mr-1">
+			<span class="text-xs font-bold uppercase tracking-wider text-muted-foreground/70 mr-1">
 				Filter tags:
 			</span>
 			{#each allTags.slice(0, 16) as tag}
@@ -178,10 +174,10 @@
 					onclick={() => {
 						selectedTag = selectedTag === tag ? null : tag;
 					}}
-					class="rounded-md border px-2.5 py-1 text-xs font-medium transition-colors {selectedTag ===
+					class="rounded-full border px-3 py-1 text-xs font-medium transition-colors cursor-pointer {selectedTag ===
 					tag
-						? 'border-primary bg-primary/20 text-primary'
-						: 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/70 hover:text-foreground'}"
+						? 'border-pink-500 bg-pink-500/25 text-pink-300 font-bold shadow-sm'
+						: 'border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white'}"
 				>
 					#{tag}
 				</button>
@@ -202,19 +198,14 @@
 						playFmhyItem(item);
 					}
 				}}
-				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl apple-glass-card p-3 shadow-md transition-all duration-300 {isCurrentlyPlaying(
+				class="group relative flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/50 p-3.5 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:border-pink-500/40 hover:shadow-2xl hover:scale-[1.015] {isCurrentlyPlaying(
 					item
 				)
-					? 'border-primary ring-2 ring-primary/60 bg-primary/10'
+					? 'border-pink-500 ring-2 ring-pink-500/50 bg-pink-500/10'
 					: ''}"
 			>
-				<!-- Ambient Glow on Hover -->
-				<div
-					class="pointer-events-none absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100"
-				></div>
-
 				<!-- Thumbnail Container -->
-				<div class="relative aspect-square w-full overflow-hidden rounded-xl bg-muted ring-1 ring-white/10">
+				<div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted ring-1 ring-white/10">
 					<img
 						src={item.thumbnail}
 						alt={item.title}
@@ -226,7 +217,7 @@
 					<!-- Live Badge -->
 					{#if item.duration === 'LIVE'}
 						<div
-							class="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-red-600/90 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-white shadow-md backdrop-blur-md border border-red-500/40"
+							class="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-red-600/95 px-2.5 py-0.5 text-[10px] font-extrabold tracking-wider text-white shadow-md backdrop-blur-md border border-red-400/40"
 						>
 							<span class="h-1.5 w-1.5 animate-ping rounded-full bg-white"></span>
 							<span>LIVE</span>
@@ -235,7 +226,7 @@
 
 					<!-- Category Pill -->
 					<div
-						class="absolute right-2.5 top-2.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-md border border-white/10"
+						class="absolute right-2.5 top-2.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90 backdrop-blur-md border border-white/10"
 					>
 						{item.category}
 					</div>
@@ -245,74 +236,47 @@
 						class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:opacity-100"
 					>
 						<div
-							class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/50 transition-transform group-hover:scale-110 active:scale-95"
+							class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-rose-600 text-white shadow-2xl shadow-pink-500/50 transition-transform group-hover:scale-110 active:scale-95"
 						>
-							<HugeiconsIcon icon={PlayIcon} class="h-6 w-6 fill-current translate-x-0.5" />
+							<HugeiconsIcon icon={PlayIcon} size={24} fill="currentColor" class="translate-x-0.5" />
 						</div>
 					</div>
 				</div>
 
 				<!-- Details -->
-				<div class="mt-3 flex flex-1 flex-col justify-between gap-2 min-w-0">
+				<div class="mt-3.5 flex flex-1 flex-col justify-between gap-2 min-w-0">
 					<div class="flex flex-col min-w-0">
-						<h2 class="line-clamp-1 font-heading text-base font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
+						<h2 class="line-clamp-1 font-heading text-sm font-bold text-white group-hover:text-primary transition-colors">
 							{item.title}
 						</h2>
-						<p class="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+						<p class="mt-0.5 line-clamp-1 text-xs text-muted-foreground/80">
 							{item.subtitle}
 						</p>
-						{#if item.description}
-							<p class="mt-1 line-clamp-2 text-xs text-muted-foreground/80 leading-relaxed">
-								{item.description}
-							</p>
-						{/if}
 					</div>
 
 					<!-- Card Footer (Tags & Action) -->
-					<div class="flex items-center justify-between pt-2 border-t border-border/40 mt-1">
+					<div class="flex items-center justify-between pt-2 border-t border-white/8 mt-1">
 						<div class="flex flex-wrap gap-1">
 							{#each item.tags.slice(0, 2) as tag}
-								<span class="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+								<span class="rounded-md bg-white/6 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
 									{tag}
 								</span>
 							{/each}
 						</div>
 
 						{#if item.category !== 'tool' && item.category !== 'chart'}
-							<Button
-								variant="ghost"
-								size="icon-xs"
+							<button
+								type="button"
 								title="Add to queue"
 								onclick={(e) => queueFmhyItem(item, e)}
-								class="opacity-0 group-hover:opacity-100 hover:text-primary transition-opacity"
+								class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:text-white hover:bg-white/10 transition-colors"
 							>
-								<HugeiconsIcon icon={MusicNote01Icon} class="h-3.5 w-3.5" />
-							</Button>
+								<HugeiconsIcon icon={MusicNote01Icon} size={15} />
+							</button>
 						{/if}
 					</div>
 				</div>
 			</div>
 		{/each}
 	</div>
-
-	{#if filteredItems.length === 0}
-		<div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
-			<HugeiconsIcon icon={Search01Icon} class="h-10 w-10 text-muted-foreground" />
-			<h2 class="font-heading text-lg font-semibold">No items matched your search</h2>
-			<p class="text-sm text-muted-foreground">
-				Try clearing filters or searching for something else.
-			</p>
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={() => {
-					searchQuery = '';
-					activeCategory = 'all';
-					selectedTag = null;
-				}}
-			>
-				Reset Filters
-			</Button>
-		</div>
-	{/if}
 </div>

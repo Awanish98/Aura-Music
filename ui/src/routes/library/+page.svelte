@@ -147,9 +147,12 @@
 	{/if}
 {/snippet}
 
-<div class="p-6">
-	<div class="mb-6 flex items-center justify-between">
-		<h1 class="font-heading text-2xl font-bold">{t('library.title')}</h1>
+<div class="p-4 sm:p-6 md:p-8 space-y-6">
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div>
+			<h1 class="font-heading text-3xl font-extrabold tracking-tight text-foreground">{t('library.title')}</h1>
+			<p class="text-xs sm:text-sm text-muted-foreground mt-0.5">Your personal music collection, playlists, albums & cloud library</p>
+		</div>
 		{#if auth.account?.signedIn}
 			<div class="flex items-center gap-2">
 				<!-- Only with something to push: saves made before signing in, which live on this
@@ -170,6 +173,7 @@
 										onclick={sync}
 										disabled={syncing}
 										aria-label={t('a11y.sync_to_ytm', { count: toSync.length })}
+										class="apple-glass-pill"
 									>
 										<span class="relative">
 											<HugeiconsIcon
@@ -179,7 +183,7 @@
 											<!-- ring-background so the count reads over the icon's stroke (as in
 											     Titlebar). -->
 											<span
-												class="absolute -right-2 -top-1.5 min-w-3.5 rounded-full bg-accent px-[3px] text-[9px] font-semibold leading-[0.875rem] text-accent-foreground ring-[1.5px] ring-background"
+												class="absolute -right-2 -top-1.5 min-w-3.5 rounded-full bg-primary px-[3px] text-[9px] font-semibold leading-[0.875rem] text-primary-foreground ring-[1.5px] ring-background shadow-sm"
 											>
 												{toSync.length}
 											</span>
@@ -195,7 +199,7 @@
 						</Tooltip.Root>
 					</Tooltip.Provider>
 				{/if}
-				<Button variant="outline" size="sm" class="gap-2" onclick={() => (dialogOpen = true)}>
+				<Button size="sm" class="gap-2 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all" onclick={() => (dialogOpen = true)}>
 					<HugeiconsIcon icon={Add01Icon} class="h-4 w-4" /> {t('nav.new_playlist')}
 				</Button>
 			</div>
@@ -215,12 +219,12 @@
 					createNew();
 				}}
 			>
-				<Input bind:value={newTitle} placeholder={t('dialogs.edit_playlist.name_placeholder')} autofocus />
+				<Input bind:value={newTitle} placeholder={t('dialogs.edit_playlist.name_placeholder')} autofocus class="rounded-xl" />
 				<Dialog.Footer>
-					<Button type="button" variant="outline" onclick={() => (dialogOpen = false)}>
+					<Button type="button" variant="outline" onclick={() => (dialogOpen = false)} class="rounded-xl">
 						{t('common.cancel')}
 					</Button>
-					<Button type="submit" disabled={busy || !newTitle.trim()}>
+					<Button type="submit" disabled={busy || !newTitle.trim()} class="rounded-xl">
 						{busy ? t('common.loading') : t('common.create')}
 					</Button>
 				</Dialog.Footer>
@@ -230,30 +234,30 @@
 
 	<!-- The tabs always render: Local music needs neither an account nor a connection. -->
 	<Tabs.Root bind:value={tab}>
-		<Tabs.List class="mb-4">
-			<Tabs.Trigger value="all">
-				<HugeiconsIcon icon={SquareStackIcon} class="h-4 w-4" /> {t('common.all')}
+		<Tabs.List class="mb-6 flex flex-wrap gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/8 backdrop-blur-xl">
+			<Tabs.Trigger value="all" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={SquareStackIcon} class="h-4 w-4 mr-1.5" /> {t('common.all')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="playlists">
-				<HugeiconsIcon icon={Playlist02Icon} class="h-4 w-4" /> {t('library.playlists_tab')}
+			<Tabs.Trigger value="playlists" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={Playlist02Icon} class="h-4 w-4 mr-1.5" /> {t('library.playlists_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="albums">
-				<HugeiconsIcon icon={MusicNoteSquare02Icon} class="h-4 w-4" /> {t('library.albums_tab')}
+			<Tabs.Trigger value="albums" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={MusicNoteSquare02Icon} class="h-4 w-4 mr-1.5" /> {t('library.albums_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="artists">
-				<HugeiconsIcon icon={UserSharingIcon} class="h-4 w-4" /> {t('library.artists_tab')}
+			<Tabs.Trigger value="artists" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={UserSharingIcon} class="h-4 w-4 mr-1.5" /> {t('library.artists_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="songs">
-				<HugeiconsIcon icon={MusicNote01Icon} class="h-4 w-4" /> {t('library.songs_tab')}
+			<Tabs.Trigger value="songs" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={MusicNote01Icon} class="h-4 w-4 mr-1.5" /> {t('library.songs_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="uploads">
-				<HugeiconsIcon icon={CloudUploadIcon} class="h-4 w-4" /> {t('library.uploads_tab')}
+			<Tabs.Trigger value="uploads" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={CloudUploadIcon} class="h-4 w-4 mr-1.5" /> {t('library.uploads_tab')}
 			</Tabs.Trigger>
-			<Tabs.Trigger value="drive">
-				<HugeiconsIcon icon={CloudIcon} class="h-4 w-4" /> Google Drive
+			<Tabs.Trigger value="drive" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={CloudIcon} class="h-4 w-4 mr-1.5" /> Google Drive
 			</Tabs.Trigger>
-			<Tabs.Trigger value="local">
-				<HugeiconsIcon icon={DriveIcon} class="h-4 w-4" /> {t('library.local_tab')}
+			<Tabs.Trigger value="local" class="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/25 transition-all">
+				<HugeiconsIcon icon={DriveIcon} class="h-4 w-4 mr-1.5" /> {t('library.local_tab')}
 			</Tabs.Trigger>
 		</Tabs.List>
 		<!-- Every branch below is gated on `tab`, because bits-ui never unmounts an inactive panel: it
