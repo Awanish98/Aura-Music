@@ -11,12 +11,16 @@
 		Cancel01Icon,
 		Loading03Icon,
 		Database02Icon,
-		LinkSquare01Icon
+		LinkSquare01Icon,
+		Settings02Icon,
+		InformationCircleIcon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { Switch } from '$lib/components/ui/switch';
 	import {
 		gdrive,
+		GDRIVE_CONFIG,
 		type GDriveAuthState,
 		type GDriveBackup,
 		type GDriveAudioFile
@@ -34,6 +38,8 @@
 	let backups = $state<GDriveBackup[]>([]);
 	let scannedSongs = $state<SongItem[]>([]);
 	let autoSync = $state(true);
+	let showConfig = $state(false);
+	let clientIdInput = $state(GDRIVE_CONFIG.clientId);
 
 	onMount(() => {
 		const unsub = gdrive.subscribe((s) => {
@@ -43,11 +49,28 @@
 			}
 		});
 
+		clientIdInput = GDRIVE_CONFIG.clientId;
 		// Load local scanned songs cache if any
 		scannedSongs = getWebStorage<SongItem[]>('gdrive_songs', []);
 
 		return () => unsub();
 	});
+
+	function saveClientId() {
+		const trimmed = clientIdInput.trim();
+		if (!trimmed) {
+			toast.error('Client ID cannot be empty');
+			return;
+		}
+		GDRIVE_CONFIG.clientId = trimmed;
+		toast.success('Google OAuth Client ID saved!');
+	}
+
+	function resetClientId() {
+		localStorage.removeItem('gdrive_client_id');
+		clientIdInput = GDRIVE_CONFIG.clientId;
+		toast.success('Reset to default Client ID');
+	}
 
 	async function handleConnect() {
 		loading = true;
@@ -232,6 +255,59 @@
 						class="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 rounded-full"
 						style="width: {storagePercent}%"
 					></div>
+				</div>
+			</div>
+		{/if}
+	</div>
+
+	<!-- Google OAuth Credentials & Configuration Box -->
+	<div class="rounded-xl border border-border/70 bg-card/60 p-4 backdrop-blur-md">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2.5">
+				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
+					<HugeiconsIcon icon={Settings02Icon} class="h-4 w-4" />
+				</div>
+				<div>
+					<h4 class="text-sm font-semibold text-foreground flex items-center gap-2">
+						<span>Google OAuth 2.0 Client ID</span>
+						{#if !authState.connected}
+							<span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">Customizable</span>
+						{/if}
+					</h4>
+					<p class="text-[11px] text-muted-foreground">If you see <code class="font-mono text-amber-500">Error 401: deleted_client</code>, paste your new Client ID here</p>
+				</div>
+			</div>
+			<Button
+				variant="ghost"
+				size="sm"
+				class="text-xs text-muted-foreground hover:text-foreground"
+				onclick={() => (showConfig = !showConfig)}
+			>
+				{showConfig ? 'Hide Config' : 'Configure'}
+			</Button>
+		</div>
+
+		{#if showConfig || !authState.connected}
+			<div class="mt-4 border-t border-border/40 pt-4 space-y-3">
+				<div class="flex flex-col sm:flex-row gap-2">
+					<Input
+						bind:value={clientIdInput}
+						placeholder="e.g. 123456789-xxxx.apps.googleusercontent.com"
+						class="font-mono text-xs flex-1"
+					/>
+					<div class="flex gap-2">
+						<Button size="sm" onclick={saveClientId} class="text-xs">Save ID</Button>
+						<Button size="sm" variant="outline" onclick={resetClientId} class="text-xs">Reset</Button>
+					</div>
+				</div>
+				<div class="rounded-lg bg-muted/40 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5 border border-border/40">
+					<div class="font-semibold text-foreground flex items-center gap-1.5">
+						<HugeiconsIcon icon={InformationCircleIcon} class="h-3.5 w-3.5 text-primary" />
+						<span>Quick setup guide:</span>
+					</div>
+					<p>1. In your Google Cloud Console (or from your downloaded <code class="font-mono text-foreground">client_secret.json</code>), copy the <code class="font-mono text-primary">client_id</code>.</p>
+					<p>2. Under <strong>Credentials → Authorized JavaScript Origins</strong>, make sure both <code class="font-mono text-foreground">https://aura-music-1no9.onrender.com</code> and <code class="font-mono text-foreground">http://localhost:5183</code> are added.</p>
+					<p>3. Paste the Client ID above, click <strong>Save ID</strong>, then click <strong>Connect Google Drive</strong>.</p>
 				</div>
 			</div>
 		{/if}

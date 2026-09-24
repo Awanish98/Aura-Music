@@ -11,11 +11,13 @@
 		Loading03Icon,
 		CheckmarkCircle01Icon,
 		Add01Icon,
-		CloudUploadIcon
+		CloudUploadIcon,
+		Settings02Icon,
+		InformationCircleIcon
 	} from '@hugeicons/core-free-icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { gdrive, type GDriveAuthState } from '$lib/gdrive';
+	import { gdrive, GDRIVE_CONFIG, type GDriveAuthState } from '$lib/gdrive';
 	import { getWebStorage, setWebStorage, type SongItem } from '$lib/api';
 	import { playback, personal, library, toast } from '$lib/player.svelte';
 	import * as api from '$lib/api';
@@ -27,12 +29,15 @@
 	let scanning = $state(false);
 	let backingUp = $state(false);
 	let searchQuery = $state('');
+	let showConfig = $state(false);
+	let clientIdInput = $state(GDRIVE_CONFIG.clientId);
 
 	onMount(() => {
 		const unsub = gdrive.subscribe((s) => {
 			authState = s;
 		});
 
+		clientIdInput = GDRIVE_CONFIG.clientId;
 		songs = getWebStorage<SongItem[]>('gdrive_songs', []);
 		if (songs.length === 0 && authState.connected) {
 			scanDrive();
@@ -40,6 +45,22 @@
 
 		return () => unsub();
 	});
+
+	function saveClientId() {
+		const trimmed = clientIdInput.trim();
+		if (!trimmed) {
+			toast.error('Client ID cannot be empty');
+			return;
+		}
+		GDRIVE_CONFIG.clientId = trimmed;
+		toast.success('Google OAuth Client ID saved!');
+	}
+
+	function resetClientId() {
+		localStorage.removeItem('gdrive_client_id');
+		clientIdInput = GDRIVE_CONFIG.clientId;
+		toast.success('Reset to default Client ID');
+	}
 
 	async function handleConnect() {
 		loading = true;
@@ -146,8 +167,24 @@
 						disabled={loading}
 						class="gap-2 shadow-xl shadow-primary/25 rounded-xl font-medium"
 					>
-						<HugeiconsIcon icon={CloudIcon} class="h-4 w-4" />
-						Connect Drive
+						{#if loading}
+							<HugeiconsIcon icon={Loading03Icon} class="h-4 w-4 animate-spin" />
+							Connecting...
+						{:else}
+							<HugeiconsIcon icon={CloudIcon} class="h-4 w-4" />
+							Connect Drive
+						{/if}
+					</Button>
+
+					<Button
+						variant="outline"
+						size="default"
+						onclick={() => (showConfig = !showConfig)}
+						class="gap-2 rounded-xl text-xs font-medium border-border/70"
+						title="Configure custom Google OAuth Client ID"
+					>
+						<HugeiconsIcon icon={Settings02Icon} class="h-4 w-4" />
+						{showConfig ? 'Hide Config' : 'OAuth Config'}
 					</Button>
 				{:else}
 					<Button
@@ -208,6 +245,49 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Google OAuth Credentials & Configuration Box -->
+	{#if showConfig || !authState.connected}
+		<div class="rounded-2xl border border-border/80 bg-card/60 p-5 backdrop-blur-md space-y-3">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-2.5">
+					<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
+						<HugeiconsIcon icon={Settings02Icon} class="h-4 w-4" />
+					</div>
+					<div>
+						<h4 class="text-sm font-semibold text-foreground flex items-center gap-2">
+							<span>Google OAuth 2.0 Client ID</span>
+							<span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">Customizable</span>
+						</h4>
+						<p class="text-[11px] text-muted-foreground">If you see <code class="font-mono text-amber-500">Error 401: deleted_client</code>, paste your new Client ID here</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="border-t border-border/40 pt-3 space-y-3">
+				<div class="flex flex-col sm:flex-row gap-2">
+					<Input
+						bind:value={clientIdInput}
+						placeholder="e.g. 123456789-xxxx.apps.googleusercontent.com"
+						class="font-mono text-xs flex-1"
+					/>
+					<div class="flex gap-2">
+						<Button size="sm" onclick={saveClientId} class="text-xs">Save ID</Button>
+						<Button size="sm" variant="outline" onclick={resetClientId} class="text-xs">Reset</Button>
+					</div>
+				</div>
+				<div class="rounded-lg bg-muted/40 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5 border border-border/40">
+					<div class="font-semibold text-foreground flex items-center gap-1.5">
+						<HugeiconsIcon icon={InformationCircleIcon} class="h-3.5 w-3.5 text-primary" />
+						<span>Setup Instructions:</span>
+					</div>
+					<p>1. Open your downloaded <code class="font-mono text-foreground">client_secret.json</code> and copy the <code class="font-mono text-primary">client_id</code>.</p>
+					<p>2. In Google Cloud Console → <strong>Credentials → Authorized JavaScript Origins</strong>, ensure both <code class="font-mono text-foreground">https://aura-music-1no9.onrender.com</code> and <code class="font-mono text-foreground">http://localhost:5183</code> are added.</p>
+					<p>3. Paste the Client ID above, click <strong>Save ID</strong>, then click <strong>Connect Drive</strong>.</p>
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Content Section -->
 	{#if !authState.connected}
