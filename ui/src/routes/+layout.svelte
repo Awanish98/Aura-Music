@@ -195,7 +195,7 @@
 			<Sidebar />
 			<!-- dragScroll: dragging a card up to home's Shortcuts grid has to be possible from anywhere in
 			     the feed, so aiming at the top edge scrolls this container while the drag is in flight. -->
-			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-28" {@attach dragScroll}>
+			<main id="main-content" aria-label="Main Content" class="min-w-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+9rem)] md:pb-36" {@attach dragScroll}>
 				<!-- Remount the current page on sign-in/out so it refetches with the new account, and on
 				     a refresh (titlebar button / F5), which drops the browse cache first. -->
 				{#key `${auth.epoch}:${ui.epoch}`}

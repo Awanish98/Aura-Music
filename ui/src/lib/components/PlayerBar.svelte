@@ -152,7 +152,7 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative md:border rounded-2xl md:rounded-2xl apple-liquid-dock liquid-glass-fx transition-all duration-300 select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border rounded-2xl md:rounded-2xl apple-liquid-dock transition-all duration-300 select-none overflow-hidden shadow-2xl {np.open ? 'hidden md:flex' : 'flex'}"
 >
 	<!-- Mobile Floating Mini Player (< md) -->
 	<div
@@ -448,7 +448,7 @@
 							<div
 								class="flex-1 rounded-full transition-all duration-150 {isPlayed
 									? 'bg-gradient-to-t from-pink-600 via-rose-500 to-fuchsia-400 shadow-[0_0_8px_rgba(255,42,122,0.8)]'
-									: 'bg-white/15 dark:bg-white/10 group-hover/wave:bg-white/25'}"
+									: 'bg-slate-300 dark:bg-white/20 group-hover/wave:bg-slate-400 dark:group-hover/wave:bg-white/35'}"
 								style="height: {barHeight}%; {isPlayed && !playback.paused ? `animation: pulse ${(0.8 + (i % 5) * 0.2).toFixed(1)}s ease-in-out infinite alternate;` : ''}"
 							></div>
 						{/each}
