@@ -26,7 +26,7 @@
 </script>
 
 <nav
-	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-[#07090e]/95 backdrop-blur-3xl border-t border-white/10 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] select-none md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.8)]"
+	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-card/85 dark:bg-[#07090e]/95 backdrop-blur-3xl border-t border-border/40 text-foreground px-3 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] select-none md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.8)] transition-colors duration-300"
 	aria-label="Mobile Navigation"
 >
 	{#each navItems as item}

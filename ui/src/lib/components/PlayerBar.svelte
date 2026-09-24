@@ -152,7 +152,7 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative md:border-t rounded-2xl md:rounded-none apple-liquid-dock transition-all select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative md:border rounded-2xl md:rounded-2xl apple-liquid-dock liquid-glass-fx transition-all duration-300 select-none overflow-hidden {np.open ? 'hidden md:flex' : 'flex'}"
 >
 	<!-- Mobile Floating Mini Player (< md) -->
 	<div
@@ -166,7 +166,7 @@
 		}}
 	>
 		<!-- Top Micro Progress Line -->
-		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-white/10 overflow-hidden pointer-events-none">
+		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-muted/40 dark:bg-white/10 overflow-hidden pointer-events-none">
 			<div
 				class="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-150 shadow-[0_0_8px_#ff2a7a]"
 				style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
@@ -183,25 +183,27 @@
 		>
 			{#key playback.now?.videoId}
 				{#if playback.now?.thumbnail}
-					<img
-						src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
-						alt=""
-						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/15"
-						in:fade={{ duration: 250 }}
-						decoding="async"
-					/>
+					<div class="relative shrink-0">
+						<img
+							src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
+							alt=""
+							style="max-width:none"
+							class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-border/40 {!playback.paused ? 'artwork-aura-playing' : ''}"
+							in:fade={{ duration: 250 }}
+							decoding="async"
+						/>
+					</div>
 				{:else}
 					<img
 						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
 						alt="Aura Music"
 						style="max-width:none"
-						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/15"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-border/40"
 					/>
 				{/if}
 			{/key}
 			<div class="min-w-0 flex-1 pr-1">
-				<Marquee text={playback.now?.title ?? 'Aura Music • Ready'} class="text-xs font-bold text-white" />
+				<Marquee text={playback.now?.title ?? 'Aura Music • Ready'} class="text-xs font-bold text-foreground" />
 				<div class="truncate text-[11px] font-medium text-muted-foreground">
 					{playback.now?.artists ?? 'Tap to browse songs'}
 				</div>
@@ -211,7 +213,7 @@
 		<!-- Right Mobile Actions -->
 		<div class="flex items-center gap-1.5 shrink-0" onclick={(e) => e.stopPropagation()}>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-tap transition-transform"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground apple-spring-tap transition-transform cursor-pointer"
 				onclick={(e) => {
 					e.stopPropagation();
 					toggleLike();
@@ -227,7 +229,7 @@
 				</span>
 			</button>
 			<button
-				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/40 apple-spring-tap transition-transform"
+				class="flex h-10 w-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/40 apple-spring-tap transition-transform cursor-pointer"
 				onclick={(e) => {
 					e.stopPropagation();
 					api.togglePause();
@@ -243,7 +245,7 @@
 				/>
 			</button>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-tap transition-transform"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground apple-spring-tap transition-transform cursor-pointer"
 				onclick={(e) => {
 					e.stopPropagation();
 					api.nextTrack();
@@ -261,12 +263,12 @@
 		<div class="flex min-w-0 w-1/4 max-w-sm items-center gap-3.5" data-ctx>
 			{#key playback.now?.videoId || 'idle'}
 				{#if playback.now?.thumbnail}
-					<div class="relative group">
+					<div class="relative group shrink-0">
 						<img
 							src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 							alt=""
 							style="max-width:none"
-							class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-white/20 transition-transform duration-300 group-hover:scale-105"
+							class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-border/50 transition-transform duration-300 group-hover:scale-105 {!playback.paused ? 'artwork-aura-playing' : ''}"
 							in:fade={{ duration: 250 }}
 							decoding="async"
 						/>
@@ -279,7 +281,7 @@
 						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
 						alt="Aura Music"
 						style="max-width:none"
-						class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-white/20"
+						class="h-13 w-13 shrink-0 rounded-2xl object-cover shadow-xl ring-1 ring-border/50"
 					/>
 				{/if}
 			{/key}
@@ -288,7 +290,7 @@
 					{#snippet title()}
 						<Marquee
 							text={playback.now?.title ?? 'Aura Music • Ready'}
-							class="text-sm font-bold text-white tracking-tight"
+							class="text-sm font-bold text-foreground tracking-tight"
 						/>
 					{/snippet}
 					{#if albumId}
@@ -312,7 +314,7 @@
 						runs={playback.now?.artistRuns}
 						text={playback.now?.artists ?? 'Select any song to start playback'}
 						marquee
-						class="block max-w-full text-xs text-muted-foreground/80 font-medium"
+						class="block max-w-full text-xs text-muted-foreground font-medium"
 					/>
 				</div>
 			</div>
@@ -320,7 +322,7 @@
 			<!-- Like & Menu Actions -->
 			<div class="flex items-center gap-1">
 				<button
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 					onclick={toggleLike}
 					aria-label={t('common.like')}
 				>
@@ -335,7 +337,7 @@
 						song={currentSong}
 						linksOnly
 						onAdd={() => openAddToPlaylist(currentSong!)}
-						triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white apple-spring-tap transition-colors"
+						triggerClass="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-muted/60 hover:text-foreground apple-spring-tap transition-colors"
 					/>
 				{/if}
 			</div>
@@ -348,7 +350,7 @@
 				<button
 					onclick={() => api.toggleShuffle()}
 					aria-label={t('player.shuffle')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={ShuffleIcon}
@@ -359,7 +361,7 @@
 				<button
 					onclick={() => api.prevTrack()}
 					aria-label={t('player.previous')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-foreground apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon icon={PreviousIcon} size={20} />
 				</button>
@@ -393,7 +395,7 @@
 				<button
 					onclick={() => api.nextTrack()}
 					aria-label={t('player.next')}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/80 hover:text-foreground apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon icon={NextIcon} size={20} />
 				</button>
@@ -402,7 +404,7 @@
 					aria-label={t('player.repeat_state', {
 						state: repeat === 'off' ? t('player.repeat_off') : repeat === 'one' ? t('player.repeat_one') : t('player.repeat_all')
 					})}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground apple-spring-hover apple-spring-tap transition-colors cursor-pointer"
 				>
 					<HugeiconsIcon
 						icon={RepeatIcon}
@@ -415,8 +417,8 @@
 			</div>
 
 			<!-- Seek Progress Bar -->
-			<div class="flex w-full items-center gap-2.5 text-[11px] font-medium text-muted-foreground/80">
-				<span class="tabular-nums">{fmt(shownPosition)}</span>
+			<div class="flex w-full items-center gap-2.5 text-[11px] font-medium text-muted-foreground">
+				<span class="tabular-nums font-mono">{fmt(shownPosition)}</span>
 				<input
 					type="range"
 					class="range flex-1"
@@ -428,7 +430,7 @@
 					onchange={onSeekCommit}
 					aria-label={t('player.seek')}
 				/>
-				<span class="tabular-nums">{fmt(playback.duration)}</span>
+				<span class="tabular-nums font-mono">{fmt(playback.duration)}</span>
 			</div>
 		</div>
 
@@ -437,7 +439,7 @@
 			<!-- Lyrics Frosted Pill Button -->
 			<button
 				onclick={onToggleLyrics}
-				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-white/10 bg-white/5 hover:bg-white/12 text-foreground apple-spring-hover apple-spring-tap transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary shadow-[0_0_12px_rgba(255,42,122,0.3)]' : ''}"
+				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-border/50 bg-card/60 hover:bg-muted/60 text-foreground apple-spring-hover apple-spring-tap transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary shadow-[0_0_12px_rgba(255,42,122,0.3)]' : ''}"
 				title="Toggle Lyrics"
 			>
 				<HugeiconsIcon icon={Mic01Icon} size={14} />
@@ -448,7 +450,7 @@
 			<div class="hidden xl:flex items-center gap-1.5 pl-2">
 				<button
 					onclick={toggleMute}
-					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-white transition-colors cursor-pointer"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
 					aria-label={playback.volume === 0 ? t('player.unmute') : t('player.mute')}
 				>
 					<HugeiconsIcon
@@ -476,7 +478,7 @@
 			{#if playback.crossfading}
 				<button
 					onclick={() => (showEq = true)}
-					class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-pink-500/25 text-pink-300 border border-pink-500/40 shadow-[0_0_12px_rgba(236,72,153,0.5)] animate-pulse cursor-pointer"
+					class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-pink-500/25 text-pink-500 dark:text-pink-300 border border-pink-500/40 shadow-[0_0_12px_rgba(236,72,153,0.5)] animate-pulse cursor-pointer"
 					title="DJ Crossfade Active"
 				>
 					<span class="size-1.5 rounded-full bg-pink-400 animate-ping"></span>
@@ -484,7 +486,7 @@
 				</button>
 			{:else if playback.preloading}
 				<span
-					class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+					class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30"
 					title="Preloading Next Track"
 				>
 					<span class="size-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -495,16 +497,16 @@
 			<!-- 60FPS Audio Visualizer Studio (vizz.fm) -->
 			<button
 				onclick={() => (audioFx.visualizerModalOpen = !audioFx.visualizerModalOpen)}
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer relative {audioFx.visualizerModalOpen ? 'bg-pink-500/20 text-pink-400' : ''}"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer relative {audioFx.visualizerModalOpen ? 'bg-pink-500/20 text-pink-500' : ''}"
 				title="60FPS Audio Visualizer Studio (vizz.fm)"
 				aria-label="Audio Visualizer Studio"
 			>
-				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.visualizerModalOpen ? 'text-pink-400 animate-pulse' : ''} />
+				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.visualizerModalOpen ? 'text-pink-500 animate-pulse' : ''} />
 			</button>
 
 			<button
 				onclick={() => (showEq = !showEq)}
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer relative"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer relative"
 				title="Equalizer, Gapless & DJ Crossfade"
 			>
 				<HugeiconsIcon icon={SparklesIcon} size={17} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
@@ -518,7 +520,7 @@
 			<!-- Queue -->
 			<button
 				onclick={onToggleQueue}
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer {queueOpen ? 'text-primary' : ''}"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer {queueOpen ? 'text-primary' : ''}"
 				title="Queue"
 			>
 				<HugeiconsIcon icon={Queue01Icon} size={17} />
@@ -527,7 +529,7 @@
 			<!-- Theater Fullscreen -->
 			<button
 				onclick={() => (ui.theaterOpen = true)}
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer"
 				title="Fullscreen Mode"
 			>
 				<HugeiconsIcon icon={MaximizeScreenIcon} size={17} />

@@ -91,7 +91,7 @@
 </script>
 
 <aside
-	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-white/8 bg-[#090c14]/95 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
+	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-border/40 bg-sidebar/85 dark:bg-[#090c14]/95 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
 		'lg:w-64'
 	)} select-none"
 >
@@ -128,8 +128,8 @@
 					class="group relative flex items-center justify-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 apple-spring-tap {wide(
 						'lg:justify-start'
 					)} {active
-						? 'apple-liquid-glass bg-gradient-to-r from-pink-500/20 via-purple-600/15 to-transparent text-pink-400 border-pink-500/40 shadow-lg shadow-pink-500/20'
-						: 'text-muted-foreground hover:bg-white/6 hover:text-foreground hover:translate-x-0.5'}"
+						? 'apple-liquid-glass bg-gradient-to-r from-pink-500/20 via-purple-600/15 to-transparent text-primary font-bold border-pink-500/40 shadow-lg shadow-pink-500/20'
+						: 'text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:translate-x-0.5'}"
 				>
 					{#if active}
 						<span class="absolute left-0 top-1/2 h-5 w-1.5 -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_#ff2a7a]"></span>
@@ -151,7 +151,7 @@
 						'lg:justify-start'
 					)} {n.isSpecial
 						? 'text-primary hover:bg-primary/15 hover:border hover:border-primary/30'
-						: 'text-muted-foreground hover:bg-white/6 hover:text-foreground'}"
+						: 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}"
 				>
 					<HugeiconsIcon
 						icon={n.icon}
@@ -165,14 +165,14 @@
 	</nav>
 
 	<!-- Playlists Section -->
-	<div class="mt-4 hidden min-h-0 flex-1 flex-col border-t border-white/8 pt-3 {wide('lg:flex')}">
+	<div class="mt-4 hidden min-h-0 flex-1 flex-col border-t border-border/40 pt-3 {wide('lg:flex')}">
 		<div class="flex items-center justify-between px-2 mb-2">
 			<span class="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
 				Playlists
 			</span>
 			<button
 				onclick={() => (dialogOpen = true)}
-				class="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-white/10 hover:text-primary transition-colors cursor-pointer"
+				class="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted/60 hover:text-primary transition-colors cursor-pointer"
 				title="Create Playlist"
 			>
 				<HugeiconsIcon icon={Add01Icon} size={15} />
@@ -185,7 +185,7 @@
 			{#each curatedPlaylists as pl}
 				<button
 					onclick={() => goto(`/search?q=${encodeURIComponent(pl.query)}`)}
-					class="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-white/6 hover:text-foreground cursor-pointer"
+					class="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-muted/60 hover:text-foreground cursor-pointer"
 				>
 					<span class="text-sm shrink-0">{pl.icon}</span>
 					<span class="truncate">{pl.title}</span>
@@ -198,7 +198,7 @@
 					<a
 						href={`/playlist/${encodeURIComponent(pl.id)}`}
 						title={pl.title}
-						class="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-white/6 hover:text-foreground pr-8"
+						class="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-muted/60 hover:text-foreground pr-8"
 					>
 						<span class="text-sm shrink-0">🎵</span>
 						<span class="truncate">{pl.title}</span>
@@ -218,8 +218,8 @@
 		</div>
 
 		<!-- Upgrade to Aura Pro Card at Bottom -->
-		<div class="mt-auto pt-3 border-t border-white/8">
-			<div class="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-black/40 p-3.5 shadow-xl backdrop-blur-xl">
+		<div class="mt-auto pt-3 border-t border-border/40">
+			<div class="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-purple-900/20 via-pink-900/10 to-card/50 p-3.5 shadow-xl backdrop-blur-xl">
 				<div class="flex items-center gap-2">
 					<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
 						<HugeiconsIcon icon={CrownIcon} size={15} />
@@ -229,8 +229,8 @@
 						<div class="text-xs font-extrabold text-foreground">Aura Pro</div>
 					</div>
 				</div>
-				<p class="text-[11px] text-muted-foreground/80 mt-1.5 leading-snug">
-					Ad-free, high quality audio & more
+				<p class="text-[11px] text-muted-foreground mt-1.5 leading-snug font-medium">
+					Ad-free, lossless audio & more
 				</p>
 				<button
 					onclick={() => toast.success('Aura Pro: Unlimited Lossless Audio & Offline Listening Active!')}

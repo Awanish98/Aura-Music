@@ -237,7 +237,7 @@
 					{/if}
 
 					<div
-						class="flex h-20 cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-2xl border bg-gradient-to-r {gradient} {border} p-2.5 backdrop-blur-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.015]"
+						class="flex h-20 cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-2xl border apple-liquid-card card-spotlight bg-gradient-to-r {gradient} {border} p-2.5 backdrop-blur-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.015]"
 						role="button"
 						tabindex="0"
 						draggable="true"
@@ -254,23 +254,23 @@
 						<!-- Left Icon + Details -->
 						<div class="flex items-center gap-3 min-w-0 flex-1">
 							<!-- Frosted Glow Icon Badge -->
-							<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {iconBg} {iconColor} border border-white/10 shadow-sm">
+							<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {iconBg} {iconColor} border border-border/40 shadow-sm">
 								<HugeiconsIcon icon={iconComp} size={19} />
 							</div>
 
 							<!-- Title and Subtitle -->
 							<div class="min-w-0 flex-1">
-								<h3 class="truncate text-xs sm:text-sm font-bold tracking-tight text-white group-hover/pick:text-primary transition-colors">
+								<h3 class="truncate text-xs sm:text-sm font-bold tracking-tight text-foreground group-hover/pick:text-primary transition-colors">
 									{item.title}
 								</h3>
-								<p class="truncate text-[11px] text-muted-foreground/80 mt-0.5">
+								<p class="truncate text-[11px] text-muted-foreground mt-0.5 font-medium">
 									{item.subtitle || 'Music Mix'}
 								</p>
 							</div>
 						</div>
 
 						<!-- Right Artwork with Hover Play Overlay -->
-						<div class="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-muted shadow-md ring-1 ring-white/10">
+						<div class="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-muted shadow-md ring-1 ring-border/40">
 							<img
 								src={thumb(item.thumbnail, 200)}
 								alt={item.title}

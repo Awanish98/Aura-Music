@@ -109,22 +109,22 @@
 
 <header
 	data-tauri-drag-region
-	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-white/8 bg-[#07090e]/90 backdrop-blur-3xl px-4 sm:px-6 transition-all"
+	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-border/40 bg-card/80 dark:bg-[#07090e]/90 backdrop-blur-3xl px-4 sm:px-6 transition-colors duration-300"
 >
 	<!-- Left: Brand Logo & History Navigation -->
 	<div class="flex items-center gap-3">
 		<!-- Aura Music Logo Monogram -->
 		<a href="/" class="flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95 group">
 			<img src={auraLogo} alt="Aura Logo" class="h-8 w-8 drop-shadow-[0_0_12px_rgba(255,42,122,0.6)]" />
-			<span class="hidden sm:inline font-heading text-lg font-black tracking-wider text-white uppercase group-hover:text-primary transition-colors">
+			<span class="hidden sm:inline font-heading text-lg font-black tracking-wider text-foreground uppercase group-hover:text-primary transition-colors">
 				AURA <span class="text-primary">MUSIC</span>
 			</span>
 		</a>
 
 		<!-- Back / Forward / Refresh controls -->
-		<div class="hidden md:flex items-center gap-1 ml-2 pl-3 border-l border-white/10">
+		<div class="hidden md:flex items-center gap-1 ml-2 pl-3 border-l border-border/40">
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-white/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-20"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/60 hover:text-foreground disabled:pointer-events-none disabled:opacity-20 cursor-pointer"
 				onclick={() => history.back()}
 				disabled={depth === 0}
 				title={t('common.back')}
@@ -133,7 +133,7 @@
 				<HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2.2} class="h-4 w-4" />
 			</button>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-white/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-20"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/60 hover:text-foreground disabled:pointer-events-none disabled:opacity-20 cursor-pointer"
 				onclick={() => history.forward()}
 				disabled={depth === deepest}
 				title={t('common.forward')}
@@ -142,7 +142,7 @@
 				<HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2.2} class="h-4 w-4" />
 			</button>
 			<button
-				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-white/10 hover:text-foreground"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/60 hover:text-foreground cursor-pointer"
 				onclick={refreshView}
 				title={t('common.refresh')}
 				aria-label={t('common.refresh')}
@@ -168,10 +168,10 @@
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Search songs, artists, albums, moods..."
-				class="w-full h-10 pl-10 pr-24 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-white/8 transition-all shadow-inner"
+				class="w-full h-10 pl-10 pr-24 rounded-full bg-muted/40 dark:bg-white/5 border border-border/40 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/60 focus:bg-card transition-all shadow-inner"
 			/>
 			<div class="absolute right-2.5 flex items-center gap-1.5 pointer-events-none">
-				<kbd class="hidden lg:inline-flex items-center gap-0.5 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-mono text-muted-foreground font-semibold">
+				<kbd class="hidden lg:inline-flex items-center gap-0.5 rounded-full border border-border/50 bg-muted/60 px-2 py-0.5 text-[10px] font-mono text-muted-foreground font-semibold">
 					Ctrl K
 				</kbd>
 			</div>
@@ -195,7 +195,7 @@
 
 		<!-- Notification Bell with Glowing Alert Dot -->
 		<button
-			class="relative flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm"
+			class="relative flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm cursor-pointer"
 			title="Notifications"
 			aria-label="Notifications"
 			onclick={() => toast('No new notifications')}
@@ -206,7 +206,7 @@
 
 		<!-- Dark / Light Theme Toggle -->
 		<button
-			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm"
+			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm cursor-pointer"
 			onclick={toggleMode}
 			title={t('a11y.toggle_theme')}
 			aria-label={t('a11y.toggle_theme')}
@@ -235,7 +235,7 @@
 
 		<!-- Quick Tools Dropdown Button -->
 		<button
-			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-muted-foreground transition-colors hover:text-foreground apple-spring-hover apple-spring-tap"
+			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-muted-foreground transition-colors hover:text-foreground apple-spring-hover apple-spring-tap cursor-pointer"
 			onclick={openToolsMenu}
 			title="Integrations & Tools"
 			aria-label="Integrations & Tools"
@@ -245,17 +245,17 @@
 
 		<!-- Window Controls (Tauri on Windows/Linux) -->
 		{#if isTauri() && win.chrome === 'off'}
-			<div class="mx-0.5 h-4 w-px bg-white/10"></div>
+			<div class="mx-0.5 h-4 w-px bg-border/40"></div>
 			<div class="flex items-center">
 				<button
-					class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors"
+					class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
 					onclick={() => w?.minimize()}
 					aria-label={t('common.minimize')}
 				>
 					<HugeiconsIcon icon={MinusSignIcon} class="h-3.5 w-3.5" />
 				</button>
 				<button
-					class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors"
+					class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
 					onclick={() => w?.toggleMaximize()}
 					aria-label={t('common.maximize')}
 				>
@@ -281,13 +281,13 @@
 		aria-label={t('common.close')}
 	></button>
 	<div
-		class="fixed z-50 w-56 animate-in rounded-2xl border border-white/12 bg-[#0d101b]/95 p-2 text-popover-foreground shadow-2xl backdrop-blur-2xl duration-150 fade-in-0 zoom-in-95"
+		class="fixed z-50 w-56 animate-in rounded-2xl border border-border/40 bg-popover/95 p-2 text-popover-foreground shadow-2xl backdrop-blur-2xl duration-150 fade-in-0 zoom-in-95"
 		style={toolsAnchor.style}
 		{@attach fitMenu(toolsAnchor)}
 	>
 		<!-- Open URL link -->
 		<button
-			class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-white/8 cursor-pointer"
+			class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-muted/60 cursor-pointer"
 			onclick={() => {
 				toolsMenuOpen = false;
 				ui.linkOpen = true;
@@ -299,7 +299,7 @@
 
 		<!-- Listen Together -->
 		<button
-			class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-white/8 cursor-pointer"
+			class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-muted/60 cursor-pointer"
 			onclick={() => {
 				toolsMenuOpen = false;
 				ui.ltOpen = true;
@@ -316,14 +316,14 @@
 
 		<!-- Discord Rich Presence Toggle -->
 		<button
-			class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-white/8 cursor-pointer"
+			class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-muted/60 cursor-pointer"
 			onclick={toggleDiscord}
 		>
 			<div class="flex items-center gap-2.5">
 				<DiscordIcon class="h-4 w-4 text-muted-foreground" />
 				<span>Discord RPC</span>
 			</div>
-			<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {discordOn ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-muted-foreground'}">
+			<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {discordOn ? 'bg-emerald-500/20 text-emerald-400' : 'bg-muted/60 text-muted-foreground'}">
 				{discordOn ? 'On' : 'Off'}
 			</span>
 		</button>

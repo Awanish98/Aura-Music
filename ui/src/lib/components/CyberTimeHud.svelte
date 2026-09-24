@@ -137,25 +137,25 @@
 		aria-label="Open Cyber Time Matrix"
 	>
 		<!-- Live Digital Clock Core with Animated Colon -->
-		<div class="flex items-center font-heading font-black tracking-tight text-white text-xs sm:text-sm">
-			<span class="tabular-nums drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{hoursStr}</span>
+		<div class="flex items-center font-heading font-black tracking-tight text-foreground text-xs sm:text-sm">
+			<span class="tabular-nums drop-shadow-sm">{hoursStr}</span>
 			<span class="animate-neon-colon text-primary px-0.5 font-bold">:</span>
-			<span class="tabular-nums drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{minutesStr}</span>
+			<span class="tabular-nums drop-shadow-sm">{minutesStr}</span>
 			
-			<span class="ml-1 text-[9px] font-mono font-bold tracking-wider uppercase text-primary/90 bg-primary/10 border border-primary/20 px-1 py-0.2 rounded-md">
+			<span class="ml-1 text-[9px] font-mono font-bold tracking-wider uppercase text-primary bg-primary/10 border border-primary/20 px-1 py-0.2 rounded-md">
 				{ampmStr}
 			</span>
 		</div>
 
 		<!-- Subtle Divider -->
-		<div class="h-3.5 w-px bg-white/15"></div>
+		<div class="h-3.5 w-px bg-border/60"></div>
 
 		<!-- Cyber Date & Mood Badge -->
-		<div class="hidden xl:flex items-center gap-1.5 text-[11px] font-medium text-white/80">
-			<span class="font-mono font-bold text-[10px] text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-1.5 py-0.2 rounded-md">
+		<div class="hidden xl:flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+			<span class="font-mono font-bold text-[10px] text-cyan-500 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-1.5 py-0.2 rounded-md">
 				{dayOfWeek}
 			</span>
-			<span class="tracking-wide text-white/70 font-sans">{dayNum} {monthStr}</span>
+			<span class="tracking-wide text-foreground/80 font-sans">{dayNum} {monthStr}</span>
 			<span class="text-xs">{moodIcon}</span>
 		</div>
 
@@ -170,7 +170,7 @@
 
 		<!-- Active Sleep Timer Badge (if running) -->
 		{#if sleepTimer.active}
-			<div class="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded-full animate-pulse">
+			<div class="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded-full animate-pulse">
 				<HugeiconsIcon icon={HourglassIcon} size={11} />
 				<span>{formatSleepRemaining(sleepTimer.remainingSecs)}</span>
 			</div>
@@ -187,33 +187,33 @@
 		></button>
 
 		<div
-			class="absolute right-0 top-12 z-50 w-80 sm:w-96 rounded-2xl border border-white/15 bg-[#090c14]/95 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-3xl"
+			class="absolute right-0 top-12 z-50 w-80 sm:w-96 rounded-2xl border border-border/40 bg-popover/95 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-3xl text-popover-foreground"
 			transition:scale={{ start: 0.95, duration: 200, easing: cubicOut }}
 		>
 			<!-- Top HUD Header -->
-			<div class="flex items-center justify-between border-b border-white/10 pb-3.5">
+			<div class="flex items-center justify-between border-b border-border/40 pb-3.5">
 				<div class="flex items-center gap-2">
 					<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20 text-primary border border-primary/30">
 						<HugeiconsIcon icon={Clock01Icon} size={16} />
 					</div>
 					<div>
-						<h3 class="font-heading text-sm font-black tracking-wide text-white uppercase flex items-center gap-1.5">
+						<h3 class="font-heading text-sm font-black tracking-wide text-foreground uppercase flex items-center gap-1.5">
 							CYBER <span class="text-primary">TIME HUD</span>
 						</h3>
-						<p class="text-[10px] text-white/50 font-mono">Aura Quantum Sync • 21st UI</p>
+						<p class="text-[10px] text-muted-foreground font-mono">Aura Quantum Sync • 21st UI</p>
 					</div>
 				</div>
 
 				<div class="flex items-center gap-1.5">
 					<button
 						onclick={toggleHourFormat}
-						class="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-mono font-bold text-white/80 transition-all hover:bg-white/15 hover:text-white active:scale-95 cursor-pointer"
+						class="rounded-lg border border-border/40 bg-muted/60 px-2 py-1 text-[10px] font-mono font-bold text-foreground transition-all hover:bg-muted active:scale-95 cursor-pointer"
 					>
 						{is24Hour ? '24-HOUR' : '12-HOUR'}
 					</button>
 					<button
 						onclick={() => (open = false)}
-						class="flex h-7 w-7 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+						class="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer"
 						aria-label="Close"
 					>
 						<HugeiconsIcon icon={Cancel01Icon} size={14} />
@@ -222,114 +222,114 @@
 			</div>
 
 			<!-- Main Live Display Card -->
-			<div class="my-4 rounded-xl border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.02] to-transparent p-4 relative overflow-hidden">
+			<div class="my-4 rounded-xl border border-border/40 bg-gradient-to-br from-card/80 via-card/40 to-transparent p-4 relative overflow-hidden shadow-inner">
 				<div class="flex items-center justify-between">
 					<div>
-						<div class="flex items-baseline gap-1 font-heading font-black text-3xl sm:text-4xl tracking-tight text-white">
+						<div class="flex items-baseline gap-1 font-heading font-black text-3xl sm:text-4xl tracking-tight text-foreground">
 							<span>{hoursStr}</span>
 							<span class="animate-neon-colon text-primary">:</span>
 							<span>{minutesStr}</span>
-							<span class="text-base font-mono font-bold text-cyan-400 ml-1.5">:{secondsNum.toString().padStart(2, '0')}</span>
+							<span class="text-base font-mono font-bold text-cyan-500 dark:text-cyan-400 ml-1.5">:{secondsNum.toString().padStart(2, '0')}</span>
 							<span class="text-xs font-mono font-bold text-primary ml-1">{ampmStr}</span>
 						</div>
-						<div class="mt-1 flex items-center gap-2 text-xs font-medium text-white/70">
-							<span class="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-300 border border-cyan-400/20">
+						<div class="mt-1 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+							<span class="rounded bg-cyan-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-600 dark:text-cyan-300 border border-cyan-400/20">
 								{dayOfWeek}
 							</span>
-							<span>{dayNum} {monthStr} {yearStr}</span>
+							<span class="text-foreground/80">{dayNum} {monthStr} {yearStr}</span>
 						</div>
 					</div>
 
 					<div class="flex flex-col items-end text-right">
 						<span class="text-2xl">{moodIcon}</span>
 						<span class="text-[11px] font-semibold text-primary/90 mt-1">{greeting}</span>
-						<span class="text-[9px] text-white/40 font-mono">Local Synchronized</span>
+						<span class="text-[9px] text-muted-foreground font-mono">Local Synchronized</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- World Time Matrix -->
 			<div class="space-y-2 mb-4">
-				<div class="flex items-center justify-between text-[11px] font-semibold text-white/60 px-1">
-					<span class="flex items-center gap-1">
+				<div class="flex items-center justify-between text-[11px] font-semibold text-muted-foreground px-1">
+					<span class="flex items-center gap-1 text-foreground">
 						<HugeiconsIcon icon={Globe02Icon} size={13} />
 						World Matrix
 					</span>
-					<span class="font-mono text-[10px] text-white/40">Global Timezones</span>
+					<span class="font-mono text-[10px]">Global Timezones</span>
 				</div>
 				<div class="grid grid-cols-2 gap-2">
-					<div class="rounded-lg border border-white/8 bg-white/3 p-2 flex items-center justify-between">
+					<div class="rounded-lg border border-border/40 bg-card/60 p-2 flex items-center justify-between">
 						<div>
-							<span class="block text-[10px] font-mono text-white/50">Mumbai / IST</span>
-							<span class="text-xs font-bold text-white/90">{getWorldTime('Asia/Kolkata')}</span>
+							<span class="block text-[10px] font-mono text-muted-foreground">Mumbai / IST</span>
+							<span class="text-xs font-bold text-foreground">{getWorldTime('Asia/Kolkata')}</span>
 						</div>
-						<span class="text-[10px] text-emerald-400 font-mono">UTC+5:30</span>
+						<span class="text-[10px] text-emerald-500 dark:text-emerald-400 font-mono">UTC+5:30</span>
 					</div>
-					<div class="rounded-lg border border-white/8 bg-white/3 p-2 flex items-center justify-between">
+					<div class="rounded-lg border border-border/40 bg-card/60 p-2 flex items-center justify-between">
 						<div>
-							<span class="block text-[10px] font-mono text-white/50">London / UTC</span>
-							<span class="text-xs font-bold text-white/90">{getWorldTime('Europe/London')}</span>
+							<span class="block text-[10px] font-mono text-muted-foreground">London / UTC</span>
+							<span class="text-xs font-bold text-foreground">{getWorldTime('Europe/London')}</span>
 						</div>
-						<span class="text-[10px] text-cyan-400 font-mono">GMT</span>
+						<span class="text-[10px] text-cyan-500 dark:text-cyan-400 font-mono">GMT</span>
 					</div>
-					<div class="rounded-lg border border-white/8 bg-white/3 p-2 flex items-center justify-between">
+					<div class="rounded-lg border border-border/40 bg-card/60 p-2 flex items-center justify-between">
 						<div>
-							<span class="block text-[10px] font-mono text-white/50">New York / EST</span>
-							<span class="text-xs font-bold text-white/90">{getWorldTime('America/New_York')}</span>
+							<span class="block text-[10px] font-mono text-muted-foreground">New York / EST</span>
+							<span class="text-xs font-bold text-foreground">{getWorldTime('America/New_York')}</span>
 						</div>
-						<span class="text-[10px] text-violet-400 font-mono">UTC-4</span>
+						<span class="text-[10px] text-violet-500 dark:text-violet-400 font-mono">UTC-4</span>
 					</div>
-					<div class="rounded-lg border border-white/8 bg-white/3 p-2 flex items-center justify-between">
+					<div class="rounded-lg border border-border/40 bg-card/60 p-2 flex items-center justify-between">
 						<div>
-							<span class="block text-[10px] font-mono text-white/50">Tokyo / JST</span>
-							<span class="text-xs font-bold text-white/90">{getWorldTime('Asia/Tokyo')}</span>
+							<span class="block text-[10px] font-mono text-muted-foreground">Tokyo / JST</span>
+							<span class="text-xs font-bold text-foreground">{getWorldTime('Asia/Tokyo')}</span>
 						</div>
-						<span class="text-[10px] text-rose-400 font-mono">UTC+9</span>
+						<span class="text-[10px] text-rose-500 dark:text-rose-400 font-mono">UTC+9</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- Sleep & Focus Timer Integration -->
-			<div class="border-t border-white/10 pt-3.5 space-y-2">
-				<div class="flex items-center justify-between text-[11px] font-semibold text-white/60 px-1">
-					<span class="flex items-center gap-1.5">
+			<div class="border-t border-border/40 pt-3.5 space-y-2">
+				<div class="flex items-center justify-between text-[11px] font-semibold text-muted-foreground px-1">
+					<span class="flex items-center gap-1.5 text-foreground">
 						<HugeiconsIcon icon={HourglassIcon} size={13} class="text-primary" />
 						Auto Sleep Timer
 					</span>
 					{#if sleepTimer.active}
 						<button
 							onclick={() => setSleepTimer(null)}
-							class="text-[10px] font-mono text-rose-400 hover:underline cursor-pointer"
+							class="text-[10px] font-mono text-rose-500 hover:underline cursor-pointer"
 						>
 							Turn Off ({formatSleepRemaining(sleepTimer.remainingSecs)})
 						</button>
 					{:else}
-						<span class="text-[10px] font-mono text-white/40">Off</span>
+						<span class="text-[10px] font-mono text-muted-foreground">Off</span>
 					{/if}
 				</div>
 
 				<div class="grid grid-cols-4 gap-1.5">
 					<button
 						onclick={() => setSleepTimer(15)}
-						class="rounded-lg border border-white/10 bg-white/5 py-1.5 text-center text-xs font-semibold text-white/80 transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-white active:scale-95 cursor-pointer"
+						class="rounded-lg border border-border/40 bg-muted/50 py-1.5 text-center text-xs font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-primary active:scale-95 cursor-pointer"
 					>
 						15m
 					</button>
 					<button
 						onclick={() => setSleepTimer(30)}
-						class="rounded-lg border border-white/10 bg-white/5 py-1.5 text-center text-xs font-semibold text-white/80 transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-white active:scale-95 cursor-pointer"
+						class="rounded-lg border border-border/40 bg-muted/50 py-1.5 text-center text-xs font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-primary active:scale-95 cursor-pointer"
 					>
 						30m
 					</button>
 					<button
 						onclick={() => setSleepTimer(60)}
-						class="rounded-lg border border-white/10 bg-white/5 py-1.5 text-center text-xs font-semibold text-white/80 transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-white active:scale-95 cursor-pointer"
+						class="rounded-lg border border-border/40 bg-muted/50 py-1.5 text-center text-xs font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-primary active:scale-95 cursor-pointer"
 					>
 						60m
 					</button>
 					<button
 						onclick={() => setSleepTimer('end')}
-						class="rounded-lg border border-white/10 bg-white/5 py-1.5 text-center text-[10px] font-semibold text-white/80 transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-white active:scale-95 cursor-pointer"
+						class="rounded-lg border border-border/40 bg-muted/50 py-1.5 text-center text-[10px] font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/20 hover:text-primary active:scale-95 cursor-pointer"
 					>
 						End Song
 					</button>
@@ -337,9 +337,9 @@
 			</div>
 
 			<!-- Footer Session Stats -->
-			<div class="mt-3.5 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-white/50 px-1">
+			<div class="mt-3.5 pt-3 border-t border-border/40 flex items-center justify-between text-[10px] font-mono text-muted-foreground px-1">
 				<span>Session Listening Uptime:</span>
-				<span class="text-white/90 font-bold">{formatSessionUptime(sessionSeconds)}</span>
+				<span class="text-foreground font-bold">{formatSessionUptime(sessionSeconds)}</span>
 			</div>
 		</div>
 	{/if}

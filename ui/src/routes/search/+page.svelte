@@ -274,7 +274,7 @@
 				type="button"
 				variant="outline"
 				size="icon"
-				class="h-10 w-10 shrink-0 rounded-xl border-white/10 bg-card/60 hover:bg-card hover:text-primary active:scale-95"
+				class="h-10 w-10 shrink-0 rounded-xl border-border/40 bg-card/60 hover:bg-card hover:text-primary active:scale-95 cursor-pointer"
 				onclick={() => (ui.shazamOpen = true)}
 				title="Identify Song / Voice Search"
 			>
@@ -282,7 +282,7 @@
 			</Button>
 
 			<!-- Search Submit Button -->
-			<Button type="submit" class="gap-2 shrink-0 rounded-xl px-4 h-10" disabled={searching}>
+			<Button type="submit" class="gap-2 shrink-0 rounded-xl px-4 h-10 cursor-pointer" disabled={searching}>
 				<HugeiconsIcon icon={Search01Icon} class="h-4 w-4" />
 				<span class="hidden sm:inline">{searching ? t('common.searching') : t('common.search')}</span>
 			</Button>
@@ -299,10 +299,10 @@
 								activeTab = tab.id;
 								showAllSongs = tab.id === 'songs';
 							}}
-							class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all {activeTab ===
+							class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer {activeTab ===
 							tab.id
 								? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]'
-								: 'apple-glass-pill text-muted-foreground hover:text-foreground'}"
+								: 'liquid-glass-fx text-muted-foreground hover:text-foreground'}"
 						>
 							<span>{tab.label}</span>
 							{#if tab.count !== undefined && tab.count > 0}
@@ -362,7 +362,7 @@
 								<button
 									type="button"
 									onclick={() => triggerSearch(p.query)}
-									class="flex items-center justify-between p-3.5 rounded-2xl bg-card/60 hover:bg-card border border-white/10 hover:border-primary/40 transition-all text-left group cursor-pointer active:scale-98 shadow-md"
+									class="flex items-center justify-between p-3.5 rounded-2xl bg-card/60 hover:bg-card border border-border/40 hover:border-primary/50 transition-all text-left group cursor-pointer active:scale-98 shadow-md apple-spring-hover"
 								>
 									<div class="flex items-center gap-3 min-w-0">
 										<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary group-hover:scale-105 transition-transform">
@@ -372,7 +372,7 @@
 											<div class="font-semibold text-sm truncate text-foreground group-hover:text-primary transition-colors">
 												{p.title}
 											</div>
-											<div class="text-xs text-muted-foreground truncate mt-0.5">
+											<div class="text-xs text-muted-foreground truncate mt-0.5 font-medium">
 												{p.subtitle}
 											</div>
 										</div>
@@ -397,7 +397,7 @@
 							<button
 								type="button"
 								onclick={handleClearAllRecents}
-								class="text-xs font-semibold text-muted-foreground hover:text-rose-400 transition-colors"
+								class="text-xs font-semibold text-muted-foreground hover:text-rose-400 transition-colors cursor-pointer"
 							>
 								Clear All
 							</button>
@@ -405,12 +405,12 @@
 						<div class="flex flex-wrap gap-2">
 							{#each recentSearches as r}
 								<div
-									class="group flex items-center gap-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-1.5 text-xs font-medium text-foreground transition-all cursor-pointer active:scale-95"
+									class="group flex items-center gap-2 rounded-full bg-muted/50 hover:bg-muted border border-border/40 px-3.5 py-1.5 text-xs font-medium text-foreground transition-all cursor-pointer active:scale-95"
 								>
 									<button
 										type="button"
 										onclick={() => triggerSearch(r)}
-										class="flex items-center gap-1.5 truncate text-left"
+										class="flex items-center gap-1.5 truncate text-left cursor-pointer"
 									>
 										<HugeiconsIcon icon={Clock01Icon} size={13} class="text-muted-foreground" />
 										<span class="truncate">{r}</span>
@@ -418,7 +418,7 @@
 									<button
 										type="button"
 										onclick={(e) => handleRemoveRecent(r, e)}
-										class="opacity-60 hover:opacity-100 p-0.5 hover:text-rose-400 transition-colors"
+										class="opacity-60 hover:opacity-100 p-0.5 hover:text-rose-400 transition-colors cursor-pointer"
 										title="Remove"
 									>
 										<HugeiconsIcon icon={Cancel01Icon} size={12} />
@@ -441,7 +441,7 @@
 							<button
 								type="button"
 								onclick={() => triggerSearch(tag.query)}
-								class="rounded-full bg-card/70 hover:bg-primary/20 border border-white/10 hover:border-primary/40 px-3.5 py-1.5 text-xs font-semibold text-foreground hover:text-primary transition-all active:scale-95 shadow-sm"
+								class="rounded-full liquid-glass-fx hover:border-primary/50 px-3.5 py-1.5 text-xs font-semibold text-foreground hover:text-primary transition-all active:scale-95 shadow-sm cursor-pointer"
 							>
 								{tag.label}
 							</button>

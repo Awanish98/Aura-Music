@@ -123,7 +123,7 @@
 			role="button"
 			tabindex="0"
 			onkeydown={(e) => e.key === 'Enter' && playMood()}
-			class="group relative overflow-hidden rounded-2xl border border-white/10 bg-card/60 p-3.5 backdrop-blur-xl shadow-xl transition-all duration-300 hover:border-primary/40 hover:shadow-primary/10 cursor-pointer"
+			class="group relative overflow-hidden rounded-2xl border border-border/40 apple-liquid-card p-3.5 backdrop-blur-xl shadow-xl transition-all duration-300 hover:border-primary/50 hover:shadow-primary/20 cursor-pointer"
 		>
 			<!-- Background Image -->
 			<div class="relative h-28 w-full overflow-hidden rounded-xl bg-muted">
@@ -132,11 +132,11 @@
 					alt="Now Mood"
 					class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
 				/>
-				<div class="absolute inset-0 bg-gradient-to-t from-[#07090e] via-black/40 to-transparent"></div>
+				<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
 				
 				<!-- Play Overlay -->
 				<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-					<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30">
+					<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 apple-spring-hover apple-spring-tap">
 						<HugeiconsIcon icon={PlayIcon} size={18} fill="currentColor" class="ml-0.5" />
 					</div>
 				</div>
@@ -147,7 +147,7 @@
 				<h4 class="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
 					{currentMood.title}
 				</h4>
-				<p class="text-xs text-muted-foreground mt-0.5">
+				<p class="text-xs text-muted-foreground mt-0.5 font-medium">
 					{currentMood.subtitle}
 				</p>
 			</div>
@@ -169,17 +169,17 @@
 		</div>
 
 		<!-- Vertical List of Genres with Mini Avatars and Chevrons -->
-		<div class="flex flex-col gap-1 rounded-2xl border border-white/10 bg-card/40 p-2 backdrop-blur-xl">
+		<div class="flex flex-col gap-1 rounded-2xl border border-border/40 bg-card/60 p-2 backdrop-blur-xl">
 			{#each topGenres as genre}
 				<button
 					onclick={() => goto(`/search?q=${encodeURIComponent(genre.query)}`)}
-					class="group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all duration-200 hover:bg-white/5 cursor-pointer"
+					class="group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all duration-200 hover:bg-muted/60 cursor-pointer"
 				>
 					<div class="flex items-center gap-3 min-w-0">
 						<img
 							src={genre.thumbnail}
 							alt={genre.name}
-							class="h-7 w-7 rounded-full object-cover ring-1 ring-white/10 transition-transform group-hover:scale-105"
+							class="h-7 w-7 rounded-full object-cover ring-1 ring-border/40 transition-transform group-hover:scale-105"
 							loading="lazy"
 						/>
 						<span class="text-xs font-semibold text-foreground/90 group-hover:text-primary transition-colors truncate">

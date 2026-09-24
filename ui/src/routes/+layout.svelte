@@ -213,10 +213,10 @@
 			{#if lyricsOpen}<LyricsPanel onClose={() => (lyricsOpen = false)} {queueOpen} />{/if}
 			{#if queueOpen}<QueuePanel onClose={() => (queueOpen = false)} />{/if}
 		</div>
-		<!-- Persistent Player Bar (always docked on desktop like Spotify, floating capsule on mobile when playing) -->
+		<!-- Persistent Player Bar (floating liquid glass dock on desktop & mobile) -->
 		{#if playback.now}
 			<div
-				class="fixed md:relative bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-auto inset-x-0 z-20 px-2.5 sm:px-3 md:px-0 pointer-events-none md:pointer-events-auto"
+				class="fixed md:relative bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-auto inset-x-0 z-20 px-2.5 sm:px-3 md:px-4 md:py-2 pointer-events-none md:pointer-events-auto"
 				in:fly={{ y: 64, duration: 250, easing: cubicOut }}
 			>
 				<div class="pointer-events-auto max-w-lg md:max-w-none mx-auto w-full">
@@ -229,7 +229,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="hidden md:block relative inset-x-0 z-20 border-t border-border/40 bg-card/95">
+			<div class="hidden md:block relative inset-x-0 z-20 px-4 py-2">
 				<PlayerBar
 					onToggleQueue={() => (tabbed ? (np.tab = 'queue') : (queueOpen = !queueOpen))}
 					queueOpen={tabbed ? np.tab === 'queue' : queueOpen}
