@@ -443,13 +443,37 @@
 				/>
 			</div>
 
-			<!-- Audio Visualizer / EQ -->
+			<!-- Audio Visualizer / EQ / Playback Mode -->
+			{#if playback.crossfading}
+				<button
+					onclick={() => (showEq = true)}
+					class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-pink-500/25 text-pink-300 border border-pink-500/40 shadow-[0_0_12px_rgba(236,72,153,0.5)] animate-pulse cursor-pointer"
+					title="DJ Crossfade Active"
+				>
+					<span class="size-1.5 rounded-full bg-pink-400 animate-ping"></span>
+					<span>DJ Fade</span>
+				</button>
+			{:else if playback.preloading}
+				<span
+					class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+					title="Preloading Next Track"
+				>
+					<span class="size-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+					<span>Buffering</span>
+				</span>
+			{/if}
+
 			<button
 				onclick={() => (showEq = !showEq)}
-				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
-				title="Equalizer & Audio FX"
+				class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-white transition-colors cursor-pointer relative"
+				title="Equalizer, Gapless & DJ Crossfade"
 			>
-				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
+				<HugeiconsIcon icon={AudioWave02Icon} size={17} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
+				{#if audioFx.playbackMode === 'crossfade'}
+					<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-pink-500 shadow-[0_0_6px_#ec4899]"></span>
+				{:else if audioFx.playbackMode === 'gapless'}
+					<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span>
+				{/if}
 			</button>
 
 			<!-- Queue -->

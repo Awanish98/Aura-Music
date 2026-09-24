@@ -357,6 +357,11 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		webPlayer.setVolume(args?.volume as number);
 		return undefined as unknown as T;
 	}
+	if (cmd === 'set_playback_params') {
+		const speed = Number(args?.speed ?? 1);
+		webPlayer.setSpeed(speed);
+		return undefined as unknown as T;
+	}
 	if (cmd === 'next_track') {
 		webPlayer.next();
 		return undefined as unknown as T;

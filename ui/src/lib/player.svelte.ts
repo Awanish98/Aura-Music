@@ -37,7 +37,9 @@ export const playback = $state({
 	// Rating of the current track — seeded from its real `likeStatus` on each change, then
 	// optimistic on toggle. Owned here rather than in `ratings` below because the mini player is a
 	// separate webview with its own module instance: the backend reseed is what keeps them agreeing.
-	rating: 'indifferent' as Rating
+	rating: 'indifferent' as Rating,
+	crossfading: false,
+	preloading: false
 });
 
 /**

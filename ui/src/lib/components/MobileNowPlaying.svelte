@@ -28,6 +28,7 @@
 	import {
 		np,
 		playback,
+		audioFx,
 		cycleRepeat,
 		dragVolume,
 		commitVolume,
@@ -46,11 +47,13 @@
 	import LyricsView from './LyricsView.svelte';
 	import QueueList from './QueueList.svelte';
 	import SleepTimerModal from './SleepTimerModal.svelte';
+	import EqualizerDialog from './EqualizerDialog.svelte';
 	import TrackMenu from './TrackMenu.svelte';
 	import AiSongStory from './AiSongStory.svelte';
 
 	let activeTab = $state<'player' | 'lyrics' | 'story' | 'queue'>('player');
 	let sleepModalOpen = $state(false);
+	let eqModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
 
@@ -426,21 +429,44 @@
 				</button>
 			</div>
 
-			<!-- Quick Utilities Bar (Speed, Sleep Timer, Volume) -->
+			<!-- Quick Utilities Bar (Speed, Sleep Timer, EQ & Audio FX, Share) -->
 			<div class="mt-4 shrink-0 flex items-center justify-between border-t border-white/5 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] text-xs text-muted-foreground">
 				<!-- Sleep Timer -->
 				<button
-					class="flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:text-foreground {sleepTimer.active
+					class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {sleepTimer.active
 						? 'text-primary border border-primary/40 bg-primary/10'
 						: ''}"
 					onclick={() => (sleepModalOpen = true)}
 				>
-					<HugeiconsIcon icon={Moon02Icon} size={15} />
+					<HugeiconsIcon icon={Moon02Icon} size={14} />
 					<span>
 						{#if sleepTimer.active}
-							{sleepTimer.endOfSong ? 'End of song' : `${Math.ceil(sleepTimer.remainingSecs / 60)}m`}
+							{sleepTimer.endOfSong ? 'End' : `${Math.ceil(sleepTimer.remainingSecs / 60)}m`}
 						{:else}
-							Sleep Timer
+							Timer
+						{/if}
+					</span>
+				</button>
+
+				<!-- Audio FX / Equalizer / Gapless / DJ Crossfade -->
+				<button
+					class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {playback.crossfading
+						? 'border-pink-500/50 bg-pink-500/20 text-pink-300 animate-pulse'
+						: audioFx.playbackMode !== 'normal'
+							? 'text-primary border border-primary/40 bg-primary/10'
+							: ''}"
+					onclick={() => (eqModalOpen = true)}
+				>
+					<HugeiconsIcon icon={AudioWave01Icon} size={14} />
+					<span>
+						{#if playback.crossfading}
+							DJ Fade
+						{:else if audioFx.playbackMode === 'crossfade'}
+							{audioFx.crossfadeDuration}s Fade
+						{:else if audioFx.playbackMode === 'gapless'}
+							Gapless
+						{:else}
+							Audio FX
 						{/if}
 					</span>
 				</button>
@@ -448,12 +474,12 @@
 				<!-- Playback Speed -->
 				<div class="relative">
 					<button
-						class="flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:text-foreground {playback.speed !== 1
+						class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {playback.speed !== 1
 							? 'text-primary border border-primary/40 bg-primary/10'
 							: ''}"
 						onclick={() => (speedMenuOpen = !speedMenuOpen)}
 					>
-						<HugeiconsIcon icon={DashboardSpeed01Icon} size={15} />
+						<HugeiconsIcon icon={DashboardSpeed01Icon} size={14} />
 						<span>{playback.speed}x</span>
 					</button>
 
@@ -482,7 +508,7 @@
 				<!-- Share Button -->
 				{#if playback.now}
 					<button
-						class="flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:text-foreground"
+						class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground"
 						onclick={() => {
 							const now = playback.now!;
 							openShare({
@@ -494,7 +520,7 @@
 							});
 						}}
 					>
-						<HugeiconsIcon icon={Share01Icon} size={15} />
+						<HugeiconsIcon icon={Share01Icon} size={14} />
 						<span>Share</span>
 					</button>
 				{/if}
@@ -621,3 +647,4 @@
 </div>
 
 <SleepTimerModal bind:open={sleepModalOpen} />
+<EqualizerDialog bind:open={eqModalOpen} />

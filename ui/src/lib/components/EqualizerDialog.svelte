@@ -88,73 +88,115 @@
 			</div>
 
 			<div class="mt-5 space-y-6">
-				<!-- Section: Playback Mode -->
-				<div>
-					<div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center justify-between">
-						<span>Playback Mode</span>
-						<span class="text-[10px] font-mono text-primary font-bold lowercase">
-							{audioFx.playbackMode === 'crossfade' ? `crossfade (${audioFx.crossfadeDuration}s)` : audioFx.playbackMode}
+				<!-- Section: Playback Mode (Normal, Gapless, DJ Crossfade) -->
+				<div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4">
+					<div class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center justify-between">
+						<span class="flex items-center gap-1.5 text-foreground">
+							<HugeiconsIcon icon={SparklesIcon} size={14} class="text-primary" />
+							<span>Smart Transitions</span>
 						</span>
+						{#if playback.crossfading}
+							<span class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 animate-pulse font-bold">
+								<span class="size-1.5 rounded-full bg-pink-400 animate-ping"></span>
+								DJ Fading
+							</span>
+						{:else if playback.preloading}
+							<span class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold">
+								Buffered
+							</span>
+						{:else}
+							<span class="text-[10px] font-mono text-primary font-bold uppercase px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+								{audioFx.playbackMode}
+							</span>
+						{/if}
 					</div>
-					<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
 						<!-- Normal -->
 						<button
-							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'normal'
-								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
-								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'normal'
+								? 'border-primary bg-primary/15 text-primary shadow-lg shadow-primary/10 ring-1 ring-primary'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground hover:bg-muted/40'}"
 							onclick={() => setPlaybackMode('normal')}
 						>
 							<div class="flex items-center justify-between w-full">
-								<span class="text-xs font-bold">Normal</span>
+								<span class="text-xs font-bold flex items-center gap-1">
+									<span>Standard</span>
+								</span>
 								{#if audioFx.playbackMode === 'normal'}
 									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
 								{/if}
 							</div>
-							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Standard song transition</span>
+							<span class="text-[10px] text-muted-foreground mt-1 leading-tight">Plays track to track normally</span>
 						</button>
 
 						<!-- Gapless -->
 						<button
-							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'gapless'
-								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
-								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'gapless'
+								? 'border-cyan-500 bg-cyan-500/15 text-cyan-400 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-500'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground hover:bg-muted/40'}"
 							onclick={() => setPlaybackMode('gapless')}
 						>
 							<div class="flex items-center justify-between w-full">
-								<span class="text-xs font-bold">Gapless</span>
+								<span class="text-xs font-bold flex items-center gap-1">
+									<span>Gapless</span>
+								</span>
 								{#if audioFx.playbackMode === 'gapless'}
-									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
+									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-cyan-400" />
 								{/if}
 							</div>
-							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Preload next & zero gap</span>
+							<span class="text-[10px] text-muted-foreground mt-1 leading-tight">Preload next & zero-gap handoff</span>
 						</button>
 
 						<!-- Crossfade -->
 						<button
-							class="flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'crossfade'
-								? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary'
-								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground'}"
+							class="flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer {audioFx.playbackMode === 'crossfade'
+								? 'border-pink-500 bg-pink-500/15 text-pink-400 shadow-lg shadow-pink-500/10 ring-1 ring-pink-500'
+								: 'border-border/60 bg-muted/20 hover:border-foreground/30 text-foreground hover:bg-muted/40'}"
 							onclick={() => setPlaybackMode('crossfade')}
 						>
 							<div class="flex items-center justify-between w-full">
-								<span class="text-xs font-bold">Crossfade</span>
+								<span class="text-xs font-bold flex items-center gap-1">
+									<span>DJ Crossfade</span>
+								</span>
 								{#if audioFx.playbackMode === 'crossfade'}
-									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-primary" />
+									<HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} class="text-pink-400" />
 								{/if}
 							</div>
-							<span class="text-[10px] text-muted-foreground mt-0.5 leading-tight">Overlap 3–12s</span>
+							<span class="text-[10px] text-muted-foreground mt-1 leading-tight">Seamless Equal-Power overlap</span>
 						</button>
 					</div>
 
-					<!-- Crossfade Duration Slider -->
+					<!-- Crossfade Duration Controls & Presets -->
 					{#if audioFx.playbackMode === 'crossfade'}
-						<div class="mt-2 rounded-xl border border-primary/20 bg-primary/5 p-3 flex flex-col gap-2">
+						<div class="mt-3 rounded-xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-transparent p-3.5 flex flex-col gap-3">
 							<div class="flex items-center justify-between text-xs">
-								<span class="font-medium text-foreground">Crossfade Overlap</span>
-								<span class="font-mono font-bold text-primary px-2 py-0.5 rounded-md bg-primary/15">{audioFx.crossfadeDuration}s</span>
+								<div class="flex items-center gap-1.5 font-bold text-foreground">
+									<span>Overlap Duration</span>
+									<span class="text-[10px] font-normal text-muted-foreground">(Equal-Power Curve)</span>
+								</div>
+								<span class="font-mono font-bold text-pink-400 px-2.5 py-0.5 rounded-full bg-pink-500/15 border border-pink-500/30">
+									{audioFx.crossfadeDuration} seconds
+								</span>
 							</div>
-							<div class="flex items-center gap-2">
-								<span class="text-[10px] text-muted-foreground font-mono">3s</span>
+
+							<!-- Duration Presets (3s, 5s, 8s, 12s) -->
+							<div class="grid grid-cols-4 gap-1.5">
+								{#each [3, 5, 8, 12] as sec}
+									<button
+										class="py-1 px-2 rounded-lg text-[10px] font-bold transition-all cursor-pointer border {audioFx.crossfadeDuration === sec
+											? 'bg-pink-500 text-white border-pink-400 shadow-sm shadow-pink-500/30'
+											: 'bg-white/5 border-white/10 text-muted-foreground hover:text-white hover:bg-white/10'}"
+										onclick={() => setCrossfadeDuration(sec)}
+									>
+										{sec === 3 ? '3s Quick' : sec === 5 ? '5s Smooth' : sec === 8 ? '8s DJ' : '12s Ambient'}
+									</button>
+								{/each}
+							</div>
+
+							<!-- Slider -->
+							<div class="flex items-center gap-2 pt-1">
+								<span class="text-[10px] text-muted-foreground font-mono font-bold">3s</span>
 								<input
 									type="range"
 									min="3"
@@ -162,9 +204,9 @@
 									step="1"
 									value={audioFx.crossfadeDuration}
 									oninput={(e) => setCrossfadeDuration(Number(e.currentTarget.value))}
-									class="w-full accent-primary h-1.5 cursor-pointer bg-muted rounded-lg"
+									class="w-full accent-pink-500 h-1.5 cursor-pointer bg-muted rounded-lg"
 								/>
-								<span class="text-[10px] text-muted-foreground font-mono">12s</span>
+								<span class="text-[10px] text-muted-foreground font-mono font-bold">12s</span>
 							</div>
 						</div>
 					{/if}
