@@ -4,6 +4,7 @@ import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import CryptoJS from 'crypto-js';
+import { initTelegramBot } from './telegram_bot.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1292,4 +1293,7 @@ app.get('*', (req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
 	console.log(`🎵 Aura Music Backend & FMHY Audio Server running on http://0.0.0.0:${PORT}`);
 	console.log(`🚀 Unified Search: http://localhost:${PORT}/api/search/unified?q=Arijit+Singh`);
+
+	// Initialize Telegram Bot Integration (@Aura36bot)
+	initTelegramBot(app).catch((e) => console.error('[Telegram Bot Startup Error]', e));
 });

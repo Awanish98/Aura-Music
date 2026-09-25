@@ -27,6 +27,7 @@
 	import auraLogo from '$lib/assets/aura_logo.svg';
 	import LastFmIcon from './LastFmIcon.svelte';
 	import DiscordIcon from './DiscordIcon.svelte';
+	import TelegramIcon from './TelegramIcon.svelte';
 	import AccountMenu from './AccountMenu.svelte';
 	import CyberTimeHud from './CyberTimeHud.svelte';
 	import SearchSuggest from './SearchSuggest.svelte';
@@ -329,6 +330,21 @@
 				{discordOn ? 'On' : 'Off'}
 			</span>
 		</button>
+
+		<!-- Telegram Bot Connection -->
+		<a
+			href="https://t.me/Aura36bot"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-sky-500/15 text-sky-400 hover:text-sky-300 cursor-pointer"
+			onclick={() => (toolsMenuOpen = false)}
+		>
+			<div class="flex items-center gap-2.5">
+				<TelegramIcon class="h-4 w-4 text-sky-400" />
+				<span>Telegram Bot (@Aura36bot)</span>
+			</div>
+			<span class="rounded-full bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400">Bot</span>
+		</a>
 
 		<!-- Install App -->
 		{#if !isTauri() && !pwa.isInstalled}

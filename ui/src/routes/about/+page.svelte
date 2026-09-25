@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import { InformationCircleIcon, ArrowLeft02Icon, SparklesIcon, MusicNote01Icon, Mic01Icon, Radio02Icon } from '@hugeicons/core-free-icons';
+	import TelegramIcon from '$lib/components/TelegramIcon.svelte';
 </script>
 
 <svelte:head>
@@ -67,6 +68,28 @@
 					Contextual playlist generator and vibe builder tailored to your mood, current track, and listening habits.
 				</p>
 			</div>
+		</div>
+
+		<!-- Telegram Bot Banner Card -->
+		<div class="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-500/10 via-blue-500/5 to-transparent p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+			<div class="space-y-1">
+				<div class="flex items-center gap-2 text-sky-400 font-bold text-base">
+					<TelegramIcon class="size-5 text-sky-400" />
+					<span>Official Telegram Bot (@Aura36bot)</span>
+				</div>
+				<p class="text-xs text-muted-foreground max-w-xl">
+					Search, stream, and download 320kbps audio files directly in Telegram or launch the full Aura Music Mini App right inside your chats.
+				</p>
+			</div>
+			<a
+				href="https://t.me/Aura36bot"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs px-4 py-2.5 shadow-lg shadow-sky-500/25 transition-all hover:scale-105 active:scale-95 shrink-0"
+			>
+				<TelegramIcon class="size-4" />
+				<span>Open @Aura36bot</span>
+			</a>
 		</div>
 	</div>
 </div>

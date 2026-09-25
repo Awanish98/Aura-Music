@@ -138,6 +138,16 @@ async function runAll() {
 		}
 	});
 
+	// 11. Telegram Bot Connectivity & Webhook Status
+	await test('Telegram Bot API Integration & Status (@Aura36bot)', async () => {
+		const res = await fetch('https://api.telegram.org/bot8840396258:AAFHti7zvAAs2V63DHmLEsLjUqZhvhEDTZs/getMe');
+		assert.strictEqual(res.status, 200, `Expected 200 OK, got ${res.status}`);
+		const data = await res.json();
+		assert.strictEqual(data.ok, true, 'Telegram getMe should return ok: true');
+		assert.strictEqual(data.result.username, 'Aura36bot', 'Bot username must match @Aura36bot');
+		console.log(`(Connected to @${data.result.username} - "${data.result.first_name}")`);
+	});
+
 	console.log('\n========================================================');
 	console.log(`📊 Exhaustive Test Results: ${passed} Passed, ${failed} Failed`);
 	console.log('========================================================\n');
