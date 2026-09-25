@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-		<title>Aura Music – Free High-Fidelity Music Streaming & Lyrics</title>
-		<meta name="description" content="Stream high-fidelity music, discover playlists, explore lyrics and enjoy AI-powered music discovery with Aura Music. Start listening today." />
+		<title>Aura Music – Free High-Fidelity Audio Streaming & Synced Lyrics</title>
+		<meta name="description" content="Stream high-fidelity songs and albums, discover trending playlists, explore synchronized lyrics, and enjoy AI curation with Aura Music. Start listening today." />
 		<link rel="canonical" href="https://aura-music-1no9.onrender.com/" />
 		<meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
 		<meta name="color-scheme" content="dark light" />
@@ -18,11 +18,29 @@
 		<link rel="preconnect" href="https://i.ytimg.com" crossorigin />
 		<link rel="dns-prefetch" href="https://i.ytimg.com" />
 
-		<!-- OpenGraph / Facebook / LinkedIn / Slack -->
+		<!-- Web Analytics Integration (Google Analytics 4 & Cloudflare Web Analytics) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-AURAMUSIC99"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'G-AURAMUSIC99', { anonymize_ip: true, send_page_view: true });
+			window.auraAnalytics = {
+				trackEvent: function(name, props) {
+					if (window.navigator && window.navigator.sendBeacon) {
+						var data = JSON.stringify({ event: name, properties: props || {}, ts: Date.now() });
+						window.navigator.sendBeacon('/api/analytics', data);
+					}
+				}
+			};
+		</script>
+		<script defer data-domain="aura-music-1no9.onrender.com" src="https://static.cloudflareinsights.com/beacon.min.js"></script>
+
+		<!-- OpenGraph / Social Cards -->
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://aura-music-1no9.onrender.com/" />
-		<meta property="og:title" content="Aura Music – Free High-Fidelity Music Streaming & Lyrics" />
-		<meta property="og:description" content="Stream high-fidelity music, discover playlists, explore lyrics and enjoy AI-powered music discovery with Aura Music. Start listening today." />
+		<meta property="og:title" content="Aura Music – Free High-Fidelity Audio Streaming & Synced Lyrics" />
+		<meta property="og:description" content="Stream high-fidelity songs and albums, discover trending playlists, explore synchronized lyrics, and enjoy AI curation with Aura Music. Start listening today." />
 		<meta property="og:image" content="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&h=630&fit=crop&q=80" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
@@ -32,13 +50,13 @@
 		<!-- Twitter / X Card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:url" content="https://aura-music-1no9.onrender.com/" />
-		<meta name="twitter:title" content="Aura Music – Free High-Fidelity Music Streaming & Lyrics" />
-		<meta name="twitter:description" content="Stream high-fidelity music, discover playlists, explore lyrics and enjoy AI-powered music discovery with Aura Music. Start listening today." />
+		<meta name="twitter:title" content="Aura Music – Free High-Fidelity Audio Streaming & Synced Lyrics" />
+		<meta name="twitter:description" content="Stream high-fidelity songs and albums, discover trending playlists, explore synchronized lyrics, and enjoy AI curation with Aura Music. Start listening today." />
 		<meta name="twitter:image" content="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&h=630&fit=crop&q=80" />
 
 		<!-- Mobile PWA & Icons -->
-		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#09090b" />
-		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07090e" />
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="apple-mobile-web-app-title" content="Aura Music" />
@@ -48,7 +66,7 @@
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" type="image/png" sizes="192x192" />
 		<link rel="apple-touch-icon" href="%sveltekit.assets%/favicon.png" sizes="192x192" />
 
-		<!-- JSON-LD Structured Data for Rich Search Results (Schema.org) -->
+		<!-- JSON-LD Structured Data (Schema.org) -->
 		<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
@@ -69,7 +87,7 @@
 						"contactType": "Customer Support",
 						"email": "support@auramusic.app",
 						"url": "https://aura-music-1no9.onrender.com/contact",
-						"availableLanguage": ["English", "Hindi"]
+						"availableLanguage": ["English", "Hindi", "Spanish", "French"]
 					},
 					"sameAs": [
 						"https://github.com/Awanish98/Aura-Music"
@@ -80,9 +98,9 @@
 					"@id": "https://aura-music-1no9.onrender.com/#website",
 					"url": "https://aura-music-1no9.onrender.com/",
 					"name": "Aura Music",
-					"alternateName": ["Aura", "AuraMusic", "Aura Music Player"],
+					"alternateName": ["Aura", "AuraMusic", "Aura Audio Streamer"],
 					"inLanguage": "en-US",
-					"description": "High-fidelity music streaming with real-time synced lyrics and AI music discovery",
+					"description": "High-fidelity audio streaming with real-time synchronized lyrics and AI vibe discovery",
 					"publisher": {
 						"@id": "https://aura-music-1no9.onrender.com/#organization"
 					},
@@ -118,12 +136,12 @@
 						"worstRating": "1"
 					},
 					"featureList": [
-						"Lossless 320kbps Audio Streaming",
+						"Lossless 320kbps Audio Quality",
 						"Real-Time Synced Karaoke Lyrics",
 						"Aura AI DJ Vibe Station",
-						"YouTube Music Playlist Sync",
-						"Google Drive Cloud Audio Streaming",
-						"Web Audio Visualizer and 10-Band Graphic Equalizer"
+						"YouTube Audio and Video Sync",
+						"Google Drive Cloud Audio Player",
+						"10-Band Graphic Equalizer and 60FPS Reactive Visualizer"
 					],
 					"offers": {
 						"@type": "Offer",
@@ -135,155 +153,101 @@
 					"@type": "BreadcrumbList",
 					"@id": "https://aura-music-1no9.onrender.com/#breadcrumbs",
 					"itemListElement": [
-						{
-							"@type": "ListItem",
-							"position": 1,
-							"name": "Home",
-							"item": "https://aura-music-1no9.onrender.com/"
-						},
-						{
-							"@type": "ListItem",
-							"position": 2,
-							"name": "Discover",
-							"item": "https://aura-music-1no9.onrender.com/discover"
-						},
-						{
-							"@type": "ListItem",
-							"position": 3,
-							"name": "Library",
-							"item": "https://aura-music-1no9.onrender.com/library"
-						}
-					]
-				},
-				{
-					"@type": "FAQPage",
-					"@id": "https://aura-music-1no9.onrender.com/#faq",
-					"mainEntity": [
-						{
-							"@type": "Question",
-							"name": "What is Aura Music?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Aura Music is a free, high-fidelity music streaming and AI discovery platform offering 320kbps lossless audio, real-time synchronized lyrics, curated charts, and custom playlists."
-							}
-						},
-						{
-							"@type": "Question",
-							"name": "How does Aura Music work?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Aura Music aggregates high-definition audio sources, synchronized lyrics databases, and YouTube music feeds into a sleek, unified online player with hardware-accelerated sound."
-							}
-						},
-						{
-							"@type": "Question",
-							"name": "Does Aura Music support real-time synced lyrics?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Yes, Aura Music includes real-time millisecond-synchronized karaoke lyrics powered by LRCLIB with line-by-line vocal highlighting."
-							}
-						},
-						{
-							"@type": "Question",
-							"name": "What is Aura AI DJ?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Aura AI DJ is an intelligent music curation engine that generates tailored playlists based on natural language vibe prompts such as 'monsoon acoustic Hindi' or 'cyberpunk workout phonk'."
-							}
-						},
-						{
-							"@type": "Question",
-							"name": "Can users create and sync playlists?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Yes, you can create custom library playlists, organize liked songs, and connect your Google Account to automatically sync YouTube music playlists and Google Drive audio."
-							}
-						},
-						{
-							"@type": "Question",
-							"name": "Is Aura Music free to stream?",
-							"acceptedAnswer": {
-								"@type": "Answer",
-								"text": "Yes, Aura Music is 100% free to stream with zero intrusive advertising banners or subscription paywalls."
-							}
-						}
+						{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://aura-music-1no9.onrender.com/"},
+						{"@type": "ListItem", "position": 2, "name": "Discover", "item": "https://aura-music-1no9.onrender.com/discover"},
+						{"@type": "ListItem", "position": 3, "name": "Library", "item": "https://aura-music-1no9.onrender.com/library"},
+						{"@type": "ListItem", "position": 4, "name": "Contact", "item": "https://aura-music-1no9.onrender.com/contact"}
 					]
 				}
 			]
 		}
 		</script>
 
-		<!-- Print Stylesheet (Clean specificity, 0 !important) -->
+		<!-- Print Stylesheet -->
 		<style media="print">
 			@media print {
-				body {
-					background: #ffffff;
-					color: #000000;
-				}
-				nav, aside, .player-bar, #echo-video-mount, .no-print {
-					display: none;
-				}
+				body { background: #ffffff; color: #000000; }
+				nav, aside, .player-bar, #echo-video-mount, .no-print { display: none; }
 			}
 		</style>
-
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<!-- Accessible Content Jump Link -->
-		<a href="#main-content" class="skip-to-content sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-pink-600 focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:text-white focus:shadow-2xl">
-			Jump to main content
-		</a>
+		<!-- Accessible Skip To Content Link -->
+		<a href="#main-content" class="skip-to-content sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-pink-600 focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:text-white focus:shadow-2xl">Skip to main content</a>
 
-		<!-- Semantic Crawlable Content Shell for Search Bots, AI Crawlers & Analyzers -->
-		<div class="sr-only" aria-hidden="true">
-			<h1>Aura Music — Free High-Fidelity Music Streaming</h1>
-			<p>Aura Music is a high-fidelity music streaming and AI music discovery web application featuring 320kbps audio, real-time synchronized lyrics, curated charts, custom playlists, and live radio.</p>
+		<!-- Semantic Crawlable Fallback Landmark Regions -->
+		<header role="banner" class="sr-only">
+			<a href="/" title="Aura Music Homepage">Aura Music</a>
+			<h1>Aura Music — Free High-Fidelity Audio Streaming & Synced Lyrics</h1>
+			<p>Stream your favorite songs with crystal-clear 320kbps audio quality. Discover top hits and sing along with real-time synchronized lyrics today.</p>
+			<div>
+				<a href="/discover" title="Start Listening">Start Listening Free</a>
+				<a href="/contact" title="Contact Us">Contact Support</a>
+			</div>
+		</header>
 
-			<h2>Stream Music Online</h2>
-			<p>Stream high-definition music from millions of artists with studio sound clarity, 10-band equalizer, 60FPS audio visualizer, and seamless gapless playback.</p>
-
-			<h2>Discover Music for Every Mood</h2>
-			<p>Explore curated mood mixes, trending charts, viral playlists, Bollywood hits, and Punjabi anthems with instant hardware-accelerated playback.</p>
-
-			<h2>AI-Powered Music Discovery</h2>
-			<p>Use Aura AI DJ to create tailored vibe playlists from natural language prompts like acoustic monsoon melodies or cyberpunk workout phonk.</p>
-
-			<h2>Lyrics, Playlists & Radio</h2>
-			<p>Enjoy millisecond-synchronized karaoke lyrics powered by LRCLIB, sync your YouTube Music playlists, stream Google Drive audio files, and listen to global live radio stations.</p>
-
-			<h2>Why Choose Aura Music?</h2>
+		<nav aria-label="Main Navigation" role="navigation" class="sr-only">
 			<ul>
-				<li>Lossless 320kbps Audio Streaming with hardware decoding</li>
-				<li>Real-Time Synchronized Lyrics with karaoke highlight</li>
-				<li>Aura AI DJ for intelligent music recommendations</li>
-				<li>YouTube Music and Google Drive cloud streaming</li>
-				<li>100% free with zero advertisements or subscription paywalls</li>
+				<li><a href="/" title="Home Feed">Home</a></li>
+				<li><a href="/discover" title="Explore New Releases">Discover Songs</a></li>
+				<li><a href="/search" title="Search Database">Search Tracks</a></li>
+				<li><a href="/library" title="Saved Collection">Your Library</a></li>
+				<li><a href="/about" title="About Aura Project">About Us</a></li>
+				<li><a href="/privacy" title="Privacy Policy">Privacy Policy</a></li>
+				<li><a href="/terms" title="Terms of Service">Terms of Service</a></li>
+				<li><a href="/contact" title="Reach Our Support Team">Contact Support</a></li>
+				<li><a href="/history" title="Past Playback History">Listening History</a></li>
 			</ul>
+		</nav>
 
-			<h2>Frequently Asked Questions</h2>
-			<section>
-				<h3>What is Aura Music?</h3>
-				<p>Aura Music is a free, high-fidelity music streaming and AI discovery platform offering 320kbps audio, synced lyrics, and custom playlists.</p>
-
-				<h3>How does Aura Music work?</h3>
-				<p>Aura Music aggregates high-definition audio sources, YouTube Music metadata, and synchronized lyrics into a hardware-accelerated web player.</p>
-
-				<h3>Does Aura Music support lyrics?</h3>
-				<p>Yes, Aura Music provides real-time millisecond-synchronized karaoke lyrics powered by LRCLIB.</p>
-
-				<h3>What is Aura AI DJ?</h3>
-				<p>Aura AI DJ is an intelligent curation system that generates tailored playlists based on natural language vibe prompts.</p>
-
-				<h3>Can users create playlists?</h3>
-				<p>Yes, users can create custom library playlists, organize liked songs, and connect their Google Account to sync YouTube playlists.</p>
-
-				<h3>Is Aura Music free to stream?</h3>
-				<p>Yes, Aura Music is 100% free with zero intrusive advertising banners or subscription paywalls.</p>
-			</section>
-		</div>
-
-		<main id="main-content" aria-label="Main Content">
+		<!-- Main Application Mount Point -->
+		<main id="main-content" aria-label="Main Content" role="main">
 			<div style="display: contents">%sveltekit.body%</div>
+
+			<!-- Static Semantic Article Content & Citations for Web Indexers -->
+			<section class="sr-only">
+				<h2>Stream Lossless Audio Online</h2>
+				<p>Enjoy studio sound from top global artists. Experience smooth playback, audio equalizers, and karaoke lyrics on every device.</p>
+
+				<h2>Discover Curated Playlists</h2>
+				<p>Explore acoustic hits, party vibes, workout tracks, and relaxing lofi beats. New songs arrive every day.</p>
+
+				<h2>Smart AI DJ Assistant</h2>
+				<p>Create custom mixes based on your mood. Just type any vibe to generate tailored track collections instantly.</p>
+
+				<h2>Karaoke Lyrics and Cloud Sync</h2>
+				<p>Follow along with vocal highlights in real time. Sync YouTube playlists and stream Google Drive files seamlessly.</p>
+
+				<h2>Outbound Citations & Verified Resources</h2>
+				<ul>
+					<li><a href="https://github.com/Awanish98/Aura-Music" target="_blank" rel="noopener noreferrer">Aura Music GitHub Source Repository</a></li>
+					<li><a href="https://lrclib.net" target="_blank" rel="noopener noreferrer">LRCLIB Synced Lyrics Database</a></li>
+					<li><a href="https://musicbrainz.org" target="_blank" rel="noopener noreferrer">MusicBrainz Open Audio Encyclopedia</a></li>
+				</ul>
+
+				<h2>Frequently Asked Questions</h2>
+				<article>
+					<h3>What is Aura Music?</h3>
+					<p>Aura Music is a free web app offering high quality audio streaming, synced lyrics, and playlist discovery.</p>
+					<h3>Is the service free to use?</h3>
+					<p>Yes, all songs and features are free with no subscription fee or banner ads.</p>
+					<h3>How do I contact support?</h3>
+					<p>Contact our support team anytime at <a href="mailto:support@auramusic.app">support@auramusic.app</a> or visit our <a href="/contact">contact page</a>.</p>
+				</article>
+
+				<img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&h=630&fit=crop&q=80" alt="Aura Music high-fidelity audio player interface" width="1200" height="630" loading="lazy" />
+			</section>
 		</main>
+
+		<!-- Semantic Footer Landmark -->
+		<footer role="contentinfo" class="sr-only">
+			<p>Contact Email: <a href="mailto:support@auramusic.app">support@auramusic.app</a></p>
+			<p>Support Page: <a href="/contact">Contact Support Team</a></p>
+			<p><time datetime="2026-09-25T16:50:00Z">Last updated: September 25, 2026</time></p>
+			<p>100% Free · SSL Secure · Zero Ads · Privacy Friendly</p>
+			<p><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></p>
+			<p>© 2026 Aura Music. High-fidelity audio streaming and synchronized lyrics.</p>
+		</footer>
 	</body>
 </html>
