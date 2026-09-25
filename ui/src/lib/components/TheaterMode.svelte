@@ -628,14 +628,14 @@
 	</header>
 
 	<!-- 🎬 4. MAIN STAGE (Left: 3D Vinyl Player | Right: Synced Lyrics / Tabs) -->
-	<div class="relative z-10 grid min-h-0 flex-1 w-full grid-cols-1 lg:grid-cols-2 overflow-x-clip overflow-y-hidden px-4 pb-6 sm:px-10 lg:px-14">
+	<div class="relative z-10 grid min-h-0 flex-1 w-full grid-cols-1 lg:grid-cols-2 overflow-hidden px-4 pb-6 sm:px-10 lg:px-14">
 		
 		<!-- 💿 LEFT STAGE: 3D FLOATING VINYL RECORD SLEEVE & CONTROLS -->
-		<div class="relative flex h-full w-full flex-col items-center justify-center px-2 py-4 sm:px-6 overflow-visible select-none">
+		<div class="relative flex h-full w-full flex-col items-center justify-center px-2 py-4 sm:px-6 select-none">
 			<div class="flex flex-col w-full max-w-[320px] sm:max-w-[360px] xl:max-w-[400px] items-center gap-4 sm:gap-6 my-auto z-10">
 				
 				<!-- 3D Floating Vinyl Record + Artwork Sleeve Container -->
-				<div class="relative mx-auto w-full aspect-square flex items-center justify-center group perspective-1000 overflow-visible">
+				<div class="relative mx-auto w-full aspect-square flex items-center justify-center group overflow-hidden rounded-3xl">
 					
 					<!-- Sliding Vinyl Disc Wrapper (Slides out smoothly to right when playing) -->
 					<div
