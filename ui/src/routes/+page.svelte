@@ -11,6 +11,7 @@
 	import HomeHero from '$lib/components/HomeHero.svelte';
 	import Shortcuts from '$lib/components/Shortcuts.svelte';
 	import AiVibeGenerator from '$lib/components/AiVibeGenerator.svelte';
+	import FeaturedForYou from '$lib/components/FeaturedForYou.svelte';
 	import RecentRail from '$lib/components/RecentRail.svelte';
 	import Shelf from '$lib/components/Shelf.svelte';
 	import ForgottenFavourites from '$lib/components/ForgottenFavourites.svelte';
@@ -282,11 +283,14 @@
 			/>
 
 			{#if !selected}
-				<!-- Shortcuts 6 Gradient Liquid Glass Cards -->
+				<!-- Shortcuts 4 Gradient Liquid Glass Cards -->
 				<Shortcuts onEdit={() => (editing = true)} />
 
 				<!-- Aura AI Vibe Station Card with 3D Mascot -->
 				<AiVibeGenerator />
+
+				<!-- Featured For You Mix Cards (Matches Reference UI) -->
+				<FeaturedForYou />
 
 				<!-- Popular Artists & Vocalists (Top 20 with Neon Rings) -->
 				<FeaturedArtistsRail />

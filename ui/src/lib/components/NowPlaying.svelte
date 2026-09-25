@@ -444,6 +444,17 @@
 						aria-valuemax={playback.duration || 100}
 						aria-valuenow={shownPosition}
 						aria-label={t('player.seek')}
+						onkeydown={(e) => {
+							if (e.key === 'ArrowRight') {
+								const targetTime = Math.min(playback.duration || 0, (playback.position || 0) + 5);
+								playback.position = targetTime;
+								api.seek(targetTime);
+							} else if (e.key === 'ArrowLeft') {
+								const targetTime = Math.max(0, (playback.position || 0) - 5);
+								playback.position = targetTime;
+								api.seek(targetTime);
+							}
+						}}
 						onclick={(e) => {
 							const rect = e.currentTarget.getBoundingClientRect();
 							const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));

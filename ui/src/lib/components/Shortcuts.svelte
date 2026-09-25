@@ -12,7 +12,8 @@
 		ListRestartIcon,
 		CrownIcon,
 		Globe02Icon,
-		Radio02Icon
+		Radio02Icon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import SectionHeading from './SectionHeading.svelte';
 	import ShortcutPicker from './ShortcutPicker.svelte';
@@ -43,76 +44,52 @@
 
 	const DEFAULT_SHORTCUTS: ShortcutConfig[] = [
 		{
-			id: 'VLLM',
-			title: 'Liked Songs',
-			subtitle: 'Auto-playlist • Favorites',
-			kind: 'playlist',
-			thumbnail: '/default_cover.jpg',
-			gradient: 'from-rose-500/15 via-pink-500/10 to-rose-500/5 dark:from-rose-600/90 dark:via-pink-600/80 dark:to-rose-900/60',
-			border: 'border-rose-300/50 dark:border-rose-400/40 hover:border-rose-400/80',
-			icon: FavouriteIcon,
-			iconColor: 'text-rose-500 dark:text-white',
-			iconBg: 'bg-rose-500/15 dark:bg-white/20'
-		},
-		{
-			id: 'curated_chart_hindi_50',
-			title: 'Hindi Superhits Top 50',
-			subtitle: 'Top Bollywood Charts',
+			id: 'on_repeat_default',
+			title: 'On Repeat',
+			subtitle: 'Your most played',
 			kind: 'playlist',
 			thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200&auto=format&fit=crop&q=80',
+			gradient: 'from-pink-500/15 via-rose-500/10 to-pink-500/5 dark:from-pink-600/90 dark:via-rose-600/80 dark:to-pink-900/60',
+			border: 'border-pink-300/50 dark:border-pink-400/40 hover:border-pink-400/80',
+			icon: ListRestartIcon,
+			iconColor: 'text-pink-500 dark:text-pink-300',
+			iconBg: 'bg-pink-500/15 dark:bg-pink-500/20'
+		},
+		{
+			id: 'aidj_default',
+			title: 'AI DJ',
+			subtitle: 'Personalized radio',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
+			gradient: 'from-indigo-500/15 via-purple-500/10 to-indigo-500/5 dark:from-indigo-600/90 dark:via-purple-600/80 dark:to-indigo-900/60',
+			border: 'border-indigo-300/50 dark:border-indigo-400/40 hover:border-indigo-400/80',
+			icon: SparklesIcon,
+			iconColor: 'text-indigo-500 dark:text-indigo-300',
+			iconBg: 'bg-indigo-500/15 dark:bg-indigo-500/20'
+		},
+		{
+			id: 'VLLM',
+			title: 'Liked Songs',
+			subtitle: 'Saved tracks',
+			kind: 'playlist',
+			thumbnail: '/default_cover.jpg',
+			gradient: 'from-rose-500/15 via-red-500/10 to-rose-500/5 dark:from-rose-600/90 dark:via-red-600/80 dark:to-rose-900/60',
+			border: 'border-rose-300/50 dark:border-rose-400/40 hover:border-rose-400/80',
+			icon: FavouriteIcon,
+			iconColor: 'text-rose-500 dark:text-rose-300',
+			iconBg: 'bg-rose-500/15 dark:bg-rose-500/20'
+		},
+		{
+			id: 'recently_played_default',
+			title: 'Recently Played',
+			subtitle: 'Pick up where you left',
+			kind: 'playlist',
+			thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200&auto=format&fit=crop&q=80',
 			gradient: 'from-sky-500/15 via-blue-500/10 to-indigo-500/5 dark:from-sky-500/90 dark:via-blue-600/80 dark:to-indigo-900/60',
 			border: 'border-sky-300/50 dark:border-sky-400/40 hover:border-sky-400/80',
 			icon: AudioWave02Icon,
-			iconColor: 'text-sky-500 dark:text-white',
-			iconBg: 'bg-sky-500/15 dark:bg-white/20'
-		},
-		{
-			id: 'daily_mix_01',
-			title: 'Daily Mix 01',
-			subtitle: 'Arijit Singh, Pritam',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-purple-500/15 via-violet-500/10 to-indigo-500/5 dark:from-purple-600/90 dark:via-violet-600/80 dark:to-indigo-900/60',
-			border: 'border-purple-300/50 dark:border-purple-400/40 hover:border-purple-400/80',
-			icon: ListRestartIcon,
-			iconColor: 'text-purple-500 dark:text-white',
-			iconBg: 'bg-purple-500/15 dark:bg-white/20'
-		},
-		{
-			id: 'curated_chart_punjabi_50',
-			title: 'Punjabi Top 50',
-			subtitle: 'Diljit, Karan Aujla, Shubh',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-amber-500/15 via-orange-500/10 to-amber-500/5 dark:from-amber-500/90 dark:via-orange-600/80 dark:to-amber-900/60',
-			border: 'border-amber-300/50 dark:border-amber-400/40 hover:border-amber-400/80',
-			icon: CrownIcon,
-			iconColor: 'text-amber-500 dark:text-white',
-			iconBg: 'bg-amber-500/15 dark:bg-white/20'
-		},
-		{
-			id: 'curated_chart_global_50',
-			title: "Today's Global Hits",
-			subtitle: 'Top 50 International',
-			kind: 'playlist',
-			thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-cyan-500/15 via-blue-500/10 to-blue-600/5 dark:from-cyan-600/90 dark:via-blue-600/80 dark:to-blue-950/60',
-			border: 'border-cyan-300/50 dark:border-cyan-400/40 hover:border-cyan-400/80',
-			icon: Globe02Icon,
-			iconColor: 'text-cyan-500 dark:text-white',
-			iconBg: 'bg-cyan-500/15 dark:bg-white/20'
-		},
-		{
-			id: 'artist_diljit_dosanjh',
-			title: 'Diljit Dosanjh Radio',
-			subtitle: 'Artist Station • Punjabi Pop',
-			kind: 'artist',
-			thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&auto=format&fit=crop&q=80',
-			gradient: 'from-fuchsia-500/15 via-pink-500/10 to-rose-500/5 dark:from-fuchsia-600/90 dark:via-pink-600/80 dark:to-rose-900/60',
-			border: 'border-fuchsia-300/50 dark:border-fuchsia-400/40 hover:border-fuchsia-400/80',
-			icon: Radio02Icon,
-			iconColor: 'text-fuchsia-500 dark:text-white',
-			iconBg: 'bg-fuchsia-500/15 dark:bg-white/20'
+			iconColor: 'text-sky-500 dark:text-sky-300',
+			iconBg: 'bg-sky-500/15 dark:bg-sky-500/20'
 		}
 	];
 
@@ -202,7 +179,7 @@
 		</div>
 	</div>
 
-	<!-- 6 Liquid Glass Gradient Shortcut Cards Grid (swipe-friendly on mobile) -->
+	<!-- 4 Liquid Glass Gradient Shortcut Cards Grid matching reference UI -->
 	<div
 		role="group"
 		aria-label={t('home.shortcuts')}
@@ -216,7 +193,7 @@
 	>
 		<div
 			data-grid
-			class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-3 overflow-x-auto no-scrollbar"
+			class="grid grid-cols-2 lg:grid-cols-4 gap-3"
 		>
 			{#each picks as item (item.id)}
 				{@const meta = defaultItemMap.get(item.id)}
@@ -237,7 +214,7 @@
 					{/if}
 
 					<div
-						class="flex h-20 cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-2xl border bg-white dark:bg-[#101322]/85 border-slate-200/90 dark:border-white/10 p-2.5 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:shadow-md dark:hover:shadow-2xl hover:border-pink-400/60 hover:scale-[1.015]"
+						class="flex flex-col justify-between h-28 cursor-pointer rounded-2xl border bg-white dark:bg-[#101322]/85 border-slate-200/90 dark:border-white/10 p-4 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:shadow-md dark:hover:shadow-2xl hover:border-pink-400/60 hover:scale-[1.02]"
 						role="button"
 						tabindex="0"
 						draggable="true"
@@ -251,42 +228,15 @@
 							}
 						}}
 					>
-						<!-- Left Icon + Details -->
-						<div class="flex items-center gap-3 min-w-0 flex-1">
-							<!-- Frosted Glow Icon Badge -->
-							<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {iconBg} {iconColor} border border-border/40 shadow-sm">
-								<HugeiconsIcon icon={iconComp} size={19} />
+						<!-- Top: Glowing Icon Badge + Quick Play Button on hover -->
+						<div class="flex items-center justify-between">
+							<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {iconBg} {iconColor} border border-border/40 shadow-sm transition-transform duration-300 group-hover/pick:scale-110">
+								<HugeiconsIcon icon={iconComp} size={20} />
 							</div>
 
-							<!-- Title and Subtitle -->
-							<div class="min-w-0 flex-1">
-								<h3 class="truncate text-xs sm:text-sm font-bold tracking-tight text-slate-900 dark:text-white group-hover/pick:text-primary transition-colors">
-									{item.title}
-								</h3>
-								<p class="truncate text-[11px] text-slate-500 dark:text-white/70 mt-0.5 font-medium">
-									{item.subtitle || 'Music Mix'}
-								</p>
-							</div>
-						</div>
-
-						<!-- Right Artwork with Hover Play Overlay -->
-						<div class="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-muted shadow-md ring-1 ring-border/40">
-							<img
-								src={item.thumbnail && !failed[item.thumbnail] ? thumb(item.thumbnail, 200) : '/default_cover.jpg'}
-								alt={item.title}
-								class="h-full w-full object-cover transition-transform duration-300 group-hover/pick:scale-105"
-								loading="lazy"
-								decoding="async"
-								draggable="false"
-								onerror={(e) => {
-									if (item.thumbnail) failed = { ...failed, [item.thumbnail]: true };
-									(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
-								}}
-							/>
-
-							<!-- Center Play Button Overlay -->
+							<!-- Hover Play Action Button -->
 							<button
-								class="absolute inset-0 m-auto flex size-8 cursor-pointer items-center justify-center rounded-full bg-white text-slate-950 shadow-[0_4px_14px_rgba(0,0,0,0.6)] opacity-90 transition-all duration-200 hover:scale-110 hover:opacity-100 active:scale-95 group-hover/pick:scale-105"
+								class="flex size-7 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-md opacity-0 transition-all duration-200 hover:scale-110 active:scale-95 group-hover/pick:opacity-100"
 								class:animate-pulse={busy === item.id}
 								disabled={busy === item.id}
 								aria-label={t('a11y.play_item', { title: item.title })}
@@ -295,8 +245,18 @@
 									play(item);
 								}}
 							>
-								<HugeiconsIcon icon={PlayIcon} size={15} fill="currentColor" class="ml-0.5" />
+								<HugeiconsIcon icon={PlayIcon} size={13} fill="currentColor" class="ml-0.5" />
 							</button>
+						</div>
+
+						<!-- Bottom: Title and Subtitle -->
+						<div class="min-w-0">
+							<h3 class="truncate text-xs sm:text-sm font-bold tracking-tight text-slate-900 dark:text-white group-hover/pick:text-primary transition-colors">
+								{item.title}
+							</h3>
+							<p class="truncate text-[11px] text-slate-500 dark:text-white/60 mt-0.5 font-medium">
+								{item.subtitle || 'Music Mix'}
+							</p>
 						</div>
 					</div>
 

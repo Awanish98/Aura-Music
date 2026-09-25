@@ -42,9 +42,9 @@
 		{ href: '/library', label: 'Library', icon: LibraryIcon },
 		{ action: () => (ui.aiDjOpen = true), label: 'AI DJ', icon: SparklesIcon, isSpecial: true },
 		{ href: '/discover', label: 'Radio', icon: Radio02Icon },
-		{ href: '/library?tab=playlists', label: 'Playlist', icon: Playlist02Icon },
+		{ href: '/library?tab=local', label: 'Downloads', icon: Download04Icon },
 		{ href: '/library?tab=songs', label: 'Favorites', icon: FavouriteIcon },
-		{ href: '/library?tab=local', label: 'Local Files', icon: Download04Icon }
+		{ href: '/library?tab=playlists', label: 'Playlists', icon: Playlist02Icon }
 	]);
 
 	const curatedPlaylists = [
@@ -219,24 +219,23 @@
 
 		<!-- Upgrade to Aura Pro Card at Bottom -->
 		<div class="mt-auto pt-3 border-t border-border/40">
-			<div class="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-pink-50/90 via-purple-50/80 to-white/90 dark:from-purple-900/20 dark:via-pink-900/10 dark:to-card/50 p-3.5 shadow-sm dark:shadow-xl backdrop-blur-xl">
+			<div class="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-pink-50/90 via-purple-50/80 to-white/90 dark:from-[#15102a] dark:via-[#1c0e2a] dark:to-[#0f0c1e] p-3.5 shadow-sm dark:shadow-xl backdrop-blur-xl">
 				<div class="flex items-center gap-2">
 					<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/30">
 						<HugeiconsIcon icon={CrownIcon} size={15} />
 					</div>
 					<div>
-						<div class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Upgrade to</div>
-						<div class="text-xs font-extrabold text-foreground">Aura Pro</div>
+						<div class="text-xs font-extrabold text-slate-900 dark:text-white">Aura Pro</div>
 					</div>
 				</div>
-				<p class="text-[11px] text-muted-foreground mt-1.5 leading-snug font-medium">
-					Ad-free, lossless audio & more
+				<p class="text-[11px] text-slate-600 dark:text-white/70 mt-1.5 leading-snug font-medium">
+					Unlock ad-free music, high quality audio and more.
 				</p>
 				<button
 					onclick={() => toast.success('Aura Pro: Unlimited Lossless Audio & Offline Listening Active!')}
-					class="mt-2.5 w-full rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 py-1.5 text-center text-xs font-bold text-white shadow-md shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-transform cursor-pointer"
+					class="mt-2.5 w-full rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 py-1.5 text-center text-xs font-bold text-white shadow-md shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-transform cursor-pointer"
 				>
-					Get Pro →
+					Upgrade
 				</button>
 			</div>
 		</div>
