@@ -499,9 +499,9 @@
 
 				<!-- Hero Spotlight Video Card -->
 				<div
-					class="group relative overflow-hidden rounded-2xl border border-red-200 dark:border-red-500/30 bg-white dark:bg-gradient-to-br dark:{featuredVideo.color} p-3 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:border-red-400 dark:hover:border-red-500/60"
+					class="group relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#101322]/90 p-3 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:border-pink-500/50"
 				>
-					<div class="relative aspect-video w-full overflow-hidden rounded-xl bg-black/60 shadow-inner">
+					<div class="relative aspect-video w-full overflow-hidden rounded-xl bg-black/80 shadow-inner">
 						<img
 							src={featuredVideo.thumbnail}
 							alt={featuredVideo.title}
@@ -511,16 +511,16 @@
 
 						<!-- Top Quality & Duration Badges -->
 						<div class="absolute top-2 left-2 flex items-center gap-1.5">
-							<span class="rounded-md bg-red-600/90 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-0.5">
+							<span class="rounded-md bg-red-600/95 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-0.5">
 								<span>▶</span> YouTube
 							</span>
-							<span class="rounded-md bg-black/70 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/30">
+							<span class="rounded-md bg-black/75 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/40">
 								{featuredVideo.quality}
 							</span>
 						</div>
 
 						<div class="absolute top-2 right-2">
-							<span class="rounded-md bg-black/75 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-mono text-white/90">
+							<span class="rounded-md bg-black/80 backdrop-blur-md px-1.5 py-0.5 text-[9px] font-mono text-white/90">
 								{featuredVideo.duration}
 							</span>
 						</div>
@@ -551,10 +551,10 @@
 					<!-- Video Title, Details & Direct Action Buttons -->
 					<div class="mt-2.5 flex items-center justify-between gap-2">
 						<div class="min-w-0 flex-1">
-							<h4 class="text-xs font-black text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-300 transition-colors truncate">
+							<h4 class="text-xs font-black text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-pink-400 transition-colors truncate">
 								{featuredVideo.title}
 							</h4>
-							<p class="text-[11px] text-slate-600 dark:text-white/75 truncate mt-0.5 font-medium">
+							<p class="text-[11px] text-slate-600 dark:text-white/70 truncate mt-0.5 font-medium">
 								{featuredVideo.artists}
 							</p>
 						</div>
@@ -563,7 +563,7 @@
 						<div class="flex items-center gap-1.5 shrink-0">
 							<button
 								onclick={() => playVideoDirect(featuredVideo, true)}
-								class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/25 text-slate-700 dark:text-white transition-colors cursor-pointer border border-slate-200 dark:border-transparent"
+								class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors cursor-pointer border border-slate-200 dark:border-transparent"
 								title="Watch in Theater HD"
 								aria-label="Watch in Theater HD"
 							>

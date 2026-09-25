@@ -184,7 +184,7 @@
 				<button
 					onclick={onEdit}
 					title={t('home.edit_home')}
-					class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-white/20 hover:bg-white/5 hover:text-foreground"
+					class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-white/5 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-muted-foreground transition-colors hover:border-pink-500/40 hover:text-foreground"
 				>
 					<HugeiconsIcon icon={Edit01Icon} size={13} />
 					<span>{t('home.edit_home')}</span>
