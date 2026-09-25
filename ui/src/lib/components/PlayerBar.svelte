@@ -205,9 +205,23 @@
 				{/if}
 			{/key}
 			<div class="min-w-0 flex-1 pr-1">
-				<Marquee text={playback.now?.title ?? 'Aura Music • Ready'} class="text-xs font-bold text-foreground" />
-				<div class="truncate text-[11px] font-medium text-muted-foreground">
-					{playback.now?.artists ?? 'Tap to expand player'}
+				<div class="flex items-center gap-1.5">
+					<Marquee text={playback.now?.title ?? 'Aura Music • Ready'} class="text-xs font-bold text-foreground" />
+					{#if !playback.paused && playback.now}
+						<div class="flex items-end gap-0.5 h-2.5 shrink-0" aria-label="Playing">
+							<span class="w-0.5 bg-primary rounded-full animate-eq-1 h-2.5"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-2 h-2.5"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-3 h-2.5"></span>
+						</div>
+					{/if}
+				</div>
+				<div class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground truncate">
+					<span class="truncate">{playback.now?.artists ?? 'Tap to expand player'}</span>
+					{#if playback.now}
+						<span class="shrink-0 px-1.5 py-0.2 rounded text-[9px] font-bold tracking-wider uppercase bg-pink-500/15 text-pink-500 dark:text-pink-400 border border-pink-500/30">
+							Hi-Fi
+						</span>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -231,20 +245,23 @@
 				</span>
 			</button>
 			<button
-				class="flex h-9 w-9 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/40 apple-spring-tap transition-transform cursor-pointer"
+				class="flex h-9 w-9 items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-pink-500/40 apple-spring-tap transition-transform cursor-pointer relative"
 				onclick={(e) => {
 					e.stopPropagation();
 					api.togglePause();
 				}}
 				aria-label={playback.paused ? t('player.play') : t('player.pause')}
 			>
+				{#if !playback.paused && playback.now}
+					<span class="absolute -inset-0.5 rounded-full bg-pink-500/50 blur-[2px] animate-pulse"></span>
+				{/if}
 				<HugeiconsIcon
 					icon={PauseIcon}
 					altIcon={PlayIcon}
 					showAlt={playback.paused}
 					size={17}
 					fill="currentColor"
-					class={playback.paused ? 'ml-0.5' : ''}
+					class={playback.paused ? 'ml-0.5 relative z-10' : 'relative z-10'}
 				/>
 			</button>
 			<button
@@ -297,7 +314,7 @@
 				{/if}
 			{/key}
 			<div class="min-w-0 flex-1">
-				<div class="flex items-center gap-1.5">
+				<div class="flex items-center gap-2">
 					{#snippet title()}
 						<Marquee
 							text={playback.now?.title ?? 'Aura Music • Ready'}
@@ -317,6 +334,14 @@
 					{:else}
 						{@render title()}
 					{/if}
+					{#if !playback.paused && playback.now}
+						<div class="flex items-end gap-0.5 h-3 shrink-0" aria-label="Playing">
+							<span class="w-0.5 bg-primary rounded-full animate-eq-1 h-3"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-2 h-3"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-3 h-3"></span>
+							<span class="w-0.5 bg-primary rounded-full animate-eq-4 h-3"></span>
+						</div>
+					{/if}
 					{#if autoplayTrack}
 						<span class="shrink-0 text-muted-foreground" title={t('player.autoplay_notice')}>
 							<HugeiconsIcon icon={InfinityIcon} size={13} />
@@ -330,6 +355,12 @@
 						marquee
 						class="block max-w-full text-[11px] text-muted-foreground font-medium"
 					/>
+					{#if playback.now}
+						<span class="hidden xl:inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold tracking-widest uppercase bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-cyan-500/15 text-pink-500 dark:text-pink-300 border border-pink-500/30 shadow-[0_0_8px_rgba(255,42,122,0.2)]">
+							<span class="size-1 rounded-full bg-pink-500 animate-ping"></span>
+							320K LOSSLESS
+						</span>
+					{/if}
 				</div>
 			</div>
 
@@ -380,7 +411,7 @@
 					<HugeiconsIcon icon={PreviousIcon} size={18} />
 				</button>
 
-				<!-- Center Glowing Neon Pink Play Button (36px) -->
+				<!-- Center Glowing Neon Pink Play Button (38px) -->
 				<button
 					onclick={() => {
 						if (!playback.now && playback.queue.items.length === 0) {
@@ -394,15 +425,18 @@
 						}
 					}}
 					aria-label={playback.paused ? t('player.play') : t('player.pause')}
-					class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 text-white shadow-lg shadow-pink-500/40 apple-spring-hover apple-spring-tap cursor-pointer hover:scale-105 transition-transform"
+					class="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-fuchsia-500 text-white shadow-xl shadow-pink-500/40 apple-spring-hover apple-spring-tap cursor-pointer hover:scale-105 transition-all duration-300"
 				>
+					{#if !playback.paused && playback.now}
+						<span class="absolute -inset-1 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 opacity-40 blur-sm animate-pulse pointer-events-none"></span>
+					{/if}
 					<HugeiconsIcon
 						icon={PauseIcon}
 						altIcon={PlayIcon}
 						showAlt={!playback.now || playback.paused}
-						size={18}
+						size={19}
 						fill="currentColor"
-						class={!playback.now || playback.paused ? 'ml-0.5' : ''}
+						class={!playback.now || playback.paused ? 'ml-0.5 relative z-10' : 'relative z-10'}
 					/>
 				</button>
 

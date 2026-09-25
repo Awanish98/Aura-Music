@@ -118,10 +118,19 @@
 	<div class="flex items-center gap-3">
 		<!-- Aura Music Logo Monogram -->
 		<a href="/" class="flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95 group">
-			<img src={auraLogo} alt="Aura Logo" class="h-8 w-8 drop-shadow-[0_0_12px_rgba(255,42,122,0.6)]" />
-			<span class="hidden sm:inline font-heading text-lg font-black tracking-wider text-foreground uppercase group-hover:text-primary transition-colors">
-				AURA <span class="text-primary">MUSIC</span>
-			</span>
+			<div class="relative">
+				<img src={auraLogo} alt="Aura Logo" class="h-8 w-8 drop-shadow-[0_0_12px_rgba(255,42,122,0.6)] group-hover:rotate-6 transition-transform duration-300" />
+				<span class="absolute -top-1 -right-1 flex h-2 w-2">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+					<span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+				</span>
+			</div>
+			<div class="hidden sm:flex flex-col leading-none">
+				<span class="font-heading text-lg font-black tracking-wider text-foreground uppercase group-hover:text-primary transition-colors flex items-center gap-1">
+					AURA <span class="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">MUSIC</span>
+				</span>
+				<span class="text-[8px] font-mono tracking-widest text-muted-foreground uppercase font-bold">Studio Edition</span>
+			</div>
 		</a>
 
 		<!-- Back / Forward / Refresh controls -->

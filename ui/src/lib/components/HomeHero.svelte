@@ -159,12 +159,19 @@
 
 	<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 		<!-- Left: Big Greeting + Subtitle -->
-		<div class="flex-1 space-y-1.5 max-w-lg">
+		<div class="flex-1 space-y-2 max-w-lg">
+			<div class="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-3 py-1 text-xs font-bold text-pink-600 dark:text-pink-400 backdrop-blur-md shadow-[0_0_12px_rgba(255,42,122,0.2)]">
+				<span class="flex h-2 w-2 relative">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+					<span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+				</span>
+				<span class="tracking-wide uppercase text-[10px]">Aura Studio • 320kbps Lossless Audio</span>
+			</div>
 			<h2 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white dark:drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
 				{prefix} <span class="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 dark:from-pink-400 dark:via-fuchsia-400 dark:to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,42,122,0.4)]">{part}</span>
 			</h2>
 			<p class="text-sm sm:text-base text-slate-600 dark:text-white/80 font-medium tracking-wide">
-				What's your vibe today? Stream high-fidelity music and explore curated charts.
+				What's your vibe today? Stream high-fidelity music, sing along with synchronized lyrics, and explore AI curated mixes.
 			</p>
 		</div>
 

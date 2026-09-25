@@ -180,11 +180,11 @@
 	data-selected={selectable ? selected : undefined}
 	aria-describedby={selectable ? selectionDescriptionId : undefined}
 	aria-label={selectable ? t(guestAdd ? 'selection.track_guest' : 'selection.track', { title: song.title }) : guestAdd ? `Add ${song.title} to the session queue` : `Play ${song.title}`}
-	class="group flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 transition-all duration-200 hover:bg-white/[0.06] active:scale-[0.99] select-none {selected
-		? 'bg-primary/15'
+	class="group flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2.5 transition-all duration-200 hover:bg-slate-200/50 dark:hover:bg-white/[0.06] active:scale-[0.99] select-none {selected
+		? 'bg-primary/15 ring-1 ring-primary/30'
 		: active
-		? 'bg-primary/10 border-l-2 border-primary pl-2.5'
-		: ''} {compact ? '' : '[content-visibility:auto] [contain-intrinsic-size:auto_3.5rem]'}"
+		? 'bg-gradient-to-r from-pink-500/15 via-purple-500/10 to-transparent border border-pink-500/35 shadow-sm dark:shadow-[0_0_20px_rgba(255,42,122,0.15)]'
+		: 'border border-transparent'} {compact ? '' : '[content-visibility:auto] [contain-intrinsic-size:auto_3.5rem]'}"
 >
 	{#if selectable}
 		<span id={selectionDescriptionId} class="sr-only">
@@ -238,22 +238,24 @@
 			{/if}
 			{#if !hideThumb}
 				{#if song.thumbnail}
-					<img
-						src={thumb(song.thumbnail, 96, song.title, 'song')}
-						alt={song.title}
-						class="h-10 w-10 shrink-0 rounded-md object-cover shadow-xs"
-						loading="lazy"
-						decoding="async"
-						onerror={(e) => {
-							const target = e.currentTarget as HTMLImageElement;
-							target.src = generateAvatarSvg(song.title, 'song');
-						}}
-					/>
+					<div class="relative shrink-0">
+						<img
+							src={thumb(song.thumbnail, 96, song.title, 'song')}
+							alt={song.title}
+							class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-slate-900/10 dark:ring-white/10 transition-transform duration-300 group-hover:scale-105 {active ? 'ring-2 ring-primary/70 shadow-[0_0_12px_rgba(255,42,122,0.4)]' : ''}"
+							loading="lazy"
+							decoding="async"
+							onerror={(e) => {
+								const target = e.currentTarget as HTMLImageElement;
+								target.src = generateAvatarSvg(song.title, 'song');
+							}}
+						/>
+					</div>
 				{:else}
 					<img
 						src={generateAvatarSvg(song.title, 'song')}
 						alt={song.title}
-						class="h-10 w-10 shrink-0 rounded-md object-cover shadow-xs"
+						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-xs"
 						loading="lazy"
 						decoding="async"
 					/>
@@ -262,7 +264,7 @@
 		</div>
 		<div class="min-w-0 flex-1">
 			<div class="flex min-w-0 items-center gap-2">
-				<span class="min-w-0 truncate text-sm font-medium {active ? 'text-primary' : ''}">
+				<span class="min-w-0 truncate text-sm font-semibold tracking-tight {active ? 'text-primary font-bold drop-shadow-[0_0_8px_rgba(255,42,122,0.4)]' : 'text-slate-900 dark:text-white group-hover:text-primary transition-colors'}">
 					{song.title}
 				</span>
 				{#if song.queued_by}
