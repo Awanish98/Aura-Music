@@ -69,8 +69,9 @@ async function runAll() {
 		const res = await fetch(`${BASE_URL}/api/lyrics?track=Shape+of+You&artist=Ed+Sheeran`);
 		assert.strictEqual(res.status, 200, `Expected 200 OK, got ${res.status}`);
 		const data = await res.json();
-		assert.ok(data.lyrics || data.syncedLyrics || data.plainLyrics || data.text, 'Lyrics should be returned');
-		console.log(`(Lyrics resolved successfully)`);
+		assert.ok(data.lines || data.lyrics || data.syncedLyrics || data.plainLyrics, 'Lyrics lines should be returned');
+		const lineCount = data.lines?.length || 0;
+		console.log(`(Resolved ${lineCount} synchronized lyrics lines with word-level timing)`);
 	});
 
 	// 6. Direct 320kbps Audio Stream Resolution
@@ -82,11 +83,18 @@ async function runAll() {
 		assert.ok(songs.length > 0, 'Need search result for stream test');
 		const songId = songs[0].video_id || songs[0].id;
 		
+		// Test JSON metadata resolution
+		const metaRes = await fetch(`${BASE_URL}/api/stream/${encodeURIComponent(songId)}`, {
+			headers: { 'Accept': 'application/json' }
+		});
+		assert.strictEqual(metaRes.status, 200, `Expected 200 OK, got ${metaRes.status}`);
+		const metaData = await metaRes.json();
+		assert.ok(metaData.url || metaData.stream_url, 'Stream URL must be returned in metadata');
+
+		// Test direct raw audio stream pipe
 		const streamRes = await fetch(`${BASE_URL}/api/stream/${encodeURIComponent(songId)}`);
-		assert.strictEqual(streamRes.status, 200, `Expected 200 OK, got ${streamRes.status}`);
-		const streamData = await streamRes.json();
-		assert.ok(streamData.url || streamData.stream_url, 'Stream URL must be returned');
-		console.log(`(Bitrate: ${streamData.bitrate || '320kbps'}, source: ${streamData.source || 'JioSaavn / YouTube'})`);
+		assert.ok(streamRes.status === 200 || streamRes.status === 206 || streamRes.status === 302, `Expected 200/206/302, got ${streamRes.status}`);
+		console.log(`(Bitrate: ${metaData.bitrate || '320kbps'}, source: ${metaData.source || 'JioSaavn / YouTube'})`);
 	});
 
 	// 7. Security Headers Verification

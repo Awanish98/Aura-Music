@@ -23,7 +23,8 @@
 		VolumeMute02Icon,
 		Share01Icon,
 		AudioWave01Icon,
-		SparklesIcon
+		SparklesIcon,
+		CdIcon
 	} from '@hugeicons/core-free-icons';
 	import {
 		np,
@@ -58,6 +59,7 @@
 	let eqModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
+	let vinylMode = $state(false);
 
 	// Header touch swipe down to dismiss
 	let headerStartY = 0;
@@ -292,32 +294,87 @@
 	<!-- Main Content Area based on Tab -->
 	{#if activeTab === 'player'}
 		<div class="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 py-2">
-			<!-- Artwork Card -->
-			<div class="flex flex-1 items-center justify-center py-2">
+			<!-- Artwork Card & Vinyl LP Mode Container -->
+			<div class="flex flex-1 items-center justify-center py-2 relative">
+				<!-- Ambient Aura Glow Ring behind art when playing -->
+				{#if !playback.paused}
+					<div class="pointer-events-none absolute w-64 h-64 rounded-full bg-gradient-to-tr from-pink-500/40 via-purple-500/30 to-cyan-400/40 blur-3xl animate-pulse opacity-90"></div>
+				{/if}
+
+				<!-- Vinyl Mode Floating Badge Toggle -->
+				<button
+					type="button"
+					onclick={() => (vinylMode = !vinylMode)}
+					aria-label={vinylMode ? 'Switch to Cover' : 'Switch to Vinyl'}
+					class="absolute top-3 right-4 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-90 {vinylMode
+						? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
+						: 'bg-black/60 text-white/80 border-white/10'}"
+				>
+					<HugeiconsIcon icon={CdIcon} class="h-3 w-3 {vinylMode ? 'animate-spin-vinyl text-white' : 'text-pink-400'}" />
+					<span>{vinylMode ? 'Vinyl' : 'Disc'}</span>
+				</button>
+
 				<div
-					class="relative aspect-square w-full max-w-[340px] max-h-[340px] overflow-hidden rounded-3xl shadow-2xl transition-all duration-300 touch-pan-y {playback.paused
+					class="relative aspect-square w-full max-w-[320px] max-h-[320px] transition-all duration-300 touch-pan-y {vinylMode ? 'rounded-full' : 'overflow-hidden rounded-3xl shadow-2xl'} {playback.paused
 						? 'scale-95 shadow-black/40 opacity-90'
 						: 'scale-100 shadow-[0_20px_60px_-15px_var(--primary)]'}"
 					ontouchstart={handleArtTouchStart}
 					ontouchmove={handleArtTouchMove}
 					ontouchend={handleArtTouchEnd}
 				>
-					{#if playback.now?.thumbnail}
-						<img
-							src={thumb(playback.now.thumbnail, 720, playback.now?.title || 'Aura', 'song')}
-							alt=""
-							class="h-full w-full object-cover"
-							onerror={(e) => {
-								const target = e.currentTarget as HTMLImageElement;
-								target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
-							}}
-						/>
+					{#if vinylMode}
+						<!-- Realistic Audiophile Spinning 12-inch Vinyl LP Record on Mobile -->
+						<div class="relative w-full h-full rounded-full bg-[#0a0a0f] shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_0_0_2px_rgba(255,255,255,0.12)] flex items-center justify-center overflow-hidden {!playback.paused ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}">
+							<!-- Concentric Vinyl Grooves -->
+							<div class="absolute inset-2 rounded-full border border-white/[0.04] shadow-[inset_0_0_15px_rgba(0,0,0,0.9)]"></div>
+							<div class="absolute inset-5 rounded-full border border-white/[0.05]"></div>
+							<div class="absolute inset-9 rounded-full border border-white/[0.04]"></div>
+							<div class="absolute inset-13 rounded-full border border-white/[0.06]"></div>
+							<div class="absolute inset-17 rounded-full border border-white/[0.04]"></div>
+							<!-- Holographic Light Reflections -->
+							<div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.09] to-transparent pointer-events-none"></div>
+							<div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/[0.06] to-transparent pointer-events-none"></div>
+							<!-- Center Artwork Label -->
+							<div class="relative w-[38%] h-[38%] rounded-full overflow-hidden border-2 border-white/25 shadow-2xl ring-2 ring-black/80">
+								{#if playback.now?.thumbnail}
+									<img
+										src={thumb(playback.now.thumbnail, 400, playback.now?.title || 'Aura', 'song')}
+										alt=""
+										class="w-full h-full object-cover"
+										onerror={(e) => {
+											const target = e.currentTarget as HTMLImageElement;
+											target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+										}}
+									/>
+								{:else}
+									<img
+										src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+										alt=""
+										class="w-full h-full object-cover"
+									/>
+								{/if}
+								<!-- Spindle Center Hole -->
+								<div class="absolute inset-0 m-auto w-3.5 h-3.5 rounded-full bg-[#070709] border-2 border-white/40 shadow-inner"></div>
+							</div>
+						</div>
 					{:else}
-						<img
-							src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
-							alt=""
-							class="h-full w-full object-cover"
-						/>
+						{#if playback.now?.thumbnail}
+							<img
+								src={thumb(playback.now.thumbnail, 720, playback.now?.title || 'Aura', 'song')}
+								alt=""
+								class="h-full w-full object-cover rounded-3xl"
+								onerror={(e) => {
+									const target = e.currentTarget as HTMLImageElement;
+									target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+								}}
+							/>
+						{:else}
+							<img
+								src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+								alt=""
+								class="h-full w-full object-cover rounded-3xl"
+							/>
+						{/if}
 					{/if}
 				</div>
 			</div>

@@ -28,7 +28,8 @@
 		FavouriteIcon,
 		Add01Icon,
 		Share01Icon,
-		InfinityIcon
+		InfinityIcon,
+		CdIcon
 	} from '@hugeicons/core-free-icons';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as api from '$lib/api';
@@ -74,6 +75,7 @@
 
 	let showEq = $state(false);
 	let justLiked = $state(false);
+	let vinylMode = $state(false);
 
 	function toggleLike() {
 		if (playback.rating !== 'like') justLiked = true;
@@ -203,72 +205,130 @@
 						</div>
 					{/if}
 
-					<button
-						type="button"
-						onclick={toggle}
-						aria-label={t('a11y.play_pause')}
-						class="block w-full cursor-pointer relative group rounded-3xl overflow-hidden shadow-2xl transition-transform duration-300 hover:scale-[1.01]"
-					>
-						{#if flash}
-							<div
-								in:scale={{ start: 0.7, duration: 150, easing: cubicOut }}
-								out:scale={{ start: 1.3, duration: 320, easing: cubicOut }}
-								class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-[2px]"
-							>
-								<div class="rounded-full bg-black/60 p-4 text-white shadow-2xl">
-									<HugeiconsIcon
-										icon={PauseIcon}
-										altIcon={PlayIcon}
-										showAlt={flash === 'play'}
-										class="h-8 w-8"
-									/>
+					<!-- Dynamic Glowing Vinyl / Cover Artwork Container -->
+					<div class="relative w-full aspect-square flex items-center justify-center">
+						<!-- Ambient Aura Glow Ring behind art when playing -->
+						{#if !playback.paused}
+							<div class="pointer-events-none absolute -inset-3 rounded-full bg-gradient-to-tr from-pink-500/40 via-purple-500/30 to-cyan-400/40 blur-2xl animate-pulse opacity-85"></div>
+						{/if}
+
+						<button
+							type="button"
+							onclick={toggle}
+							aria-label={t('a11y.play_pause')}
+							class="block w-full h-full cursor-pointer relative group transition-transform duration-300 hover:scale-[1.015] {vinylMode ? 'rounded-full' : 'rounded-3xl overflow-hidden shadow-2xl'}"
+						>
+							{#if flash}
+								<div
+									in:scale={{ start: 0.7, duration: 150, easing: cubicOut }}
+									out:scale={{ start: 1.3, duration: 320, easing: cubicOut }}
+									class="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px] {vinylMode ? 'rounded-full' : 'rounded-3xl'}"
+								>
+									<div class="rounded-full bg-black/70 p-4 text-white shadow-2xl ring-1 ring-white/20">
+										<HugeiconsIcon
+											icon={PauseIcon}
+											altIcon={PlayIcon}
+											showAlt={flash === 'play'}
+											class="h-8 w-8"
+										/>
+									</div>
 								</div>
-							</div>
-						{/if}
+							{/if}
 
-						<div
-							class="contents"
-							{@attach (box: HTMLElement) => {
-								claimVideo(box);
-								return parkVideo;
-							}}
-						></div>
-
-						{#if !showVideo() && src && attempt < srcs.length}
-							<img
-								{src}
-								alt={playback.now?.title || 'Aura'}
-								onerror={(e) => {
-									if (attempt < srcs.length - 1) {
-										attempt++;
-									} else {
-										const target = e.currentTarget as HTMLImageElement;
-										target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
-									}
+							<div
+								class="contents"
+								{@attach (box: HTMLElement) => {
+									claimVideo(box);
+									return parkVideo;
 								}}
-								class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10"
-								decoding="async"
-							/>
-						{:else if !showVideo()}
-							<img
-								src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
-								alt={playback.now?.title || 'Aura'}
-								class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10"
-								decoding="async"
-							/>
-						{/if}
-					</button>
+							></div>
 
-					<!-- Artwork Floating Header Badges -->
+							{#if vinylMode}
+								<!-- Realistic Audiophile Spinning 12-inch Vinyl LP Record -->
+								<div class="relative w-full h-full rounded-full bg-[#0a0a0f] shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_0_0_2px_rgba(255,255,255,0.12)] flex items-center justify-center overflow-hidden {!playback.paused ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}">
+									<!-- Concentric Vinyl Grooves -->
+									<div class="absolute inset-2 rounded-full border border-white/[0.04] shadow-[inset_0_0_15px_rgba(0,0,0,0.9)]"></div>
+									<div class="absolute inset-5 rounded-full border border-white/[0.05]"></div>
+									<div class="absolute inset-9 rounded-full border border-white/[0.04]"></div>
+									<div class="absolute inset-13 rounded-full border border-white/[0.06]"></div>
+									<div class="absolute inset-17 rounded-full border border-white/[0.04]"></div>
+									<div class="absolute inset-21 rounded-full border border-white/[0.05]"></div>
+									<!-- Holographic Light Reflections -->
+									<div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.09] to-transparent pointer-events-none"></div>
+									<div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/[0.06] to-transparent pointer-events-none"></div>
+									<!-- Center Artwork Label -->
+									<div class="relative w-[38%] h-[38%] rounded-full overflow-hidden border-2 border-white/25 shadow-2xl ring-2 ring-black/80">
+										{#if src}
+											<img
+												{src}
+												alt={playback.now?.title || 'Aura'}
+												class="w-full h-full object-cover"
+												decoding="async"
+											/>
+										{:else}
+											<img
+												src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+												alt={playback.now?.title || 'Aura'}
+												class="w-full h-full object-cover"
+												decoding="async"
+											/>
+										{/if}
+										<!-- Spindle Center Hole -->
+										<div class="absolute inset-0 m-auto w-4 h-4 rounded-full bg-[#070709] border-2 border-white/40 shadow-inner"></div>
+									</div>
+								</div>
+							{:else}
+								<!-- Premium Album Cover Sleeve with Aura Glow -->
+								{#if !showVideo() && src && attempt < srcs.length}
+									<img
+										{src}
+										alt={playback.now?.title || 'Aura'}
+										onerror={(e) => {
+											if (attempt < srcs.length - 1) {
+												attempt++;
+											} else {
+												const target = e.currentTarget as HTMLImageElement;
+												target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
+											}
+										}}
+										class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-500 {!playback.paused ? 'artwork-aura-playing' : ''}"
+										decoding="async"
+									/>
+								{:else if !showVideo()}
+									<img
+										src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
+										alt={playback.now?.title || 'Aura'}
+										class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-500 {!playback.paused ? 'artwork-aura-playing' : ''}"
+										decoding="async"
+									/>
+								{/if}
+							{/if}
+						</button>
+					</div>
+
+					<!-- Artwork Floating Header Badges (Visualizer Studio + Vinyl Mode Toggle + Theater Mode) -->
 					<div class="absolute left-3 top-3 z-10 flex items-center gap-1.5">
 						<button
 							type="button"
 							onclick={() => (audioFx.visualizerModalOpen = true)}
 							aria-label="Launch Fullscreen Visualizer Studio"
-							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10"
+							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10 active:scale-95"
 						>
 							<HugeiconsIcon icon={AudioWave01Icon} class="h-3.5 w-3.5 text-pink-400" />
 							<span>Visualizer</span>
+						</button>
+
+						<button
+							type="button"
+							onclick={() => (vinylMode = !vinylMode)}
+							aria-label={vinylMode ? 'Switch to Album Cover' : 'Switch to Vinyl Disc'}
+							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {vinylMode
+								? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
+								: 'bg-black/60 text-white/80 hover:text-white border-white/10'}"
+							title={vinylMode ? 'Cover View' : 'Vinyl Disc Mode'}
+						>
+							<HugeiconsIcon icon={CdIcon} class="h-3.5 w-3.5 {vinylMode ? 'animate-spin-vinyl text-white' : 'text-pink-400'}" />
+							<span>{vinylMode ? 'Vinyl' : 'Disc'}</span>
 						</button>
 					</div>
 
@@ -278,7 +338,7 @@
 								type="button"
 								onclick={() => (video.want = !video.want)}
 								aria-label={showVideo() ? t('a11y.show_artwork') : t('a11y.show_video')}
-								class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10"
+								class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10 active:scale-95"
 								title="Toggle Video"
 							>
 								<HugeiconsIcon
@@ -296,7 +356,7 @@
 								ui.theaterOpen = true;
 							}}
 							aria-label="Enter Fullscreen Theater Mode"
-							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-primary hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg"
+							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-primary hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg active:scale-95"
 							title="Cinema / Fullscreen Theater Mode"
 						>
 							<HugeiconsIcon icon={MaximizeScreenIcon} class="h-4 w-4" />
@@ -305,7 +365,7 @@
 							type="button"
 							onclick={() => (np.open = false)}
 							aria-label="Minimize Player"
-							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-white hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg"
+							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-white hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg active:scale-95"
 							title="Minimize Now Playing"
 						>
 							<HugeiconsIcon icon={ArrowDown01Icon} class="h-4 w-4 text-primary" />
