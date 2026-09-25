@@ -58,6 +58,7 @@
 	import GlassFilter from '$lib/components/ui/GlassFilter.svelte';
 	import AuraAmbientBackground from '$lib/components/AuraAmbientBackground.svelte';
 	import CosmicBackgroundAnimation from '$lib/components/CosmicBackgroundAnimation.svelte';
+	import PwaInstallBanner from '$lib/components/PwaInstallBanner.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
 	import { win, initWin } from '$lib/win.svelte';
@@ -196,10 +197,8 @@
 			? ''
 			: 'rounded-[12px]'}"
 	>
-		<!-- Premium Centralized Aura Ambient Animated Gradient System -->
+		<!-- Premium Centralized Aura Ambient Animated Fluid Gradient System -->
 		<AuraAmbientBackground variant="auto" intensity="medium" reactiveToArtwork={true} interactive={true} />
-		<!-- Atmospheric Starfield & Interactive Constellation Laser Network -->
-		<CosmicBackgroundAnimation />
 
 		<ResizeBorders />
 		<Titlebar />
@@ -229,7 +228,7 @@
 			{#if queueOpen}<QueuePanel onClose={() => (queueOpen = false)} />{/if}
 		</div>
 		<!-- Persistent Player Bar (floating macOS liquid glass dock) -->
-		{#if playback.now}
+		{#if playback.now && !np.open}
 			<div
 				class="fixed md:absolute bottom-[calc(env(safe-area-inset-bottom,0px)+3.85rem)] md:bottom-3.5 inset-x-0 z-20 px-2.5 sm:px-3 md:px-6 pointer-events-none"
 				in:fly={{ y: 64, duration: 250, easing: cubicOut }}
@@ -243,7 +242,7 @@
 					/>
 				</div>
 			</div>
-		{:else}
+		{:else if !np.open}
 			<div class="hidden md:block absolute bottom-3.5 inset-x-0 z-20 px-6 pointer-events-none">
 				<div class="pointer-events-auto max-w-7xl mx-auto w-full">
 					<PlayerBar
@@ -288,6 +287,7 @@
 	<CookieConsent />
 	<LegalDialog />
 	<GlassFilter />
+	<PwaInstallBanner />
 
 	<!-- The two notification banners below run at z-[100]. Dialogs and menus sit at z-50 and portal to
 	     <body>, so a z-50 banner loses the tie on DOM order and hides behind an open modal. -->

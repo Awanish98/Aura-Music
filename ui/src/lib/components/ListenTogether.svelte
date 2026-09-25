@@ -217,6 +217,15 @@
 							<img
 								src={lt.currentTrack.thumbnail}
 								alt=""
+								onerror={(e) => {
+									(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+								}}
+								class="h-10 w-10 shrink-0 rounded object-cover"
+							/>
+						{:else}
+							<img
+								src="/default_cover.jpg"
+								alt=""
 								class="h-10 w-10 shrink-0 rounded object-cover"
 							/>
 						{/if}

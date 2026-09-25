@@ -171,6 +171,9 @@
 		<img
 			src={thumb(playback.now.thumbnail, 400)}
 			alt=""
+			onerror={(e) => {
+				(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+			}}
 			class="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover opacity-35 blur-3xl transition-opacity duration-700 dark:opacity-45"
 		/>
 	{/if}
@@ -187,7 +190,7 @@
 		<button
 			type="button"
 			aria-label="Dismiss player"
-			class="w-12 h-1.5 rounded-full bg-white/25 mx-auto mb-2 hover:bg-white/40 cursor-pointer active:scale-95 transition-transform"
+			class="w-12 h-1.5 rounded-full bg-black/20 dark:bg-white/25 mx-auto mb-2 hover:bg-black/30 dark:hover:bg-white/40 cursor-pointer active:scale-95 transition-transform"
 			onclick={(e) => {
 				e.stopPropagation();
 				np.open = false;
@@ -196,7 +199,7 @@
 
 		<div class="flex items-center justify-between">
 			<button
-				class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
+				class="flex size-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-muted-foreground transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
 				onclick={(e) => {
 					e.stopPropagation();
 					np.open = false;
@@ -221,11 +224,11 @@
 						song={currentSong}
 						linksOnly={false}
 						onAdd={() => openAddToPlaylist(currentSong!)}
-						triggerClass="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
+						triggerClass="flex size-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-muted-foreground transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground active:scale-90"
 					/>
 				{:else}
 					<button
-						class="flex size-10 items-center justify-center rounded-full bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground active:scale-90"
+						class="flex size-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-muted-foreground transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground active:scale-90"
 						onclick={() => (sleepModalOpen = true)}
 					>
 						<HugeiconsIcon icon={Moon02Icon} size={20} />
@@ -237,7 +240,7 @@
 
 	<!-- Segmented Glass Tab Switcher (Track, Visualizer, Lyrics, AI Story, Queue) -->
 	<div class="relative z-10 flex shrink-0 items-center justify-center px-2 py-1.5 overflow-x-auto no-scrollbar">
-		<div class="flex items-center gap-1 rounded-full bg-black/40 p-1 border border-white/10 shadow-inner backdrop-blur-md">
+		<div class="flex items-center gap-1 rounded-full bg-slate-200/80 dark:bg-black/50 p-1 border border-black/5 dark:border-white/10 shadow-inner backdrop-blur-md">
 			<button
 				class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all {activeTab === 'player'
 					? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-100'
@@ -497,10 +500,10 @@
 			</div>
 
 			<!-- Quick Utilities Bar (Speed, Sleep Timer, EQ & Audio FX, Share) -->
-			<div class="mt-3.5 shrink-0 flex items-center justify-between border-t border-white/5 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] text-xs text-muted-foreground">
+			<div class="mt-3.5 shrink-0 flex items-center justify-between border-t border-black/5 dark:border-white/5 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] text-xs text-muted-foreground">
 				<!-- Sleep Timer -->
 				<button
-					class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {sleepTimer.active
+					class="flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-1.5 transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground {sleepTimer.active
 						? 'text-primary border border-primary/40 bg-primary/10'
 						: ''}"
 					onclick={() => (sleepModalOpen = true)}
@@ -517,7 +520,7 @@
 
 				<!-- Audio FX / Equalizer / Gapless / DJ Crossfade -->
 				<button
-					class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {playback.crossfading
+					class="flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-1.5 transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground {playback.crossfading
 						? 'border-pink-500/50 bg-pink-500/20 text-pink-300 animate-pulse'
 						: audioFx.playbackMode !== 'normal'
 							? 'text-primary border border-primary/40 bg-primary/10'
@@ -541,7 +544,7 @@
 				<!-- Playback Speed -->
 				<div class="relative">
 					<button
-						class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground {playback.speed !== 1
+						class="flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-1.5 transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground {playback.speed !== 1
 							? 'text-primary border border-primary/40 bg-primary/10'
 							: ''}"
 						onclick={() => (speedMenuOpen = !speedMenuOpen)}
@@ -552,7 +555,7 @@
 
 					{#if speedMenuOpen}
 						<div
-							class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-1 rounded-2xl border border-white/10 bg-card/95 p-2 shadow-2xl backdrop-blur-xl"
+							class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-1 rounded-2xl border border-black/10 dark:border-white/10 bg-card/95 p-2 shadow-2xl backdrop-blur-xl"
 							transition:scale={{ start: 0.9, duration: 150 }}
 						>
 							{#each speeds as sp}
@@ -575,7 +578,7 @@
 				<!-- Share Button -->
 				{#if playback.now}
 					<button
-						class="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1.5 transition hover:bg-white/10 hover:text-foreground"
+						class="flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-1.5 transition hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground"
 						onclick={() => {
 							const now = playback.now!;
 							openShare({
@@ -599,7 +602,7 @@
 			<!-- Scrollable Active View -->
 			<div class="relative min-h-0 flex-1 overflow-hidden {activeTab === 'lyrics' ? 'p-0' : 'p-3'}">
 				{#if activeTab === 'visualizer'}
-					<div class="h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl p-1 relative">
+					<div class="h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-black/60 shadow-2xl p-1 relative">
 						<VisualizerStudio inline />
 					</div>
 				{:else if activeTab === 'lyrics'}
@@ -616,7 +619,7 @@
 			</div>
 
 			<!-- Sleek Bottom Glass Transport HUD (Play/Pause, Scrubber, Next/Prev, Track Info) -->
-			<div class="shrink-0 border-t border-white/10 bg-background/85 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] shadow-2xl backdrop-blur-2xl">
+			<div class="shrink-0 border-t border-black/5 dark:border-white/10 bg-background/90 dark:bg-background/85 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] shadow-2xl backdrop-blur-2xl">
 				<!-- Mini Scrubber Bar -->
 				<div class="mb-2 flex items-center gap-2">
 					<span class="text-[10px] font-semibold tabular-nums text-muted-foreground w-8 text-right">
@@ -650,12 +653,17 @@
 							<img
 								src={thumb(playback.now.thumbnail, 120, playback.now?.title || 'Aura', 'song')}
 								alt=""
+								onerror={(e) => {
+									(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+								}}
 								class="size-10 rounded-lg object-cover shadow shrink-0"
 							/>
 						{:else}
-							<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-								<HugeiconsIcon icon={MusicNote01Icon} size={18} class="text-primary" />
-							</div>
+							<img
+								src="/default_cover.jpg"
+								alt=""
+								class="size-10 rounded-lg object-cover shadow shrink-0"
+							/>
 						{/if}
 						<div class="min-w-0 flex-1">
 							<p class="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">

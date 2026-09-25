@@ -1,15 +1,21 @@
 <script lang="ts">
 	import { fade, fly, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		Maximize01Icon,
 		Minimize01Icon,
+		MaximizeScreenIcon,
 		Mic01Icon,
 		MusicNote01Icon,
 		PlayIcon,
 		PauseIcon,
+		PreviousIcon,
+		NextIcon,
+		ShuffleIcon,
+		RepeatIcon,
+		RepeatOne01Icon,
 		Queue01Icon,
 		Video01Icon,
 		VideoOffIcon,
@@ -17,11 +23,29 @@
 		VolumeMute02Icon,
 		SparklesIcon,
 		AudioWave01Icon,
-		ArrowDown01Icon
+		AudioWave02Icon,
+		ArrowDown01Icon,
+		FavouriteIcon,
+		Add01Icon,
+		Share01Icon,
+		InfinityIcon
 	} from '@hugeicons/core-free-icons';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as api from '$lib/api';
-	import { np, playback, ui, wheelVolume, audioFx } from '$lib/player.svelte';
+	import {
+		np,
+		playback,
+		ui,
+		wheelVolume,
+		audioFx,
+		cycleRepeat,
+		dragVolume,
+		commitVolume,
+		toggleMute,
+		toggleNowPlayingRating,
+		openAddToPlaylist,
+		openShare
+	} from '$lib/player.svelte';
 	import { canVideo, claimVideo, parkVideo, showVideo, video } from '$lib/video.svelte';
 	import { appearance } from '$lib/theme.svelte';
 	import { t } from '$lib/i18n.svelte';
@@ -31,49 +55,41 @@
 	import LyricsView from './LyricsView.svelte';
 	import AiSongStory from './AiSongStory.svelte';
 	import VisualizerStudio from './VisualizerStudio.svelte';
+	import Marquee from './Marquee.svelte';
+	import ArtistLine from './ArtistLine.svelte';
+	import EqualizerDialog from './EqualizerDialog.svelte';
 
-	// Off in settings, this view drops its tabs and the queue/lyrics panels stay in charge of both
-	// (see +layout): they paint above this (z-30 over z-20), so all this needs is to hand back the
-	// width they take at lg+ instead of letting them cover a third of the artwork. Below lg they're
-	// a scrimmed overlay and there's nothing to shrink into. In tabbed mode both are always closed.
 	let { queueOpen, lyricsOpen }: { queueOpen: boolean; lyricsOpen: boolean } = $props();
 	const tabbed = $derived(appearance.tabbedPlayer);
-	// Survives queue/lyrics tab switches without keeping an inactive queue mounted.
 	const queueScrollMemory: QueueScrollMemory = {};
-	// ponytail: mirrors QueuePanel / LyricsPanel's w-80, keep in sync if those change.
 	const panels = $derived(Number(queueOpen) + Number(lyricsOpen));
 	const inset = $derived(['', 'lg:right-80', 'lg:right-[40rem]'][panels]);
 
-	// Going somewhere means the user wants that page, not this one: minimise. The player bar brings
-	// it back. beforeNavigate (not a pathname effect) so clicking the tab you're already on counts.
 	beforeNavigate(() => (np.open = false));
 
-	// Enlarged lyrics take the whole view, artwork column and tab strip included. A class swap
-	// rather than unmounting the tabs: LyricsView must survive it or it refetches and loses its
-	// scroll position.
 	let big = $state(false);
 	$effect(() => {
-		if (np.tab !== 'lyrics') big = false; // nothing to enlarge on the queue tab
+		if (np.tab !== 'lyrics') big = false;
 	});
 
-	// Google's CDN doesn't serve every rewritten size for every image (see MediaCard), and at this
-	// size a broken-image glyph *is* the page. So step down until one loads: crisp, then the size
-	// proven everywhere else in the app, then the 120 the player bar is already showing for this
-	// very track, and only then a music note.
+	let showEq = $state(false);
+	let justLiked = $state(false);
+
+	function toggleLike() {
+		if (playback.rating !== 'like') justLiked = true;
+		toggleNowPlayingRating();
+	}
+
 	let attempt = $state(0);
 	let bgFailed = $state(false);
 	$effect(() => {
-		playback.now?.thumbnail; // re-arm on every track change
+		playback.now?.thumbnail;
 		attempt = 0;
 		bgFailed = false;
 	});
 	const srcs = $derived([720, 400, 120].map((px) => thumb(playback.now?.thumbnail, px)));
 	const src = $derived(srcs[attempt]);
-	const imgFailed = () => attempt++;
 
-	// Clicking the artwork toggles playback, and flashes the action just taken over it so the click
-	// visibly did something. Read `paused` before the toggle: the backend event that flips it is a
-	// round trip away, and the icon has to be right on the frame the user clicked.
 	let flash: 'play' | 'pause' | null = $state(null);
 	let flashTimer: ReturnType<typeof setTimeout>;
 	function toggle() {
@@ -83,8 +99,6 @@
 		api.togglePause();
 	}
 
-	// Scrolling the artwork is the volume, same step as the slider. The level only draws while the
-	// gesture is live (plus a second to read it) so the artwork is otherwise untouched.
 	let volFlash = $state(false);
 	let volTimer: ReturnType<typeof setTimeout>;
 	function onWheel(e: WheelEvent) {
@@ -94,42 +108,64 @@
 		volTimer = setTimeout(() => (volFlash = false), 1000);
 	}
 
+	const fmt = (secs: number) => {
+		if (!secs || secs < 0 || !isFinite(secs) || isNaN(secs)) return '0:00';
+		const t = Math.floor(secs);
+		const h = Math.floor(t / 3600);
+		const m = Math.floor((t % 3600) / 60);
+		const s = t % 60;
+		const mm = h ? m.toString().padStart(2, '0') : `${m}`;
+		return `${h ? `${h}:` : ''}${mm}:${s.toString().padStart(2, '0')}`;
+	};
+
+	const shuffleOn = $derived(playback.queue.shuffle ?? false);
+	const repeat = $derived(playback.queue.repeat ?? 'off');
+
+	const currentSong = $derived.by(() => {
+		const cur = playback.queue.items[playback.queue.currentIndex];
+		return cur?.video_id === playback.now?.videoId ? cur : null;
+	});
+
+	const albumId = $derived(
+		currentSong && !api.isLocalId(currentSong.video_id) ? currentSong.album_id : undefined
+	);
+
+	const autoplayTrack = $derived.by(() => {
+		const cur = playback.queue.items[playback.queue.currentIndex];
+		return !!cur?.autoplay && cur.video_id === playback.now?.videoId;
+	});
+
+	let seekDrag = $state<number | null>(null);
+	const shownPosition = $derived(seekDrag ?? playback.position);
+
+	function onSeekInput(e: Event) {
+		seekDrag = Number((e.target as HTMLInputElement).value);
+	}
+	function onSeekCommit(e: Event) {
+		const v = Number((e.target as HTMLInputElement).value);
+		playback.position = v;
+		seekDrag = null;
+		api.seek(v);
+	}
+
+	const onVolume = (e: Event) => dragVolume(Number((e.target as HTMLInputElement).value));
+	const onVolumeCommit = (e: Event) => commitVolume(Number((e.target as HTMLInputElement).value));
 </script>
 
-<!-- Covers the page but not the sidebar (you navigate away to minimise) and not the player bar,
-     which stays in charge of transport and paints above this on the way in and out.
-     z-20 matches the highest a page uses for its own chrome (home's sticky mood chips) and wins the
-     tie on DOM order, since <main> is static and its z-indexes land in the same stacking context.
-     The player bar and the queue/lyrics panels come later/higher, so they still paint above.
-     ponytail: left offsets mirror Sidebar's w-16/lg:w-60 (and its manual collapse) — keep in sync
-     if those change. -->
+<!-- Full Desktop Now Playing Experience (Integrated Controls + Ambient Glow) -->
 <div
 	transition:fly={{ y: '100%', duration: 320, easing: cubicOut }}
-	class="absolute inset-y-0 left-16 right-0 z-20 flex justify-center overflow-hidden bg-background px-4 py-4 sm:px-6 sm:py-6 lg:px-10 {ui.sidebarCollapsed
+	class="absolute inset-y-0 left-16 right-0 z-20 flex justify-center overflow-hidden bg-background/95 text-foreground backdrop-blur-3xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8 {ui.sidebarCollapsed
 		? ''
 		: 'lg:left-60'} {inset}"
 >
-	<!-- The artwork itself, blurred to a wash, is the background: same trick as HomeHero, and it
-	     needs no colour extraction (which a remote image would taint the canvas for anyway). The
-	     120px variant is the one the player bar has already loaded for this track, so this costs
-	     no request and nothing new to decode.
-	     Two opacities because the wash sits on opposite grounds: over white it has to stay pale
-	     enough for dark text, over near-black it can carry more colour before muted-foreground
-	     stops reading. Turn them up together if it's too subtle.
-
-	     Not while a video is playing. WebKitGTK re-runs this 40px blur for the damaged region on
-	     every video frame, and the damaged region is the video, so the cost grows with the window.
-	     Measured 2026-08-20 on a 1100px box, 720p30: with the wash 13 fps of video and 74ms UI
-	     frames, without it 30 fps and 17ms. Layer promotion does not help (will-change,
-	     translateZ(0) and contain:paint all measured as noise), and the cost tracks the blur
-	     radius rather than the image. A video fills the view on its own, so there is nothing to
-	     replace it with. -->
+	<!-- Ambient Animated Background Glow -->
 	{#if appearance.artworkBackground && !showVideo() && srcs[2] && !bgFailed}
 		<img
 			src={srcs[2]}
 			alt=""
 			onerror={() => (bgFailed = true)}
-			class="pointer-events-none absolute inset-0 h-full w-full art-wash scale-110 object-cover opacity-30 blur-2xl dark:opacity-40"
+			class="pointer-events-none absolute inset-0 h-full w-full art-wash scale-125 object-cover opacity-35 blur-3xl dark:opacity-45"
 		/>
 	{:else if appearance.artworkBackground && !showVideo()}
 		<div
@@ -137,44 +173,19 @@
 			style="background: radial-gradient(circle at 40% 40%, #a855f7 0%, #ec4899 45%, #3b82f6 80%, transparent 100%)"
 		></div>
 	{/if}
+	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/40 via-background/75 to-background"></div>
 
-	<!-- Capped and centred, so a wide window doesn't park the artwork in the middle of an empty half
-	     with the tabs glued to the right edge. --art is the artwork's side: whichever is smaller of
-	     the column's width and the height left over once the titlebar, the player bar and this
-	     padding have had theirs, at 75% so the square doesn't dominate the view.
-	     ponytail: 11rem is those three measured, not computed. The 0.75 leaves it plenty of slack
-	     now, so only a much taller player bar would need it raised.
-
-	     A video gets its own budget, and a wider cap to spend it in. 16:9 in the square's width
-	     leaves half the height empty, so --vid is the width that spends the same leftover height
-	     instead: height * 16 / 9, capped by the column (max-width can only shrink `w-full`). The
-	     80rem cap exists to stop a square drifting into an empty half, which a video this wide
-	     never does. -->
-	<div
-		class="relative flex w-full gap-6 xl:gap-10 {showVideo() ? 'max-w-[100rem]' : 'max-w-[80rem]'}"
-		style="--art:calc(min(100%,100vh - 11rem) * 0.75); --vid:calc((100vh - 11rem) * 0.85 * 16 / 9)"
-	>
+	<!-- Main Container -->
+	<div class="relative z-10 flex w-full max-w-[98rem] h-full min-h-0 gap-6 xl:gap-8 {big ? 'justify-center' : ''}">
+		<!-- Left: Album Art & Integrated Player Controls (Hidden when lyrics enlarged) -->
 		{#if !big}
-			<!-- Centred against the full height of the column on the right. Below md there isn't room
-			     for both columns, and the queue wins. Untabbed there is no second column, so the
-			     artwork is the whole view at every width. -->
-			<div
-				class="min-w-0 flex-1 items-center justify-center {tabbed ? 'hidden md:flex' : 'flex'}"
-			>
-				<!-- A div, not a button: the video-mode toggle has to be a sibling of the play/pause
-				     button rather than nested inside it (nested buttons are invalid HTML and the
-				     inner one never reliably gets the click). -->
-				<div
-					class="relative w-full {showVideo() ? 'max-w-[var(--vid)]' : 'max-w-[var(--art)]'}"
-					onwheel={onWheel}
-				>
+			<div class="flex flex-col justify-between w-full md:w-[22rem] lg:w-[26rem] xl:w-[29rem] shrink-0 h-full min-h-0 py-1 overflow-y-auto no-scrollbar">
+				<!-- Artwork Container with Badges & Minimize Button -->
+				<div class="relative w-full max-w-[280px] lg:max-w-[320px] xl:max-w-[340px] mx-auto shrink-0" onwheel={onWheel}>
 					{#if volFlash}
-						<!-- Middle left of the artwork, on a plate: it sits over whatever the picture is,
-						     so it needs its own background to stay readable. Theme tokens, same
-						     primary-on-muted as the volume slider in the player bar. -->
 						<div
 							transition:fade={{ duration: 120 }}
-							class="pointer-events-none absolute left-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-2 rounded-full border bg-popover/90 px-2 py-3 text-popover-foreground"
+							class="pointer-events-none absolute left-3 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-2 rounded-full border bg-popover/90 px-2 py-3 text-popover-foreground shadow-2xl backdrop-blur-md"
 						>
 							<HugeiconsIcon
 								icon={VolumeHighIcon}
@@ -182,7 +193,7 @@
 								showAlt={playback.volume === 0}
 								class="h-4 w-4"
 							/>
-							<div class="relative h-24 w-1 overflow-hidden rounded-full bg-muted">
+							<div class="relative h-20 w-1 overflow-hidden rounded-full bg-muted">
 								<div
 									class="absolute inset-x-0 bottom-0 rounded-full bg-primary"
 									style="height:{playback.volume}%"
@@ -191,35 +202,30 @@
 							<span class="text-[10px] tabular-nums">{playback.volume}</span>
 						</div>
 					{/if}
+
 					<button
 						type="button"
 						onclick={toggle}
 						aria-label={t('a11y.play_pause')}
-						class="block w-full cursor-pointer"
+						class="block w-full cursor-pointer relative group rounded-3xl overflow-hidden shadow-2xl transition-transform duration-300 hover:scale-[1.01]"
 					>
 						{#if flash}
-							<!-- No backdrop-blur: re-blurring the plate on every frame of the scale is what made
-							     this stutter on WebKitGTK. Transform and opacity only. -->
 							<div
 								in:scale={{ start: 0.7, duration: 150, easing: cubicOut }}
 								out:scale={{ start: 1.3, duration: 320, easing: cubicOut }}
-								class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center"
+								class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-[2px]"
 							>
-								<div class="rounded-full bg-black/55 p-3.5 text-white">
-									<!-- icon is frozen at mount, so swap via showAlt, not a ternary. -->
+								<div class="rounded-full bg-black/60 p-4 text-white shadow-2xl">
 									<HugeiconsIcon
 										icon={PauseIcon}
 										altIcon={PlayIcon}
 										showAlt={flash === 'play'}
-										class="h-7 w-7"
+										class="h-8 w-8"
 									/>
 								</div>
 							</div>
 						{/if}
-						<!-- The picture is not built here. VideoSurface owns it so it survives this view
-						     being closed, and this is where it gets moved to while the view is open.
-						     `display: contents` so the wrapper generates no box of its own and the video's
-						     `w-full` still resolves against the button. -->
+
 						<div
 							class="contents"
 							{@attach (box: HTMLElement) => {
@@ -227,8 +233,7 @@
 								return parkVideo;
 							}}
 						></div>
-						<!-- The artwork, when the video above isn't the picture. Both arms carry the same
-						     guard rather than nesting, so the branch below keeps its indentation. -->
+
 						{#if !showVideo() && src && attempt < srcs.length}
 							<img
 								{src}
@@ -241,26 +246,26 @@
 										target.src = generateAvatarSvg(playback.now?.title || 'Aura', 'song');
 									}
 								}}
-								style={srcs[2] ? `background-image:url(${srcs[2]})` : undefined}
-								class="aspect-square w-full rounded-2xl bg-cover object-cover shadow-2xl"
+								class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10"
 								decoding="async"
 							/>
 						{:else if !showVideo()}
 							<img
 								src={generateAvatarSvg(playback.now?.title || 'Aura', 'song')}
 								alt={playback.now?.title || 'Aura'}
-								class="aspect-square w-full rounded-2xl bg-cover object-cover shadow-2xl"
+								class="aspect-square w-full rounded-3xl object-cover shadow-2xl ring-1 ring-white/10"
 								decoding="async"
 							/>
 						{/if}
 					</button>
-					<!-- Artwork Launch Buttons: Video & Visualizer Studio -->
+
+					<!-- Artwork Floating Header Badges -->
 					<div class="absolute left-3 top-3 z-10 flex items-center gap-1.5">
 						<button
 							type="button"
 							onclick={() => (audioFx.visualizerModalOpen = true)}
 							aria-label="Launch Fullscreen Visualizer Studio"
-							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10"
+							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10"
 						>
 							<HugeiconsIcon icon={AudioWave01Icon} class="h-3.5 w-3.5 text-pink-400" />
 							<span>Visualizer</span>
@@ -273,7 +278,8 @@
 								type="button"
 								onclick={() => (video.want = !video.want)}
 								aria-label={showVideo() ? t('a11y.show_artwork') : t('a11y.show_video')}
-								class="cursor-pointer rounded-full bg-black/60 p-2 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10"
+								class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10"
+								title="Toggle Video"
 							>
 								<HugeiconsIcon
 									icon={Video01Icon}
@@ -285,78 +291,332 @@
 						{/if}
 						<button
 							type="button"
+							onclick={() => {
+								np.open = false;
+								ui.theaterOpen = true;
+							}}
+							aria-label="Enter Fullscreen Theater Mode"
+							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-primary hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg"
+							title="Cinema / Fullscreen Theater Mode"
+						>
+							<HugeiconsIcon icon={MaximizeScreenIcon} class="h-4 w-4" />
+						</button>
+						<button
+							type="button"
 							onclick={() => (np.open = false)}
-							aria-label="Collapse Player"
-							class="cursor-pointer rounded-full bg-black/60 p-2 text-white/70 backdrop-blur-md transition-colors hover:text-white border border-white/10 hover:scale-105"
+							aria-label="Minimize Player"
+							class="cursor-pointer rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-md transition-all hover:text-white hover:bg-black/80 hover:scale-105 border border-white/10 shadow-lg"
 							title="Minimize Now Playing"
 						>
-							<HugeiconsIcon icon={ArrowDown01Icon} class="h-4 w-4" />
+							<HugeiconsIcon icon={ArrowDown01Icon} class="h-4 w-4 text-primary" />
 						</button>
+					</div>
+				</div>
+
+				<!-- Track Metadata & Status -->
+				<div class="mt-3 shrink-0 flex flex-col gap-1 px-1">
+					<div class="flex items-center justify-between gap-3">
+						<div class="min-w-0 flex-1">
+							{#if albumId}
+								<button
+									class="min-w-0 cursor-pointer text-left hover:underline block max-w-full"
+									onclick={() => goto(`/album/${encodeURIComponent(albumId)}`)}
+								>
+									<Marquee
+										text={playback.now?.title ?? 'Aura Music'}
+										class="font-heading text-xl lg:text-2xl font-black text-foreground tracking-tight hover:text-primary transition-colors"
+									/>
+								</button>
+							{:else}
+								<Marquee
+									text={playback.now?.title ?? 'Aura Music'}
+									class="font-heading text-xl lg:text-2xl font-black text-foreground tracking-tight"
+								/>
+							{/if}
+							<div class="mt-0.5 flex items-center gap-2">
+								<ArtistLine
+									runs={playback.now?.artistRuns}
+									text={playback.now?.artists ?? ''}
+									marquee
+									class="block text-xs lg:text-sm font-semibold text-muted-foreground"
+								/>
+								{#if autoplayTrack}
+									<span class="shrink-0 text-muted-foreground" title={t('player.autoplay_notice')}>
+										<HugeiconsIcon icon={InfinityIcon} size={13} />
+									</span>
+								{/if}
+							</div>
+						</div>
+
+						<!-- Like Button -->
+						<button
+							onclick={toggleLike}
+							class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/5 border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all active:scale-95 shadow-md"
+							aria-label={t('common.like')}
+						>
+							<span class:animate-heart-pop={justLiked} onanimationend={() => (justLiked = false)}>
+								<HugeiconsIcon
+									icon={FavouriteIcon}
+									size={19}
+									class={playback.rating === 'like' ? 'fill-current text-primary drop-shadow-[0_0_8px_#ff0a78]' : ''}
+								/>
+							</span>
+						</button>
+					</div>
+
+					<div class="mt-1 flex items-center gap-2">
+						<span class="rounded-md bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400">
+							320kbps Lossless
+						</span>
+						<span class="rounded-md bg-primary/15 border border-primary/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+							Aura Hi-Fi
+						</span>
+					</div>
+				</div>
+
+				<!-- Timeline Progress Scrubber -->
+				<div class="mt-3 shrink-0 flex flex-col gap-1 px-1">
+					<div
+						class="relative flex h-4 w-full cursor-pointer select-none items-center group/seek"
+						role="slider"
+						tabindex="0"
+						aria-valuemin="0"
+						aria-valuemax={playback.duration || 100}
+						aria-valuenow={shownPosition}
+						aria-label={t('player.seek')}
+						onclick={(e) => {
+							const rect = e.currentTarget.getBoundingClientRect();
+							const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+							const targetTime = pos * (playback.duration || 0);
+							playback.position = targetTime;
+							api.seek(targetTime);
+						}}
+					>
+						<div class="w-full h-1.5 rounded-full bg-white/15 overflow-hidden transition-all group-hover/seek:h-2">
+							<div
+								class="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-primary shadow-[0_0_8px_rgba(255,10,120,0.8)] rounded-full transition-all"
+								style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
+							></div>
+						</div>
+						<div
+							class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-3.5 w-3.5 rounded-full bg-white border-2 border-pink-500 shadow-[0_0_10px_#ff0a78] pointer-events-none opacity-0 group-hover/seek:opacity-100 transition-opacity"
+							style="left: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
+						></div>
+						<input
+							type="range"
+							class="sr-only"
+							min="0"
+							max={playback.duration || 0}
+							value={shownPosition}
+							oninput={onSeekInput}
+							onchange={onSeekCommit}
+						/>
+					</div>
+					<div class="flex justify-between text-[11px] font-mono font-medium text-muted-foreground/80">
+						<span>{fmt(shownPosition)}</span>
+						{#if playback.now?.duration === 'LIVE' || !playback.duration}
+							<span class="rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-400">LIVE</span>
+						{:else}
+							<span>{fmt(playback.duration)}</span>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Hero Playback Transport Controls -->
+				<div class="mt-2 shrink-0 flex items-center justify-center gap-3 lg:gap-4">
+					<button
+						onclick={() => api.toggleShuffle()}
+						aria-label={t('player.shuffle')}
+						class="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer {shuffleOn ? 'text-primary' : ''}"
+					>
+						<HugeiconsIcon icon={ShuffleIcon} size={18} />
+					</button>
+
+					<button
+						onclick={() => api.prevTrack()}
+						aria-label={t('player.previous')}
+						class="flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
+					>
+						<HugeiconsIcon icon={PreviousIcon} size={22} />
+					</button>
+
+					<!-- Glowing Neon Center Play Button -->
+					<button
+						onclick={toggle}
+						aria-label={playback.paused ? t('player.play') : t('player.pause')}
+						class="flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 text-white shadow-xl shadow-pink-500/40 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+					>
+						<HugeiconsIcon
+							icon={PauseIcon}
+							altIcon={PlayIcon}
+							showAlt={playback.paused}
+							size={24}
+							fill="currentColor"
+							class={playback.paused ? 'ml-0.5' : ''}
+						/>
+					</button>
+
+					<button
+						onclick={() => api.nextTrack()}
+						aria-label={t('player.next')}
+						class="flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
+					>
+						<HugeiconsIcon icon={NextIcon} size={22} />
+					</button>
+
+					<button
+						onclick={cycleRepeat}
+						aria-label="Repeat"
+						class="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer {repeat !== 'off' ? 'text-primary' : ''}"
+					>
+						<HugeiconsIcon
+							icon={RepeatIcon}
+							altIcon={RepeatOne01Icon}
+							showAlt={repeat === 'one'}
+							size={18}
+						/>
+					</button>
+				</div>
+
+				<!-- Bottom Controls Bar (Volume Slider + Add To Playlist + Equalizer + Share) -->
+				<div class="mt-2 shrink-0 flex items-center justify-between border-t border-white/10 pt-2 px-1">
+					<!-- Volume -->
+					<div class="flex items-center gap-1.5">
+						<button
+							onclick={toggleMute}
+							class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+							aria-label={playback.volume === 0 ? t('player.unmute') : t('player.mute')}
+						>
+							<HugeiconsIcon
+								icon={VolumeHighIcon}
+								altIcon={VolumeMute02Icon}
+								showAlt={playback.volume === 0}
+								size={15}
+							/>
+						</button>
+						<input
+							type="range"
+							class="range w-20 cursor-pointer"
+							style="--pct:{playback.volume}%"
+							min="0"
+							max="100"
+							value={playback.volume}
+							oninput={onVolume}
+							onchange={onVolumeCommit}
+							onwheel={wheelVolume}
+							aria-label={t('player.volume')}
+						/>
+						<span class="text-[10px] font-mono text-muted-foreground/80 w-6">{playback.volume}%</span>
+					</div>
+
+					<div class="flex items-center gap-1">
+						{#if currentSong}
+							<button
+								onclick={() => openAddToPlaylist(currentSong!)}
+								class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+								title="Add to Playlist"
+							>
+								<HugeiconsIcon icon={Add01Icon} size={15} />
+							</button>
+						{/if}
+
+						<button
+							onclick={() => (showEq = true)}
+							class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+							title="Equalizer & Audio FX"
+						>
+							<HugeiconsIcon icon={SparklesIcon} size={15} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
+						</button>
+
+						{#if playback.now}
+							<button
+								onclick={() => {
+									const now = playback.now!;
+									openShare({
+										id: now.videoId,
+										title: now.title,
+										subtitle: now.artists,
+										kind: 'song',
+										thumbnail: now.thumbnail
+									});
+								}}
+								class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+								title="Share Track"
+							>
+								<HugeiconsIcon icon={Share01Icon} size={15} />
+							</button>
+						{/if}
 					</div>
 				</div>
 			</div>
 		{/if}
 
+		<!-- Right: Clean Full-Height Tabbed Content (Queue, Visualizer, Lyrics, Story) -->
 		{#if tabbed}
-			<div class="flex min-h-0 flex-col {big ? 'flex-1' : 'w-full md:w-[26rem] xl:w-[32rem]'}">
+			<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/30 backdrop-blur-2xl shadow-2xl p-3 lg:p-4 {big ? 'max-w-5xl w-full' : ''}">
 				<Tabs.Root
 					value={np.tab}
 					onValueChange={(v) => (np.tab = v as typeof np.tab)}
-					class="min-h-0 flex-1"
+					class="min-h-0 flex-1 flex flex-col"
 				>
-					<div class="flex items-center gap-2 {big ? 'justify-end' : ''}">
-						<!-- Same two glyphs the player bar uses for the queue and lyrics buttons. -->
-						<Tabs.List class={big ? 'hidden' : 'flex-1'}>
-							<Tabs.Trigger value="queue" class="gap-2.5">
+					<div class="flex items-center justify-between gap-2 pb-2 shrink-0 border-b border-white/10">
+						<Tabs.List class="flex-1 max-w-lg">
+							<Tabs.Trigger value="queue" class="gap-2">
 								<HugeiconsIcon icon={Queue01Icon} class="h-4 w-4" /> {t('player.queue')}
 							</Tabs.Trigger>
-							<Tabs.Trigger value="visualizer" class="gap-2.5">
+							<Tabs.Trigger value="visualizer" class="gap-2">
 								<HugeiconsIcon icon={AudioWave01Icon} class="h-4 w-4 text-pink-400" /> Visualizer
 							</Tabs.Trigger>
-							<Tabs.Trigger value="lyrics" class="gap-2.5">
+							<Tabs.Trigger value="lyrics" class="gap-2">
 								<HugeiconsIcon icon={Mic01Icon} class="h-4 w-4" /> {t('player.lyrics')}
 							</Tabs.Trigger>
-							<Tabs.Trigger value="story" class="gap-2.5">
+							<Tabs.Trigger value="story" class="gap-2">
 								<HugeiconsIcon icon={SparklesIcon} class="h-4 w-4 text-primary" /> Story
 							</Tabs.Trigger>
 						</Tabs.List>
-						{#if np.tab === 'lyrics'}
-							<button
-								onclick={() => (big = !big)}
-								class="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-								aria-label={big ? t('player.shrink_lyrics') : t('player.enlarge_lyrics')}
-							>
-								<!-- icon swap via altIcon/showAlt: `icon` is frozen at mount -->
-								<HugeiconsIcon
-									icon={Maximize01Icon}
-									altIcon={Minimize01Icon}
-									showAlt={big}
-									class="h-4 w-4"
-								/>
-							</button>
+
+						<div class="flex items-center gap-1.5">
+							{#if np.tab === 'lyrics'}
+								<button
+									onclick={() => (big = !big)}
+									class="cursor-pointer rounded-lg p-1.5 text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors"
+									aria-label={big ? t('player.shrink_lyrics') : t('player.enlarge_lyrics')}
+									title={big ? 'Restore side view' : 'Maximize lyrics'}
+								>
+									<HugeiconsIcon
+										icon={Maximize01Icon}
+										altIcon={Minimize01Icon}
+										showAlt={big}
+										class="h-4 w-4"
+									/>
+								</button>
+							{/if}
+						</div>
+					</div>
+
+					<div class="relative min-h-0 flex-1 overflow-hidden mt-2">
+						{#if np.tab === 'queue'}
+							<Tabs.Content value="queue" class="h-full flex min-h-0 flex-col overflow-hidden">
+								<QueueList scrollMemory={queueScrollMemory} />
+							</Tabs.Content>
+						{:else if np.tab === 'visualizer'}
+							<Tabs.Content value="visualizer" class="h-full flex min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl relative p-1">
+								<VisualizerStudio inline />
+							</Tabs.Content>
+						{:else if np.tab === 'lyrics'}
+							<Tabs.Content value="lyrics" class="h-full flex min-h-0 flex-col overflow-hidden">
+								<LyricsView expanded={big} />
+							</Tabs.Content>
+						{:else if np.tab === 'story'}
+							<Tabs.Content value="story" class="h-full flex min-h-0 flex-col overflow-y-auto">
+								<AiSongStory />
+							</Tabs.Content>
 						{/if}
 					</div>
-					<!-- Only the open tab is mounted: bits-ui keeps inactive content in the DOM, which would
-					     leave LyricsView fetching lyrics for every track you never asked to see. -->
-					{#if np.tab === 'queue'}
-						<Tabs.Content value="queue" class="flex min-h-0 flex-col">
-							<QueueList scrollMemory={queueScrollMemory} />
-						</Tabs.Content>
-					{:else if np.tab === 'visualizer'}
-						<Tabs.Content value="visualizer" class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl relative p-1">
-							<VisualizerStudio inline />
-						</Tabs.Content>
-					{:else if np.tab === 'lyrics'}
-						<Tabs.Content value="lyrics" class="flex min-h-0 flex-col">
-							<LyricsView expanded={big} />
-						</Tabs.Content>
-					{:else if np.tab === 'story'}
-						<Tabs.Content value="story" class="flex min-h-0 flex-1 flex-col overflow-y-auto">
-							<AiSongStory />
-						</Tabs.Content>
-					{/if}
 				</Tabs.Root>
 			</div>
 		{/if}
 	</div>
 </div>
+
+<EqualizerDialog bind:open={showEq} />

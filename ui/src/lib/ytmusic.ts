@@ -16,6 +16,7 @@ import type {
 	SongItem
 } from './api';
 import { getApiUrl } from './apiBase';
+import { deduplicateSongs } from './saavn';
 
 async function post(endpoint: string, body: Record<string, unknown> = {}): Promise<any> {
 	// 1. Try local proxy endpoint first (only when running locally on dev server)
@@ -716,24 +717,10 @@ export async function fetchSearch(query: string): Promise<SearchResults> {
 	}
 
 	// Construct final songs list with verified 320kbps lossless tracks FIRST
-	const songs: BrowseItem[] = [...saavnOfficial];
-
-	// Append any additional YouTube official songs that aren't already included
-	for (const s of ytSongs) {
-		if (!songs.some((existing) => existing.title.toLowerCase() === s.title.toLowerCase())) {
-			songs.push(s);
-		}
-	}
+	const songs: BrowseItem[] = deduplicateSongs([...saavnOfficial, ...ytSongs]);
 
 	// Combine all versions/covers cleanly into versions array
-	const versions: BrowseItem[] = [];
-	const seenVersionIds = new Set<string>();
-	for (const v of [...saavnVersions, ...ytVersions]) {
-		if (!seenVersionIds.has(v.id)) {
-			seenVersionIds.add(v.id);
-			versions.push(v);
-		}
-	}
+	const versions: BrowseItem[] = deduplicateSongs([...saavnVersions, ...ytVersions]);
 
 	// Top result selection: prioritize the best official song if top isn't an artist/album
 	if (!top.length && songs.length) {
@@ -1018,7 +1005,7 @@ export async function fetchAlbum(id: string): Promise<AlbumPage> {
 			secondSubtitle,
 			description,
 			thumbnail,
-			items,
+			items: deduplicateSongs(items),
 			explicit: false,
 			inLibrary: false,
 			sections: []
@@ -1091,7 +1078,7 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 						subtitle,
 						thumbnail,
 						description,
-						items,
+						items: deduplicateSongs(items),
 						owned: false,
 						collaborative: false
 					};
@@ -1136,7 +1123,7 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 					subtitle: item.subtitle,
 					thumbnail: item.thumbnail,
 					description: item.description || 'Curated from FMHY Audio Guide',
-					items: searchItems,
+					items: deduplicateSongs(searchItems),
 					owned: false,
 					collaborative: false
 				};
@@ -1157,7 +1144,7 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 					subtitle: pl.subtitle,
 					thumbnail: pl.thumbnail,
 					description: pl.description,
-					items: pl.songs,
+					items: deduplicateSongs(pl.songs),
 					owned: false,
 					collaborative: false
 				};
@@ -1202,7 +1189,7 @@ export async function fetchPlaylist(id: string): Promise<PlaylistPage> {
 			subtitle,
 			thumbnail,
 			description,
-			items,
+			items: deduplicateSongs(items),
 			owned: false,
 			collaborative: false
 		};
@@ -1296,25 +1283,57 @@ function computeTokenSimilarity(a: string, b: string): number {
 	return (2 * intersection) / (setA.size + setB.size);
 }
 
+function extractSongVariants(rawTitle: string, rawArtist?: string) {
+	const variants: { title: string; artist: string }[] = [];
+	const cleanTitle = cleanLyricQuery(rawTitle) || rawTitle;
+	const cleanArtist = cleanLyricQuery((rawArtist || '').split(',')[0].split('&')[0]) || rawArtist || '';
+
+	const isRecordLabel = /(t-?series|sony\s*music|zee\s*music|yrf|saregama|tips|speed\s*records|vevo|topic|universal|warner)/i.test(cleanArtist);
+
+	variants.push({
+		title: cleanTitle,
+		artist: isRecordLabel ? '' : cleanArtist
+	});
+
+	if (rawTitle && (rawTitle.includes(' - ') || rawTitle.includes(' – '))) {
+		const parts = rawTitle.split(/[-–]/).map((p) => cleanLyricQuery(p.trim())).filter(Boolean);
+		if (parts.length >= 2) {
+			variants.push({ title: parts[1], artist: parts[0] });
+			variants.push({ title: parts[0], artist: parts[1] });
+			variants.push({ title: parts[0], artist: isRecordLabel ? '' : cleanArtist });
+			variants.push({ title: parts[1], artist: isRecordLabel ? '' : cleanArtist });
+		}
+	}
+
+	if (rawTitle && rawTitle.includes('|')) {
+		const parts = rawTitle.split('|').map((p) => cleanLyricQuery(p.trim())).filter(Boolean);
+		if (parts.length > 0) {
+			variants.push({ title: parts[0], artist: isRecordLabel ? '' : cleanArtist });
+		}
+	}
+
+	variants.push({ title: cleanTitle, artist: '' });
+
+	return variants;
+}
+
 function scoreCandidate(cand: any, targetTitle: string, targetArtist?: string, targetDur?: number): number {
 	const candTitle = cand.trackName || cand.name || cand.title || '';
 	const candArtist = cand.artistName || cand.artist || cand.artists || '';
 	const titleSim = computeTokenSimilarity(candTitle, targetTitle);
 	const artistSim = targetArtist ? computeTokenSimilarity(candArtist, targetArtist) : 0.8;
 
-	// Strict disqualification: if artist was specified and has 0 match, or title has low match
-	if (targetArtist && artistSim < 0.25) return 0;
-	if (titleSim < 0.35) return 0;
+	if (titleSim < 0.28) return 0;
 
 	let durScore = 1.0;
 	if (targetDur && cand.duration) {
 		const diff = Math.abs(cand.duration - targetDur);
-		if (diff > 45) return 0;
-		durScore = Math.max(0, 1 - diff / 45);
+		if (diff > 50) return 0;
+		durScore = Math.max(0, 1 - diff / 50);
 	}
 
-	const syncedBonus = cand.syncedLyrics ? 0.15 : 0;
-	return titleSim * 0.45 + artistSim * 0.40 + durScore * 0.15 + syncedBonus;
+	const syncedBonus = cand.syncedLyrics ? 0.20 : 0;
+	return titleSim * 0.50 + artistSim * 0.30 + durScore * 0.15 + syncedBonus;
 }
 
 export async function fetchLyrics(
@@ -1326,13 +1345,12 @@ export async function fetchLyrics(
 ): Promise<Lyrics | null> {
 	if (!title) return null;
 
-	const cleanTitle = cleanLyricQuery(title) || title;
-	const cleanArtist = cleanLyricQuery((artist || '').split(',')[0].split('&')[0]) || artist;
+	const variants = extractSongVariants(title, artist);
 
 	// 1. Prioritize Aura Backend Apple Music Word-to-Word Engine
 	try {
-		const qParams = new URLSearchParams({ title: cleanTitle });
-		if (cleanArtist) qParams.set('artist', cleanArtist);
+		const qParams = new URLSearchParams({ title: variants[0].title });
+		if (variants[0].artist) qParams.set('artist', variants[0].artist);
 		if (album) qParams.set('album', album);
 		if (duration && duration > 0) qParams.set('duration', Math.round(duration).toString());
 
@@ -1351,103 +1369,154 @@ export async function fetchLyrics(
 		}
 	} catch {}
 
-	// 2. Direct LRCLIB Client Fallback with Strict Scoring
-	try {
-		const getParams = new URLSearchParams({ track_name: cleanTitle });
-		if (cleanArtist) getParams.set('artist_name', cleanArtist);
-		if (album) getParams.set('album_name', album);
-		if (duration && duration > 0) getParams.set('duration', Math.round(duration).toString());
+	// 2. Direct LRCLIB Client Fallback with Query Variants
+	for (const v of variants) {
+		if (!v.title) continue;
+		try {
+			const getParams = new URLSearchParams({ track_name: v.title });
+			if (v.artist) getParams.set('artist_name', v.artist);
+			if (album) getParams.set('album_name', album);
+			if (duration && duration > 0) getParams.set('duration', Math.round(duration).toString());
 
-		let res = await fetch(`https://lrclib.net/api/get?${getParams.toString()}`, {
-			headers: { 'User-Agent': 'AuraMusic/1.2.0' }
-		}).catch(() => null);
-
-		let data = res && res.ok ? await res.json() : null;
-		if (data) {
-			const score = scoreCandidate(data, cleanTitle, cleanArtist, duration);
-			if (score < 0.6) data = null;
-		}
-
-		if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-			const q = cleanArtist ? `${cleanTitle} ${cleanArtist}`.trim() : cleanTitle;
-			const searchRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
+			let res = await fetch(`https://lrclib.net/api/get?${getParams.toString()}`, {
 				headers: { 'User-Agent': 'AuraMusic/1.2.0' }
 			}).catch(() => null);
 
-			if (searchRes && searchRes.ok) {
-				const searchItems = await searchRes.json();
-				if (Array.isArray(searchItems) && searchItems.length > 0) {
-					const scored = searchItems
-						.map((item: any) => ({ item, score: scoreCandidate(item, cleanTitle, cleanArtist, duration) }))
-						.filter((x: any) => x.score >= 0.55)
-						.sort((a: any, b: any) => b.score - a.score);
+			let data = res && res.ok ? await res.json() : null;
+			if (data) {
+				const score = scoreCandidate(data, v.title, v.artist, duration);
+				if (score < 0.45) data = null;
+			}
 
-					if (scored.length > 0) {
-						data = scored[0].item;
+			if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
+				const q = v.artist ? `${v.title} ${v.artist}`.trim() : v.title;
+				const searchRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
+					headers: { 'User-Agent': 'AuraMusic/1.2.0' }
+				}).catch(() => null);
+
+				if (searchRes && searchRes.ok) {
+					const searchItems = await searchRes.json();
+					if (Array.isArray(searchItems) && searchItems.length > 0) {
+						const scored = searchItems
+							.map((item: any) => ({ item, score: scoreCandidate(item, v.title, v.artist, duration) }))
+							.filter((x: any) => x.score >= 0.45)
+							.sort((a: any, b: any) => b.score - a.score);
+
+						if (scored.length > 0) {
+							data = scored[0].item;
+						}
 					}
 				}
 			}
-		}
 
-		if (data) {
-			const lines: LyricLine[] = [];
-			let isSynced = false;
+			if (data) {
+				const lines: LyricLine[] = [];
+				let isSynced = false;
 
-			if (data.syncedLyrics) {
-				isSynced = true;
-				for (const line of data.syncedLyrics.split('\n')) {
-					const match = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
-					if (match) {
-						const min = parseInt(match[1], 10);
-						const sec = parseFloat(match[2]);
-						lines.push({
-							time_ms: Math.round((min * 60 + sec) * 1000),
-							text: match[3] || ''
-						});
+				if (data.syncedLyrics) {
+					isSynced = true;
+					for (const line of data.syncedLyrics.split('\n')) {
+						const match = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
+						if (match) {
+							const min = parseInt(match[1], 10);
+							const sec = parseFloat(match[2]);
+							lines.push({
+								time_ms: Math.round((min * 60 + sec) * 1000),
+								text: match[3] || ''
+							});
+						}
+					}
+				} else if (data.plainLyrics) {
+					for (const line of data.plainLyrics.split('\n')) {
+						if (line.trim()) lines.push({ text: line.trim() });
 					}
 				}
-			} else if (data.plainLyrics) {
-				for (const line of data.plainLyrics.split('\n')) {
-					if (line.trim()) lines.push({ text: line.trim() });
+
+				if (lines.length > 0) {
+					return {
+						source: 'LRCLIB (Verified)',
+						synced: isSynced,
+						instrumental: !!data.instrumental,
+						lines: isSynced ? synthesizeWordTimings(lines) : lines
+					};
 				}
 			}
-
-			if (lines.length > 0) {
-				return {
-					source: 'LRCLIB (Verified)',
-					synced: isSynced,
-					instrumental: !!data.instrumental,
-					lines: isSynced ? synthesizeWordTimings(lines) : lines
-				};
-			}
+		} catch (e) {
+			console.warn('[LRCLIB fetch fallback error]', e);
 		}
-	} catch (e) {
-		console.warn('[LRCLIB fetch fallback error]', e);
 	}
 
 	// 3. Try JioSaavn Official Lyrics Fallback
-	try {
-		const { fetchSaavnLyrics } = await import('./saavn');
-		const saavnRes = await fetchSaavnLyrics(cleanTitle, cleanArtist);
-		if (saavnRes?.lyrics) {
-			const lines: LyricLine[] = saavnRes.lyrics
-				.split('\n')
-				.map((text: string) => ({ text: text.trim() }))
-				.filter((l: any) => l.text.length > 0);
-			if (lines.length > 0) {
-				return {
-					source: 'JioSaavn (Official)',
-					synced: false,
-					instrumental: false,
-					lines
-				};
+	for (const v of variants) {
+		if (!v.title) continue;
+		try {
+			const { fetchSaavnLyrics } = await import('./saavn');
+			const saavnRes = await fetchSaavnLyrics(v.title, v.artist);
+			if (saavnRes?.lyrics) {
+				const lines: LyricLine[] = saavnRes.lyrics
+					.split('\n')
+					.map((text: string) => ({ text: text.trim() }))
+					.filter((l: any) => l.text.length > 0);
+				if (lines.length > 0) {
+					return {
+						source: 'JioSaavn (Official)',
+						synced: false,
+						instrumental: false,
+						lines
+					};
+				}
 			}
+		} catch (e) {
+			console.warn('[Saavn lyrics fallback error]', e);
 		}
-	} catch (e) {
-		console.warn('[Saavn lyrics fallback error]', e);
 	}
 
-	// 4. Try YouTube Music timed lyrics browse if videoId available
+	// 4. Try NetEase Cloud Music Synced Lyrics Fallback
+	for (const v of variants) {
+		if (!v.title) continue;
+		try {
+			const nQuery = v.artist ? `${v.title} ${v.artist}` : v.title;
+			const nSearchUrl = `https://music.xianqiao.wang/neteaseapiv2/search?keywords=${encodeURIComponent(nQuery)}&limit=5`;
+			const nRes = await fetch(nSearchUrl, { signal: AbortSignal.timeout(3500) });
+			if (nRes.ok) {
+				const nData = await nRes.json();
+				const songs = nData?.result?.songs;
+				if (Array.isArray(songs) && songs.length > 0) {
+					const songId = songs[0].id;
+					const nLrcUrl = `https://music.xianqiao.wang/neteaseapiv2/lyric?id=${songId}`;
+					const lrcRes = await fetch(nLrcUrl, { signal: AbortSignal.timeout(3500) });
+					if (lrcRes.ok) {
+						const lrcData = await lrcRes.json();
+						const lrcText = lrcData?.lrc?.lyric;
+						if (lrcText && lrcText.includes('[')) {
+							const lines: LyricLine[] = [];
+							for (const line of lrcText.split('\n')) {
+								const match = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
+								if (match) {
+									const min = parseInt(match[1], 10);
+									const sec = parseFloat(match[2]);
+									lines.push({
+										time_ms: Math.round((min * 60 + sec) * 1000),
+										text: match[3] || ''
+									});
+								}
+							}
+							if (lines.length > 0) {
+								return {
+									source: 'NetEase (Synced)',
+									synced: true,
+									instrumental: false,
+									lines: synthesizeWordTimings(lines)
+								};
+							}
+						}
+					}
+				}
+			}
+		} catch {}
+	}
+
+	// 5. Try YouTube Music timed lyrics browse if videoId available
 	if (videoId && !videoId.startsWith('sp:') && !videoId.startsWith('gdrive:') && !videoId.startsWith('fmhy_') && !videoId.startsWith('saavn_')) {
 		try {
 			const nextData = await post('next', { videoId });

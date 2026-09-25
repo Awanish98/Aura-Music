@@ -91,7 +91,7 @@
 </script>
 
 <aside
-	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-border/30 bg-white/40 dark:bg-[#080b16]/50 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
+	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-[#070912]/80 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
 		'lg:w-64'
 	)} select-none"
 >
@@ -219,9 +219,9 @@
 
 		<!-- Upgrade to Aura Pro Card at Bottom -->
 		<div class="mt-auto pt-3 border-t border-border/40">
-			<div class="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-purple-900/20 via-pink-900/10 to-card/50 p-3.5 shadow-xl backdrop-blur-xl">
+			<div class="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-pink-50/90 via-purple-50/80 to-white/90 dark:from-purple-900/20 dark:via-pink-900/10 dark:to-card/50 p-3.5 shadow-sm dark:shadow-xl backdrop-blur-xl">
 				<div class="flex items-center gap-2">
-					<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+					<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/30">
 						<HugeiconsIcon icon={CrownIcon} size={15} />
 					</div>
 					<div>

@@ -116,6 +116,17 @@
 				src={thumb(now.thumbnail, 480)}
 				alt=""
 				in:fade={{ duration: 300 }}
+				onerror={(e) => {
+					(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+				}}
+				class="pointer-events-none absolute inset-y-0 left-0 h-full w-[56%] object-cover"
+				style="mask-image:linear-gradient(to right,#000 0,#000 70%,transparent 100%);-webkit-mask-image:linear-gradient(to right,#000 0,#000 70%,transparent 100%)"
+			/>
+		{:else}
+			<img
+				src="/default_cover.jpg"
+				alt=""
+				in:fade={{ duration: 300 }}
 				class="pointer-events-none absolute inset-y-0 left-0 h-full w-[56%] object-cover"
 				style="mask-image:linear-gradient(to right,#000 0,#000 70%,transparent 100%);-webkit-mask-image:linear-gradient(to right,#000 0,#000 70%,transparent 100%)"
 			/>
@@ -279,13 +290,17 @@
 							alt=""
 							style="max-width:none"
 							class="h-6 w-6 shrink-0 rounded object-cover"
+							onerror={(e) => {
+								(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+							}}
 						/>
 					{:else}
-						<div
-							class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground/50"
-						>
-							<HugeiconsIcon icon={MusicNote01Icon} class="h-3 w-3" />
-						</div>
+						<img
+							src="/default_cover.jpg"
+							alt=""
+							style="max-width:none"
+							class="h-6 w-6 shrink-0 rounded object-cover"
+						/>
 					{/if}
 					<span class="truncate text-xs">{item.title}</span>
 				</button>

@@ -79,9 +79,20 @@
 				onclick={() => (open = false)}
 			>
 				{#if pl.thumbnail}
-					<img src={pl.thumbnail} alt="" class="h-7 w-7 shrink-0 rounded object-cover" />
+					<img
+						src={pl.thumbnail}
+						alt=""
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
+						class="h-7 w-7 shrink-0 rounded object-cover"
+					/>
 				{:else}
-					<div class="h-7 w-7 shrink-0 rounded bg-muted"></div>
+					<img
+						src="/default_cover.jpg"
+						alt=""
+						class="h-7 w-7 shrink-0 rounded object-cover"
+					/>
 				{/if}
 				<span class="min-w-0 truncate text-sm">{pl.title}</span>
 			</a>

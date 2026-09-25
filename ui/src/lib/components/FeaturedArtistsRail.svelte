@@ -94,8 +94,8 @@
 		<div>
 			<div class="flex items-center gap-2">
 				<span class="text-amber-400 text-lg">⭐</span>
-				<h2 class="text-xl font-bold tracking-tight text-white">Popular Artists & Vocalists</h2>
-				<span class="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/15 text-pink-400 border border-pink-500/30 font-bold">
+				<h2 class="text-xl font-bold tracking-tight text-foreground">Popular Artists & Vocalists</h2>
+				<span class="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/15 text-pink-500 dark:text-pink-400 border border-pink-500/30 font-bold">
 					Top 20
 				</span>
 			</div>
@@ -147,7 +147,7 @@
 
 				<!-- Artist Details with Verified Blue Checkmark -->
 				<div class="flex items-center justify-center gap-1 w-full">
-					<h3 class="truncate text-xs sm:text-sm font-bold text-white group-hover:text-primary transition-colors">
+					<h3 class="truncate text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors">
 						{artist.name}
 					</h3>
 					<span class="text-sky-400 shrink-0" title="Verified Artist">

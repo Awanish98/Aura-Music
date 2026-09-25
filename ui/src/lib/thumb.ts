@@ -1,5 +1,7 @@
 import { convertFileSrc } from '$lib/api';
 
+export const DEFAULT_COVER = '/default_cover.jpg';
+
 const PALETTES: [string, string][] = [
 	['#8b5cf6', '#ec4899'], // Violet to Pink
 	['#3b82f6', '#06b6d4'], // Blue to Cyan
@@ -33,9 +35,11 @@ export function getInitials(name: string): string {
 }
 
 export function generateAvatarSvg(title: string = 'Aura', kind: string = 'song'): string {
+	if (kind !== 'artist') {
+		return DEFAULT_COVER;
+	}
 	const [c1, c2] = getGradientColors(title || 'Aura');
-	const text = kind === 'artist' ? getInitials(title) : '♪';
-	const rx = kind === 'artist' ? '100' : '28';
+	const text = getInitials(title);
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
 		<defs>
 			<linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -47,17 +51,17 @@ export function generateAvatarSvg(title: string = 'Aura', kind: string = 'song')
 				<stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
 			</radialGradient>
 		</defs>
-		<rect width="200" height="200" rx="${rx}" fill="url(#g)" />
+		<rect width="200" height="200" rx="100" fill="url(#g)" />
 		<circle cx="100" cy="100" r="85" fill="url(#glow)" />
-		<text x="50%" y="54%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="${kind === 'artist' ? '64' : '72'}" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" opacity="0.95">${text}</text>
+		<text x="50%" y="54%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="64" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" opacity="0.95">${text}</text>
 	</svg>`;
 	return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-// Rewrite a Google, YouTube, or JioSaavn image URL to the optimal pixel size, with instant SVG fallback.
+// Rewrite a Google, YouTube, or JioSaavn image URL to the optimal pixel size, with instant fallback to custom Aura Music cover.
 export function thumb(url: string | undefined | null, px: number = 400, title: string = '', kind: string = 'song'): string {
 	if (!url) {
-		return generateAvatarSvg(title || 'Aura Music', kind);
+		return kind === 'artist' ? generateAvatarSvg(title || 'Aura Music', kind) : DEFAULT_COVER;
 	}
 	// Local library artwork
 	if (url.startsWith('/') || /^[A-Za-z]:[\\/]/.test(url)) return convertFileSrc(url);
@@ -88,4 +92,3 @@ export function thumb(url: string | undefined | null, px: number = 400, title: s
 
 	return url;
 }
-

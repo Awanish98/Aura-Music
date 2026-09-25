@@ -55,9 +55,13 @@
 				onerror={imgFailed}
 			/>
 		{:else}
-			<div class="flex h-full w-full items-center justify-center text-muted-foreground/40">
-				<HugeiconsIcon icon={UserIcon} class="h-10 w-10" />
-			</div>
+			<img
+				src="/default_cover.jpg"
+				alt={item.title}
+				class="h-full w-full object-cover object-[center_22%]"
+				loading="lazy"
+				draggable="false"
+			/>
 		{/if}
 		<!-- Two stops, weighted to the bottom third: enough to hold small white text without
 		     graying out the face above it. -->

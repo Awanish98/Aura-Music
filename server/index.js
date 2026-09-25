@@ -145,6 +145,36 @@ function formatSaavnSong(item) {
 	};
 }
 
+function deduplicateSongs(items) {
+	if (!Array.isArray(items)) return [];
+	const seen = new Set();
+	const out = [];
+	for (const item of items) {
+		if (!item || !item.title) continue;
+		const cleanTitle = String(item.title)
+			.toLowerCase()
+			.replace(/\(.*?\)/g, '')
+			.replace(/\[.*?\]/g, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const rawArtist = String(item.artists || item.artist || item.subtitle || '').split(',')[0].split('&')[0];
+		const cleanArtist = rawArtist
+			.toLowerCase()
+			.replace(/320kbps.*$/gi, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const key = cleanArtist ? `${cleanTitle}::${cleanArtist}` : cleanTitle;
+		const idKey = item.video_id || item.id;
+		if (seen.has(key) || (idKey && seen.has(idKey))) continue;
+		seen.add(key);
+		if (idKey) seen.add(idKey);
+		out.push(item);
+	}
+	return out;
+}
+
 // 1. JioSaavn High-Fidelity 320kbps Song Search
 app.get('/api/saavn/search', async (req, res) => {
 	const query = req.query.q || req.query.query;
@@ -163,10 +193,11 @@ app.get('/api/saavn/search', async (req, res) => {
 			}
 		});
 		const data = await saavnRes.json();
-		const results = (data.results || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const rawResults = (data.results || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const results = deduplicateSongs(rawResults);
 		res.json({
 			success: true,
-			total: data.total || results.length,
+			total: results.length,
 			results
 		});
 	} catch (e) {
@@ -225,7 +256,8 @@ app.get('/api/saavn/playlist', async (req, res) => {
 		const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
 		const data = await resp.json();
 
-		const songs = (data.songs || data.list || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const rawSongs = (data.songs || data.list || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const songs = deduplicateSongs(rawSongs);
 		res.json({
 			id: data.id || playlistId,
 			title: (data.title || data.listname || '').replace(/&quot;/g, '"'),
@@ -281,7 +313,8 @@ app.get('/api/search/unified', async (req, res) => {
 			headers: { 'User-Agent': 'Mozilla/5.0' }
 		});
 		const data = await saavnRes.json();
-		const saavnSongs = (data.results || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const rawSaavnSongs = (data.results || []).map(formatSaavnSong).filter((s) => s.streamUrl);
+		const saavnSongs = deduplicateSongs(rawSaavnSongs);
 
 		res.json({
 			success: true,
@@ -504,12 +537,53 @@ app.get('/api/stream', async (req, res) => {
 });
 
 // 7. Word-to-Word Apple Music Synced Lyrics Engine (LRCLIB + JioSaavn + Natural Timing Synthesizer)
+// 7. Word-to-Word Apple Music Synced Lyrics Engine (LRCLIB + JioSaavn + NetEase + In-Memory Cache)
+const lyricsCache = new Map();
+
 function cleanLyricString(str) {
 	if (!str || typeof str !== 'string') return '';
 	return str
 		.replace(/(\(|\[)(Official|Lyric|Audio|Video|Visualizer|HD|4K|Remastered|feat\.?|ft\.?|From\s*".*?").*?(\)|\])/gi, '')
 		.replace(/[-–|].*$/g, '')
 		.trim();
+}
+
+function extractSongVariants(rawTitle, rawArtist) {
+	const variants = [];
+	const cleanTitle = cleanLyricString(rawTitle) || rawTitle;
+	const cleanArtist = cleanLyricString((rawArtist || '').split(',')[0].split('&')[0]) || rawArtist;
+
+	// Check for channel/label names in artist
+	const isRecordLabel = /(t-?series|sony\s*music|zee\s*music|yrf|saregama|tips|speed\s*records|vevo|topic|universal|warner)/i.test(cleanArtist || '');
+
+	variants.push({
+		title: cleanTitle,
+		artist: isRecordLabel ? '' : cleanArtist
+	});
+
+	// If title contains hyphen "Artist - Song" or "Song - Artist"
+	if (rawTitle && (rawTitle.includes(' - ') || rawTitle.includes(' – '))) {
+		const parts = rawTitle.split(/[-–]/).map((p) => cleanLyricString(p.trim())).filter(Boolean);
+		if (parts.length >= 2) {
+			variants.push({ title: parts[1], artist: parts[0] });
+			variants.push({ title: parts[0], artist: parts[1] });
+			variants.push({ title: parts[0], artist: isRecordLabel ? '' : cleanArtist });
+			variants.push({ title: parts[1], artist: isRecordLabel ? '' : cleanArtist });
+		}
+	}
+
+	// If title contains pipe "|"
+	if (rawTitle && rawTitle.includes('|')) {
+		const parts = rawTitle.split('|').map((p) => cleanLyricString(p.trim())).filter(Boolean);
+		if (parts.length > 0) {
+			variants.push({ title: parts[0], artist: isRecordLabel ? '' : cleanArtist });
+		}
+	}
+
+	// Plain title only variant
+	variants.push({ title: cleanTitle, artist: '' });
+
+	return variants;
 }
 
 function normalizeString(str) {
@@ -547,19 +621,18 @@ function scoreCandidate(cand, targetTitle, targetArtist, targetDur) {
 	const titleSim = computeTokenSimilarity(candTitle, targetTitle);
 	const artistSim = targetArtist ? computeTokenSimilarity(candArtist, targetArtist) : 0.8;
 
-	// Strict disqualification: if artist was specified and has 0 match, or title has low match
-	if (targetArtist && artistSim < 0.25) return 0;
-	if (titleSim < 0.35) return 0;
+	// If title match is poor, reject
+	if (titleSim < 0.28) return 0;
 
 	let durScore = 1.0;
 	if (targetDur && cand.duration) {
 		const diff = Math.abs(cand.duration - targetDur);
-		if (diff > 45) return 0;
-		durScore = Math.max(0, 1 - diff / 45);
+		if (diff > 50) return 0;
+		durScore = Math.max(0, 1 - diff / 50);
 	}
 
-	const syncedBonus = cand.syncedLyrics ? 0.15 : 0;
-	return titleSim * 0.45 + artistSim * 0.40 + durScore * 0.15 + syncedBonus;
+	const syncedBonus = cand.syncedLyrics ? 0.20 : 0;
+	return titleSim * 0.50 + artistSim * 0.30 + durScore * 0.15 + syncedBonus;
 }
 
 function parseAndEnrichLrc(syncedLyrics) {
@@ -660,36 +733,51 @@ app.get('/api/lyrics', async (req, res) => {
 		return res.status(400).json({ error: 'Missing title parameter' });
 	}
 
-	const cleanTitle = cleanLyricString(songTitle) || songTitle;
-	const cleanArtist = cleanLyricString(songArtist.split(',')[0].split('&')[0]) || songArtist;
+	// Check in-memory persistent cache first
+	const cacheKey = `${normalizeString(songTitle)}_${normalizeString(songArtist)}`;
+	if (lyricsCache.has(cacheKey)) {
+		const cached = lyricsCache.get(cacheKey);
+		if (cached) return res.json(cached);
+	}
+
+	const variants = extractSongVariants(songTitle, songArtist);
 
 	try {
-		// 1. Try Exact Match on LRCLIB
-		const exactParams = new URLSearchParams({ track_name: cleanTitle });
-		if (cleanArtist) exactParams.set('artist_name', cleanArtist);
-		if (songAlbum) exactParams.set('album_name', songAlbum);
-		if (songDur && songDur > 0) exactParams.set('duration', songDur.toString());
+		// 1. Try LRCLIB across extracted query variants
+		for (const v of variants) {
+			if (!v.title) continue;
 
-		let lrcData = null;
-		try {
-			const getRes = await fetch(`https://lrclib.net/api/get?${exactParams.toString()}`, {
-				headers: { 'User-Agent': 'AuraMusic/1.2.0' },
-				signal: AbortSignal.timeout(3500)
-			});
-			if (getRes.ok) {
-				const json = await getRes.json();
-				if (json && (json.syncedLyrics || json.plainLyrics)) {
-					const score = scoreCandidate(json, cleanTitle, cleanArtist, songDur);
-					if (score >= 0.6) {
-						lrcData = json;
+			// Exact match query
+			const exactParams = new URLSearchParams({ track_name: v.title });
+			if (v.artist) exactParams.set('artist_name', v.artist);
+			if (songAlbum) exactParams.set('album_name', songAlbum);
+			if (songDur && songDur > 0) exactParams.set('duration', songDur.toString());
+
+			try {
+				const getRes = await fetch(`https://lrclib.net/api/get?${exactParams.toString()}`, {
+					headers: { 'User-Agent': 'AuraMusic/1.2.0' },
+					signal: AbortSignal.timeout(3500)
+				});
+				if (getRes.ok) {
+					const json = await getRes.json();
+					if (json && (json.syncedLyrics || json.plainLyrics)) {
+						if (json.syncedLyrics) {
+							const lines = parseAndEnrichLrc(json.syncedLyrics);
+							const result = {
+								source: 'Apple Music (Synced)',
+								synced: true,
+								instrumental: !!json.instrumental,
+								lines
+							};
+							lyricsCache.set(cacheKey, result);
+							return res.json(result);
+						}
 					}
 				}
-			}
-		} catch {}
+			} catch {}
 
-		// 2. Try Search on LRCLIB with Strict Multi-Candidate Scoring
-		if (!lrcData || !lrcData.syncedLyrics) {
-			const query = cleanArtist ? `${cleanTitle} ${cleanArtist}`.trim() : cleanTitle;
+			// Search query
+			const query = v.artist ? `${v.title} ${v.artist}`.trim() : v.title;
 			try {
 				const sRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`, {
 					headers: { 'User-Agent': 'AuraMusic/1.2.0' },
@@ -699,74 +787,74 @@ app.get('/api/lyrics', async (req, res) => {
 					const items = await sRes.json();
 					if (Array.isArray(items) && items.length > 0) {
 						const scored = items
-							.map((item) => ({ item, score: scoreCandidate(item, cleanTitle, cleanArtist, songDur) }))
-							.filter((x) => x.score >= 0.55)
+							.map((item) => ({ item, score: scoreCandidate(item, v.title, v.artist, songDur) }))
+							.filter((x) => x.score >= 0.45)
 							.sort((a, b) => b.score - a.score);
 
-						if (scored.length > 0) {
-							if (scored[0].item.syncedLyrics || !lrcData) {
-								lrcData = scored[0].item;
-							}
+						if (scored.length > 0 && scored[0].item.syncedLyrics) {
+							const lines = parseAndEnrichLrc(scored[0].item.syncedLyrics);
+							const result = {
+								source: 'Apple Music (Synced)',
+								synced: true,
+								instrumental: !!scored[0].item.instrumental,
+								lines
+							};
+							lyricsCache.set(cacheKey, result);
+							return res.json(result);
 						}
 					}
 				}
 			} catch {}
 		}
 
-		// 3. If LRCLIB gave synced lyrics from a verified candidate, return it
-		if (lrcData && lrcData.syncedLyrics) {
-			const lines = parseAndEnrichLrc(lrcData.syncedLyrics);
-			return res.json({
-				source: 'LRCLIB (Apple Music Synced)',
-				synced: true,
-				instrumental: !!lrcData.instrumental,
-				lines
-			});
-		}
+		// 2. Try JioSaavn Official Lyrics (Highly accurate for Bollywood / Hindi / Punjabi / Indian Regional)
+		for (const v of variants) {
+			if (!v.title) continue;
+			try {
+				const saavnQuery = v.artist ? `${v.title} ${v.artist}`.trim() : v.title;
+				const saavnSearchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(saavnQuery)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+				const saavnRes = await fetch(saavnSearchUrl, { signal: AbortSignal.timeout(3500) });
+				if (saavnRes.ok) {
+					const rawText = await saavnRes.text();
+					const cleanJson = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+					if (cleanJson.includes('{')) {
+						const sData = JSON.parse(cleanJson);
+						if (Array.isArray(sData.results) && sData.results.length > 0) {
+							const validResults = sData.results.filter((r) => {
+								const sim = computeTokenSimilarity(r.title || '', v.title);
+								return sim >= 0.30;
+							});
+							const matchedSong = validResults.find((r) => r.more_info?.has_lyrics === 'true') || validResults[0];
 
-		// 4. Try JioSaavn Official Lyrics (Highly accurate for Bollywood / Hindi / Punjabi / Regional songs)
-		try {
-			const saavnQuery = cleanArtist ? `${cleanTitle} ${cleanArtist}`.trim() : cleanTitle;
-			const saavnSearchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(saavnQuery)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
-			const saavnRes = await fetch(saavnSearchUrl, { signal: AbortSignal.timeout(3500) });
-			if (saavnRes.ok) {
-				const rawText = await saavnRes.text();
-				const cleanJson = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-				if (cleanJson.includes('{')) {
-					const sData = JSON.parse(cleanJson);
-					if (Array.isArray(sData.results) && sData.results.length > 0) {
-						const validResults = sData.results.filter((r) => {
-							const sim = computeTokenSimilarity(r.title || '', cleanTitle);
-							return sim >= 0.35;
-						});
-						const matchedSong = validResults.find((r) => r.more_info?.has_lyrics === 'true') || validResults[0];
-
-						if (matchedSong && matchedSong.more_info?.has_lyrics === 'true') {
-							const lyrUrl = `https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&lyrics_id=${encodeURIComponent(matchedSong.id)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
-							const lyrRes = await fetch(lyrUrl, { signal: AbortSignal.timeout(3500) });
-							if (lyrRes.ok) {
-								const lyrRaw = await lyrRes.text();
-								const lyrClean = lyrRaw.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-								if (lyrClean.includes('{')) {
-									const lyrData = JSON.parse(lyrClean);
-									if (lyrData && lyrData.lyrics) {
-										const cleanLyrics = lyrData.lyrics
-											.replace(/<br\s*\/?>/gi, '\n')
-											.replace(/&quot;/g, '"')
-											.replace(/&#039;/g, "'")
-											.replace(/&amp;/g, '&')
-											.trim();
-										const lines = cleanLyrics
-											.split('\n')
-											.map((text) => ({ text: text.trim() }))
-											.filter((l) => l.text.length > 0);
-										if (lines.length > 0) {
-											return res.json({
-												source: 'JioSaavn (Official)',
-												synced: false,
-												instrumental: false,
-												lines
-											});
+							if (matchedSong && matchedSong.more_info?.has_lyrics === 'true') {
+								const lyrUrl = `https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&lyrics_id=${encodeURIComponent(matchedSong.id)}&_format=json&_marker=0&api_version=4&ctx=web6dot0`;
+								const lyrRes = await fetch(lyrUrl, { signal: AbortSignal.timeout(3500) });
+								if (lyrRes.ok) {
+									const lyrRaw = await lyrRes.text();
+									const lyrClean = lyrRaw.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+									if (lyrClean.includes('{')) {
+										const lyrData = JSON.parse(lyrClean);
+										if (lyrData && lyrData.lyrics) {
+											const cleanLyrics = lyrData.lyrics
+												.replace(/<br\s*\/?>/gi, '\n')
+												.replace(/&quot;/g, '"')
+												.replace(/&#039;/g, "'")
+												.replace(/&amp;/g, '&')
+												.trim();
+											const lines = cleanLyrics
+												.split('\n')
+												.map((text) => ({ text: text.trim() }))
+												.filter((l) => l.text.length > 0);
+											if (lines.length > 0) {
+												const result = {
+													source: 'JioSaavn (Official)',
+													synced: false,
+													instrumental: false,
+													lines
+												};
+												lyricsCache.set(cacheKey, result);
+												return res.json(result);
+											}
 										}
 									}
 								}
@@ -774,23 +862,43 @@ app.get('/api/lyrics', async (req, res) => {
 						}
 					}
 				}
-			}
-		} catch (e) {
-			console.warn('[JioSaavn Lyrics fetch fallback error]', e);
+			} catch {}
 		}
 
-		// 5. Fallback to Verified Plain Lyrics from LRCLIB
-		if (lrcData && lrcData.plainLyrics) {
-			const lines = lrcData.plainLyrics
-				.split('\n')
-				.map((text) => ({ text: text.trim() }))
-				.filter((l) => l.text.length > 0);
-			return res.json({
-				source: 'LRCLIB (Official)',
-				synced: false,
-				instrumental: !!lrcData.instrumental,
-				lines
-			});
+		// 3. Try NetEase Cloud Music Synced Lyrics Fallback
+		for (const v of variants) {
+			if (!v.title) continue;
+			try {
+				const nQuery = v.artist ? `${v.title} ${v.artist}` : v.title;
+				const nSearchUrl = `https://music.xianqiao.wang/neteaseapiv2/search?keywords=${encodeURIComponent(nQuery)}&limit=5`;
+				const nRes = await fetch(nSearchUrl, { signal: AbortSignal.timeout(3500) });
+				if (nRes.ok) {
+					const nData = await nRes.json();
+					const songs = nData?.result?.songs;
+					if (Array.isArray(songs) && songs.length > 0) {
+						const songId = songs[0].id;
+						const nLrcUrl = `https://music.xianqiao.wang/neteaseapiv2/lyric?id=${songId}`;
+						const lrcRes = await fetch(nLrcUrl, { signal: AbortSignal.timeout(3500) });
+						if (lrcRes.ok) {
+							const lrcData = await lrcRes.json();
+							const lrcText = lrcData?.lrc?.lyric;
+							if (lrcText && lrcText.includes('[')) {
+								const lines = parseAndEnrichLrc(lrcText);
+								if (lines.length > 0) {
+									const result = {
+										source: 'NetEase (Synced)',
+										synced: true,
+										instrumental: false,
+										lines
+									};
+									lyricsCache.set(cacheKey, result);
+									return res.json(result);
+								}
+							}
+						}
+					}
+				}
+			} catch {}
 		}
 
 		res.status(404).json({ error: 'Lyrics not found' });

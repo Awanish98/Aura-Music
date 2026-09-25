@@ -2,7 +2,7 @@
 import { playback, np, audioFx } from './player.svelte';
 import type { NowPlaying, QueueState, SongItem } from './api';
 import { fetchSearch } from './ytmusic';
-import { searchSaavnDirect } from './saavn';
+import { searchSaavnDirect, deduplicateSongs } from './saavn';
 import { getApiUrl } from './apiBase';
 
 declare global {
@@ -45,6 +45,8 @@ class WebPlayer {
 	private sourceNodes: Map<HTMLAudioElement, MediaElementAudioSourceNode> = new Map();
 	private freqArray: Uint8Array | null = null;
 	private timeArray: Uint8Array | null = null;
+	private smoothedFreq: Float32Array = new Float32Array(64);
+	private smoothedTime: Float32Array = new Float32Array(64);
 	private prevBass = 0;
 	private beatDecay = 0;
 
@@ -522,6 +524,13 @@ class WebPlayer {
 		};
 
 		if (playback.paused || !playback.now) {
+			// Smooth decay to zero when paused
+			for (let i = 0; i < 64; i++) {
+				this.smoothedFreq[i] *= 0.88;
+				this.smoothedTime[i] = this.smoothedTime[i] * 0.9 + 128 * 0.1;
+				metrics.freqData[i] = Math.round(this.smoothedFreq[i]);
+				metrics.timeData[i] = Math.round(this.smoothedTime[i]);
+			}
 			return metrics;
 		}
 
@@ -539,12 +548,26 @@ class WebPlayer {
 				for (let i = 0; i < 32; i++) {
 					sum += this.freqArray[i];
 				}
-				if (sum > 40) {
+				if (sum > 35) {
 					hasRealData = true;
-					const len = Math.min(64, this.freqArray.length);
-					for (let i = 0; i < len; i++) {
-						metrics.freqData[i] = this.freqArray[i];
-						metrics.timeData[i] = this.timeArray[i];
+					const binCount = this.freqArray.length;
+					for (let i = 0; i < 64; i++) {
+						// Logarithmic frequency bin distribution across human hearing curve
+						const logIdx = Math.min(binCount - 1, Math.floor(Math.pow(i / 63, 1.6) * (binCount * 0.75)));
+						const rawVal = this.freqArray[logIdx] || 0;
+						const rawTime = this.timeArray[i] || 128;
+
+						// Ballistics: fast attack (0.35), smooth decay (0.15)
+						const cur = this.smoothedFreq[i];
+						if (rawVal > cur) {
+							this.smoothedFreq[i] += (rawVal - cur) * 0.38;
+						} else {
+							this.smoothedFreq[i] += (rawVal - cur) * 0.14;
+						}
+
+						this.smoothedTime[i] += (rawTime - this.smoothedTime[i]) * 0.45;
+						metrics.freqData[i] = Math.min(255, Math.max(0, Math.round(this.smoothedFreq[i])));
+						metrics.timeData[i] = Math.min(255, Math.max(0, Math.round(this.smoothedTime[i])));
 					}
 				}
 			} catch {}
@@ -554,29 +577,43 @@ class WebPlayer {
 			// High-fidelity synthesized audio reactivity (tempo-aware, harmonic multi-wave)
 			const time = performance.now() / 1000;
 			const pos = playback.position || time;
-			const beatPhase = (pos * 2.1) % 1;
-			const beatHit = Math.pow(Math.max(0, 1 - beatPhase * 2.2), 3);
-			const subHit = Math.pow(Math.max(0, 1 - ((pos * 4.2) % 1) * 2.5), 2);
+			
+			// 124 BPM harmonic pulse clock
+			const beatPhase = (pos * 2.06) % 1;
+			const beatHit = Math.pow(Math.max(0, 1 - beatPhase * 2.0), 2.5);
+			const subHit = Math.pow(Math.max(0, 1 - ((pos * 4.12) % 1) * 2.4), 2);
+			const hiHatHit = Math.pow(Math.max(0, 1 - ((pos * 8.24) % 1) * 3.0), 3) * 0.6;
 
 			for (let i = 0; i < 64; i++) {
-				const f = i / 64;
-				const wave1 = Math.sin(time * 3.2 + i * 0.25) * 0.5 + 0.5;
-				const wave2 = Math.cos(time * 5.4 - i * 0.18) * 0.5 + 0.5;
-				const wave3 = Math.sin(time * 8.8 + i * 0.38) * 0.5 + 0.5;
+				const f = i / 63;
+				const wave1 = Math.sin(time * 3.2 + i * 0.28) * 0.5 + 0.5;
+				const wave2 = Math.cos(time * 5.6 - i * 0.22) * 0.5 + 0.5;
+				const wave3 = Math.sin(time * 9.2 + i * 0.42) * 0.5 + 0.5;
 
-				let v = 0;
-				if (i < 8) {
-					// Bass
-					v = (beatHit * 190 + subHit * 60 + wave1 * 60 + 35) * Math.max(0.4, 1 - f * 0.7);
-				} else if (i < 24) {
-					// Mids
-					v = (wave1 * 105 + wave2 * 95 + beatHit * 45 + 25) * (1 - f * 0.45);
+				let targetV = 0;
+				if (i < 10) {
+					// Sub-bass & Bass punch
+					targetV = (beatHit * 210 + subHit * 70 + wave1 * 50 + 20) * (1 - f * 0.4);
+				} else if (i < 28) {
+					// Vocal & Melodic Mids
+					targetV = (wave1 * 115 + wave2 * 90 + beatHit * 55 + 25) * (1 - f * 0.35);
 				} else {
-					// Treble
-					v = (wave2 * 85 + wave3 * 115 + subHit * 55 + 20) * (1 - f * 0.3);
+					// Air & Treble Shimmer
+					targetV = (wave2 * 75 + wave3 * 105 + hiHatHit * 120 + 15) * (1 - f * 0.25);
 				}
-				metrics.freqData[i] = Math.min(255, Math.max(0, Math.floor(v)));
-				metrics.timeData[i] = Math.min(255, Math.max(0, Math.floor(128 + Math.sin(time * 12 + i * 0.35) * (v * 0.45))));
+
+				const cur = this.smoothedFreq[i];
+				if (targetV > cur) {
+					this.smoothedFreq[i] += (targetV - cur) * 0.35;
+				} else {
+					this.smoothedFreq[i] += (targetV - cur) * 0.12;
+				}
+
+				const synthTime = 128 + Math.sin(time * 14 + i * 0.38) * (this.smoothedFreq[i] * 0.42);
+				this.smoothedTime[i] += (synthTime - this.smoothedTime[i]) * 0.4;
+
+				metrics.freqData[i] = Math.min(255, Math.max(0, Math.round(this.smoothedFreq[i])));
+				metrics.timeData[i] = Math.min(255, Math.max(0, Math.round(this.smoothedTime[i])));
 			}
 		}
 
@@ -596,7 +633,7 @@ class WebPlayer {
 		metrics.energy = Math.min(1, metrics.bass * 0.5 + metrics.mid * 0.3 + metrics.treble * 0.2);
 
 		// Beat detection
-		if (metrics.bass > 0.62 && metrics.bass - this.prevBass > 0.12) {
+		if (metrics.bass > 0.60 && metrics.bass - this.prevBass > 0.10) {
 			metrics.beat = true;
 			this.beatDecay = 1.0;
 		} else {
@@ -1236,8 +1273,10 @@ class WebPlayer {
 	) {
 		if (!items.length) return;
 		this.cancelCrossfade();
-		let queueItems = [...items];
-		let startIndex = start ?? 0;
+		const currentSelected = start !== null && items[start] ? items[start] : items[0];
+		let queueItems = deduplicateSongs([...items]);
+		let startIndex = queueItems.findIndex((x) => x.video_id === currentSelected.video_id);
+		if (startIndex === -1) startIndex = 0;
 
 		if (shuffle) {
 			const [first] = queueItems.splice(startIndex, 1);

@@ -19,6 +19,7 @@ import type { Personal } from './personal';
 import { appearance } from './theme.svelte';
 import { t } from './i18n.svelte';
 import { analytics } from './analytics';
+import { deduplicateSongs } from './saavn';
 
 export const playback = $state({
 	now: null as NowPlaying | null,
@@ -148,8 +149,8 @@ export const audioFx = $state({
 	audioQuality: (browser ? localStorage.getItem('aura_audio_quality') || '320k' : '320k') as '320k' | '160k' | '128k' | '64k',
 	visualizerEnabled: true,
 	visualizerModalOpen: false,
-	visualizerPreset: (browser ? (localStorage.getItem('aura_visualizer_preset') as VisualizerPreset) || 'silk_waves' : 'silk_waves') as VisualizerPreset,
-	visualizerTheme: (browser ? (localStorage.getItem('aura_visualizer_theme') as VisualizerColorTheme) || 'cyberpunk' : 'cyberpunk') as VisualizerColorTheme,
+	visualizerPreset: (browser ? (localStorage.getItem('aura_visualizer_preset') as VisualizerPreset) || 'cosmic_aura' : 'cosmic_aura') as VisualizerPreset,
+	visualizerTheme: (browser ? (localStorage.getItem('aura_visualizer_theme') as VisualizerColorTheme) || 'artwork' : 'artwork') as VisualizerColorTheme,
 	visualizerSensitivity: 1.1,
 	visualizerGlow: true,
 	playbackMode: (browser ? (localStorage.getItem('aura_playback_mode') as PlaybackMode) || 'crossfade' : 'crossfade') as PlaybackMode,
@@ -1351,7 +1352,12 @@ export function initApp(mini = false): () => void {
 			capOverrides(ratings);
 			if (playback.now?.videoId === videoId) playback.rating = rating;
 		}),
-		api.onQueueChanged((q) => (playback.queue = q)),
+		api.onQueueChanged((q) => {
+			playback.queue = {
+				...q,
+				items: deduplicateSongs(q.items)
+			};
+		}),
 		// The items did not change, so keep the array we already hold and patch the rest. Splice
 		// the playing row back in: `start_current` backfills its duration and artists after the
 		// stream resolves, and that repair rides on this event rather than a whole new queue.
@@ -1369,14 +1375,7 @@ export function initApp(mini = false): () => void {
 			};
 		}),
 		api.onQueueAppended((q) => {
-			const items = [...playback.queue.items, ...q.items];
-			if (items.length !== q.len) {
-				// Missed an event. Cheaper to refetch once than to guess at what we are missing.
-				api.getQueue()
-					.then((full) => (playback.queue = full))
-					.catch(() => {});
-				return;
-			}
+			const items = deduplicateSongs([...playback.queue.items, ...q.items]);
 			playback.queue = {
 				...playback.queue,
 				items,
@@ -1431,7 +1430,16 @@ export function initApp(mini = false): () => void {
 	];
 	const teardown = () => subs.forEach((u) => u.then((f) => f()));
 	api.getQueue()
-		.then((q) => (playback.queue = q))
+		.then((q) => {
+			if (q && Array.isArray(q.items)) {
+				playback.queue = {
+					...q,
+					items: deduplicateSongs(q.items)
+				};
+			} else {
+				playback.queue = q;
+			}
+		})
 		.catch(() => {});
 	// The events above are fire-and-forget, and this window missed every one that already fired:
 	// on a cold start the backend restores the queue before the UI subscribes, and the mini player

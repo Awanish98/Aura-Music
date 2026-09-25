@@ -84,16 +84,22 @@
 							loading="lazy"
 							decoding="async"
 							draggable="false"
-							onerror={() => (failed = { ...failed, [item.thumbnail!]: true })}
+							onerror={(e) => {
+								if (item.thumbnail) failed = { ...failed, [item.thumbnail]: true };
+								(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+							}}
 						/>
 					{:else}
 						<img
-							src={generateAvatarSvg(item.title, item.kind)}
+							src={item.kind === 'artist' ? generateAvatarSvg(item.title, 'artist') : '/default_cover.jpg'}
 							alt={item.title}
 							class="h-full w-full object-cover"
 							loading="lazy"
 							decoding="async"
 							draggable="false"
+							onerror={(e) => {
+								(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+							}}
 						/>
 					{/if}
 				</div>

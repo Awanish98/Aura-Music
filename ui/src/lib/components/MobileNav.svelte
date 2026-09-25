@@ -26,7 +26,7 @@
 </script>
 
 <nav
-	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-[#04060f]/90 dark:bg-[#04060f]/90 backdrop-blur-3xl border-t border-white/[0.08] text-foreground px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom,0px),6px)] select-none md:hidden shadow-[0_-10px_35px_rgba(0,0,0,0.85)] touch-manipulation"
+	class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around bg-white/90 dark:bg-[#070914]/95 backdrop-blur-3xl border-t border-slate-200/80 dark:border-white/[0.08] text-foreground px-2 pt-2 pb-[max(env(safe-area-inset-bottom,0px),8px)] select-none md:hidden shadow-[0_-10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_-10px_35px_rgba(0,0,0,0.85)] touch-manipulation transition-colors duration-300"
 	aria-label="Mobile Navigation"
 >
 	{#each navItems as item}
@@ -37,11 +37,11 @@
 				aria-label="Aura AI DJ"
 				class="relative -top-3.5 flex flex-col items-center justify-center transition-transform active:scale-90 cursor-pointer group"
 			>
-				<div class="relative flex size-12 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-rose-500 to-violet-600 text-white shadow-[0_4px_20px_rgba(255,10,120,0.5)] border-2 border-white/25">
+				<div class="relative flex size-12 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-rose-500 to-violet-600 text-white shadow-[0_4px_20px_rgba(255,10,120,0.5)] border-2 border-white/40 dark:border-white/25">
 					<span class="absolute inset-0 rounded-full bg-pink-500/30 animate-ping pointer-events-none"></span>
 					<HugeiconsIcon icon={SparklesIcon} size={22} class="animate-pulse" />
 				</div>
-				<span class="text-[10px] font-black text-pink-400 mt-0.5 tracking-tight uppercase">AI DJ</span>
+				<span class="text-[10px] font-black text-pink-600 dark:text-pink-400 mt-0.5 tracking-tight uppercase">AI DJ</span>
 			</button>
 		{:else}
 			{@const active = isActive(item.href)}
@@ -50,11 +50,11 @@
 				aria-label={item.label}
 				class="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-1 transition-all duration-150 select-none {active
 					? 'text-primary scale-105 font-bold'
-					: 'text-muted-foreground/80 hover:text-foreground active:scale-90'}"
+					: 'text-slate-500 dark:text-muted-foreground/80 hover:text-foreground active:scale-90'}"
 			>
 				{#if active}
 					<div
-						class="absolute -top-1.5 h-1 w-6 rounded-full bg-gradient-to-r from-pink-500 to-cyan-400 shadow-[0_0_10px_#ff0a78]"
+						class="absolute -top-2 h-1 w-6 rounded-full bg-gradient-to-r from-pink-500 to-cyan-400 shadow-[0_0_10px_#ff0a78]"
 					></div>
 				{/if}
 				<HugeiconsIcon icon={item.icon} size={21} strokeWidth={active ? 2.5 : 1.7} />

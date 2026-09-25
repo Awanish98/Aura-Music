@@ -366,6 +366,9 @@
 									<img
 										src={thumb((s.item as BrowseItem).thumbnail!, 120)}
 										alt=""
+										onerror={(e) => {
+											(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+										}}
 										class="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-black/10 dark:ring-white/15"
 									/>
 								{:else if s.type === 'history'}

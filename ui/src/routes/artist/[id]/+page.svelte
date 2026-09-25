@@ -198,7 +198,14 @@
 	<!-- Hero -->
 	<div class="content-in relative flex min-h-[45vh] flex-col justify-end overflow-hidden">
 		{#if artist.thumbnail}
-			<img src={artist.thumbnail} alt="" class="absolute inset-0 h-full w-full object-cover" />
+			<img
+				src={artist.thumbnail}
+				alt=""
+				onerror={(e) => {
+					(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+				}}
+				class="absolute inset-0 h-full w-full object-cover"
+			/>
 		{/if}
 		<div
 			class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/10"

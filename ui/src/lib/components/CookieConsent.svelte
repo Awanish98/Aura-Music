@@ -8,7 +8,7 @@
 	import { ui } from '$lib/player.svelte';
 
 	let visible = $state(false);
-	let acceptButton: HTMLButtonElement | undefined = $state();
+	let acceptButton: HTMLButtonElement | null = $state(null);
 
 	onMount(() => {
 		try {
@@ -77,17 +77,17 @@
 				Privacy Policy & Terms
 			</button>
 			<div class="flex items-center gap-2">
-				<Button size="sm" variant="outline" class="h-8 text-xs" onclick={accept}>
+				<Button size="sm" variant="outline" class="h-8 text-xs cursor-pointer" onclick={accept}>
 					Essential Only
 				</Button>
-				<Button
-					bind:ref={acceptButton}
-					size="sm"
-					class="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+				<button
+					bind:this={acceptButton}
+					type="button"
+					class="h-8 px-3 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md cursor-pointer transition-colors"
 					onclick={accept}
 				>
 					Accept All
-				</Button>
+				</button>
 			</div>
 		</div>
 	</div>

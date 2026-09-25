@@ -131,6 +131,36 @@ export async function fetchSaavnSongDetailsDirect(songId: string): Promise<SongI
 	return null;
 }
 
+export function deduplicateSongs<T extends { title?: string; artists?: string; video_id?: string; id?: string }>(items: T[]): T[] {
+	if (!Array.isArray(items)) return [];
+	const seen = new Set<string>();
+	const out: T[] = [];
+	for (const item of items) {
+		if (!item || !item.title) continue;
+		const cleanTitle = String(item.title)
+			.toLowerCase()
+			.replace(/\(.*?\)/g, '')
+			.replace(/\[.*?\]/g, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const rawArtist = String(item.artists || '').split(',')[0].split('&')[0];
+		const cleanArtist = rawArtist
+			.toLowerCase()
+			.replace(/320kbps.*$/gi, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const key = cleanArtist ? `${cleanTitle}::${cleanArtist}` : cleanTitle;
+		const idKey = item.video_id || item.id;
+		if (seen.has(key) || (idKey && seen.has(idKey))) continue;
+		seen.add(key);
+		if (idKey) seen.add(idKey);
+		out.push(item);
+	}
+	return out;
+}
+
 // Multi-endpoint search proxy & direct fallback
 export async function searchSaavnDirect(query: string, page = 1, limit = 20): Promise<SongItem[]> {
 	if (!query || !query.trim()) return [];
@@ -143,11 +173,12 @@ export async function searchSaavnDirect(query: string, page = 1, limit = 20): Pr
 		if (res.ok) {
 			const data = await res.json();
 			if (Array.isArray(data.results) && data.results.length > 0) {
-				return data.results.map((r: any) => ({
+				const raw = data.results.map((r: any) => ({
 					...r,
 					video_id: r.video_id || `saavn_${r.id}`,
 					artist_runs: r.artist_runs || [{ text: r.artists }]
 				}));
+				return deduplicateSongs(raw);
 			}
 		}
 	} catch {}
@@ -174,7 +205,7 @@ export async function searchSaavnDirect(query: string, page = 1, limit = 20): Pr
 				const results = (data.results || data.data?.results || [])
 					.map(formatSaavnSong)
 					.filter((s: SongItem | null): s is SongItem => !!s && !!s.streamUrl);
-				if (results.length > 0) return results;
+				if (results.length > 0) return deduplicateSongs(results);
 			}
 		} catch {}
 	}
@@ -250,7 +281,7 @@ export async function fetchSaavnPlaylistDetailsDirect(playlistId: string): Promi
 				subtitle: `JioSaavn • ${songs.length} tracks`,
 				thumbnail: data.thumbnail || songs[0]?.thumbnail || '',
 				description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
-				songs
+				songs: deduplicateSongs(songs)
 			};
 		}
 	} catch {}
@@ -271,7 +302,7 @@ export async function fetchSaavnPlaylistDetailsDirect(playlistId: string): Promi
 				subtitle: `JioSaavn • ${songs.length} tracks`,
 				thumbnail: (data.image || '').replace('150x150', '500x500') || songs[0]?.thumbnail || '',
 				description: 'High-Fidelity 320kbps Lossless Audio from JioSaavn',
-				songs
+				songs: deduplicateSongs(songs)
 			};
 		}
 	} catch {}
@@ -367,6 +398,23 @@ export async function fetchSaavnLyrics(queryOrSongId: string, artist?: string): 
 	if (!queryOrSongId) return null;
 	const isDirectId = !queryOrSongId.includes(' ') && queryOrSongId.length <= 16;
 
+	// 1. Try local server lyrics endpoint
+	try {
+		const q = artist ? `${queryOrSongId} ${artist}`.trim() : queryOrSongId.trim();
+		const serverUrl = getApiUrl(`/api/lyrics?title=${encodeURIComponent(queryOrSongId)}&artist=${encodeURIComponent(artist || '')}`);
+		const sRes = await fetch(serverUrl, { signal: AbortSignal.timeout(5000) });
+		if (sRes.ok) {
+			const sData = await sRes.json();
+			if (sData && Array.isArray(sData.lines) && sData.lines.length > 0) {
+				const fullText = sData.lines.map((l: any) => l.text).join('\n');
+				if (fullText.length > 10) {
+					return { lyrics: fullText };
+				}
+			}
+		}
+	} catch {}
+
+	// 2. Direct fallback
 	try {
 		let songId = isDirectId ? queryOrSongId.replace('saavn_', '') : null;
 		if (!songId) {
@@ -410,9 +458,7 @@ export async function fetchSaavnLyrics(queryOrSongId: string, artist?: string): 
 				}
 			}
 		}
-	} catch (e) {
-		console.warn('[Saavn Lyrics Fetch Error]', e);
-	}
+	} catch {}
 
 	return null;
 }

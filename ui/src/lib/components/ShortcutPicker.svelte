@@ -68,10 +68,17 @@
 							<img
 								src={thumb(item.thumbnail, 96)}
 								alt=""
+								onerror={(e) => {
+									(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+								}}
 								class="h-10 w-10 shrink-0 rounded-md object-cover"
 							/>
 						{:else}
-							<div class="h-10 w-10 shrink-0 rounded-md bg-muted"></div>
+							<img
+								src="/default_cover.jpg"
+								alt=""
+								class="h-10 w-10 shrink-0 rounded-md object-cover"
+							/>
 						{/if}
 						<div class="min-w-0 flex-1">
 							<div class="truncate text-sm font-medium">{item.title}</div>

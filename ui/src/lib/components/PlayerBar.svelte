@@ -17,7 +17,8 @@
 		InfinityIcon,
 		MaximizeScreenIcon,
 		AudioWave02Icon,
-		SparklesIcon
+		SparklesIcon,
+		Video01Icon
 	} from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -149,7 +150,7 @@
 <footer
 	onpointerdown={(e) => (pressedControl = isControl(e.target))}
 	onclick={onBarClick}
-	class="relative rounded-2xl md:rounded-2xl apple-liquid-dock transition-all duration-300 select-none overflow-hidden shadow-2xl {np.open ? 'hidden md:flex' : 'flex'}"
+	class="relative rounded-2xl md:rounded-2xl apple-liquid-dock transition-all duration-300 select-none overflow-hidden shadow-2xl {np.open ? 'hidden' : 'flex'}"
 >
 	<!-- Mobile Compact Mini Player (< md) -->
 	<div
@@ -163,7 +164,7 @@
 		}}
 	>
 		<!-- Micro Progress Line -->
-		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-white/10 overflow-hidden pointer-events-none">
+		<div class="absolute inset-x-0 top-0 h-[2.5px] bg-slate-300/50 dark:bg-white/10 overflow-hidden pointer-events-none">
 			<div
 				class="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-primary transition-all duration-150 shadow-[0_0_8px_#ff0a78]"
 				style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
@@ -188,11 +189,15 @@
 							class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10 {!playback.paused ? 'artwork-aura-playing' : ''}"
 							in:fade={{ duration: 200 }}
 							decoding="async"
+							onerror={(e) => {
+								const target = e.currentTarget as HTMLImageElement;
+								target.src = '/default_cover.jpg';
+							}}
 						/>
 					</div>
 				{:else}
 					<img
-						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
+						src="/default_cover.jpg"
 						alt="Aura Music"
 						style="max-width:none"
 						class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/10"
@@ -273,6 +278,10 @@
 							class="h-11 w-11 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/10 transition-transform duration-300 group-hover/track:scale-105 {!playback.paused ? 'artwork-aura-playing' : ''}"
 							in:fade={{ duration: 200 }}
 							decoding="async"
+							onerror={(e) => {
+								const target = e.currentTarget as HTMLImageElement;
+								target.src = '/default_cover.jpg';
+							}}
 						/>
 						{#if !playback.paused}
 							<div class="absolute inset-0 rounded-xl ring-2 ring-primary/60 animate-pulse pointer-events-none"></div>
@@ -280,7 +289,7 @@
 					</div>
 				{:else}
 					<img
-						src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120&auto=format&fit=crop&q=80"
+						src="/default_cover.jpg"
 						alt="Aura Music"
 						style="max-width:none"
 						class="h-11 w-11 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/10"
@@ -342,7 +351,7 @@
 						song={currentSong}
 						linksOnly
 						onAdd={() => openAddToPlaylist(currentSong!)}
-						triggerClass="inline-flex size-7 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground apple-spring-tap transition-colors"
+						triggerClass="inline-flex size-7 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground apple-spring-tap transition-colors"
 					/>
 				{/if}
 			</div>
@@ -423,7 +432,7 @@
 
 			<!-- Sleek Razor-Sharp Progress Timeline Bar -->
 			<div class="flex w-full items-center gap-2.5 text-[10px] font-mono text-muted-foreground">
-				<span class="tabular-nums text-[11px] text-muted-foreground/90 shrink-0 w-8 text-right">{fmt(shownPosition)}</span>
+				<span class="tabular-nums text-[11px] font-semibold text-foreground/80 shrink-0 w-8 text-right">{fmt(shownPosition)}</span>
 				
 				<!-- Interactive Scrubber Bar -->
 				<div
@@ -443,7 +452,7 @@
 					}}
 				>
 					<!-- Track Background -->
-					<div class="w-full h-1.5 rounded-full bg-white/15 overflow-hidden transition-all group-hover/seek:h-2">
+					<div class="w-full h-1.5 rounded-full bg-slate-300/70 dark:bg-white/15 overflow-hidden transition-all group-hover/seek:h-2">
 						<div
 							class="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-fuchsia-400 shadow-[0_0_8px_rgba(255,10,120,0.8)] rounded-full transition-all"
 							style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
@@ -468,7 +477,7 @@
 					/>
 				</div>
 
-				<span class="tabular-nums text-[11px] text-muted-foreground/90 shrink-0 w-8">{fmt(playback.duration)}</span>
+				<span class="tabular-nums text-[11px] font-semibold text-foreground/80 shrink-0 w-8">{fmt(playback.duration)}</span>
 			</div>
 		</div>
 
@@ -477,7 +486,7 @@
 			<!-- Lyrics Pill Button -->
 			<button
 				onclick={onToggleLyrics}
-				class="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-white/10 bg-white/5 hover:bg-white/10 text-foreground apple-spring-hover apple-spring-tap transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/20 text-primary shadow-[0_0_12px_rgba(255,10,120,0.3)]' : ''}"
+				class="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-slate-200/90 dark:border-white/10 bg-slate-100/90 hover:bg-slate-200/90 dark:bg-white/5 dark:hover:bg-white/10 text-foreground apple-spring-hover apple-spring-tap transition-all cursor-pointer {lyricsOpen ? 'border-primary bg-primary/15 text-primary shadow-[0_0_12px_rgba(255,10,120,0.25)]' : ''}"
 				title="Toggle Synced Lyrics"
 			>
 				<HugeiconsIcon icon={Mic01Icon} size={13} />
@@ -516,26 +525,42 @@
 			{#if playback.crossfading}
 				<button
 					onclick={() => (showEq = true)}
-					class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-pink-500/25 text-pink-400 border border-pink-500/40 shadow-[0_0_10px_rgba(236,72,153,0.4)] animate-pulse cursor-pointer"
+					class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-pink-500/25 text-pink-500 dark:text-pink-400 border border-pink-500/40 shadow-[0_0_10px_rgba(236,72,153,0.3)] animate-pulse cursor-pointer"
 					title="DJ Crossfade Active"
 				>
-					<span class="size-1 rounded-full bg-pink-400 animate-ping"></span>
+					<span class="size-1 rounded-full bg-pink-500 animate-ping"></span>
 					<span>DJ Fade</span>
 				</button>
 			{:else if playback.preloading}
 				<span
-					class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+					class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30"
 					title="Preloading Next Track"
 				>
-					<span class="size-1 rounded-full bg-cyan-400 animate-pulse"></span>
+					<span class="size-1 rounded-full bg-cyan-500 animate-pulse"></span>
 					<span>Buffering</span>
 				</span>
 			{/if}
 
+			<!-- Music Video Mode Toggle -->
+			<button
+				onclick={() => {
+					if (ui.videoMode === 'hidden') {
+						ui.videoMode = 'docked';
+					} else {
+						ui.videoMode = 'hidden';
+					}
+				}}
+				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer relative {ui.videoMode !== 'hidden' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : ''}"
+				title={ui.videoMode !== 'hidden' ? 'Hide Video' : 'Watch Music Video (HD)'}
+				aria-label="Music Video Mode"
+			>
+				<HugeiconsIcon icon={Video01Icon} size={15} class={ui.videoMode !== 'hidden' ? 'text-emerald-600 dark:text-emerald-400' : ''} />
+			</button>
+
 			<!-- 60FPS Audio Visualizer Studio -->
 			<button
 				onclick={() => (audioFx.visualizerModalOpen = !audioFx.visualizerModalOpen)}
-				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer relative {audioFx.visualizerModalOpen ? 'bg-pink-500/20 text-pink-500' : ''}"
+				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer relative {audioFx.visualizerModalOpen ? 'bg-pink-500/20 text-pink-500' : ''}"
 				title="60FPS Audio Visualizer Studio"
 				aria-label="Audio Visualizer Studio"
 			>
@@ -544,7 +569,7 @@
 
 			<button
 				onclick={() => (showEq = !showEq)}
-				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer relative"
+				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer relative"
 				title="Equalizer, Gapless & DJ Crossfade"
 			>
 				<HugeiconsIcon icon={SparklesIcon} size={15} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
@@ -558,7 +583,7 @@
 			<!-- Queue -->
 			<button
 				onclick={onToggleQueue}
-				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer {queueOpen ? 'text-primary' : ''}"
+				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer {queueOpen ? 'text-primary' : ''}"
 				title="Queue"
 			>
 				<HugeiconsIcon icon={Queue01Icon} size={15} />
@@ -567,7 +592,7 @@
 			<!-- Expand to Fullscreen Now Playing -->
 			<button
 				onclick={() => (np.open = true)}
-				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+				class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
 				title="Expand Now Playing"
 				aria-label="Expand Now Playing"
 			>

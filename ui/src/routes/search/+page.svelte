@@ -525,12 +525,18 @@
 												src={thumb(topResult.thumbnail, 400)}
 												alt={topResult.title}
 												class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+												onerror={(e) => {
+													(e.currentTarget as HTMLImageElement).src = generateAvatarSvg(topResult.title, topResult.kind);
+												}}
 											/>
 										{:else}
 											<img
 												src={generateAvatarSvg(topResult.title, topResult.kind)}
 												alt={topResult.title}
 												class="h-full w-full object-cover"
+												onerror={(e) => {
+													(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+												}}
 											/>
 										{/if}
 									</div>
@@ -624,6 +630,9 @@
 									<img
 										src={thumb(vSong.thumbnail, 120)}
 										alt={vSong.title}
+										onerror={(e) => {
+											(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+										}}
 										class="size-14 rounded-xl object-cover shrink-0 shadow-sm"
 									/>
 									<div class="min-w-0 flex-1">

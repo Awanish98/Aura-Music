@@ -20,6 +20,7 @@
 	import FeaturedArtistsRail from '$lib/components/FeaturedArtistsRail.svelte';
 	import LiveRadiosShelf from '$lib/components/LiveRadiosShelf.svelte';
 	import MoodsGrid from '$lib/components/MoodsGrid.svelte';
+	import TrendingVideosShelf from '$lib/components/TrendingVideosShelf.svelte';
 	import HomeRightRail from '$lib/components/HomeRightRail.svelte';
 	import { getFmhyHomeSections } from '$lib/fmhy';
 	import * as api from '$lib/api';
@@ -290,6 +291,9 @@
 				<!-- Popular Artists & Vocalists (Top 20 with Neon Rings) -->
 				<FeaturedArtistsRail />
 
+				<!-- Trending YouTube Music Videos & New Releases (Direct 1-Tap Play) -->
+				<TrendingVideosShelf />
+
 				<!-- Categorized Moods & Genres Grid -->
 				<MoodsGrid />
 
@@ -379,45 +383,45 @@
 			</div>
 
 			<!-- SEO & GEO: Why Choose Aura Music Section -->
-			<section class="mt-12 rounded-3xl border border-white/10 bg-gradient-to-br from-black/40 via-purple-950/20 to-black/50 p-6 sm:p-8 backdrop-blur-2xl shadow-xl space-y-6">
+			<section class="mt-12 rounded-3xl border border-slate-200/80 dark:border-white/10 bg-gradient-to-br from-white/90 via-purple-50/40 to-white/95 dark:from-black/40 dark:via-purple-950/20 dark:to-black/50 p-6 sm:p-8 backdrop-blur-2xl shadow-sm dark:shadow-xl space-y-6">
 				<div class="space-y-1.5 text-center sm:text-left">
-					<h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+					<h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
 						Why Choose Aura Music?
 					</h2>
-					<p class="text-xs sm:text-sm text-muted-foreground max-w-2xl">
+					<p class="text-xs sm:text-sm text-slate-600 dark:text-muted-foreground max-w-2xl">
 						Aura Music is engineered for audiophiles, daily listeners, and music creators who demand lossless sound quality, smart AI music discovery, and zero intrusive ads.
 					</p>
 				</div>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					<div class="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 backdrop-blur-xl">
+					<div class="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4 space-y-2 backdrop-blur-xl shadow-xs">
 						<span class="text-2xl">🎧</span>
-						<h3 class="text-sm font-bold text-white">Lossless 320kbps Audio</h3>
-						<p class="text-xs text-muted-foreground leading-relaxed">
+						<h3 class="text-sm font-bold text-slate-900 dark:text-white">Lossless 320kbps Audio</h3>
+						<p class="text-xs text-slate-600 dark:text-muted-foreground leading-relaxed">
 							Stream high-fidelity music with crystal clarity, hardware-accelerated sound decoding, and a 10-band equalizer.
 						</p>
 					</div>
 
-					<div class="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 backdrop-blur-xl">
+					<div class="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4 space-y-2 backdrop-blur-xl shadow-xs">
 						<span class="text-2xl">🎤</span>
-						<h3 class="text-sm font-bold text-white">Real-Time Synced Lyrics</h3>
-						<p class="text-xs text-muted-foreground leading-relaxed">
+						<h3 class="text-sm font-bold text-slate-900 dark:text-white">Real-Time Synced Lyrics</h3>
+						<p class="text-xs text-slate-600 dark:text-muted-foreground leading-relaxed">
 							Sing along with millisecond-synchronized karaoke lyrics, romanized translations, and full-screen visualizer mode.
 						</p>
 					</div>
 
-					<div class="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 backdrop-blur-xl">
+					<div class="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4 space-y-2 backdrop-blur-xl shadow-xs">
 						<span class="text-2xl">⚡</span>
-						<h3 class="text-sm font-bold text-white">AI-Powered Curation</h3>
-						<p class="text-xs text-muted-foreground leading-relaxed">
+						<h3 class="text-sm font-bold text-slate-900 dark:text-white">AI-Powered Curation</h3>
+						<p class="text-xs text-slate-600 dark:text-muted-foreground leading-relaxed">
 							Describe any mood or moment to Aura AI DJ to automatically generate customized vibe mixes and discover songs.
 						</p>
 					</div>
 
-					<div class="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 backdrop-blur-xl">
+					<div class="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4 space-y-2 backdrop-blur-xl shadow-xs">
 						<span class="text-2xl">🚀</span>
-						<h3 class="text-sm font-bold text-white">100% Free & Open</h3>
-						<p class="text-xs text-muted-foreground leading-relaxed">
+						<h3 class="text-sm font-bold text-slate-900 dark:text-white">100% Free & Open</h3>
+						<p class="text-xs text-slate-600 dark:text-muted-foreground leading-relaxed">
 							Enjoy uninterrupted music streaming without subscription paywalls, audio advertisements, or privacy trackers.
 						</p>
 					</div>

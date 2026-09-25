@@ -118,6 +118,9 @@
 						loading="lazy"
 						decoding="async"
 						draggable="false"
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
 					/>
 				{/if}
 				{#if item.kind !== 'artist'}

@@ -189,11 +189,14 @@
 								<img
 									src={thumb(identifiedSong.thumbnail, 400)}
 									alt={identifiedSong.title}
+									onerror={(e) => {
+										(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+									}}
 									class="h-full w-full object-cover"
 								/>
 							{:else}
 								<img
-									src={generateAvatarSvg(identifiedSong.title, 'song')}
+									src="/default_cover.jpg"
 									alt={identifiedSong.title}
 									class="h-full w-full object-cover"
 								/>

@@ -792,6 +792,9 @@
 					<img
 						src={backdrop}
 						alt=""
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
 						class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
 					/>
 				{/if}
@@ -808,9 +811,20 @@
 						<HugeiconsIcon icon={ListRestartIcon} class="h-20 w-20" />
 					</div>
 				{:else if art}
-					<img src={art} alt="" class="relative h-40 w-40 rounded-xl object-cover shadow-lg" />
+					<img
+						src={art}
+						alt=""
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
+						class="relative h-40 w-40 rounded-xl object-cover shadow-lg"
+					/>
 				{:else}
-					<div class="relative h-40 w-40 rounded-xl bg-muted"></div>
+					<img
+						src="/default_cover.jpg"
+						alt=""
+						class="relative h-40 w-40 rounded-xl object-cover shadow-lg"
+					/>
 				{/if}
 				<div class="relative min-w-0 flex-1">
 					<div class="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">

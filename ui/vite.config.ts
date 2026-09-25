@@ -62,6 +62,36 @@ function formatSaavnSong(item: any) {
 	};
 }
 
+function deduplicateSongs(items: any[]) {
+	if (!Array.isArray(items)) return [];
+	const seen = new Set<string>();
+	const out: any[] = [];
+	for (const item of items) {
+		if (!item || !item.title) continue;
+		const cleanTitle = String(item.title)
+			.toLowerCase()
+			.replace(/\(.*?\)/g, '')
+			.replace(/\[.*?\]/g, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const rawArtist = String(item.artists || item.artist || item.subtitle || '').split(',')[0].split('&')[0];
+		const cleanArtist = rawArtist
+			.toLowerCase()
+			.replace(/320kbps.*$/gi, '')
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		const key = cleanArtist ? `${cleanTitle}::${cleanArtist}` : cleanTitle;
+		const idKey = item.video_id || item.id;
+		if (seen.has(key) || (idKey && seen.has(idKey))) continue;
+		seen.add(key);
+		if (idKey) seen.add(idKey);
+		out.push(item);
+	}
+	return out;
+}
+
 const fixHugeIconsPlugin = {
 	name: 'fix-hugeicons-case-sensitivity',
 	resolveId(source: string, importer: string | undefined) {
@@ -128,9 +158,10 @@ export default defineConfig({
 								}
 							});
 							const data = await sRes.json();
-							const results = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const rawResults = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const results = deduplicateSongs(rawResults);
 							res.setHeader('Content-Type', 'application/json');
-							res.end(JSON.stringify({ success: true, total: data.total || results.length, results }));
+							res.end(JSON.stringify({ success: true, total: results.length, results }));
 						} catch (e) {
 							res.statusCode = 500;
 							res.setHeader('Content-Type', 'application/json');
@@ -188,7 +219,8 @@ export default defineConfig({
 							const url = `https://www.jiosaavn.com/api.php?__call=playlist.getDetails&_format=json&_marker=0&cc=in&listid=${encodeURIComponent(playlistId)}`;
 							const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
 							const data = await resp.json();
-							const songs = (data.songs || data.list || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const rawSongs = (data.songs || data.list || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const songs = deduplicateSongs(rawSongs);
 							res.setHeader('Content-Type', 'application/json');
 							res.end(JSON.stringify({
 								id: data.id || playlistId,
@@ -218,7 +250,8 @@ export default defineConfig({
 							const searchUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&cc=in&p=1&n=20&q=${encodeURIComponent(query)}`;
 							const saavnRes = await fetch(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
 							const data = await saavnRes.json();
-							const saavnSongs = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const rawSaavnSongs = (data.results || []).map(formatSaavnSong).filter((s: any) => s.streamUrl);
+							const saavnSongs = deduplicateSongs(rawSaavnSongs);
 							res.setHeader('Content-Type', 'application/json');
 							res.end(JSON.stringify({ success: true, songs: saavnSongs, total: saavnSongs.length }));
 						} catch (e) {

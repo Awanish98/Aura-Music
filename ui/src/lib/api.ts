@@ -3,6 +3,7 @@
 import { invoke as tauriInvoke, isTauri, convertFileSrc as tauriConvertFileSrc } from '@tauri-apps/api/core';
 import { listen as tauriListen, type UnlistenFn } from '@tauri-apps/api/event';
 import { t } from './i18n.svelte';
+import { deduplicateSongs } from './saavn';
 
 export { isTauri };
 
@@ -374,8 +375,14 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		const items = (args?.items as SongItem[]) || [];
 		if (items.length) {
 			const q = playback.queue;
+			const currentSong = q.items[q.currentIndex];
 			const idx = q.currentIndex + 1;
 			q.items.splice(idx, 0, ...items);
+			q.items = deduplicateSongs(q.items);
+			if (currentSong) {
+				const newIdx = q.items.findIndex((x) => x.video_id === currentSong.video_id);
+				if (newIdx !== -1) q.currentIndex = newIdx;
+			}
 			playback.queue = { ...q };
 		}
 		return undefined as unknown as T;
@@ -384,7 +391,13 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		const items = (args?.items as SongItem[]) || [];
 		if (items.length) {
 			const q = playback.queue;
+			const currentSong = q.items[q.currentIndex];
 			q.items.push(...items);
+			q.items = deduplicateSongs(q.items);
+			if (currentSong) {
+				const newIdx = q.items.findIndex((x) => x.video_id === currentSong.video_id);
+				if (newIdx !== -1) q.currentIndex = newIdx;
+			}
 			playback.queue = { ...q };
 		}
 		return undefined as unknown as T;

@@ -52,10 +52,10 @@
 	}
 </script>
 
-<div class="relative overflow-hidden rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-violet-900/25 to-pink-950/30 p-6 sm:p-7 backdrop-blur-3xl shadow-2xl select-none">
+<div class="relative overflow-hidden rounded-3xl border border-purple-200/80 dark:border-purple-500/30 bg-gradient-to-r from-purple-50/90 via-pink-50/70 to-white/95 dark:from-purple-950/40 dark:via-violet-900/25 dark:to-pink-950/30 p-6 sm:p-7 backdrop-blur-3xl shadow-xl dark:shadow-2xl select-none">
 	<!-- Holographic Glow Lights -->
-	<div class="pointer-events-none absolute -right-12 -top-12 h-60 w-60 rounded-full bg-purple-500/25 blur-3xl"></div>
-	<div class="pointer-events-none absolute -left-12 -bottom-12 h-60 w-60 rounded-full bg-pink-500/25 blur-3xl"></div>
+	<div class="pointer-events-none absolute -right-12 -top-12 h-60 w-60 rounded-full bg-purple-500/15 dark:bg-purple-500/25 blur-3xl"></div>
+	<div class="pointer-events-none absolute -left-12 -bottom-12 h-60 w-60 rounded-full bg-pink-500/15 dark:bg-pink-500/25 blur-3xl"></div>
 
 	<div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
 		<!-- Left: Heading + Mascot + Description + Presets + Input -->
@@ -67,12 +67,12 @@
 				</div>
 				<div>
 					<div class="flex items-center gap-2">
-						<h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Aura AI Vibe Station</h2>
-						<span class="inline-flex items-center gap-1 rounded-full bg-pink-500/20 px-2.5 py-0.5 text-[10px] font-bold text-pink-400 border border-pink-500/30 shadow-sm">
+						<h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Aura AI Vibe Station</h2>
+						<span class="inline-flex items-center gap-1 rounded-full bg-pink-500/15 dark:bg-pink-500/20 px-2.5 py-0.5 text-[10px] font-bold text-pink-600 dark:text-pink-400 border border-pink-500/30 shadow-sm">
 							⚡ Smart DJ
 						</span>
 					</div>
-					<p class="text-xs text-muted-foreground mt-0.5">
+					<p class="text-xs text-slate-600 dark:text-muted-foreground mt-0.5">
 						Type any mood or choose a preset to generate and play a custom AI mix
 					</p>
 				</div>
@@ -84,7 +84,7 @@
 					<button
 						onclick={() => handleGenerate(v.prompt)}
 						disabled={generating}
-						class="shrink-0 rounded-full border border-white/10 bg-white/6 px-3.5 py-1.5 text-xs font-semibold text-muted-foreground transition-all duration-200 hover:border-pink-500/50 hover:bg-pink-500/15 hover:text-white active:scale-95 disabled:opacity-50 {activeVibeName === v.prompt ? 'border-pink-500 bg-pink-500/25 text-pink-300 font-bold shadow-md' : ''}"
+						class="shrink-0 rounded-full border border-purple-200/80 bg-white/70 dark:border-white/10 dark:bg-white/6 px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-muted-foreground transition-all duration-200 hover:border-pink-500/50 hover:bg-purple-100/50 dark:hover:bg-pink-500/15 hover:text-slate-950 dark:hover:text-white active:scale-95 disabled:opacity-50 {activeVibeName === v.prompt ? 'border-pink-500 bg-pink-500/20 text-pink-700 dark:text-pink-300 font-bold shadow-md' : ''}"
 					>
 						{v.label}
 					</button>
@@ -105,7 +105,7 @@
 						bind:value={customVibe}
 						placeholder="Enter your own vibe (e.g: 'Chill Hindi acoustic indie', 'Cyberpunk workout')..."
 						disabled={generating}
-						class="w-full h-11 rounded-full bg-black/40 border border-white/12 px-4 text-xs sm:text-sm text-white placeholder:text-muted-foreground/70 focus:outline-none focus:border-pink-500/60 focus:bg-black/60 transition-all shadow-inner"
+						class="w-full h-11 rounded-full bg-white/90 dark:bg-black/40 border border-purple-200/80 dark:border-white/12 px-4 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-muted-foreground/70 focus:outline-none focus:border-pink-500/60 focus:bg-white dark:focus:bg-black/60 transition-all shadow-inner"
 					/>
 				</div>
 				<button

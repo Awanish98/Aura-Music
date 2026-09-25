@@ -86,6 +86,11 @@ export function initShortcuts(mini = false) {
 				if (!playback.now) return;
 				np.open = !np.open;
 				break;
+			case 't':
+			case 'T':
+				if (!playback.now) return;
+				ui.theaterOpen = !ui.theaterOpen;
+				break;
 			case 'f':
 			case 'F':
 				api.nextTrack();

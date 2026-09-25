@@ -21,7 +21,8 @@
 		Link04Icon,
 		UserGroup02Icon,
 		HotspotOfflineIcon,
-		Mic01Icon
+		Mic01Icon,
+		Download01Icon
 	} from '@hugeicons/core-free-icons';
 	import auraLogo from '$lib/assets/aura_logo.svg';
 	import LastFmIcon from './LastFmIcon.svelte';
@@ -32,6 +33,7 @@
 	import LiquidButton from '$lib/components/ui/LiquidButton.svelte';
 	import * as api from '$lib/api';
 	import { auth, playback, prefs, refreshView, toast, ui } from '$lib/player.svelte';
+	import { pwa, promptInstallApp } from '$lib/pwa.svelte';
 	import { win } from '$lib/win.svelte';
 	import { lt } from '$lib/lt.svelte';
 	import { anchorMenu, fitMenu, NO_ANCHOR } from '$lib/menu';
@@ -213,6 +215,19 @@
 			<span class="hidden lg:inline text-xs font-bold">Shazam</span>
 		</LiquidButton>
 
+		<!-- Install App Button (when available and not already standalone) -->
+		{#if !isTauri() && !pwa.isInstalled && (pwa.canInstall || pwa.isIos)}
+			<button
+				class="flex h-9 items-center gap-1.5 rounded-full px-2.5 liquid-glass-fx text-primary font-bold text-xs border border-primary/40 shadow-sm shadow-pink-500/20 apple-spring-hover apple-spring-tap cursor-pointer"
+				onclick={() => promptInstallApp()}
+				title="Install Aura Music App"
+				aria-label="Install Aura Music App"
+			>
+				<HugeiconsIcon icon={Download01Icon} size={15} />
+				<span class="hidden sm:inline">Install App</span>
+			</button>
+		{/if}
+
 		<!-- User Account Profile Avatar -->
 		<div class="relative">
 			<AccountMenu />
@@ -312,5 +327,19 @@
 				{discordOn ? 'On' : 'Off'}
 			</span>
 		</button>
+
+		<!-- Install App -->
+		{#if !isTauri() && !pwa.isInstalled}
+			<button
+				class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-bold text-primary transition-colors hover:bg-primary/10 cursor-pointer border-t border-border/30 mt-1 pt-2"
+				onclick={() => {
+					toolsMenuOpen = false;
+					promptInstallApp();
+				}}
+			>
+				<HugeiconsIcon icon={Download01Icon} class="h-4 w-4 text-primary" />
+				<span>Install Aura Music App</span>
+			</button>
+		{/if}
 	</div>
 {/if}

@@ -211,6 +211,9 @@
 						alt={item.title}
 						loading="lazy"
 						decoding="async"
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
 						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
 					/>
 

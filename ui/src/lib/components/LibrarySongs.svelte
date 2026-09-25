@@ -250,15 +250,31 @@
 			{#if covers.length >= 4}
 				<div class="grid h-28 w-28 shrink-0 grid-cols-2 grid-rows-2 overflow-hidden rounded-xl shadow-lg">
 					{#each covers.slice(0, 4) as cover (cover)}
-						<img src={thumb(cover, 400)} alt="" class="h-full w-full object-cover" />
+						<img
+							src={thumb(cover, 400)}
+							alt=""
+							class="h-full w-full object-cover"
+							onerror={(e) => {
+								(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+							}}
+						/>
 					{/each}
 				</div>
 			{:else if covers.length}
-				<img src={thumb(covers[0], 400)} alt="" class="h-28 w-28 shrink-0 rounded-xl object-cover shadow-lg" />
+				<img
+					src={thumb(covers[0], 400)}
+					alt=""
+					class="h-28 w-28 shrink-0 rounded-xl object-cover shadow-lg"
+					onerror={(e) => {
+						(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+					}}
+				/>
 			{:else}
-				<div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-					<HugeiconsIcon icon={uploads ? CloudUploadIcon : MusicNote01Icon} class="h-10 w-10" />
-				</div>
+				<img
+					src="/default_cover.jpg"
+					alt=""
+					class="h-28 w-28 shrink-0 rounded-xl object-cover shadow-lg"
+				/>
 			{/if}
 			<div class="min-w-0 flex-1">
 				<h2 class="font-heading text-2xl font-bold tracking-tight">

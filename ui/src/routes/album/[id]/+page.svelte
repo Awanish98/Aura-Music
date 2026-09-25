@@ -243,6 +243,9 @@
             <img
                 src={thumb(album.thumbnail, 120)}
                 alt=""
+                onerror={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+                }}
                 class="absolute inset-0 h-full w-full art-wash scale-125 object-cover opacity-40 blur-3xl"
             />
         {/if}
@@ -262,15 +265,18 @@
                         <img
                             src={thumb(album.thumbnail, 500)}
                             alt={album.title ?? "Album"}
+                            onerror={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+                            }}
                             class="relative w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 rounded-2xl object-cover shadow-2xl ring-1 ring-white/15"
                         />
                     </div>
                 {:else}
-                    <div
-                        class="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 shrink-0 rounded-2xl bg-muted flex items-center justify-center ring-1 ring-white/10"
-                    >
-                        <span class="text-4xl">🎵</span>
-                    </div>
+                    <img
+                        src="/default_cover.jpg"
+                        alt={album.title ?? "Album"}
+                        class="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 shrink-0 rounded-2xl object-cover shadow-2xl ring-1 ring-white/10"
+                    />
                 {/if}
 
                 <div class="min-w-0 flex-1 text-center sm:text-left">
@@ -303,6 +309,9 @@
                                     <img
                                         src={album.artistThumbnail}
                                         alt=""
+                                        onerror={(e) => {
+                                            (e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+                                        }}
                                         class="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
                                     />
                                 {/if}

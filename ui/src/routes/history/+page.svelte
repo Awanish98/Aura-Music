@@ -145,6 +145,9 @@
 								alt=""
 								style="z-index:{5 - i}"
 								class="relative -ml-5 h-20 w-20 rounded-xl object-cover shadow-lg ring-2 ring-background first:ml-0"
+								onerror={(e) => {
+									(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+								}}
 							/>
 						{/each}
 					</div>

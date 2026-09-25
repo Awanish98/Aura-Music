@@ -76,6 +76,9 @@
 						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
 						loading="lazy"
 						draggable="false"
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
 					/>
 				{/if}
 				<button

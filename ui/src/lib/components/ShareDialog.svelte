@@ -136,12 +136,21 @@
 					<img
 						src={thumb(ui.share.thumbnail, 400)}
 						alt=""
+						onerror={(e) => {
+							(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
+						}}
 						class="h-20 w-20 shrink-0 object-cover {ui.share.kind === 'artist'
 							? 'rounded-full'
 							: 'rounded-lg'}"
 					/>
 				{:else}
-					<div class="h-20 w-20 shrink-0 rounded-lg bg-muted"></div>
+					<img
+						src="/default_cover.jpg"
+						alt=""
+						class="h-20 w-20 shrink-0 object-cover {ui.share.kind === 'artist'
+							? 'rounded-full'
+							: 'rounded-lg'}"
+					/>
 				{/if}
 				<div class="min-w-0">
 					<div class="truncate font-medium">{ui.share.title}</div>

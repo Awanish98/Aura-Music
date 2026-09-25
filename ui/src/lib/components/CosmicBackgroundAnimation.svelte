@@ -1,7 +1,8 @@
 <script lang="ts">
-	// State-of-the-Art 60FPS Interactive Cosmic Nebula & Constellation Laser Background Animation
+	// State-of-the-Art 60FPS Interactive Cosmic Nebula, Twinkling Constellations & Audio-Reactive Atmosphere
 	import { onMount } from 'svelte';
 	import { playback } from '$lib/player.svelte';
+	import { webPlayer } from '$lib/webplayer';
 
 	let canvasEl: HTMLCanvasElement | null = null;
 
@@ -59,8 +60,8 @@
 		let targetMouseY = 0;
 
 		const stars: Star[] = [];
-		const STAR_COUNT = 110;
-		const starColors = ['#ffffff', '#ff70a6', '#c084fc', '#38bdf8', '#f472b6', '#a855f7'];
+		const STAR_COUNT = 120;
+		const starColors = ['#ffffff', '#ff70a6', '#c084fc', '#38bdf8', '#f472b6', '#a855f7', '#fef08a'];
 
 		function resize() {
 			const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -80,7 +81,7 @@
 					x: Math.random() * width,
 					y: Math.random() * height,
 					size: Math.random() * 2.2 + 0.6,
-					baseAlpha: Math.random() * 0.6 + 0.25,
+					baseAlpha: Math.random() * 0.65 + 0.25,
 					alpha: Math.random() * 0.8 + 0.2,
 					twinkleSpeed: Math.random() * 0.03 + 0.01,
 					twinkleOffset: Math.random() * Math.PI * 2,
@@ -95,23 +96,23 @@
 
 		// Floating Multi-Chromatic Aurora Nebula Plasma Orbs
 		const nebulae: NebulaOrb[] = [
-			{ x: 0, y: 0, baseX: 0.85, baseY: 0.15, radius: 520, color: 'rgba(255, 42, 122, 0.22)', speedX: 0.0005, speedY: 0.0007, phase: 0, pulseAmp: 45 },
-			{ x: 0, y: 0, baseX: 0.15, baseY: 0.25, radius: 550, color: 'rgba(139, 92, 246, 0.20)', speedX: 0.0006, speedY: 0.0004, phase: Math.PI / 3, pulseAmp: 50 },
-			{ x: 0, y: 0, baseX: 0.65, baseY: 0.65, radius: 580, color: 'rgba(6, 182, 212, 0.16)', speedX: 0.0004, speedY: 0.0006, phase: Math.PI, pulseAmp: 60 },
-			{ x: 0, y: 0, baseX: 0.35, baseY: 0.85, radius: 480, color: 'rgba(244, 63, 94, 0.18)', speedX: 0.0007, speedY: 0.0005, phase: Math.PI * 1.5, pulseAmp: 40 },
-			{ x: 0, y: 0, baseX: 0.92, baseY: 0.75, radius: 450, color: 'rgba(99, 102, 241, 0.17)', speedX: 0.0005, speedY: 0.0008, phase: Math.PI * 0.8, pulseAmp: 45 },
-			{ x: 0, y: 0, baseX: 0.5, baseY: 0.35, radius: 420, color: 'rgba(217, 70, 239, 0.15)', speedX: 0.0003, speedY: 0.0005, phase: Math.PI * 1.2, pulseAmp: 35 }
+			{ x: 0, y: 0, baseX: 0.85, baseY: 0.18, radius: 540, color: 'rgba(255, 42, 122, 0.26)', speedX: 0.0005, speedY: 0.0007, phase: 0, pulseAmp: 50 },
+			{ x: 0, y: 0, baseX: 0.15, baseY: 0.28, radius: 560, color: 'rgba(139, 92, 246, 0.24)', speedX: 0.0006, speedY: 0.0004, phase: Math.PI / 3, pulseAmp: 55 },
+			{ x: 0, y: 0, baseX: 0.65, baseY: 0.68, radius: 600, color: 'rgba(6, 182, 212, 0.20)', speedX: 0.0004, speedY: 0.0006, phase: Math.PI, pulseAmp: 65 },
+			{ x: 0, y: 0, baseX: 0.35, baseY: 0.85, radius: 500, color: 'rgba(244, 63, 94, 0.22)', speedX: 0.0007, speedY: 0.0005, phase: Math.PI * 1.5, pulseAmp: 45 },
+			{ x: 0, y: 0, baseX: 0.92, baseY: 0.75, radius: 460, color: 'rgba(99, 102, 241, 0.20)', speedX: 0.0005, speedY: 0.0008, phase: Math.PI * 0.8, pulseAmp: 50 },
+			{ x: 0, y: 0, baseX: 0.5, baseY: 0.35, radius: 440, color: 'rgba(217, 70, 239, 0.18)', speedX: 0.0003, speedY: 0.0005, phase: Math.PI * 1.2, pulseAmp: 40 }
 		];
 
 		const comets: Comet[] = [
-			{ x: 0, y: 0, length: 140, speed: 14, angle: Math.PI / 4, alpha: 0, color: '#ff2a7a', active: false },
-			{ x: 0, y: 0, length: 120, speed: 12, angle: Math.PI / 3.8, alpha: 0, color: '#38bdf8', active: false }
+			{ x: 0, y: 0, length: 150, speed: 14, angle: Math.PI / 4, alpha: 0, color: '#ff2a7a', active: false },
+			{ x: 0, y: 0, length: 130, speed: 12, angle: Math.PI / 3.8, alpha: 0, color: '#38bdf8', active: false }
 		];
 
 		function triggerComet(c: Comet) {
 			c.x = Math.random() * (width * 0.7);
 			c.y = Math.random() * (height * 0.25);
-			c.length = Math.random() * 80 + 120;
+			c.length = Math.random() * 80 + 130;
 			c.speed = Math.random() * 8 + 12;
 			c.alpha = 1;
 			c.active = true;
@@ -143,8 +144,11 @@
 			mouseX += (targetMouseX - mouseX) * 0.08;
 			mouseY += (targetMouseY - mouseY) * 0.08;
 
+			const metrics = webPlayer.getAudioMetrics();
 			const isPlaying = !playback.paused && !!playback.now;
-			const musicPulse = isPlaying ? Math.sin(time * 0.08) * 0.2 + 1 : 1;
+			const bassRatio = isPlaying ? metrics.bass / 255 : 0;
+			const energyRatio = isPlaying ? metrics.energy / 255 : 0;
+			const musicPulse = isPlaying ? 1 + bassRatio * 0.45 : 1;
 
 			ctx.clearRect(0, 0, width, height);
 
@@ -154,11 +158,11 @@
 			for (const neb of nebulae) {
 				const currentX = (neb.baseX * width) + Math.sin(time * neb.speedX + neb.phase) * (neb.pulseAmp * musicPulse) + (mouseX / width - 0.5) * 35;
 				const currentY = (neb.baseY * height) + Math.cos(time * neb.speedY + neb.phase) * (neb.pulseAmp * musicPulse) + (mouseY / height - 0.5) * 35;
-				const currentRadius = neb.radius * (isPlaying ? (1 + Math.sin(time * 0.04 + neb.phase) * 0.08) : 1);
+				const currentRadius = neb.radius * (isPlaying ? 1 + bassRatio * 0.15 : 1);
 				
 				const grad = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, currentRadius);
 				grad.addColorStop(0, neb.color);
-				grad.addColorStop(0.45, neb.color.replace(/[\d.]+\)$/, '0.07)'));
+				grad.addColorStop(0.45, neb.color.replace(/[\d.]+\)$/, '0.09)'));
 				grad.addColorStop(1, 'rgba(0,0,0,0)');
 				ctx.fillStyle = grad;
 				ctx.beginPath();
@@ -169,15 +173,15 @@
 
 			// 2. Draw Constellation Laser Connections between Close Stars
 			ctx.save();
-			ctx.lineWidth = 0.6;
-			const maxDist = 95;
+			ctx.lineWidth = 0.7;
+			const maxDist = 105;
 			for (let i = 0; i < stars.length; i++) {
 				for (let j = i + 1; j < stars.length; j++) {
 					const dx = stars[i].x - stars[j].x;
 					const dy = stars[i].y - stars[j].y;
 					const dist = Math.sqrt(dx * dx + dy * dy);
 					if (dist < maxDist) {
-						const lineAlpha = (1 - dist / maxDist) * 0.22 * (isPlaying ? 1.3 : 1);
+						const lineAlpha = (1 - dist / maxDist) * 0.28 * (isPlaying ? 1 + energyRatio * 0.5 : 1);
 						ctx.strokeStyle = `rgba(255, 110, 180, ${lineAlpha})`;
 						ctx.beginPath();
 						ctx.moveTo(stars[i].x, stars[i].y);
@@ -203,7 +207,7 @@
 				star.vx += (star.baseVx - star.vx) * 0.05;
 				star.vy += (star.baseVy - star.vy) * 0.05;
 
-				star.y += star.vy;
+				star.y += star.vy * (1 + energyRatio * 0.4);
 				star.x += star.vx;
 
 				if (star.y < 0) {
@@ -214,12 +218,12 @@
 				if (star.x > width) star.x = 0;
 
 				const twinkle = Math.sin(time * star.twinkleSpeed + star.twinkleOffset);
-				const alpha = Math.max(0.15, Math.min(1, star.baseAlpha + twinkle * 0.45));
+				const alpha = Math.max(0.15, Math.min(1, (star.baseAlpha + twinkle * 0.45) * (1 + bassRatio * 0.4)));
 
 				ctx.fillStyle = star.color;
 				ctx.globalAlpha = alpha;
 				ctx.beginPath();
-				ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+				ctx.arc(star.x, star.y, star.size * (1 + bassRatio * 0.2), 0, Math.PI * 2);
 				ctx.fill();
 
 				// Sparkle cross diffraction spike for bright stars
@@ -237,7 +241,7 @@
 			ctx.globalAlpha = 1.0;
 
 			// 4. Periodic Multi-Color Shooting Star Comets
-			if (Date.now() - lastCometTime > 5000 && Math.random() < 0.03) {
+			if (Date.now() - lastCometTime > 4500 && Math.random() < 0.04) {
 				const availableComet = comets.find((c) => !c.active);
 				if (availableComet) {
 					triggerComet(availableComet);
@@ -297,6 +301,6 @@
 
 <canvas
 	bind:this={canvasEl}
-	class="fixed inset-0 pointer-events-none -z-20 h-full w-full opacity-95 transition-opacity duration-1000"
+	class="fixed inset-0 pointer-events-none z-0 h-full w-full opacity-90 transition-opacity duration-1000"
 	aria-hidden="true"
 ></canvas>
