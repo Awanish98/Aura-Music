@@ -817,38 +817,41 @@
 	<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full object-cover touch-none"></canvas>
 
 	{#if inline}
-		<!-- 🎛️ INLINE THEATER MODE: Sleek Floating Glass Capsule Dock (Top Center/Right with Auto-Fade) -->
+		<!-- 🎛️ INLINE THEATER MODE: Sleek Floating Glass Capsule Dock (Centered with Auto-Fade & Scroll Protection) -->
 		<div
-			class="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex items-center gap-2 rounded-full border border-white/15 bg-black/60 p-1.5 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-400 {showControls
+			class="absolute top-2.5 sm:top-4 left-1/2 -translate-x-1/2 z-20 flex max-w-[calc(100%-1rem)] items-center gap-1.5 sm:gap-2 rounded-full border border-white/20 bg-black/80 p-1 sm:p-1.5 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.6)] transition-all duration-300 {showControls
 				? 'opacity-100 scale-100 pointer-events-auto'
-				: 'opacity-20 hover:opacity-100 scale-95 hover:scale-100 pointer-events-auto'}"
+				: 'opacity-30 hover:opacity-100 scale-95 hover:scale-100 pointer-events-auto'}"
 		>
-			<!-- Preset Switcher Capsule Pills -->
-			<div class="flex items-center gap-1">
+			<!-- Preset Switcher Capsule Pills (Smooth Scrollable without ugly scrollbar) -->
+			<div class="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5 px-0.5 max-w-full touch-pan-x">
 				{#each presets as p}
 					<button
-						class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer {audioFx.visualizerPreset === p.id
-							? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/25'
-							: 'text-white/60 hover:text-white hover:bg-white/10'}"
-						onclick={() => setVisualizerPreset(p.id)}
+						class="flex items-center gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer {audioFx.visualizerPreset === p.id
+							? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/30 font-bold scale-[1.02]'
+							: 'text-white/70 hover:text-white hover:bg-white/15'}"
+						onclick={(e) => {
+							setVisualizerPreset(p.id);
+							e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+						}}
 						title={p.desc}
 					>
 						<span>{p.icon}</span>
-						<span class="hidden xl:inline">{p.label}</span>
+						<span class="{audioFx.visualizerPreset === p.id ? 'inline' : 'hidden sm:inline'}">{p.label}</span>
 					</button>
 				{/each}
 			</div>
 
 			<!-- Divider -->
-			<div class="h-4 w-px bg-white/20"></div>
+			<div class="h-4 w-px bg-white/25 shrink-0"></div>
 
 			<!-- Color Theme Dots -->
-			<div class="flex items-center gap-1 pr-1">
+			<div class="flex items-center gap-1 shrink-0 pr-1 pl-0.5">
 				{#each themes as th}
 					<button
-						class="size-5 rounded-full border transition-transform hover:scale-125 cursor-pointer {audioFx.visualizerTheme === th.id
-							? 'ring-2 ring-white scale-110 border-white'
-							: 'border-white/20 opacity-70 hover:opacity-100'}"
+						class="size-4.5 sm:size-5 rounded-full border transition-transform hover:scale-125 cursor-pointer {audioFx.visualizerTheme === th.id
+							? 'ring-2 ring-white scale-110 border-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'
+							: 'border-white/30 opacity-70 hover:opacity-100'}"
 						style="background: linear-gradient(135deg, {th.primary}, {th.secondary});"
 						onclick={() => setVisualizerTheme(th.id)}
 						title={th.label}
@@ -861,26 +864,29 @@
 		<!-- 🎛️ FULLSCREEN MODAL: Comprehensive Studio Interface with Auto-Hiding Controls -->
 		<!-- Top Glass Header -->
 		<header
-			class="relative z-10 flex flex-col gap-2 p-4 sm:p-6 transition-opacity duration-300 {showControls
+			class="relative z-10 flex flex-col gap-2 p-3 sm:p-6 transition-opacity duration-300 {showControls
 				? 'opacity-100 pointer-events-auto'
 				: 'opacity-0 pointer-events-none'}"
 		>
-			<div class="flex items-center justify-between gap-3">
+			<div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
 				<!-- Minimalist Studio Badge -->
-				<div class="flex items-center gap-2 rounded-full bg-white/[0.06] border border-white/10 px-3.5 py-1.5 backdrop-blur-xl shadow-lg">
-					<HugeiconsIcon icon={AudioWave01Icon} size={16} class="text-primary animate-pulse" />
+				<div class="flex items-center gap-2 rounded-full bg-white/[0.08] border border-white/15 px-3 py-1.5 backdrop-blur-xl shadow-lg shrink-0">
+					<HugeiconsIcon icon={AudioWave01Icon} size={15} class="text-primary animate-pulse" />
 					<span class="text-xs font-bold tracking-wider text-white uppercase">Aura Studio</span>
-					<span class="text-[10px] text-muted-foreground">• High-Fidelity</span>
+					<span class="hidden sm:inline text-[10px] text-white/60">• High-Fidelity</span>
 				</div>
 
-				<!-- Preset Switcher Pills -->
-				<div class="hidden md:flex items-center gap-1 rounded-full bg-black/60 p-1 border border-white/10 backdrop-blur-xl shadow-2xl">
+				<!-- Preset Switcher Pills (Smooth Scrollable for all screen widths) -->
+				<div class="order-3 lg:order-2 flex items-center gap-1 rounded-full bg-black/75 p-1 border border-white/15 backdrop-blur-xl shadow-2xl overflow-x-auto scrollbar-none max-w-full touch-pan-x">
 					{#each presets as p}
 						<button
-							class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer {audioFx.visualizerPreset === p.id
-								? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/30'
-								: 'text-muted-foreground hover:text-white hover:bg-white/10'}"
-							onclick={() => setVisualizerPreset(p.id)}
+							class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer {audioFx.visualizerPreset === p.id
+								? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/30 font-bold'
+								: 'text-white/70 hover:text-white hover:bg-white/15'}"
+							onclick={(e) => {
+								setVisualizerPreset(p.id);
+								e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+							}}
 							title={p.desc}
 						>
 							<span>{p.icon}</span>
@@ -890,13 +896,13 @@
 				</div>
 
 				<!-- Right Actions: Color Theme, Fullscreen, Close -->
-				<div class="flex items-center gap-2">
-					<div class="flex items-center gap-1 rounded-full bg-black/60 p-1 border border-white/10 backdrop-blur-xl">
+				<div class="order-2 lg:order-3 flex items-center gap-2 shrink-0 ml-auto">
+					<div class="flex items-center gap-1 rounded-full bg-black/75 p-1 border border-white/15 backdrop-blur-xl">
 						{#each themes as th}
 							<button
-								class="size-5.5 rounded-full border transition-transform hover:scale-110 cursor-pointer {audioFx.visualizerTheme === th.id
-									? 'ring-2 ring-white scale-110 border-white'
-									: 'border-white/20 opacity-70 hover:opacity-100'}"
+								class="size-5 sm:size-5.5 rounded-full border transition-transform hover:scale-125 cursor-pointer {audioFx.visualizerTheme === th.id
+									? 'ring-2 ring-white scale-110 border-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'
+									: 'border-white/30 opacity-70 hover:opacity-100'}"
 								style="background: linear-gradient(135deg, {th.primary}, {th.secondary});"
 								onclick={() => setVisualizerTheme(th.id)}
 								title={th.label}
@@ -906,19 +912,19 @@
 					</div>
 
 					<button
-						class="flex size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-xl transition hover:bg-white/20 active:scale-90 cursor-pointer"
+						class="flex size-8 sm:size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-xl transition hover:bg-white/20 active:scale-90 cursor-pointer"
 						onclick={toggleFullscreen}
 						aria-label="Toggle Fullscreen"
 					>
-						<HugeiconsIcon icon={isFullscreen ? Minimize01Icon : Maximize01Icon} size={18} />
+						<HugeiconsIcon icon={isFullscreen ? Minimize01Icon : Maximize01Icon} size={17} />
 					</button>
 
 					<button
-						class="flex size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-xl transition hover:bg-red-500/80 active:scale-90 cursor-pointer"
+						class="flex size-8 sm:size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-xl transition hover:bg-red-500/80 active:scale-90 cursor-pointer"
 						onclick={onClose}
 						aria-label="Close Visualizer"
 					>
-						<HugeiconsIcon icon={Cancel01Icon} size={18} />
+						<HugeiconsIcon icon={Cancel01Icon} size={17} />
 					</button>
 				</div>
 			</div>
