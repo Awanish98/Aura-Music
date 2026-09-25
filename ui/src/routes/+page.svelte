@@ -21,7 +21,6 @@
 	import FeaturedArtistsRail from '$lib/components/FeaturedArtistsRail.svelte';
 	import LiveRadiosShelf from '$lib/components/LiveRadiosShelf.svelte';
 	import MoodsGrid from '$lib/components/MoodsGrid.svelte';
-	import TrendingVideosShelf from '$lib/components/TrendingVideosShelf.svelte';
 	import HomeRightRail from '$lib/components/HomeRightRail.svelte';
 	import { getFmhyHomeSections } from '$lib/fmhy';
 	import * as api from '$lib/api';
@@ -286,17 +285,16 @@
 				<!-- Shortcuts 4 Gradient Liquid Glass Cards -->
 				<Shortcuts onEdit={() => (editing = true)} />
 
-				<!-- Aura AI Vibe Station Card with 3D Mascot -->
-				<AiVibeGenerator />
+				<!-- Aura AI Vibe Station Card on Mobile/Tablet (< xl) -->
+				<div class="xl:hidden">
+					<AiVibeGenerator />
+				</div>
 
 				<!-- Featured For You Mix Cards (Matches Reference UI) -->
 				<FeaturedForYou />
 
 				<!-- Popular Artists & Vocalists (Top 20 with Neon Rings) -->
 				<FeaturedArtistsRail />
-
-				<!-- Trending YouTube Music Videos & New Releases (Direct 1-Tap Play) -->
-				<TrendingVideosShelf />
 
 				<!-- Categorized Moods & Genres Grid -->
 				<MoodsGrid />
