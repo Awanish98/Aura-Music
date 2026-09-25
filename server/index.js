@@ -303,7 +303,7 @@ app.get('/api/saavn/song', async (req, res) => {
 });
 
 // 4. Unified Search (JioSaavn 320kbps + YouTube Music)
-app.get('/api/search/unified', async (req, res) => {
+app.get(['/api/search', '/api/search/unified'], async (req, res) => {
 	const query = req.query.q || req.query.query;
 	if (!query) return res.status(400).json({ error: 'Missing query parameter' });
 
@@ -457,11 +457,47 @@ app.post('/api/yt-music/:endpoint', async (req, res) => {
 });
 
 // 6. Direct Audio Stream Extractor & Streaming Pipe
-app.get('/api/stream', async (req, res) => {
-	const videoId = req.query.videoId;
-	if (!videoId || typeof videoId !== 'string') {
+app.get(['/api/stream', '/api/stream/:id'], async (req, res) => {
+	const rawId = req.params.id || req.query.videoId || req.query.id;
+	if (!rawId || typeof rawId !== 'string') {
 		return res.status(400).json({ error: 'Missing or invalid videoId parameter' });
 	}
+
+	const wantsJson = req.headers.accept?.includes('application/json') || req.query.format === 'json' || req.query.json === 'true';
+
+	// Handle JioSaavn direct 320kbps song
+	if (rawId.startsWith('saavn_')) {
+		const cleanId = rawId.replace(/^saavn_/, '');
+		try {
+			const detailsUrl = `https://www.jiosaavn.com/api.php?__call=song.getDetails&_format=json&_marker=0&cc=in&pids=${encodeURIComponent(cleanId)}`;
+			const resp = await fetch(detailsUrl, {
+				headers: {
+					'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+				}
+			});
+			const data = await resp.json();
+			const rawSong = data[cleanId] || (data.songs && data.songs[0]) || Object.values(data)[0];
+			if (rawSong) {
+				const formatted = formatSaavnSong(rawSong);
+				if (formatted.streamUrl) {
+					if (wantsJson) {
+						return res.json({
+							success: true,
+							url: formatted.streamUrl,
+							stream_url: formatted.streamUrl,
+							bitrate: '320kbps',
+							source: 'JioSaavn'
+						});
+					}
+					return res.redirect(formatted.streamUrl);
+				}
+			}
+		} catch (err) {
+			console.warn('[Saavn Stream Resolution Error]', err);
+		}
+	}
+
+	const videoId = rawId.replace(/^yt_/, '');
 
 	try {
 		// Use ANDROID_VR client to extract non-throttled raw stream URLs
@@ -494,6 +530,16 @@ app.get('/api/stream', async (req, res) => {
 
 		if (!audioFormat || !audioFormat.url) {
 			return res.status(404).json({ error: 'No direct audio format found for video' });
+		}
+
+		if (wantsJson) {
+			return res.json({
+				success: true,
+				url: audioFormat.url,
+				stream_url: audioFormat.url,
+				bitrate: audioFormat.bitrate ? `${Math.round(audioFormat.bitrate / 1000)}kbps` : '160kbps',
+				source: 'YouTube'
+			});
 		}
 
 		const headers = {};
@@ -723,8 +769,8 @@ function parseAndEnrichLrc(syncedLyrics) {
 }
 
 app.get('/api/lyrics', async (req, res) => {
-	const { title, track_name, artist, artist_name, album, album_name, duration } = req.query;
-	const songTitle = String(title || track_name || '').trim();
+	const { title, track_name, track, artist, artist_name, album, album_name, duration } = req.query;
+	const songTitle = String(title || track_name || track || '').trim();
 	const songArtist = String(artist || artist_name || '').trim();
 	const songAlbum = String(album || album_name || '').trim();
 	const songDur = duration ? Math.round(Number(duration)) : undefined;
