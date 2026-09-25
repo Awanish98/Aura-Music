@@ -1,12 +1,8 @@
 <script lang="ts">
 	// State-of-the-Art Apple Music & Spotify Live Canvas Motion Engine
-	// Implements:
-	// 1. Apple Music Chromatic Living Fluid Waves & Beat-Reactive Luminescence
-	// 2. Spotify Vertical Motion Canvas & Shimmering Stardust Nebula
-	// 3. Album-Reactive Chromatic Dynamic Palettes with Real-Time Extraction
-	// 4. Ultra-Efficient 35FPS Throttled Rendering with Hidden-Tab Deep Sleep (0% Battery Overheating)
+	// With Video Canvas support — plays the current YouTube music video
+	// as a muted blurred background (Apple Music Animated Canvas style)
 	import { onMount, onDestroy } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import { playback, audioFx } from '$lib/player.svelte';
 	import { webPlayer } from '$lib/webplayer';
 	import { thumb } from '$lib/thumb';
@@ -16,21 +12,34 @@
 	let {
 		class: className = '',
 		fit = 'cover',
-		interactive = true,
-		mode = 'dynamic'
+		videoMode = false,
+		interactive = true
 	}: {
 		class?: string;
 		fit?: 'cover' | 'contain';
+		videoMode?: boolean;
 		interactive?: boolean;
-		mode?: 'dynamic' | 'aurora' | 'stardust' | 'video';
 	} = $props();
 
 	let canvasEl: HTMLCanvasElement | null = $state(null);
+	let videoEl: HTMLIFrameElement | null = $state(null);
 	let animId: number | null = null;
+
+	// Dynamic colors from album art
 	let c1 = $state('#ff0a78');
 	let c2 = $state('#8b5cf6');
 	let c3 = $state('#06b6d4');
 	let c4 = $state('#ec4899');
+
+	// Current video ID for iframe
+	let videoId = $derived(playback.now?.videoId ?? null);
+
+	// YouTube embed URL — autoplay, mute, loop, hide controls
+	const ytSrc = $derived(
+		videoId
+			? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&disablekb=1&iv_load_policy=3&modestbranding=1&rel=0&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`
+			: null
+	);
 
 	// Extract dynamic colors from album art whenever track changes
 	$effect(() => {
@@ -84,18 +93,12 @@
 		});
 		if (canvasEl.parentElement) observer.observe(canvasEl.parentElement);
 
-		// Stardust particles for Spotify-style motion atmosphere
+		// Stardust particles
 		const particleCount = isMobile ? 22 : 45;
 		const particles: {
-			x: number;
-			y: number;
-			size: number;
-			alpha: number;
-			baseAlpha: number;
-			speedY: number;
-			speedX: number;
-			phase: number;
-			color: string;
+			x: number; y: number; size: number; alpha: number;
+			baseAlpha: number; speedY: number; speedX: number;
+			phase: number; color: string;
 		}[] = [];
 
 		for (let i = 0; i < particleCount; i++) {
@@ -112,7 +115,7 @@
 			});
 		}
 
-		// Floating organic fluid blobs for Apple Music style live motion
+		// Floating organic fluid blobs for Apple Music style
 		const fluidBlobs = [
 			{ x: 0.25, y: 0.3, radius: 0.45, speedX: 0.0006, speedY: 0.0008, phase: 0 },
 			{ x: 0.75, y: 0.4, radius: 0.5, speedX: 0.0007, speedY: 0.0005, phase: Math.PI / 2 },
@@ -126,18 +129,15 @@
 		function render(now: number) {
 			if (!canvasEl || !ctx) return;
 
-			// Tab visibility / background sleep check
 			if (typeof document !== 'undefined' && document.hidden) {
 				animId = requestAnimationFrame(render);
 				return;
 			}
-
 			if (!isVisible) {
 				animId = requestAnimationFrame(render);
 				return;
 			}
-
-			// Throttle to ~35fps for zero device heating
+			// Throttle to ~35fps
 			if (now - lastFrameTime < 28) {
 				animId = requestAnimationFrame(render);
 				return;
@@ -158,9 +158,13 @@
 			const boost = isPlaying ? 1 + smoothedBass * 0.35 : 1;
 			const pulse = isPlaying ? 1 + smoothedEnergy * 0.25 : 1;
 
-			// 1. Render Apple Music Living Fluid Chromatic Gradients
+			// In video mode, canvas is semi-transparent overlay — lighter blobs
+			const blobAlpha = videoMode ? 0.45 : 1.0;
+
+			// 1. Apple Music Living Fluid Chromatic Gradients
 			ctx.save();
-			ctx.globalCompositeOperation = 'screen';
+			ctx.globalCompositeOperation = videoMode ? 'multiply' : 'screen';
+			ctx.globalAlpha = blobAlpha;
 
 			const colors = [c1, c2, c3, c4];
 			for (let i = 0; i < fluidBlobs.length; i++) {
@@ -182,8 +186,9 @@
 			}
 			ctx.restore();
 
-			// 2. Render Spotify Style Silky Harmonic Wave Ribbons
+			// 2. Spotify Style Wave Ribbons
 			ctx.save();
+			ctx.globalAlpha = videoMode ? 0.35 : 1.0;
 			ctx.lineWidth = 1.4;
 			const waveCount = 3;
 			for (let wv = 0; wv < waveCount; wv++) {
@@ -201,22 +206,19 @@
 			}
 			ctx.restore();
 
-			// 3. Render Spotify Stardust Floating Embers & Micro-Glows
+			// 3. Stardust particles
 			ctx.save();
 			for (const p of particles) {
 				p.y += p.speedY * boost;
 				p.x += p.speedX + Math.sin(tick * 0.02 + p.phase) * 0.2;
 
-				if (p.y < 0) {
-					p.y = h;
-					p.x = Math.random() * w;
-				}
+				if (p.y < 0) { p.y = h; p.x = Math.random() * w; }
 				if (p.x < 0) p.x = w;
 				if (p.x > w) p.x = 0;
 
 				const curAlpha = Math.max(0.1, Math.min(1, (p.baseAlpha + Math.sin(tick * 0.03 + p.phase) * 0.25) * pulse));
 				ctx.fillStyle = p.color;
-				ctx.globalAlpha = curAlpha * 0.75;
+				ctx.globalAlpha = curAlpha * (videoMode ? 0.5 : 0.75);
 				ctx.beginPath();
 				ctx.arc(p.x, p.y, p.size * (isPlaying ? 1.15 : 1), 0, Math.PI * 2);
 				ctx.fill();
@@ -241,7 +243,30 @@
 </script>
 
 <div class="relative h-full w-full overflow-hidden select-none {className}" aria-hidden="true">
-	<!-- Canvas Layer -->
+
+	{#if videoMode && ytSrc}
+		<!-- 🎬 YouTube Video Background (Apple Music Animated Canvas style) -->
+		<!-- Iframe plays muted, looping, controls-hidden music video -->
+		<iframe
+			bind:this={videoEl}
+			src={ytSrc}
+			title="Music Video Canvas"
+			allow="autoplay; encrypted-media"
+			class="absolute inset-0 w-full h-full pointer-events-none"
+			style="
+				border: none;
+				/* Scale up to cover black bars (16:9 in any aspect ratio) */
+				transform: scale(1.6);
+				filter: blur(8px) brightness(0.55) saturate(1.4);
+			"
+			referrerpolicy="no-referrer"
+		></iframe>
+
+		<!-- Dark overlay so canvas gradients blend nicely over the video -->
+		<div class="pointer-events-none absolute inset-0 bg-black/35"></div>
+	{/if}
+
+	<!-- Canvas gradient + particle layer (always rendered on top) -->
 	<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full object-{fit}"></canvas>
 
 	<!-- Vignette & AMOLED Contrast Mask -->

@@ -413,7 +413,7 @@
 >
 	<!-- 🌌 1. Apple Music & Spotify Style Live Animated Canvas Background -->
 	{#if audioFx.liveCanvasEnabled}
-		<LiveSongCanvas class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-70" />
+		<LiveSongCanvas videoMode={true} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-90" />
 	{:else}
 		<!-- Deep Animated Particle & Bokeh Atmosphere Canvas -->
 		<canvas bind:this={starCanvas} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-80"></canvas>
@@ -434,9 +434,9 @@
 		<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.7)_100%)] pointer-events-none"></div>
 	</div>
 
-	<!-- 🎛️ 3. TOP NAVIGATION HEADER (Matching Reference Screenshot) -->
+	<!-- 🎛️ 3. TOP NAVIGATION HEADER -->
 	<header
-		class="relative z-40 flex shrink-0 items-center justify-between px-6 pt-5 pb-3 sm:px-10 sm:pt-6 transition-all duration-400 {idle
+		class="absolute top-0 left-0 right-0 z-40 flex shrink-0 items-center justify-between px-6 pt-5 pb-3 sm:px-10 sm:pt-6 transition-all duration-400 {idle
 			? 'opacity-30 hover:opacity-100'
 			: 'opacity-100'}"
 	>
@@ -628,7 +628,7 @@
 	</header>
 
 	<!-- 🎬 4. MAIN STAGE (Left: 3D Vinyl Player | Right: Synced Lyrics / Tabs) -->
-	<div class="relative z-10 grid min-h-0 flex-1 w-full grid-cols-1 lg:grid-cols-2 overflow-hidden px-4 pb-6 sm:px-10 lg:px-14">
+	<div class="relative z-10 flex-1 w-full h-full grid grid-cols-1 lg:grid-cols-2 pt-[72px] sm:pt-[84px] overflow-hidden px-4 pb-6 sm:px-10 lg:px-14">
 		
 		<!-- 💿 LEFT STAGE: 3D FLOATING VINYL RECORD SLEEVE & CONTROLS -->
 		<div class="relative flex h-full w-full flex-col items-center justify-center px-2 py-4 sm:px-6 select-none">
