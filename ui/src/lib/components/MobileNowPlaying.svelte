@@ -39,7 +39,8 @@
 		sleepTimer,
 		setPlaybackSpeed,
 		toggleNowPlayingRating,
-		wheelVolume
+		wheelVolume,
+		toggleLiveCanvas
 	} from '$lib/player.svelte';
 	import * as api from '$lib/api';
 	import { thumb, generateAvatarSvg } from '$lib/thumb';
@@ -60,7 +61,18 @@
 	let eqModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
-	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>('canvas');
+	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>(
+		audioFx.liveCanvasEnabled ? 'canvas' : 'cover'
+	);
+
+	// Keep artViewMode in sync when liveCanvasEnabled changes externally
+	$effect(() => {
+		if (!audioFx.liveCanvasEnabled && artViewMode === 'canvas') {
+			artViewMode = 'cover';
+		} else if (audioFx.liveCanvasEnabled && artViewMode === 'cover') {
+			artViewMode = 'canvas';
+		}
+	});
 
 	// Header touch swipe down to dismiss
 	let headerStartY = 0;
@@ -308,7 +320,20 @@
 				<div class="absolute top-3 right-4 z-20 flex items-center gap-1">
 					<button
 						type="button"
-						onclick={() => (artViewMode = artViewMode === 'canvas' ? 'cover' : artViewMode === 'cover' ? 'vinyl' : 'canvas')}
+						onclick={() => {
+							if (artViewMode === 'canvas') {
+								// Turn off canvas — go to cover
+								toggleLiveCanvas(false);
+								artViewMode = 'cover';
+							} else if (artViewMode === 'cover') {
+								// Go to vinyl
+								artViewMode = 'vinyl';
+							} else {
+								// Turn on canvas from vinyl
+								toggleLiveCanvas(true);
+								artViewMode = 'canvas';
+							}
+						}}
 						aria-label="Switch Display Mode"
 						class="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-90 {artViewMode === 'canvas'
 							? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400/50 shadow-emerald-500/30'

@@ -45,7 +45,8 @@
 		toggleMute,
 		toggleNowPlayingRating,
 		openAddToPlaylist,
-		openShare
+		openShare,
+		toggleLiveCanvas
 	} from '$lib/player.svelte';
 	import { canVideo, claimVideo, parkVideo, showVideo, video } from '$lib/video.svelte';
 	import { appearance } from '$lib/theme.svelte';
@@ -76,7 +77,19 @@
 
 	let showEq = $state(false);
 	let justLiked = $state(false);
-	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>('canvas');
+	// Sync initial art view mode with persisted live canvas preference
+	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>(
+		audioFx.liveCanvasEnabled ? 'canvas' : 'cover'
+	);
+
+	// Keep artViewMode in sync when liveCanvasEnabled changes externally
+	$effect(() => {
+		if (!audioFx.liveCanvasEnabled && artViewMode === 'canvas') {
+			artViewMode = 'cover';
+		} else if (audioFx.liveCanvasEnabled && artViewMode === 'cover') {
+			artViewMode = 'canvas';
+		}
+	});
 
 	function toggleLike() {
 		if (playback.rating !== 'like') justLiked = true;
@@ -320,18 +333,21 @@
 
 					<!-- Artwork Floating Header Badges (Live Canvas + Vinyl Disc + Cover + Visualizer) -->
 					<div class="absolute left-3 top-3 z-10 flex items-center gap-1.5">
-						<!-- Live Canvas Toggle Button -->
+						<!-- Live Canvas Toggle Button — toggles global audioFx.liveCanvasEnabled -->
 						<button
 							type="button"
-							onclick={() => (artViewMode = artViewMode === 'canvas' ? 'cover' : 'canvas')}
+							onclick={() => {
+								toggleLiveCanvas();
+								artViewMode = audioFx.liveCanvasEnabled ? 'canvas' : 'cover';
+							}}
 							aria-label="Toggle Apple & Spotify Live Canvas"
-							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {artViewMode === 'canvas'
+							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {audioFx.liveCanvasEnabled
 								? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400/50 shadow-emerald-500/30'
 								: 'bg-black/60 text-white/80 hover:text-white border-white/10'}"
-							title="Apple Music & Spotify Live Canvas Motion"
+							title="{audioFx.liveCanvasEnabled ? 'Live Canvas ON — click to turn off' : 'Live Canvas OFF — click to turn on'}"
 						>
-							<HugeiconsIcon icon={SparklesIcon} class="h-3.5 w-3.5 {artViewMode === 'canvas' ? 'text-white animate-spin' : 'text-emerald-400'}" />
-							<span>Canvas</span>
+							<HugeiconsIcon icon={SparklesIcon} class="h-3.5 w-3.5 {audioFx.liveCanvasEnabled ? 'text-white animate-spin' : 'text-emerald-400'}" />
+							<span>{audioFx.liveCanvasEnabled ? 'Canvas' : 'Canvas'}</span>
 						</button>
 
 						<!-- Vinyl Disc Toggle Button -->
