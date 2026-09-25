@@ -95,15 +95,30 @@
 		'lg:w-64'
 	)} select-none"
 >
-	<!-- Sidebar Header Collapse Toggle -->
-	<div class="flex items-center justify-between px-2 pb-2">
-		<span class="hidden font-heading text-xs font-bold uppercase tracking-wider text-muted-foreground/70 {wide('lg:block')}">
-			Menu
-		</span>
+	<!-- Sidebar Header: Aura Logo + Collapse Toggle -->
+	<div class="flex items-center justify-between px-1 pb-3 pt-1">
+		<!-- Logo area: icon always visible; wordmark only when expanded -->
+		<a href="/" class="flex items-center gap-2.5 min-w-0 group" title="Aura Music Home">
+			<!-- Logo image — small circle in collapsed, rounded-lg when wide -->
+			<div class="relative shrink-0 {collapsed ? 'w-8 h-8' : 'w-9 h-9'} transition-all duration-300">
+				<div class="absolute inset-0 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 opacity-0 group-hover:opacity-60 blur-md transition-opacity duration-300"></div>
+				<img
+					src="/aura-logo.jpg"
+					alt="Aura Music"
+					class="relative w-full h-full rounded-xl object-cover shadow-lg ring-1 ring-white/10 group-hover:ring-pink-500/40 transition-all duration-300 group-hover:scale-105"
+				/>
+			</div>
+			<!-- Brand wordmark — only when sidebar is wide -->
+			<div class="hidden flex-col leading-none {wide('lg:flex')} min-w-0">
+				<span class="font-heading text-sm font-black tracking-widest bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">AURA</span>
+				<span class="text-[9px] font-semibold tracking-[0.4em] text-muted-foreground/60 uppercase pl-[0.4em]">Music</span>
+			</div>
+		</a>
+
 		<Button
 			variant="ghost"
 			size="icon-xs"
-			class="hidden hover:text-primary lg:inline-flex text-muted-foreground apple-spring-hover apple-spring-tap"
+			class="hidden hover:text-primary lg:inline-flex text-muted-foreground apple-spring-hover apple-spring-tap shrink-0"
 			onclick={toggleSidebar}
 			aria-label={collapsed ? t('a11y.expand_sidebar') : t('a11y.collapse_sidebar')}
 		>

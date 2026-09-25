@@ -14,7 +14,7 @@
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { isTauri } from '$lib/api';
 	import { analytics } from '$lib/analytics';
-	import { fly } from 'svelte/transition';
+	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import {
 		appearance,
@@ -73,6 +73,10 @@
 	} from '$lib/updater.svelte';
 
 	let { children } = $props();
+
+	// ── Splash / Loading screen ──────────────────────────────────────────────
+	let splashDone = $state(false);
+	let splashOut = $state(false); // trigger the exit animation first
 	// Queue and lyrics toggle independently and both float over the page rather than docking into
 	// it — two docked columns squeezed the content down to an unusable strip. At lg+ they sit side
 	// by side over the content; narrower, they stack (see QueuePanel / LyricsPanel).
@@ -158,6 +162,15 @@
 		};
 	});
 
+	// Hide the splash after app init (min 2.2 s so the animation plays fully)
+	$effect(() => {
+		const minTimer = setTimeout(() => {
+			splashOut = true;
+			setTimeout(() => (splashDone = true), 600); // wait for fade-out transition
+		}, 2200);
+		return () => clearTimeout(minTimer);
+	});
+
 	afterNavigate((nav) => {
 		if (browser && !isTauri()) {
 			analytics.trackPageView(nav.to?.url?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '/'));
@@ -176,6 +189,246 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <ModeWatcher />
+
+<!-- ═══════════════════════════════════════════════════════════
+     Aura Music — Animated Splash / Loading Screen
+     Shows for 2.2 s then fades out. The logo pulses with a
+     neon glow ring and three music-wave bars animate in rhythm.
+     ═══════════════════════════════════════════════════════════ -->
+{#if !splashDone}
+	<!-- svelte-ignore a11y_aria_hidden_focus -->
+	<div
+		aria-hidden="true"
+		class="aura-splash"
+		class:aura-splash--out={splashOut}
+	>
+		<!-- Ambient gradient blobs (same palette as the logo) -->
+		<div class="aura-splash__blob aura-splash__blob--1"></div>
+		<div class="aura-splash__blob aura-splash__blob--2"></div>
+		<div class="aura-splash__blob aura-splash__blob--3"></div>
+
+		<!-- Logo + brand -->
+		<div class="aura-splash__center">
+			<!-- Logo image with neon glow ring -->
+			<div class="aura-splash__logo-wrap">
+				<div class="aura-splash__glow-ring"></div>
+				<img
+					src="/aura-logo.jpg"
+					alt="Aura Music"
+					class="aura-splash__logo"
+					decoding="async"
+				/>
+			</div>
+
+			<!-- Brand text -->
+			<div class="aura-splash__brand">
+				<span class="aura-splash__brand-aura">AURA</span>
+				<span class="aura-splash__brand-music">MUSIC</span>
+			</div>
+
+			<!-- Music wave bars -->
+			<div class="aura-splash__waves" aria-hidden="true">
+				{#each [1,2,3,4,5] as i}
+					<div class="aura-splash__bar" style="--i:{i}"></div>
+				{/each}
+			</div>
+
+			<!-- Loading label -->
+			<p class="aura-splash__label">Loading your music…</p>
+
+			<!-- Progress track -->
+			<div class="aura-splash__track">
+				<div class="aura-splash__fill"></div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<style>
+	/* ── Splash container ─────────────────────────────────────── */
+	.aura-splash {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #05020f;
+		overflow: hidden;
+		transition: opacity 0.6s ease, transform 0.6s ease;
+	}
+	.aura-splash--out {
+		opacity: 0;
+		transform: scale(1.04);
+		pointer-events: none;
+	}
+
+	/* ── Ambient blobs ────────────────────────────────────────── */
+	.aura-splash__blob {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		opacity: 0.35;
+		animation: blobDrift 6s ease-in-out infinite alternate;
+	}
+	.aura-splash__blob--1 {
+		width: 500px; height: 500px;
+		background: radial-gradient(circle, #ff0a78, transparent 70%);
+		top: -120px; left: -80px;
+		animation-delay: 0s;
+	}
+	.aura-splash__blob--2 {
+		width: 420px; height: 420px;
+		background: radial-gradient(circle, #8b5cf6, transparent 70%);
+		bottom: -100px; right: -60px;
+		animation-delay: -2s;
+	}
+	.aura-splash__blob--3 {
+		width: 300px; height: 300px;
+		background: radial-gradient(circle, #06b6d4, transparent 70%);
+		top: 40%; left: 55%;
+		animation-delay: -4s;
+	}
+	@keyframes blobDrift {
+		from { transform: translate(0, 0) scale(1); }
+		to   { transform: translate(30px, -25px) scale(1.12); }
+	}
+
+	/* ── Center stack ─────────────────────────────────────────── */
+	.aura-splash__center {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.25rem;
+		animation: centerFadeIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+	}
+	@keyframes centerFadeIn {
+		from { opacity: 0; transform: translateY(24px) scale(0.94); }
+		to   { opacity: 1; transform: translateY(0) scale(1); }
+	}
+
+	/* ── Logo ─────────────────────────────────────────────────── */
+	.aura-splash__logo-wrap {
+		position: relative;
+		width: 130px;
+		height: 130px;
+	}
+	.aura-splash__glow-ring {
+		position: absolute;
+		inset: -10px;
+		border-radius: 50%;
+		background: conic-gradient(
+			from 0deg,
+			#ff0a78, #8b5cf6, #06b6d4, #ec4899, #ff0a78
+		);
+		animation: ringRotate 2.8s linear infinite;
+		filter: blur(6px);
+		opacity: 0.8;
+	}
+	@keyframes ringRotate {
+		to { transform: rotate(360deg); }
+	}
+	.aura-splash__logo {
+		position: relative;
+		width: 130px;
+		height: 130px;
+		border-radius: 28px;
+		object-fit: cover;
+		box-shadow: 0 0 40px rgba(255, 10, 120, 0.5), 0 0 80px rgba(139, 92, 246, 0.3);
+		animation: logoPulse 2s ease-in-out infinite;
+	}
+	@keyframes logoPulse {
+		0%, 100% { box-shadow: 0 0 30px rgba(255,10,120,0.45), 0 0 60px rgba(139,92,246,0.25); }
+		50%       { box-shadow: 0 0 55px rgba(255,10,120,0.75), 0 0 100px rgba(139,92,246,0.45); }
+	}
+
+	/* ── Brand text ───────────────────────────────────────────── */
+	.aura-splash__brand {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1;
+		gap: 2px;
+	}
+	.aura-splash__brand-aura {
+		font-family: 'Syne', 'Outfit', sans-serif;
+		font-size: 2.5rem;
+		font-weight: 900;
+		letter-spacing: 0.18em;
+		background: linear-gradient(135deg, #ff0a78 0%, #c084fc 45%, #38bdf8 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: textShimmer 2.5s ease-in-out infinite;
+		background-size: 200% 100%;
+	}
+	@keyframes textShimmer {
+		0%   { background-position: 0% 50%; }
+		50%  { background-position: 100% 50%; }
+		100% { background-position: 0% 50%; }
+	}
+	.aura-splash__brand-music {
+		font-family: 'Outfit', sans-serif;
+		font-size: 0.7rem;
+		font-weight: 500;
+		letter-spacing: 0.55em;
+		color: rgba(255,255,255,0.45);
+		padding-left: 0.55em; /* compensate letter-spacing for centering */
+	}
+
+	/* ── Wave bars ────────────────────────────────────────────── */
+	.aura-splash__waves {
+		display: flex;
+		align-items: flex-end;
+		gap: 5px;
+		height: 32px;
+	}
+	.aura-splash__bar {
+		width: 4px;
+		border-radius: 999px;
+		background: linear-gradient(to top, #ff0a78, #8b5cf6);
+		animation: waveBounce 0.9s ease-in-out infinite alternate;
+		animation-delay: calc((var(--i) - 1) * 0.13s);
+	}
+	.aura-splash__bar:nth-child(1) { height: 14px; }
+	.aura-splash__bar:nth-child(2) { height: 24px; }
+	.aura-splash__bar:nth-child(3) { height: 32px; }
+	.aura-splash__bar:nth-child(4) { height: 20px; }
+	.aura-splash__bar:nth-child(5) { height: 10px; }
+	@keyframes waveBounce {
+		from { transform: scaleY(0.35); opacity: 0.5; }
+		to   { transform: scaleY(1);    opacity: 1; }
+	}
+
+	/* ── Loading label ────────────────────────────────────────── */
+	.aura-splash__label {
+		font-family: 'Outfit', sans-serif;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: rgba(255,255,255,0.35);
+		letter-spacing: 0.05em;
+		margin: 0;
+	}
+
+	/* ── Progress bar ─────────────────────────────────────────── */
+	.aura-splash__track {
+		width: 160px;
+		height: 3px;
+		border-radius: 999px;
+		background: rgba(255,255,255,0.08);
+		overflow: hidden;
+	}
+	.aura-splash__fill {
+		height: 100%;
+		border-radius: 999px;
+		background: linear-gradient(90deg, #ff0a78, #8b5cf6, #06b6d4);
+		animation: progressFill 2.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	}
+	@keyframes progressFill {
+		from { width: 0%; }
+		to   { width: 100%; }
+	}
+</style>
 
 <!-- The mini player is the whole window when it is the window: no titlebar, no sidebar, no routes,
      and no toasts (a banner would cover most of a 560x180 widget). -->
