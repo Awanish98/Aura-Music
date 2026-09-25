@@ -5,10 +5,9 @@
 
 import CryptoJS from 'crypto-js';
 
-const TELEGRAM_BOT_TOKEN =
-	process.env.TELEGRAM_BOT_TOKEN || '8840396258:AAFHti7zvAAs2V63DHmLEsLjUqZhvhEDTZs';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const WEBAPP_URL = process.env.WEBAPP_URL || 'https://aura-music-1no9.onrender.com';
-const API_BASE = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
+const API_BASE = TELEGRAM_BOT_TOKEN ? `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}` : '';
 
 // Decrypt JioSaavn Encrypted Media URL (320kbps DES decryption)
 function decryptSaavnUrl(encryptedUrl) {
