@@ -169,7 +169,7 @@
 		}
 	}
 
-	// 60-120fps high-precision frame clock for Better Lyrics word-by-word sweeping
+	// Battery-efficient frame clock for word-by-word sweeping
 	let interpolatedPosSecs = $state(playback.position);
 
 	const needsFrameClock = $derived(
@@ -185,11 +185,25 @@
 		const base = pos;
 		const baseAt = performance.now();
 		interpolatedPosSecs = pos;
-		let frameId = requestAnimationFrame(function tick() {
-			interpolatedPosSecs = base + (performance.now() - baseAt) / 1000;
+		let frameId: number | null = null;
+		let lastUpdate = 0;
+
+		function tick(now: number) {
+			if (typeof document !== 'undefined' && document.hidden) {
+				frameId = requestAnimationFrame(tick);
+				return;
+			}
+			// Throttle word interpolation updates to ~32ms (30fps) to eliminate CPU strain & thermal load
+			if (now - lastUpdate >= 32) {
+				lastUpdate = now;
+				interpolatedPosSecs = base + (performance.now() - baseAt) / 1000;
+			}
 			frameId = requestAnimationFrame(tick);
-		});
-		return () => cancelAnimationFrame(frameId);
+		}
+		frameId = requestAnimationFrame(tick);
+		return () => {
+			if (frameId) cancelAnimationFrame(frameId);
+		};
 	});
 
 	// Effective position in milliseconds including manual user sync offset

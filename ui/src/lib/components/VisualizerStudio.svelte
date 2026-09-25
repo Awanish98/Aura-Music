@@ -143,7 +143,9 @@
 	function resetParticles(w: number, h: number) {
 		particles = [];
 		shockwaves = [];
-		const count = Math.min(150, Math.floor((w * h) / 7500));
+		const isMobile = w <= 768;
+		const maxAllowed = isMobile ? 36 : 120;
+		const count = Math.min(maxAllowed, Math.floor((w * h) / (isMobile ? 18000 : 7500)));
 		const cx = w / 2;
 		const cy = h / 2;
 		const maxDim = Math.min(w, h);
@@ -172,7 +174,7 @@
 		}
 
 		// Initialize constellation nodes
-		const nodeCount = 36;
+		const nodeCount = isMobile ? 14 : 32;
 		constellationNodes = [];
 		for (let i = 0; i < nodeCount; i++) {
 			const dist = (Math.random() * 0.38 + 0.05) * maxDim;
@@ -245,7 +247,8 @@
 		const resize = () => {
 			if (!canvasEl) return;
 			const rect = canvasEl.getBoundingClientRect();
-			const dpr = Math.min(2, window.devicePixelRatio || 1);
+			const isMobile = window.innerWidth <= 768;
+			const dpr = Math.min(isMobile ? 1.25 : 2, window.devicePixelRatio || 1);
 			const w = Math.floor(rect.width);
 			const h = Math.floor(rect.height);
 
@@ -263,14 +266,29 @@
 		window.addEventListener('resize', resize);
 
 		let prevTime = performance.now();
+		let lastFrame = 0;
 
-		// Ultra-Fluid Audio Reactive 60-120FPS Canvas Engine
+		// Ultra-Fluid Audio Reactive Canvas Engine (with mobile thermal throttle & hidden tab pause)
 		function render(nowTime: number) {
 			if (!canvasEl || !ctx) return;
+
+			if (typeof document !== 'undefined' && document.hidden) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+
+			const isMobile = window.innerWidth <= 768;
+			// Throttle mobile frames to ~30-35fps for zero thermal overheating
+			if (isMobile && nowTime - lastFrame < 28) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+			lastFrame = nowTime;
+
 			const dt = Math.min(0.05, (nowTime - prevTime) / 1000);
 			prevTime = nowTime;
 
-			const dpr = Math.min(2, window.devicePixelRatio || 1);
+			const dpr = Math.min(isMobile ? 1.25 : 2, window.devicePixelRatio || 1);
 			const width = canvasEl.width / dpr;
 			const height = canvasEl.height / dpr;
 			const cx = width / 2;

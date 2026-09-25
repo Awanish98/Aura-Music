@@ -180,8 +180,16 @@
 		targetY = (e.clientY / window.innerHeight) * 100;
 	}
 
+	// Clean Energy & Mobile Low-Power Detection
+	let isMobile = $state(false);
+
 	onMount(() => {
-		isTouch = window.matchMedia('(pointer: coarse)').matches;
+		const checkMobile = () => {
+			isMobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+			isTouch = window.matchMedia('(pointer: coarse)').matches;
+		};
+		checkMobile();
+
 		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
 		reducedMotion = mql.matches;
 
@@ -190,68 +198,85 @@
 		};
 		mql.addEventListener('change', motionListener);
 
-		if (!reducedMotion && !isTouch && interactive) {
+		const resizeListener = () => {
+			checkMobile();
+		};
+		window.addEventListener('resize', resizeListener, { passive: true });
+
+		if (!reducedMotion && !isMobile && interactive) {
 			window.addEventListener('mousemove', handleMouseMove, { passive: true });
 		}
 
-		// Microscopic Glowing Stardust Particles (Minimalist & Non-Intrusive)
+		// Only initialize Canvas & Animation Loop on Non-Mobile Desktop when motion is enabled
 		let ctx: CanvasRenderingContext2D | null = null;
 		let w = 0;
 		let h = 0;
 		const dustParticles: { x: number; y: number; size: number; alpha: number; speedY: number; twinkle: number }[] = [];
 
-		if (canvasEl) {
+		if (!isMobile && !reducedMotion && canvasEl) {
 			ctx = canvasEl.getContext('2d', { alpha: true });
 			w = canvasEl.width = window.innerWidth;
 			h = canvasEl.height = window.innerHeight;
 
-			const resize = () => {
+			const resizeCanvas = () => {
 				if (!canvasEl) return;
 				w = canvasEl.width = window.innerWidth;
 				h = canvasEl.height = window.innerHeight;
 			};
-			window.addEventListener('resize', resize);
+			window.addEventListener('resize', resizeCanvas, { passive: true });
 
-			for (let i = 0; i < 35; i++) {
+			for (let i = 0; i < 20; i++) {
 				dustParticles.push({
 					x: Math.random() * w,
 					y: Math.random() * h,
-					size: Math.random() * 1.4 + 0.4,
-					alpha: Math.random() * 0.4 + 0.1,
-					speedY: Math.random() * 0.2 + 0.04,
+					size: Math.random() * 1.2 + 0.4,
+					alpha: Math.random() * 0.35 + 0.1,
+					speedY: Math.random() * 0.15 + 0.03,
 					twinkle: Math.random() * 0.02 + 0.01
 				});
 			}
 		}
 
 		let tick = 0;
-		function updateLoop() {
-			tick++;
-			if (!reducedMotion && !isTouch && interactive) {
-				mouseX += (targetX - mouseX) * 0.035;
-				mouseY += (targetY - mouseY) * 0.035;
+		let lastFrameTime = 0;
+
+		function updateLoop(now: number) {
+			// Tab visibility check: freeze completely if tab is hidden (phone locked / app minimized)
+			if (typeof document !== 'undefined' && document.hidden) {
+				animFrame = requestAnimationFrame(updateLoop);
+				return;
 			}
 
-			// Read live audio ballistics from webPlayer engine
+			// Throttle background particle frame rate to ~30fps for ultra-low CPU/battery consumption
+			if (now - lastFrameTime < 30) {
+				animFrame = requestAnimationFrame(updateLoop);
+				return;
+			}
+			lastFrameTime = now;
+			tick++;
+
+			if (!reducedMotion && !isMobile && interactive) {
+				mouseX += (targetX - mouseX) * 0.03;
+				mouseY += (targetY - mouseY) * 0.03;
+			}
+
+			// Read live audio ballistics only if playing
 			if (!playback.paused && playback.now) {
 				const metrics = webPlayer.getAudioMetrics();
 				const targetB = metrics.bass / 255;
 				const targetE = metrics.energy / 255;
-				const targetT = metrics.treble / 255;
-				liveBass += (targetB - liveBass) * 0.14;
-				liveEnergy += (targetE - liveEnergy) * 0.12;
-				liveTreble += (targetT - liveTreble) * 0.10;
+				liveBass += (targetB - liveBass) * 0.1;
+				liveEnergy += (targetE - liveEnergy) * 0.08;
 			} else {
-				liveBass *= 0.92;
-				liveEnergy *= 0.92;
-				liveTreble *= 0.92;
+				liveBass *= 0.90;
+				liveEnergy *= 0.90;
 			}
 
-			// Render subtle micro-stardust
-			if (ctx && canvasEl) {
+			// Render subtle micro-stardust on desktop
+			if (ctx && canvasEl && !isMobile && !reducedMotion) {
 				ctx.clearRect(0, 0, w, h);
 				const isPlaying = !playback.paused && !!playback.now;
-				const boost = isPlaying ? 1 + liveBass * 0.35 : 1;
+				const boost = isPlaying ? 1 + liveBass * 0.25 : 1;
 
 				for (const p of dustParticles) {
 					p.y -= p.speedY * boost;
@@ -259,7 +284,7 @@
 						p.y = h;
 						p.x = Math.random() * w;
 					}
-					const curAlpha = p.alpha * (0.7 + Math.sin(tick * p.twinkle) * 0.3) * (isPlaying ? 1 + liveEnergy * 0.3 : 1);
+					const curAlpha = p.alpha * (0.7 + Math.sin(tick * p.twinkle) * 0.3) * (isPlaying ? 1 + liveEnergy * 0.2 : 1);
 					ctx.fillStyle = `rgba(255, 255, 255, ${curAlpha})`;
 					ctx.beginPath();
 					ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -269,11 +294,23 @@
 
 			animFrame = requestAnimationFrame(updateLoop);
 		}
-		animFrame = requestAnimationFrame(updateLoop);
+
+		if (!isMobile && !reducedMotion) {
+			animFrame = requestAnimationFrame(updateLoop);
+		}
+
+		const handleVisibility = () => {
+			if (!document.hidden && !isMobile && !reducedMotion && !animFrame) {
+				animFrame = requestAnimationFrame(updateLoop);
+			}
+		};
+		document.addEventListener('visibilitychange', handleVisibility);
 
 		return () => {
 			mql.removeEventListener('change', motionListener);
+			window.removeEventListener('resize', resizeListener);
 			window.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('visibilitychange', handleVisibility);
 			if (animFrame) cancelAnimationFrame(animFrame);
 		};
 	});
@@ -292,58 +329,57 @@
 		--c2: {palette.c2};
 		--c3: {palette.c3};
 		--c4: {palette.c4};
-		--aura-opacity: {palette.opacity * (1 + liveEnergy * 0.3)};
+		--aura-opacity: {palette.opacity * (1 + liveEnergy * 0.2)};
 	"
 >
 	<!-- Pure Clean Luminous Canvas in Day Mode, Deep True AMOLED Black in Night Mode -->
 	<div class="absolute inset-0 bg-[#f8fafc] dark:bg-[#000000] dark:bg-none transition-colors duration-500"></div>
 
-	<!-- Fluid Mesh Node 1: Primary Radiant Glow (Top-Left / Pointer Follow) -->
-	<div
-		class="fluid-blob blob-1"
-		class:aura-static={reducedMotion}
-		style="
-			left: {mouseX * 0.5 + 10}%;
-			top: {mouseY * 0.45 + 5}%;
-			transform: translate(-50%, -50%) scale({1 + liveBass * 0.22});
-		"
-	></div>
+	{#if isMobile || reducedMotion}
+		<!-- ⚡ ZERO-CPU / ZERO-GPU OVERHEATING MOBILE STATIC MESH -->
+		<!-- Uses pure hardware-composited static CSS radial gradients with smooth color transitions -->
+		<div class="aura-mobile-mesh absolute inset-0 transition-all duration-1000 ease-out"></div>
+	{:else}
+		<!-- Desktop Rich Fluid Mesh Blobs -->
+		<div
+			class="fluid-blob blob-1"
+			style="
+				left: {mouseX * 0.5 + 10}%;
+				top: {mouseY * 0.45 + 5}%;
+				transform: translate(-50%, -50%) scale({1 + liveBass * 0.18});
+			"
+		></div>
 
-	<!-- Fluid Mesh Node 2: Secondary Harmonic Glow (Top-Right / Counter Drift) -->
-	<div
-		class="fluid-blob blob-2"
-		class:aura-static={reducedMotion}
-		style="
-			right: {100 - (mouseX * 0.45 + 20)}%;
-			top: {mouseY * 0.4 + 35}%;
-			transform: translate(-50%, -50%) scale({1 + liveEnergy * 0.18});
-		"
-	></div>
+		<div
+			class="fluid-blob blob-2"
+			style="
+				right: {100 - (mouseX * 0.45 + 20)}%;
+				top: {mouseY * 0.4 + 35}%;
+				transform: translate(-50%, -50%) scale({1 + liveEnergy * 0.15});
+			"
+		></div>
 
-	<!-- Fluid Mesh Node 3: Deep Accent Glow (Bottom-Left / Basin) -->
-	<div
-		class="fluid-blob blob-3"
-		class:aura-static={reducedMotion}
-		style="
-			left: {mouseX * 0.4 + 25}%;
-			bottom: {100 - (mouseY * 0.55 + 20)}%;
-			transform: translate(-50%, -50%) scale({1 + liveBass * 0.16});
-		"
-	></div>
+		<div
+			class="fluid-blob blob-3"
+			style="
+				left: {mouseX * 0.4 + 25}%;
+				bottom: {100 - (mouseY * 0.55 + 20)}%;
+				transform: translate(-50%, -50%) scale({1 + liveBass * 0.12});
+			"
+		></div>
 
-	<!-- Fluid Mesh Node 4: Soft Ambient Center Hearth (Breathing with Rhythm) -->
-	<div
-		class="fluid-blob blob-4"
-		class:aura-static={reducedMotion}
-		style="
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%) scale({0.95 + liveEnergy * 0.25});
-		"
-	></div>
+		<div
+			class="fluid-blob blob-4"
+			style="
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%) scale({0.95 + liveEnergy * 0.2});
+			"
+		></div>
 
-	<!-- Ultra-Fine Minimalist Floating Sparkles Canvas -->
-	<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full pointer-events-none z-10 opacity-60"></canvas>
+		<!-- Ultra-Fine Minimalist Floating Sparkles Canvas (Desktop Only) -->
+		<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full pointer-events-none z-10 opacity-50"></canvas>
+	{/if}
 
 	<!-- Atmospheric Edge Vignette Mask for Pure AMOLED Contrast -->
 	<div class="aura-vignette absolute inset-0 z-20 pointer-events-none"></div>
@@ -361,10 +397,31 @@
 		background-color: #000000;
 	}
 
+	/* Ultra-Efficient Mobile Mesh Gradient (0% CPU / 0% continuous GPU load) */
+	.aura-mobile-mesh {
+		opacity: calc(var(--aura-opacity, 0.32) * 0.6);
+		background-image: 
+			radial-gradient(circle at 15% 15%, var(--c1) 0%, transparent 45%),
+			radial-gradient(circle at 85% 25%, var(--c2) 0%, transparent 50%),
+			radial-gradient(circle at 50% 85%, var(--c3) 0%, transparent 45%),
+			radial-gradient(circle at 80% 80%, var(--c4) 0%, transparent 40%);
+		background-size: 100% 100%;
+		pointer-events: none;
+	}
+
+	:global(.dark) .aura-mobile-mesh {
+		opacity: calc(var(--aura-opacity, 0.38) * 0.9);
+		background-image: 
+			radial-gradient(circle at 20% 15%, var(--c1) 0%, transparent 55%),
+			radial-gradient(circle at 80% 30%, var(--c2) 0%, transparent 55%),
+			radial-gradient(circle at 35% 85%, var(--c3) 0%, transparent 50%),
+			radial-gradient(circle at 85% 85%, var(--c4) 0%, transparent 45%);
+	}
+
 	.fluid-blob {
 		position: absolute;
 		border-radius: 50%;
-		filter: blur(140px);
+		filter: blur(120px);
 		mix-blend-mode: normal;
 		opacity: calc(var(--aura-opacity, 0.32) * 0.2);
 		transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), background 1.6s ease;
@@ -375,7 +432,7 @@
 	:global(.dark) .fluid-blob {
 		mix-blend-mode: screen;
 		opacity: calc(var(--aura-opacity, 0.38) * 0.85);
-		filter: blur(160px);
+		filter: blur(140px);
 	}
 
 	.blob-1 {
@@ -404,11 +461,6 @@
 		height: clamp(500px, 60vw, 1000px);
 		background: radial-gradient(circle, var(--c4) 0%, rgba(217, 70, 239, 0.18) 40%, rgba(0, 0, 0, 0) 70%);
 		animation: fluidMorph4 36s ease-in-out infinite alternate;
-	}
-
-	.aura-static {
-		animation: none !important;
-		filter: blur(150px) !important;
 	}
 
 	@keyframes fluidMorph1 {

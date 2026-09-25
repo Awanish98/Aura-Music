@@ -46,11 +46,13 @@
 	let heroCanvas: HTMLCanvasElement | null = $state(null);
 
 	onMount(() => {
-		if (!heroCanvas) return;
+		const isMobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+		if (!heroCanvas || isMobile) return;
 		const ctx = heroCanvas.getContext('2d');
 		if (!ctx) return;
 
-		let animId: number;
+		let animId: number | null = null;
+		let isVisible = true;
 		let w = (heroCanvas.width = heroCanvas.parentElement?.clientWidth || 800);
 		let h = (heroCanvas.height = heroCanvas.parentElement?.clientHeight || 320);
 
@@ -59,7 +61,12 @@
 			w = heroCanvas.width = heroCanvas.parentElement.clientWidth;
 			h = heroCanvas.height = heroCanvas.parentElement.clientHeight;
 		};
-		window.addEventListener('resize', resize);
+		window.addEventListener('resize', resize, { passive: true });
+
+		const observer = new IntersectionObserver((entries) => {
+			isVisible = entries[0]?.isIntersecting ?? true;
+		});
+		if (heroCanvas.parentElement) observer.observe(heroCanvas.parentElement);
 
 		const particles: {
 			x: number;
@@ -74,27 +81,46 @@
 
 		const colors = ['#ff0a78', '#f43f5e', '#a855f7', '#00f5ff', '#ffffff', '#fef08a'];
 
-		for (let i = 0; i < 45; i++) {
+		for (let i = 0; i < 24; i++) {
 			particles.push({
 				x: Math.random() * w,
 				y: Math.random() * h,
-				size: Math.random() * 2.2 + 0.8,
+				size: Math.random() * 1.8 + 0.6,
 				color: colors[Math.floor(Math.random() * colors.length)],
-				alpha: Math.random() * 0.7 + 0.2,
-				speedX: (Math.random() - 0.5) * 0.4 + 0.2,
-				speedY: -Math.random() * 0.45 - 0.1,
-				twinkle: Math.random() * 0.04 + 0.02
+				alpha: Math.random() * 0.6 + 0.2,
+				speedX: (Math.random() - 0.5) * 0.3 + 0.1,
+				speedY: -Math.random() * 0.35 - 0.08,
+				twinkle: Math.random() * 0.03 + 0.015
 			});
 		}
 
 		let tick = 0;
-		const render = () => {
+		let lastFrame = 0;
+
+		const render = (now: number) => {
+			if (typeof document !== 'undefined' && document.hidden) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+
+			if (!isVisible) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+
+			// Throttle to 30fps
+			if (now - lastFrame < 32) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+			lastFrame = now;
 			tick++;
+
 			ctx.clearRect(0, 0, w, h);
 
 			const isPlaying = !playback.paused && !!playback.now;
-			const metrics = webPlayer.getAudioMetrics();
-			const boost = isPlaying ? 1 + (metrics.bass / 255) * 0.5 : 1;
+			const metrics = isPlaying ? webPlayer.getAudioMetrics() : { bass: 0 };
+			const boost = isPlaying ? 1 + (metrics.bass / 255) * 0.35 : 1;
 
 			for (const p of particles) {
 				p.x += p.speedX * boost;
@@ -107,31 +133,23 @@
 				if (p.x > w) p.x = 0;
 				if (p.x < 0) p.x = w;
 
-				const curAlpha = Math.max(0.1, Math.min(1, p.alpha + Math.sin(tick * p.twinkle) * 0.35));
+				const curAlpha = Math.max(0.1, Math.min(1, p.alpha + Math.sin(tick * p.twinkle) * 0.3));
 
 				ctx.fillStyle = p.color;
 				ctx.globalAlpha = curAlpha;
 				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.size * (isPlaying ? 1.15 : 1), 0, Math.PI * 2);
+				ctx.arc(p.x, p.y, p.size * (isPlaying ? 1.1 : 1), 0, Math.PI * 2);
 				ctx.fill();
-
-				// Neon glow
-				if (p.size > 1.6) {
-					ctx.strokeStyle = p.color;
-					ctx.lineWidth = 0.5;
-					ctx.beginPath();
-					ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
-					ctx.stroke();
-				}
 			}
 			ctx.globalAlpha = 1.0;
 
 			animId = requestAnimationFrame(render);
 		};
-		render();
+		animId = requestAnimationFrame(render);
 
 		return () => {
-			cancelAnimationFrame(animId);
+			if (animId) cancelAnimationFrame(animId);
+			observer.disconnect();
 			window.removeEventListener('resize', resize);
 		};
 	});

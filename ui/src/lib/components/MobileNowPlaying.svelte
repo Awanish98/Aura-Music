@@ -165,10 +165,10 @@
 <!-- Full-screen Mobile Now Playing View -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none backdrop-blur-3xl md:hidden"
+	class="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none md:hidden"
 	transition:fly={{ y: '100%', duration: 320, easing: cubicOut }}
 >
-	<!-- Ambient Animated Artwork Backdrop -->
+	<!-- Ambient Artwork Backdrop (Optimized for Mobile GPU) -->
 	{#if playback.now?.thumbnail}
 		<img
 			src={thumb(playback.now.thumbnail, 400)}
@@ -176,10 +176,10 @@
 			onerror={(e) => {
 				(e.currentTarget as HTMLImageElement).src = '/default_cover.jpg';
 			}}
-			class="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover opacity-35 blur-3xl transition-opacity duration-700 dark:opacity-45"
+			class="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-20 blur-xl transition-opacity duration-700 dark:opacity-30"
 		/>
 	{/if}
-	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background"></div>
+	<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/80 via-background/92 to-background"></div>
 
 	<!-- Top Drag Handle & Bar -->
 	<header
@@ -298,7 +298,7 @@
 			<div class="flex flex-1 items-center justify-center py-2 relative">
 				<!-- Ambient Aura Glow Ring behind art when playing -->
 				{#if !playback.paused}
-					<div class="pointer-events-none absolute w-64 h-64 rounded-full bg-gradient-to-tr from-pink-500/40 via-purple-500/30 to-cyan-400/40 blur-3xl animate-pulse opacity-90"></div>
+					<div class="pointer-events-none absolute w-60 h-60 rounded-full bg-gradient-to-tr from-pink-500/20 via-purple-500/20 to-cyan-400/20 blur-2xl opacity-75"></div>
 				{/if}
 
 				<!-- Vinyl Mode Floating Badge Toggle -->

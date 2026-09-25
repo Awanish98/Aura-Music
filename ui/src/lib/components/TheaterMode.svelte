@@ -227,7 +227,19 @@
 				}
 
 				let tick = 0;
-				const render = () => {
+				let lastFrameTime = 0;
+				const render = (now: number) => {
+					if (typeof document !== 'undefined' && document.hidden) {
+						starAnimId = requestAnimationFrame(render);
+						return;
+					}
+
+					// Throttle to 35fps to maintain low power
+					if (now - lastFrameTime < 28) {
+						starAnimId = requestAnimationFrame(render);
+						return;
+					}
+					lastFrameTime = now;
 					tick++;
 					ctx.clearRect(0, 0, w, h);
 
@@ -282,7 +294,7 @@
 
 					starAnimId = requestAnimationFrame(render);
 				};
-				render();
+				starAnimId = requestAnimationFrame(render);
 
 				return () => {
 					window.removeEventListener('resize', resizeHandler);

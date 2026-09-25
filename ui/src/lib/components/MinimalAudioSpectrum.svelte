@@ -40,9 +40,35 @@
 		resize();
 		window.addEventListener('resize', resize);
 
-		function render() {
+		let isVisible = true;
+		let lastFrameTime = 0;
+
+		const observer = new IntersectionObserver((entries) => {
+			isVisible = entries[0]?.isIntersecting ?? true;
+		});
+		if (canvasEl.parentElement) observer.observe(canvasEl.parentElement);
+
+		function render(now: number) {
 			if (!canvasEl || !ctx) return;
-			const dpr = Math.min(2, window.devicePixelRatio || 1);
+
+			if (typeof document !== 'undefined' && document.hidden) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+
+			if (!isVisible) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+
+			// Throttle to 30fps
+			if (now - lastFrameTime < 32) {
+				animId = requestAnimationFrame(render);
+				return;
+			}
+			lastFrameTime = now;
+
+			const dpr = Math.min(1.5, window.devicePixelRatio || 1);
 			const w = canvasEl.width / dpr;
 			const h = canvasEl.height / dpr;
 
@@ -124,6 +150,7 @@
 
 		return () => {
 			if (animId) cancelAnimationFrame(animId);
+			observer.disconnect();
 			window.removeEventListener('resize', resize);
 		};
 	});

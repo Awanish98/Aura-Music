@@ -163,11 +163,6 @@ class WebPlayer {
 						if (active && !playback.paused && active.paused && this.usingDirectAudio) {
 							active.play().catch(() => {});
 						}
-						this.acquireWakeLock();
-					} else {
-						if (!playback.paused) {
-							this.acquireWakeLock();
-						}
 					}
 				});
 			}
