@@ -296,7 +296,7 @@
 	"
 >
 	<!-- Pure Clean Luminous Canvas in Day Mode, Deep True AMOLED Black in Night Mode -->
-	<div class="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#f4f7fb] to-[#edf2f9] dark:bg-[#000000] transition-colors duration-500"></div>
+	<div class="absolute inset-0 bg-[#f8fafc] dark:bg-[#000000] dark:bg-none transition-colors duration-500"></div>
 
 	<!-- Fluid Mesh Node 1: Primary Radiant Glow (Top-Left / Pointer Follow) -->
 	<div
@@ -355,6 +355,10 @@
 		transform: translateZ(0);
 		contain: strict;
 		background-color: transparent;
+	}
+
+	:global(.dark) .aura-ambient-root {
+		background-color: #000000;
 	}
 
 	.fluid-blob {

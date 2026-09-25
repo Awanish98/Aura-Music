@@ -607,12 +607,12 @@ html.art-tint:not(.dark) {
 }
 
 html.art-tint.dark {
-	--background: #07090e;
-	--card: rgba(14, 17, 28, 0.85);
-	--popover: rgba(14, 17, 28, 0.96);
-	--secondary: rgba(26, 30, 48, 0.85);
+	--background: #000000;
+	--card: rgba(8, 10, 18, 0.85);
+	--popover: rgba(8, 10, 18, 0.96);
+	--secondary: rgba(14, 16, 26, 0.85);
 	--muted: rgba(255, 255, 255, 0.06);
-	--sidebar: #090c14;
+	--sidebar: #000000;
 	--sidebar-accent: rgba(255, 255, 255, 0.06);
 }
 

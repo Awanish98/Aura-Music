@@ -57,7 +57,6 @@
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import GlassFilter from '$lib/components/ui/GlassFilter.svelte';
 	import AuraAmbientBackground from '$lib/components/AuraAmbientBackground.svelte';
-	import CosmicBackgroundAnimation from '$lib/components/CosmicBackgroundAnimation.svelte';
 	import PwaInstallBanner from '$lib/components/PwaInstallBanner.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { auth, initApp, np, playback, ui, audioFx } from '$lib/player.svelte';
