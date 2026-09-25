@@ -295,8 +295,8 @@
 		--aura-opacity: {palette.opacity * (1 + liveEnergy * 0.3)};
 	"
 >
-	<!-- Pure Clean Luminous Canvas in Day Mode, Deep Cosmic Obsidian in Night Mode -->
-	<div class="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#f4f7fb] to-[#edf2f9] dark:bg-[#07090e] transition-colors duration-500"></div>
+	<!-- Pure Clean Luminous Canvas in Day Mode, Deep True AMOLED Black in Night Mode -->
+	<div class="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#f4f7fb] to-[#edf2f9] dark:bg-[#000000] transition-colors duration-500"></div>
 
 	<!-- Fluid Mesh Node 1: Primary Radiant Glow (Top-Left / Pointer Follow) -->
 	<div
@@ -345,7 +345,7 @@
 	<!-- Ultra-Fine Minimalist Floating Sparkles Canvas -->
 	<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full pointer-events-none z-10 opacity-60"></canvas>
 
-	<!-- Atmospheric Edge Vignette Mask for Perfect Contrast -->
+	<!-- Atmospheric Edge Vignette Mask for Pure AMOLED Contrast -->
 	<div class="aura-vignette absolute inset-0 z-20 pointer-events-none"></div>
 </div>
 
@@ -354,6 +354,7 @@
 		perspective: 1200px;
 		transform: translateZ(0);
 		contain: strict;
+		background-color: transparent;
 	}
 
 	.fluid-blob {
@@ -369,34 +370,35 @@
 
 	:global(.dark) .fluid-blob {
 		mix-blend-mode: screen;
-		opacity: var(--aura-opacity, 0.32);
+		opacity: calc(var(--aura-opacity, 0.38) * 0.85);
+		filter: blur(160px);
 	}
 
 	.blob-1 {
 		width: clamp(450px, 52vw, 900px);
 		height: clamp(450px, 52vw, 900px);
-		background: radial-gradient(circle, var(--c1) 0%, rgba(255, 10, 120, 0) 68%);
+		background: radial-gradient(circle, var(--c1) 0%, rgba(255, 42, 122, 0.2) 40%, rgba(0, 0, 0, 0) 70%);
 		animation: fluidMorph1 24s ease-in-out infinite alternate;
 	}
 
 	.blob-2 {
 		width: clamp(480px, 56vw, 950px);
 		height: clamp(480px, 56vw, 950px);
-		background: radial-gradient(circle, var(--c2) 0%, rgba(139, 92, 246, 0) 68%);
+		background: radial-gradient(circle, var(--c2) 0%, rgba(139, 92, 246, 0.2) 40%, rgba(0, 0, 0, 0) 70%);
 		animation: fluidMorph2 28s ease-in-out infinite alternate;
 	}
 
 	.blob-3 {
 		width: clamp(380px, 46vw, 780px);
 		height: clamp(380px, 46vw, 780px);
-		background: radial-gradient(circle, var(--c3) 0%, rgba(6, 182, 212, 0) 68%);
+		background: radial-gradient(circle, var(--c3) 0%, rgba(6, 182, 212, 0.18) 40%, rgba(0, 0, 0, 0) 70%);
 		animation: fluidMorph3 32s ease-in-out infinite alternate;
 	}
 
 	.blob-4 {
 		width: clamp(500px, 60vw, 1000px);
 		height: clamp(500px, 60vw, 1000px);
-		background: radial-gradient(circle, var(--c4) 0%, rgba(109, 40, 217, 0) 70%);
+		background: radial-gradient(circle, var(--c4) 0%, rgba(217, 70, 239, 0.18) 40%, rgba(0, 0, 0, 0) 70%);
 		animation: fluidMorph4 36s ease-in-out infinite alternate;
 	}
 
@@ -459,6 +461,6 @@
 	}
 
 	:global(.dark) .aura-vignette {
-		background: radial-gradient(ellipse at 50% 50%, rgba(7, 9, 14, 0) 0%, rgba(7, 9, 14, 0.5) 75%, rgba(7, 9, 14, 0.95) 100%);
+		background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 65%, #000000 100%);
 	}
 </style>

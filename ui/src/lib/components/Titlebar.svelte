@@ -112,7 +112,7 @@
 
 <header
 	data-tauri-drag-region
-	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-border/30 bg-white/45 dark:bg-[#070912]/50 backdrop-blur-2xl px-4 sm:px-6 transition-colors duration-300"
+	class="relative {ui.theaterOpen ? 'z-0' : 'z-50'} flex h-16 shrink-0 select-none items-center justify-between border-b border-border/30 bg-white/45 dark:bg-black/80 backdrop-blur-2xl px-4 sm:px-6 transition-colors duration-300"
 >
 	<!-- Left: Brand Logo & History Navigation -->
 	<div class="flex items-center gap-3">

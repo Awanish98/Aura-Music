@@ -52,10 +52,10 @@
 	}
 </script>
 
-<div class="relative overflow-hidden rounded-3xl border border-slate-200/90 dark:border-white/10 bg-gradient-to-r from-white via-purple-50/60 to-pink-50/70 dark:from-[#110e28]/95 dark:via-[#161130]/90 dark:to-[#1f0d2c]/85 p-6 sm:p-7 backdrop-blur-3xl shadow-sm dark:shadow-2xl select-none">
+<div class="relative overflow-hidden rounded-3xl border border-slate-200/90 dark:border-white/10 bg-gradient-to-r from-white via-purple-50/60 to-pink-50/70 dark:from-[#000000] dark:via-[#0a0818] dark:to-[#0f0618] p-6 sm:p-7 backdrop-blur-3xl shadow-sm dark:shadow-[0_20px_50px_rgba(0,0,0,0.9)] select-none">
 	<!-- Holographic Glow Lights -->
-	<div class="pointer-events-none absolute -right-12 -top-12 h-60 w-60 rounded-full bg-purple-500/10 dark:bg-purple-500/20 blur-3xl"></div>
-	<div class="pointer-events-none absolute -left-12 -bottom-12 h-60 w-60 rounded-full bg-pink-500/10 dark:bg-pink-500/20 blur-3xl"></div>
+	<div class="pointer-events-none absolute -right-12 -top-12 h-60 w-60 rounded-full bg-purple-500/10 dark:bg-purple-500/15 blur-3xl"></div>
+	<div class="pointer-events-none absolute -left-12 -bottom-12 h-60 w-60 rounded-full bg-pink-500/10 dark:bg-pink-500/15 blur-3xl"></div>
 
 	<div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
 		<!-- Left: Heading + Mascot + Description + Presets + Input -->

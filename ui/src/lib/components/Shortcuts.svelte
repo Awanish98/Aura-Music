@@ -214,7 +214,7 @@
 					{/if}
 
 					<div
-						class="flex flex-col justify-between h-28 cursor-pointer rounded-2xl border bg-white dark:bg-[#101322]/85 border-slate-200/90 dark:border-white/10 p-4 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:shadow-md dark:hover:shadow-2xl hover:border-pink-400/60 hover:scale-[1.02]"
+						class="flex flex-col justify-between h-28 cursor-pointer rounded-2xl border bg-white dark:bg-[#060814]/90 border-slate-200/90 dark:border-white/10 p-4 backdrop-blur-2xl shadow-sm dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:shadow-md dark:hover:shadow-[0_12px_40px_rgba(255,42,122,0.15)] hover:border-pink-400/60 hover:scale-[1.02]"
 						role="button"
 						tabindex="0"
 						draggable="true"

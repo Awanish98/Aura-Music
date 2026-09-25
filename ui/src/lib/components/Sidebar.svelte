@@ -91,7 +91,7 @@
 </script>
 
 <aside
-	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-[#070912]/80 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
+	class="hidden md:flex h-full w-16 shrink-0 flex-col border-r border-slate-200/80 dark:border-white/8 bg-white/70 dark:bg-black/90 backdrop-blur-3xl p-3 text-sidebar-foreground transition-all duration-300 {wide(
 		'lg:w-64'
 	)} select-none"
 >

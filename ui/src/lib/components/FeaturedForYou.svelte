@@ -93,7 +93,7 @@
 				tabindex="0"
 				onclick={() => playFeatured(item)}
 				onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && playFeatured(item)}
-				class="group relative flex flex-col gap-2 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#101322]/85 p-2.5 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:shadow-md dark:hover:shadow-2xl hover:border-pink-500/50 hover:scale-[1.02] cursor-pointer"
+				class="group relative flex flex-col gap-2 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#060814]/90 p-2.5 backdrop-blur-2xl shadow-sm dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:shadow-md dark:hover:shadow-[0_12px_40px_rgba(255,42,122,0.15)] hover:border-pink-500/50 hover:scale-[1.02] cursor-pointer"
 			>
 				<!-- Card Image with Hover Overlay and Pink Play Button in Bottom-Right -->
 				<div class="relative aspect-video sm:aspect-square w-full overflow-hidden rounded-xl bg-muted shadow-md ring-1 ring-border/40">

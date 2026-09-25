@@ -499,7 +499,7 @@
 
 				<!-- Hero Spotlight Video Card -->
 				<div
-					class="group relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#101322]/90 p-3 backdrop-blur-2xl shadow-sm dark:shadow-xl transition-all duration-300 hover:border-pink-500/50"
+					class="group relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#060814]/90 p-3 backdrop-blur-2xl shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:border-pink-500/50"
 				>
 					<div class="relative aspect-video w-full overflow-hidden rounded-xl bg-black/80 shadow-inner">
 						<img
@@ -591,7 +591,7 @@
 					</span>
 				</div>
 
-				<div class="flex flex-col gap-1.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0c0f1c]/90 p-2 backdrop-blur-2xl shadow-sm">
+				<div class="flex flex-col gap-1.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#050610]/95 p-2 backdrop-blur-2xl shadow-sm dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)]">
 					{#each filteredVideos as videoItem}
 						<div
 							class="group flex items-center justify-between gap-2 rounded-xl p-2 transition-all duration-200 hover:bg-slate-100/80 dark:hover:bg-white/8 hover:border-red-500/20 border border-transparent"

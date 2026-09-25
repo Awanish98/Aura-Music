@@ -137,14 +137,14 @@
 	});
 </script>
 
-<div class="relative overflow-hidden rounded-3xl border border-slate-200/90 dark:border-white/10 bg-gradient-to-r from-white via-pink-50/60 to-purple-50/70 dark:from-[#0b0d1b]/95 dark:via-[#130f24]/90 dark:to-[#1b0c26]/85 p-6 sm:p-8 shadow-sm dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] mb-8 select-none backdrop-blur-3xl group">
+<div class="relative overflow-hidden rounded-3xl border border-slate-200/90 dark:border-white/10 bg-gradient-to-r from-white via-pink-50/60 to-purple-50/70 dark:from-[#000000] dark:via-[#080812] dark:to-[#0f0818] p-6 sm:p-8 shadow-sm dark:shadow-[0_20px_50px_rgba(0,0,0,0.9)] mb-8 select-none backdrop-blur-3xl group">
 	<!-- Dynamic Canvas Particles Layer Inside Hero Banner -->
 	<canvas bind:this={heroCanvas} class="pointer-events-none absolute inset-0 z-0 h-full w-full"></canvas>
 
 	<!-- Cosmic Nebula Background Ambient Glow -->
-	<div class="pointer-events-none absolute -right-16 -top-16 h-80 w-80 rounded-full bg-pink-500/10 dark:bg-pink-500/25 blur-3xl animate-pulse"></div>
-	<div class="pointer-events-none absolute -left-16 -bottom-16 h-80 w-80 rounded-full bg-purple-500/10 dark:bg-purple-600/20 blur-3xl"></div>
-	<div class="pointer-events-none absolute left-1/3 top-1/4 h-64 w-64 rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 blur-3xl"></div>
+	<div class="pointer-events-none absolute -right-16 -top-16 h-80 w-80 rounded-full bg-pink-500/10 dark:bg-pink-500/20 blur-3xl animate-pulse"></div>
+	<div class="pointer-events-none absolute -left-16 -bottom-16 h-80 w-80 rounded-full bg-purple-500/10 dark:bg-purple-600/15 blur-3xl"></div>
+	<div class="pointer-events-none absolute left-1/3 top-1/4 h-64 w-64 rounded-full bg-cyan-500/10 dark:bg-cyan-500/10 blur-3xl"></div>
 
 	<!-- Seamless Hero Girl Artwork Background Overlay -->
 	<div class="pointer-events-none absolute right-0 top-0 bottom-0 w-full sm:w-3/5 lg:w-1/2 overflow-hidden opacity-25 dark:opacity-85 mix-blend-multiply dark:mix-blend-screen transition-transform duration-1000 group-hover:scale-102">
@@ -153,8 +153,8 @@
 			alt="Aura Girl with Headphones"
 			class="h-full w-full object-cover object-right"
 		/>
-		<div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#0b0d1b] dark:via-[#0b0d1b]/60 dark:to-transparent"></div>
-		<div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent dark:from-[#0b0d1b]/80 dark:via-transparent dark:to-transparent"></div>
+		<div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#000000] dark:via-[#000000]/70 dark:to-transparent"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent dark:from-[#000000]/90 dark:via-transparent dark:to-transparent"></div>
 	</div>
 
 	<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
