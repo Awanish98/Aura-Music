@@ -500,7 +500,7 @@
 								tabindex="0"
 								onclick={() => {
 									if (topResult.kind === 'song') {
-										playSong(asSong(topResult));
+										api.playPlaylist(songRows, 0, undefined, `Search: ${searched}`);
 									} else {
 										goto(`/${topResult.kind}/${encodeURIComponent(topResult.id)}`);
 									}
@@ -509,7 +509,7 @@
 									if (e.key === 'Enter' || e.key === ' ') {
 										e.preventDefault();
 										if (topResult.kind === 'song') {
-											playSong(asSong(topResult));
+											api.playPlaylist(songRows, 0, undefined, `Search: ${searched}`);
 										} else {
 											goto(`/${topResult.kind}/${encodeURIComponent(topResult.id)}`);
 										}
@@ -589,7 +589,7 @@
 										{selection}
 										selectionKey={selection.visibleKeys[i]}
 										showPlayCount
-										onplay={() => playSong(song)}
+										onplay={() => api.playPlaylist(songRows, i, undefined, `Search: ${searched}`)}
 										onAdd={() => openAddToPlaylist(song)}
 									/>
 								{/each}
@@ -614,15 +614,15 @@
 						</div>
 
 						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-							{#each versionRows.slice(0, 8) as vSong}
+							{#each versionRows.slice(0, 8) as vSong, vIdx}
 								<div
 									role="button"
 									tabindex="0"
-									onclick={() => playSong(vSong)}
+									onclick={() => api.playPlaylist(versionRows, vIdx, undefined, 'Different Versions & Remixes')}
 									onkeydown={(e) => {
 										if (e.key === 'Enter' || e.key === ' ') {
 											e.preventDefault();
-											playSong(vSong);
+											api.playPlaylist(versionRows, vIdx, undefined, 'Different Versions & Remixes');
 										}
 									}}
 									class="flex items-center gap-3 rounded-2xl apple-glass-card p-3 cursor-pointer group hover:border-primary/40 transition-all"
@@ -651,7 +651,7 @@
 										aria-label="Play version"
 										onclick={(e) => {
 											e.stopPropagation();
-											playSong(vSong);
+											api.playPlaylist(versionRows, vIdx, undefined, 'Different Versions & Remixes');
 										}}
 									>
 										<HugeiconsIcon icon={PlayIcon} size={16} fill="currentColor" class="ml-0.5" />
@@ -691,7 +691,7 @@
 									{selection}
 									selectionKey={selection.visibleKeys[i]}
 									showPlayCount
-									onplay={() => playSong(song)}
+									onplay={() => api.playPlaylist(visibleSongRows, i, undefined, `Search: ${searched}`)}
 									onAdd={() => openAddToPlaylist(song)}
 								/>
 							{/each}

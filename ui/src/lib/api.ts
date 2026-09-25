@@ -445,6 +445,30 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 		playback.queue = { ...q };
 		return undefined as unknown as T;
 	}
+	if (cmd === 'start_radio') {
+		const kind = args?.kind as string;
+		const id = args?.id as string;
+		const name = (args?.name as string) || 'Radio';
+		(async () => {
+			try {
+				let recos: SongItem[] = [];
+				if (kind === 'artist' || kind === 'song') {
+					recos = await (await import('./saavn')).searchSaavnDirect(name || id, 1, 25);
+				} else if (kind === 'album') {
+					const album = await (await import('./saavn')).fetchSaavnAlbumDetailsDirect(id);
+					recos = album.songs;
+				} else if (kind === 'playlist') {
+					recos = await (await import('./saavn')).fetchSaavnPlaylistDirect(id);
+				}
+				if (recos.length > 0) {
+					webPlayer.playPlaylist(recos, 0, `${name} Radio`);
+				}
+			} catch (e) {
+				console.warn('[Start radio error]', e);
+			}
+		})();
+		return undefined as unknown as T;
+	}
 	if (cmd === 'get_account') {
 		const user = getWebStorage<any>('google_user', null);
 		if (user) {

@@ -107,7 +107,7 @@
 					{selection}
 					selectionKey={selection.visibleKeys[i]}
 					showPlayCount
-					onplay={() => playSong(song)}
+					onplay={() => api.playPlaylist(songs, i, undefined, `Search: ${q}`)}
 					onAdd={() => openAddToPlaylist(song)}
 				/>
 			{:else}

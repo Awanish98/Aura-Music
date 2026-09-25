@@ -1234,6 +1234,11 @@ class WebPlayer {
 			if (idx !== -1) playback.queue.currentIndex = idx;
 		}
 
+		// Auto-populate queue with suggested songs if queue only has this single song or few tracks
+		if (playback.queue.items.length <= 3) {
+			this.autoFillQueue(item).catch(() => {});
+		}
+
 		// 1. Direct stream URL already attached (e.g. JioSaavn 320kbps lossless, SomaFM, Nightwave Plaza)
 		if (item.streamUrl) {
 			if (item.duration === 'LIVE') {
@@ -1262,6 +1267,67 @@ class WebPlayer {
 			item.video_id = targetVideoId;
 			if (playback.now) playback.now.videoId = targetVideoId;
 			this.loadAndPlayYt(targetVideoId);
+		}
+	}
+
+	private isFillingQueue = false;
+
+	async autoFillQueue(seedItem?: SongItem | null) {
+		if (this.isFillingQueue) return;
+		const item = seedItem || this.currentItem || playback.queue.items[playback.queue.currentIndex];
+		if (!item) return;
+
+		// Only auto-fill if queue has fewer than 8 upcoming songs
+		const remaining = playback.queue.items.length - (playback.queue.currentIndex + 1);
+		if (remaining >= 8) return;
+
+		this.isFillingQueue = true;
+		try {
+			const rawArtist = (item.artists || '').split(/[,&/]/)[0]?.replace(/•.*$/g, '').trim();
+			const cleanTitle = (item.title || '')
+				.replace(/\(.*?\)/g, '')
+				.replace(/\[.*?\]/g, '')
+				.trim();
+
+			// Search for artist top hits or similar songs
+			let suggestions: SongItem[] = [];
+			if (rawArtist && rawArtist.length > 1) {
+				suggestions = await searchSaavnDirect(rawArtist, 1, 20);
+			}
+			if (!suggestions || suggestions.length < 5) {
+				const query = cleanTitle ? `${cleanTitle} ${rawArtist}`.trim() : rawArtist;
+				const more = await searchSaavnDirect(query, 1, 20);
+				suggestions = [...suggestions, ...more];
+			}
+
+			if (suggestions.length > 0) {
+				const currentIds = new Set(playback.queue.items.map((x) => x.video_id));
+				const currentTitles = new Set(
+					playback.queue.items.map((x) => (x.title || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '').trim())
+				);
+
+				const newSongs: SongItem[] = [];
+				for (const s of suggestions) {
+					const normTitle = (s.title || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '').trim();
+					if (!currentIds.has(s.video_id) && !currentTitles.has(normTitle)) {
+						currentIds.add(s.video_id);
+						currentTitles.add(normTitle);
+						newSongs.push({
+							...s,
+							autoplay: true
+						});
+					}
+				}
+
+				if (newSongs.length > 0) {
+					playback.queue.items = deduplicateSongs([...playback.queue.items, ...newSongs]);
+					playback.queue = { ...playback.queue };
+				}
+			}
+		} catch (e) {
+			console.warn('[Auto-fill suggested songs exception]', e);
+		} finally {
+			this.isFillingQueue = false;
 		}
 	}
 
@@ -1296,7 +1362,12 @@ class WebPlayer {
 		};
 
 		const item = queueItems[startIndex];
-		if (item) this.play(item);
+		if (item) {
+			this.play(item);
+			if (queueItems.length <= 4) {
+				this.autoFillQueue(item).catch(() => {});
+			}
+		}
 	}
 
 	playIndex(index: number) {
@@ -1390,13 +1461,22 @@ class WebPlayer {
 		}
 	}
 
-	next() {
+	async next() {
 		this.cancelCrossfade();
 		const q = playback.queue;
 		if (q.currentIndex < q.items.length - 1) {
 			this.playIndex(q.currentIndex + 1);
 		} else if (q.repeat === 'all' && q.items.length > 0) {
 			this.playIndex(0);
+		} else {
+			// At the end of queue -> auto-fetch suggested songs and keep playing without stopping!
+			const current = q.items[q.currentIndex];
+			if (current) {
+				await this.autoFillQueue(current);
+				if (playback.queue.currentIndex < playback.queue.items.length - 1) {
+					this.playIndex(playback.queue.currentIndex + 1);
+				}
+			}
 		}
 	}
 
