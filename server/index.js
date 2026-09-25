@@ -1229,7 +1229,9 @@ app.use(
 		maxAge: '1d',
 		etag: true,
 		setHeaders: (res, filePath) => {
-			if (filePath.match(/\.(js|css|woff2|png|jpg|jpeg|svg|webp|ico|json)$/)) {
+			if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.json')) {
+				res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+			} else if (filePath.match(/\.(js|css|woff2|png|jpg|jpeg|svg|webp|ico)$/)) {
 				res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
 			}
 		}

@@ -1,12 +1,16 @@
 // Aura Music Service Worker — Fast App Shell Caching & Offline Fallback
-// Version: 1.2.0
+// Version: 1.3.0
 
-const CACHE_NAME = 'aura-music-v1.2.0';
+const CACHE_NAME = 'aura-music-v1.3.0';
 const STATIC_ASSETS = [
 	'/',
 	'/manifest.json',
 	'/favicon.svg',
 	'/favicon.png',
+	'/pwa-192x192.png',
+	'/pwa-512x512.png',
+	'/pwa-maskable-512x512.png',
+	'/apple-touch-icon.png',
 	'/offline.html',
 	'/robots.txt',
 	'/llms.txt'
