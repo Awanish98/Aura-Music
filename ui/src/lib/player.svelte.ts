@@ -153,9 +153,19 @@ export const audioFx = $state({
 	visualizerTheme: (browser ? (localStorage.getItem('aura_visualizer_theme') as VisualizerColorTheme) || 'artwork' : 'artwork') as VisualizerColorTheme,
 	visualizerSensitivity: 1.1,
 	visualizerGlow: true,
+	liveCanvasEnabled: (browser ? localStorage.getItem('aura_live_canvas') !== 'false' : true),
 	playbackMode: (browser ? (localStorage.getItem('aura_playback_mode') as PlaybackMode) || 'crossfade' : 'crossfade') as PlaybackMode,
 	crossfadeDuration: (browser ? Number(localStorage.getItem('aura_crossfade_duration')) || 5 : 5)
 });
+
+export function toggleLiveCanvas(enabled?: boolean) {
+	const next = enabled !== undefined ? enabled : !audioFx.liveCanvasEnabled;
+	audioFx.liveCanvasEnabled = next;
+	if (browser) {
+		localStorage.setItem('aura_live_canvas', String(next));
+		toast.success(`Live Canvas: ${next ? 'On (Apple & Spotify Mode)' : 'Off'}`);
+	}
+}
 
 export function setVisualizerPreset(preset: VisualizerPreset) {
 	audioFx.visualizerPreset = preset;

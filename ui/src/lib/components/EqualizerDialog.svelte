@@ -17,6 +17,7 @@
 		setAudioQuality,
 		setPlaybackMode,
 		setCrossfadeDuration,
+		toggleLiveCanvas,
 		EQ_PRESETS,
 		type EqPreset,
 		type PlaybackMode,
@@ -322,6 +323,39 @@
 								{/if}
 							</button>
 						{/each}
+					</div>
+				</div>
+
+				<!-- Section 3.5: Live Canvas (Apple Music & Spotify Dynamic Motion) -->
+				<div class="rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 p-4">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="size-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+								<HugeiconsIcon icon={SparklesIcon} size={18} />
+							</div>
+							<div>
+								<div class="text-xs font-bold flex items-center gap-2 text-foreground">
+									<span>Live Canvas Artwork</span>
+									<span class="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 uppercase font-bold">
+										Live Motion
+									</span>
+								</div>
+								<p class="text-[11px] text-muted-foreground leading-tight mt-0.5">
+									Living chromatic fluid waves & stardust dynamic background
+								</p>
+							</div>
+						</div>
+						<button
+							class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {audioFx.liveCanvasEnabled ? 'bg-primary' : 'bg-muted'}"
+							role="switch"
+							aria-label="Toggle Live Canvas Artwork"
+							aria-checked={audioFx.liveCanvasEnabled}
+							onclick={() => toggleLiveCanvas()}
+						>
+							<span
+								class="pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out {audioFx.liveCanvasEnabled ? 'translate-x-5' : 'translate-x-0'}"
+							></span>
+						</button>
 					</div>
 				</div>
 

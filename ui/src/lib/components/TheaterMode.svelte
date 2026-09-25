@@ -56,9 +56,10 @@
 	import LyricsView from './LyricsView.svelte';
 	import QueueList from './QueueList.svelte';
 	import type { QueueScrollMemory } from '$lib/queue-history';
-	import VisualizerStudio from './VisualizerStudio.svelte';
 	import EqualizerDialog from './EqualizerDialog.svelte';
 	import SleepTimerModal from './SleepTimerModal.svelte';
+	import LiveSongCanvas from './LiveSongCanvas.svelte';
+	import VisualizerStudio from './VisualizerStudio.svelte';
 
 	const close = () => {
 		if (typeof document !== 'undefined' && document.fullscreenElement) {
@@ -410,8 +411,13 @@
 	onpointermove={wake}
 	class="theater fixed inset-0 z-50 flex h-[100dvh] w-[100dvw] flex-col overflow-hidden bg-[#07080d] text-white select-none"
 >
-	<!-- 🌌 1. Deep Animated Particle & Bokeh Atmosphere Canvas -->
-	<canvas bind:this={starCanvas} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-80"></canvas>
+	<!-- 🌌 1. Apple Music & Spotify Style Live Animated Canvas Background -->
+	{#if audioFx.liveCanvasEnabled}
+		<LiveSongCanvas class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-70" />
+	{:else}
+		<!-- Deep Animated Particle & Bokeh Atmosphere Canvas -->
+		<canvas bind:this={starCanvas} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-80"></canvas>
+	{/if}
 
 	<!-- 🎨 2. Rich Dynamic Blurred Artwork Backdrop & Accent Mesh -->
 	<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">

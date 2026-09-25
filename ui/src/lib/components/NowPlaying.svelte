@@ -56,9 +56,10 @@
 	import LyricsView from './LyricsView.svelte';
 	import AiSongStory from './AiSongStory.svelte';
 	import VisualizerStudio from './VisualizerStudio.svelte';
-	import Marquee from './Marquee.svelte';
 	import ArtistLine from './ArtistLine.svelte';
 	import EqualizerDialog from './EqualizerDialog.svelte';
+	import LiveSongCanvas from './LiveSongCanvas.svelte';
+	import Marquee from './Marquee.svelte';
 
 	let { queueOpen, lyricsOpen }: { queueOpen: boolean; lyricsOpen: boolean } = $props();
 	const tabbed = $derived(appearance.tabbedPlayer);
@@ -75,7 +76,7 @@
 
 	let showEq = $state(false);
 	let justLiked = $state(false);
-	let vinylMode = $state(false);
+	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>('canvas');
 
 	function toggleLike() {
 		if (playback.rating !== 'like') justLiked = true;
@@ -161,8 +162,10 @@
 		? ''
 		: 'lg:left-60'} {inset}"
 >
-	<!-- Ambient Animated Background Glow -->
-	{#if appearance.artworkBackground && !showVideo() && srcs[2] && !bgFailed}
+	<!-- Apple Music & Spotify Style Live Ambient Motion Canvas Background -->
+	{#if audioFx.liveCanvasEnabled && !showVideo()}
+		<LiveSongCanvas class="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-60" />
+	{:else if appearance.artworkBackground && !showVideo() && srcs[2] && !bgFailed}
 		<img
 			src={srcs[2]}
 			alt=""
@@ -205,7 +208,7 @@
 						</div>
 					{/if}
 
-					<!-- Dynamic Glowing Vinyl / Cover Artwork Container -->
+					<!-- Dynamic Glowing Vinyl / Cover / Live Canvas Container -->
 					<div class="relative w-full aspect-square flex items-center justify-center">
 						<!-- Ambient Aura Glow Ring behind art when playing -->
 						{#if !playback.paused}
@@ -216,13 +219,13 @@
 							type="button"
 							onclick={toggle}
 							aria-label={t('a11y.play_pause')}
-							class="block w-full h-full cursor-pointer relative group transition-transform duration-300 hover:scale-[1.015] {vinylMode ? 'rounded-full' : 'rounded-3xl overflow-hidden shadow-2xl'}"
+							class="block w-full h-full cursor-pointer relative group transition-transform duration-300 hover:scale-[1.015] {artViewMode === 'vinyl' ? 'rounded-full' : 'rounded-3xl overflow-hidden shadow-2xl'}"
 						>
 							{#if flash}
 								<div
 									in:scale={{ start: 0.7, duration: 150, easing: cubicOut }}
 									out:scale={{ start: 1.3, duration: 320, easing: cubicOut }}
-									class="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px] {vinylMode ? 'rounded-full' : 'rounded-3xl'}"
+									class="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px] {artViewMode === 'vinyl' ? 'rounded-full' : 'rounded-3xl'}"
 								>
 									<div class="rounded-full bg-black/70 p-4 text-white shadow-2xl ring-1 ring-white/20">
 										<HugeiconsIcon
@@ -243,7 +246,16 @@
 								}}
 							></div>
 
-							{#if vinylMode}
+							{#if artViewMode === 'canvas'}
+								<!-- 🌟 Apple Music & Spotify Live Animated Motion Canvas Artwork -->
+								<div class="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/15">
+									<LiveSongCanvas class="w-full h-full" />
+									<div class="absolute bottom-2.5 right-3 px-2 py-0.5 rounded-full bg-black/50 text-[10px] font-bold text-white/90 backdrop-blur-md border border-white/10 pointer-events-none flex items-center gap-1">
+										<span class="size-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+										<span>Live Canvas</span>
+									</div>
+								</div>
+							{:else if artViewMode === 'vinyl'}
 								<!-- Realistic Audiophile Spinning 12-inch Vinyl LP Record -->
 								<div class="relative w-full h-full rounded-full bg-[#0a0a0f] shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_0_0_2px_rgba(255,255,255,0.12)] flex items-center justify-center overflow-hidden {!playback.paused ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}">
 									<!-- Concentric Vinyl Grooves -->
@@ -306,29 +318,45 @@
 						</button>
 					</div>
 
-					<!-- Artwork Floating Header Badges (Visualizer Studio + Vinyl Mode Toggle + Theater Mode) -->
+					<!-- Artwork Floating Header Badges (Live Canvas + Vinyl Disc + Cover + Visualizer) -->
 					<div class="absolute left-3 top-3 z-10 flex items-center gap-1.5">
+						<!-- Live Canvas Toggle Button -->
+						<button
+							type="button"
+							onclick={() => (artViewMode = artViewMode === 'canvas' ? 'cover' : 'canvas')}
+							aria-label="Toggle Apple & Spotify Live Canvas"
+							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {artViewMode === 'canvas'
+								? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400/50 shadow-emerald-500/30'
+								: 'bg-black/60 text-white/80 hover:text-white border-white/10'}"
+							title="Apple Music & Spotify Live Canvas Motion"
+						>
+							<HugeiconsIcon icon={SparklesIcon} class="h-3.5 w-3.5 {artViewMode === 'canvas' ? 'text-white animate-spin' : 'text-emerald-400'}" />
+							<span>Canvas</span>
+						</button>
+
+						<!-- Vinyl Disc Toggle Button -->
+						<button
+							type="button"
+							onclick={() => (artViewMode = artViewMode === 'vinyl' ? 'cover' : 'vinyl')}
+							aria-label={artViewMode === 'vinyl' ? 'Switch to Album Cover' : 'Switch to Vinyl Disc'}
+							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {artViewMode === 'vinyl'
+								? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
+								: 'bg-black/60 text-white/80 hover:text-white border-white/10'}"
+							title={artViewMode === 'vinyl' ? 'Cover View' : 'Vinyl Disc Mode'}
+						>
+							<HugeiconsIcon icon={CdIcon} class="h-3.5 w-3.5 {artViewMode === 'vinyl' ? 'animate-spin-vinyl text-white' : 'text-pink-400'}" />
+							<span>{artViewMode === 'vinyl' ? 'Vinyl' : 'Disc'}</span>
+						</button>
+
+						<!-- Visualizer Studio Toggle -->
 						<button
 							type="button"
 							onclick={() => (audioFx.visualizerModalOpen = true)}
 							aria-label="Launch Fullscreen Visualizer Studio"
-							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-3 py-1 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10 active:scale-95"
+							class="flex items-center gap-1.5 cursor-pointer rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-600 hover:text-white shadow-lg border border-white/10 active:scale-95"
 						>
 							<HugeiconsIcon icon={AudioWave01Icon} class="h-3.5 w-3.5 text-pink-400" />
-							<span>Visualizer</span>
-						</button>
-
-						<button
-							type="button"
-							onclick={() => (vinylMode = !vinylMode)}
-							aria-label={vinylMode ? 'Switch to Album Cover' : 'Switch to Vinyl Disc'}
-							class="flex items-center gap-1.5 cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-95 {vinylMode
-								? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
-								: 'bg-black/60 text-white/80 hover:text-white border-white/10'}"
-							title={vinylMode ? 'Cover View' : 'Vinyl Disc Mode'}
-						>
-							<HugeiconsIcon icon={CdIcon} class="h-3.5 w-3.5 {vinylMode ? 'animate-spin-vinyl text-white' : 'text-pink-400'}" />
-							<span>{vinylMode ? 'Vinyl' : 'Disc'}</span>
+							<span>Studio</span>
 						</button>
 					</div>
 

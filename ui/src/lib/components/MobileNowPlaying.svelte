@@ -53,13 +53,14 @@
 	import TrackMenu from './TrackMenu.svelte';
 	import AiSongStory from './AiSongStory.svelte';
 	import VisualizerStudio from './VisualizerStudio.svelte';
+	import LiveSongCanvas from './LiveSongCanvas.svelte';
 
 	let activeTab = $state<'player' | 'visualizer' | 'lyrics' | 'story' | 'queue'>('player');
 	let sleepModalOpen = $state(false);
 	let eqModalOpen = $state(false);
 	let speedMenuOpen = $state(false);
 	let justLiked = $state(false);
-	let vinylMode = $state(false);
+	let artViewMode = $state<'canvas' | 'cover' | 'vinyl'>('canvas');
 
 	// Header touch swipe down to dismiss
 	let headerStartY = 0;
@@ -168,8 +169,10 @@
 	class="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col justify-between overflow-hidden bg-background/95 text-foreground select-none md:hidden"
 	transition:fly={{ y: '100%', duration: 320, easing: cubicOut }}
 >
-	<!-- Ambient Artwork Backdrop (Optimized for Mobile GPU) -->
-	{#if playback.now?.thumbnail}
+	<!-- Ambient Live Canvas / Artwork Backdrop (Optimized for Mobile GPU) -->
+	{#if audioFx.liveCanvasEnabled}
+		<LiveSongCanvas class="pointer-events-none absolute inset-0 z-0 opacity-30 dark:opacity-45" />
+	{:else if playback.now?.thumbnail}
 		<img
 			src={thumb(playback.now.thumbnail, 400)}
 			alt=""
@@ -301,28 +304,49 @@
 					<div class="pointer-events-none absolute w-60 h-60 rounded-full bg-gradient-to-tr from-pink-500/20 via-purple-500/20 to-cyan-400/20 blur-2xl opacity-75"></div>
 				{/if}
 
-				<!-- Vinyl Mode Floating Badge Toggle -->
-				<button
-					type="button"
-					onclick={() => (vinylMode = !vinylMode)}
-					aria-label={vinylMode ? 'Switch to Cover' : 'Switch to Vinyl'}
-					class="absolute top-3 right-4 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-90 {vinylMode
-						? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
-						: 'bg-black/60 text-white/80 border-white/10'}"
-				>
-					<HugeiconsIcon icon={CdIcon} class="h-3 w-3 {vinylMode ? 'animate-spin-vinyl text-white' : 'text-pink-400'}" />
-					<span>{vinylMode ? 'Vinyl' : 'Disc'}</span>
-				</button>
+				<!-- Display Mode Floating Badge Toggle (Canvas / Vinyl / Cover) -->
+				<div class="absolute top-3 right-4 z-20 flex items-center gap-1">
+					<button
+						type="button"
+						onclick={() => (artViewMode = artViewMode === 'canvas' ? 'cover' : artViewMode === 'cover' ? 'vinyl' : 'canvas')}
+						aria-label="Switch Display Mode"
+						class="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-md transition-all border shadow-lg active:scale-90 {artViewMode === 'canvas'
+							? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400/50 shadow-emerald-500/30'
+							: artViewMode === 'vinyl'
+								? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400/50 shadow-pink-500/30'
+								: 'bg-black/60 text-white/80 border-white/10'}"
+					>
+						{#if artViewMode === 'canvas'}
+							<HugeiconsIcon icon={SparklesIcon} class="h-3 w-3 text-white animate-spin" />
+							<span>Canvas</span>
+						{:else if artViewMode === 'vinyl'}
+							<HugeiconsIcon icon={CdIcon} class="h-3 w-3 animate-spin-vinyl text-white" />
+							<span>Vinyl</span>
+						{:else}
+							<HugeiconsIcon icon={MusicNote01Icon} class="h-3 w-3 text-pink-400" />
+							<span>Cover</span>
+						{/if}
+					</button>
+				</div>
 
 				<div
-					class="relative aspect-square w-full max-w-[320px] max-h-[320px] transition-all duration-300 touch-pan-y {vinylMode ? 'rounded-full' : 'overflow-hidden rounded-3xl shadow-2xl'} {playback.paused
+					class="relative aspect-square w-full max-w-[320px] max-h-[320px] transition-all duration-300 touch-pan-y {artViewMode === 'vinyl' ? 'rounded-full' : 'overflow-hidden rounded-3xl shadow-2xl'} {playback.paused
 						? 'scale-95 shadow-black/40 opacity-90'
 						: 'scale-100 shadow-[0_20px_60px_-15px_var(--primary)]'}"
 					ontouchstart={handleArtTouchStart}
 					ontouchmove={handleArtTouchMove}
 					ontouchend={handleArtTouchEnd}
 				>
-					{#if vinylMode}
+					{#if artViewMode === 'canvas'}
+						<!-- 🌟 Apple Music & Spotify Live Canvas Motion Artwork on Mobile -->
+						<div class="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/15">
+							<LiveSongCanvas class="w-full h-full" />
+							<div class="absolute bottom-2.5 right-3 px-2 py-0.5 rounded-full bg-black/60 text-[9px] font-bold text-white/90 backdrop-blur-md border border-white/10 pointer-events-none flex items-center gap-1">
+								<span class="size-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+								<span>Live Canvas</span>
+							</div>
+						</div>
+					{:else if artViewMode === 'vinyl'}
 						<!-- Realistic Audiophile Spinning 12-inch Vinyl LP Record on Mobile -->
 						<div class="relative w-full h-full rounded-full bg-[#0a0a0f] shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_0_0_2px_rgba(255,255,255,0.12)] flex items-center justify-center overflow-hidden {!playback.paused ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}">
 							<!-- Concentric Vinyl Grooves -->
