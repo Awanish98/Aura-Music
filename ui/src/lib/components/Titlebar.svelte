@@ -30,6 +30,7 @@
 	import AccountMenu from './AccountMenu.svelte';
 	import CyberTimeHud from './CyberTimeHud.svelte';
 	import SearchSuggest from './SearchSuggest.svelte';
+	import NightToggle from './NightToggle.svelte';
 	import LiquidButton from '$lib/components/ui/LiquidButton.svelte';
 	import * as api from '$lib/api';
 	import { auth, playback, prefs, refreshView, toast, ui } from '$lib/player.svelte';
@@ -200,16 +201,8 @@
 			<span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e] animate-pulse"></span>
 		</button>
 
-		<!-- Dark / Light Theme Toggle -->
-		<button
-			class="flex h-9 w-9 items-center justify-center rounded-full liquid-glass-fx text-foreground/80 transition-all hover:text-primary apple-spring-hover apple-spring-tap shadow-sm cursor-pointer"
-			onclick={toggleMode}
-			title={t('a11y.toggle_theme')}
-			aria-label={t('a11y.toggle_theme')}
-		>
-			<HugeiconsIcon icon={Sun01Icon} size={17} class="dark:hidden" />
-			<HugeiconsIcon icon={Moon02Icon} size={17} class="hidden dark:block" />
-		</button>
+		<!-- Animated Celestial Day / Night Sky Toggle Switch (react-night-toggle style) -->
+		<NightToggle size="sm" />
 
 		<!-- Song Identifier / Shazam Audio Liquid Button -->
 		<LiquidButton

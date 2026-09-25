@@ -79,6 +79,7 @@
 	import { isTauri } from '$lib/api';
 	import { t, setLocale, currentLocale, LOCALES, type LocaleId } from '$lib/i18n.svelte';
 	import { appIcon, chooseAppIcon } from '$lib/appicon.svelte';
+	import NightToggle from '$lib/components/NightToggle.svelte';
 
 	type TabId = 'general' | 'ai' | 'themes' | 'playback' | 'discord' | 'data' | 'about';
 	const TABS = $derived<{ id: TabId; label: string; hint: string; icon: typeof Settings02Icon }[]>([
@@ -627,6 +628,11 @@
 							<h3 class={LABEL}>{t('settings.sections.theme')}</h3>
 							<div class={CARD}>
 								{@render row({
+									title: 'Appearance Mode',
+									desc: 'Celestial Sky Toggle (Day Sun / Night AMOLED Moon)',
+									control: nightModeToggle
+								})}
+								{@render row({
 									title: t('settings.tabs.themes'),
 									desc: t('settings.tabs.themes_hint'),
 									control: presetSelect
@@ -1007,6 +1013,10 @@
 		checked={appearance.artworkAccent}
 		onCheckedChange={(on) => setAppearance({ artworkAccent: on })}
 	/>{/snippet}
+
+{#snippet nightModeToggle()}
+	<NightToggle size="md" showLabel={true} />
+{/snippet}
 
 {#snippet presetSelect()}
 	<Select.Root type="single" value={theme.id} onValueChange={(v) => applyTheme(v as ThemeId)}>
