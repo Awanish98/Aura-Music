@@ -12,10 +12,13 @@
 	import * as api from '$lib/api';
 	import { playback } from '$lib/player.svelte';
 	import { t } from '$lib/i18n.svelte';
+	import { mode } from 'mode-watcher';
 	import { romanizeText, hasNonLatin, translateLyricLine } from '$lib/romanizer';
 
 	let { expanded = false, compact = false }: { expanded?: boolean; compact?: boolean } =
 		$props();
+
+	const isDark = $derived(mode.current === 'dark');
 
 	function durationSecs(d?: string): number | undefined {
 		if (!d) return undefined;
@@ -321,12 +324,12 @@
 	<!-- Better Lyrics Toolbar Header (Expanded / Studio View) -->
 	{#if !compact && lyrics}
 		<header
-			class="relative z-20 flex shrink-0 items-center justify-between gap-2 {expanded ? 'bg-transparent border-none' : 'border-b border-white/[0.08] bg-black/25 backdrop-blur-xl'} px-4 py-2 transition-all"
+			class="relative z-20 flex shrink-0 items-center justify-between gap-2 {expanded ? 'bg-transparent border-none' : 'border-b border-border/40 dark:border-white/[0.08] bg-slate-100/80 dark:bg-black/25 backdrop-blur-xl'} px-4 py-2 transition-all"
 		>
 			<!-- Left: Provider & Word-Sync Status -->
 			<div class="flex items-center gap-2 overflow-hidden">
 				<span
-					class="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-0.5 text-[11px] font-semibold text-white/80 border border-white/10"
+					class="inline-flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/[0.06] px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-white/80 border border-slate-300/40 dark:border-white/10"
 				>
 					<HugeiconsIcon icon={SparklesIcon} size={11} class="text-primary" />
 					<span class="truncate max-w-[120px] sm:max-w-[200px]"
@@ -336,9 +339,9 @@
 
 				{#if lyrics.synced}
 					<span
-						class="hidden items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-400 sm:inline-flex"
+						class="hidden items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-600 dark:text-emerald-400 sm:inline-flex"
 					>
-						<span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+						<span class="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
 						WORD-SYNC
 					</span>
 				{/if}
@@ -351,8 +354,8 @@
 					onclick={toggleRomanization}
 					title={showRomanization ? 'Hide Romanization' : 'Show Romanization (Romaji / Latin)'}
 					class="relative flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-bold transition-all {showRomanization
-						? 'bg-primary/25 text-primary border border-primary/40 shadow-sm'
-						: 'bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white border border-transparent'}"
+						? 'bg-primary/20 text-primary border border-primary/40 shadow-sm'
+						: 'bg-black/5 dark:bg-white/[0.05] text-slate-700 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white border border-transparent'}"
 				>
 					<span>🔤</span>
 					<span class="hidden sm:inline">Romaji</span>
@@ -366,12 +369,12 @@
 					onclick={toggleTranslation}
 					title={showTranslation ? 'Hide Translation' : 'Show Live Translation (English)'}
 					class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-bold transition-all {showTranslation
-						? 'bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm'
-						: 'bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white border border-transparent'}"
+						? 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 shadow-sm'
+						: 'bg-black/5 dark:bg-white/[0.05] text-slate-700 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white border border-transparent'}"
 				>
 					{#if isTranslating}
 						<span
-							class="h-3 w-3 animate-spin rounded-full border-2 border-amber-300 border-t-transparent"
+							class="h-3 w-3 animate-spin rounded-full border-2 border-amber-500 dark:border-amber-300 border-t-transparent"
 						></span>
 					{:else}
 						<span>🌐</span>
@@ -381,20 +384,20 @@
 
 				<!-- Font Size Adjuster (A- / A+) -->
 				<div
-					class="flex h-7 items-center rounded-lg bg-white/[0.05] p-0.5 border border-white/10 text-[11px]"
+					class="flex h-7 items-center rounded-lg bg-black/5 dark:bg-white/[0.05] p-0.5 border border-slate-300/40 dark:border-white/10 text-[11px]"
 				>
 					<button
 						onclick={() => updateScale(-0.1)}
 						title="Decrease Lyric Font Size"
-						class="flex h-6 w-6 items-center justify-center rounded text-white/70 hover:bg-white/15 hover:text-white transition-colors"
+						class="flex h-6 w-6 items-center justify-center rounded text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/15 hover:text-slate-900 dark:hover:text-white transition-colors"
 					>
 						A-
 					</button>
-					<span class="px-1 text-[10px] font-bold text-white/50">{Math.round(fontScale * 100)}%</span>
+					<span class="px-1 text-[10px] font-bold text-slate-600 dark:text-white/50">{Math.round(fontScale * 100)}%</span>
 					<button
 						onclick={() => updateScale(0.1)}
 						title="Increase Lyric Font Size"
-						class="flex h-6 w-6 items-center justify-center rounded text-white/70 hover:bg-white/15 hover:text-white transition-colors"
+						class="flex h-6 w-6 items-center justify-center rounded text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/15 hover:text-slate-900 dark:hover:text-white transition-colors"
 					>
 						A+
 					</button>
@@ -408,8 +411,8 @@
 							title="Calibrate Lyric Timing Offset"
 							class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-bold transition-all {syncOffset !==
 							0
-								? 'bg-cyan-500/25 text-cyan-300 border border-cyan-500/40'
-								: 'bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white border border-transparent'}"
+								? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/40'
+								: 'bg-black/5 dark:bg-white/[0.05] text-slate-700 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white border border-transparent'}"
 						>
 							<span>⏱️</span>
 							<span class="hidden sm:inline"
@@ -420,33 +423,33 @@
 						{#if showOffsetPicker}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
-								class="absolute right-0 top-9 z-50 flex flex-col gap-2 rounded-xl border border-white/15 bg-black/80 p-3 shadow-2xl backdrop-blur-2xl w-48"
+								class="absolute right-0 top-9 z-50 flex flex-col gap-2 rounded-xl border border-border/60 dark:border-white/15 bg-popover/95 dark:bg-black/80 p-3 shadow-2xl backdrop-blur-2xl w-48 text-popover-foreground"
 								transition:scale={{ duration: 150, start: 0.95 }}
 							>
-								<div class="flex items-center justify-between text-[11px] font-bold text-white/80">
+								<div class="flex items-center justify-between text-[11px] font-bold text-foreground/80">
 									<span>Timing Offset</span>
-									<span class="text-cyan-400">{syncOffset > 0 ? '+' : ''}{syncOffset.toFixed(1)}s</span>
+									<span class="text-cyan-600 dark:text-cyan-400">{syncOffset > 0 ? '+' : ''}{syncOffset.toFixed(1)}s</span>
 								</div>
 
 								<div class="grid grid-cols-4 gap-1">
 									<button
 										onclick={() => adjustSyncOffset(-0.5)}
-										class="rounded bg-white/10 py-1 text-[10px] font-bold hover:bg-white/20 text-white"
+										class="rounded bg-muted/60 dark:bg-white/10 py-1 text-[10px] font-bold hover:bg-muted dark:hover:bg-white/20 text-foreground"
 										>-0.5s</button
 									>
 									<button
 										onclick={() => adjustSyncOffset(-0.1)}
-										class="rounded bg-white/10 py-1 text-[10px] font-bold hover:bg-white/20 text-white"
+										class="rounded bg-muted/60 dark:bg-white/10 py-1 text-[10px] font-bold hover:bg-muted dark:hover:bg-white/20 text-foreground"
 										>-0.1s</button
 									>
 									<button
 										onclick={() => adjustSyncOffset(0.1)}
-										class="rounded bg-white/10 py-1 text-[10px] font-bold hover:bg-white/20 text-white"
+										class="rounded bg-muted/60 dark:bg-white/10 py-1 text-[10px] font-bold hover:bg-muted dark:hover:bg-white/20 text-foreground"
 										>+0.1s</button
 									>
 									<button
 										onclick={() => adjustSyncOffset(0.5)}
-										class="rounded bg-white/10 py-1 text-[10px] font-bold hover:bg-white/20 text-white"
+										class="rounded bg-muted/60 dark:bg-white/10 py-1 text-[10px] font-bold hover:bg-muted dark:hover:bg-white/20 text-foreground"
 										>+0.5s</button
 									>
 								</div>
@@ -454,7 +457,7 @@
 								{#if syncOffset !== 0}
 									<button
 										onclick={() => setSyncOffset(0)}
-										class="w-full rounded-md bg-white/10 py-1 text-[10px] font-semibold text-white/70 hover:bg-white/20 hover:text-white"
+										class="w-full rounded-md bg-muted/60 dark:bg-white/10 py-1 text-[10px] font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
 									>
 										Reset to Default (0.0s)
 									</button>
@@ -553,17 +556,17 @@
 									? 'my-1.5 py-1 text-base leading-snug'
 									: 'my-3 py-2 text-2xl sm:text-3xl leading-snug'}
 								{isActive
-								? 'scale-[1.03] text-[#fef3c7] opacity-100 drop-shadow-[0_0_32px_rgba(245,158,11,0.55)]'
+								? 'scale-[1.03] text-amber-950 dark:text-[#fef3c7] opacity-100 drop-shadow-[0_0_24px_rgba(245,158,11,0.45)]'
 								: isPast
-									? 'opacity-35 hover:opacity-80 text-white/80'
+									? 'opacity-35 hover:opacity-80 text-slate-800 dark:text-white/80'
 									: dist <= 2
-										? 'opacity-60 hover:opacity-95 text-white/90'
-										: 'opacity-30 hover:opacity-75 text-white/70'}"
+										? 'opacity-70 hover:opacity-95 text-slate-900 dark:text-white/90'
+										: 'opacity-30 hover:opacity-75 text-slate-800 dark:text-white/70'}"
 							style="font-size: calc({expanded ? '2.5rem' : compact ? '1rem' : '1.65rem'} * var(--lyric-scale, 1));"
 						>
 							<!-- Mini Audio Wave Equalizer Indicator directly above active lyrics (reference image match) -->
 							{#if isActive}
-								<div class="mb-2 flex items-center gap-1.5 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.85)]">
+								<div class="mb-2 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.85)]">
 									<HugeiconsIcon icon={AudioWave01Icon} size={expanded ? 24 : 18} class="animate-pulse" />
 								</div>
 							{/if}
@@ -587,10 +590,16 @@
 														? 'mr-[0.28em]'
 														: ''} {isCurrentWord ? 'scale-[1.06]' : ''}"
 													style={isSung
-														? 'color: #fffbeb; text-shadow: 0 0 20px rgba(254,240,138,0.7);'
+														? (isDark
+															? 'color: #fffbeb; text-shadow: 0 0 20px rgba(254,240,138,0.7);'
+															: 'color: #78350f; font-weight: 900; text-shadow: 0 0 10px rgba(245,158,11,0.35);')
 														: isCurrentWord
-															? `background-image: linear-gradient(90deg, #fef08a ${pct}%, rgba(255,255,255,0.3) ${pct}%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 24px rgba(245,158,11,0.8);`
-															: 'color: rgba(255, 255, 255, 0.35);'}
+															? (isDark
+																? `background-image: linear-gradient(90deg, #fef08a ${pct}%, rgba(255,255,255,0.3) ${pct}%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 24px rgba(245,158,11,0.8);`
+																: `background-image: linear-gradient(90deg, #b45309 ${pct}%, rgba(15,23,42,0.25) ${pct}%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 12px rgba(245,158,11,0.4);`)
+															: (isDark
+																? 'color: rgba(255, 255, 255, 0.35);'
+																: 'color: rgba(15, 23, 42, 0.35);')}
 												>
 													{cleanText}
 												</span>
@@ -602,14 +611,14 @@
 										{/each}
 									</span>
 								{:else}
-									<span class={isActive ? 'text-[#fffbeb] drop-shadow-[0_0_24px_rgba(245,158,11,0.7)]' : ''}>{line.text}</span>
+									<span class={isActive ? 'text-amber-950 dark:text-[#fffbeb] drop-shadow-[0_0_24px_rgba(245,158,11,0.7)]' : ''}>{line.text}</span>
 								{/if}
 							</div>
 
 							<!-- TIER 2: Romanization / Romaji (Transliteration) -->
 							{#if showRomanization && romText}
 								<p
-									class="mt-1 font-sans font-medium tracking-normal text-white/70 italic transition-all duration-200"
+									class="mt-1 font-sans font-medium tracking-normal text-slate-700/80 dark:text-white/70 italic transition-all duration-200"
 									style="font-size: calc(0.48em * var(--lyric-scale, 1));"
 								>
 									{romText}
@@ -619,7 +628,7 @@
 							<!-- TIER 3: Live Translation (English / Selected) -->
 							{#if showTranslation && transText}
 								<p
-									class="mt-1 font-sans font-normal tracking-wide text-amber-300/85 transition-all duration-200"
+									class="mt-1 font-sans font-medium tracking-wide text-amber-800 dark:text-amber-300/85 transition-all duration-200"
 									style="font-size: calc(0.44em * var(--lyric-scale, 1));"
 								>
 									{transText}
@@ -646,13 +655,13 @@
 					{@const transText = translations[i]}
 
 					{#if line.text}
-						<div class="rounded-xl p-2 transition-colors hover:bg-white/[0.04]">
-							<p class="font-bold text-white/95">{line.text}</p>
+						<div class="rounded-xl p-2 transition-colors hover:bg-black/5 dark:hover:bg-white/[0.04]">
+							<p class="font-bold text-slate-900 dark:text-white/95">{line.text}</p>
 							{#if showRomanization && romText}
-								<p class="mt-0.5 text-xs text-white/60 italic">{romText}</p>
+								<p class="mt-0.5 text-xs text-slate-600 dark:text-white/60 italic">{romText}</p>
 							{/if}
 							{#if showTranslation && transText}
-								<p class="mt-0.5 text-xs text-amber-300/80">{transText}</p>
+								<p class="mt-0.5 text-xs text-amber-800 dark:text-amber-300/80">{transText}</p>
 							{/if}
 						</div>
 					{:else}
@@ -662,25 +671,25 @@
 			</div>
 		{:else if loading}
 			<div class="relative z-10 flex flex-col items-center justify-center py-24 text-center animate-pulse">
-				<div class="relative mb-4 flex size-14 items-center justify-center rounded-2xl border border-amber-400/30 bg-amber-500/10 text-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.25)]">
+				<div class="relative mb-4 flex size-14 items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.25)]">
 					<HugeiconsIcon icon={Mic01Icon} size={26} class="animate-bounce" />
 				</div>
-				<p class="text-base font-semibold text-white/90">Searching synchronized lyrics...</p>
-				<p class="mt-1 text-xs text-white/40 font-mono">Querying LRCLIB & NetEase Cloud</p>
+				<p class="text-base font-semibold text-slate-800 dark:text-white/90">Searching synchronized lyrics...</p>
+				<p class="mt-1 text-xs text-slate-500 dark:text-white/40 font-mono">Querying LRCLIB & NetEase Cloud</p>
 			</div>
 		{:else}
 			<div class="relative z-10 flex flex-col items-center justify-center py-24 text-center">
-				<div class="mb-3 flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white/30">
+				<div class="mb-3 flex size-12 items-center justify-center rounded-2xl border border-slate-300/40 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/30">
 					<HugeiconsIcon icon={Mic01Icon} size={24} />
 				</div>
-				<p class="text-base font-medium text-white/80">{t('lyrics.none_found')}</p>
-				<p class="mt-1 text-xs text-white/40">No synced lyrics available for this release</p>
+				<p class="text-base font-semibold text-slate-800 dark:text-white/80">{t('lyrics.none_found')}</p>
+				<p class="mt-1 text-xs text-slate-500 dark:text-white/40">No synced lyrics available for this release</p>
 				<button
 					type="button"
 					onclick={() => lyricsService.loadLyrics(true)}
-					class="mt-4 flex cursor-pointer items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/15 px-4 py-1.5 text-xs font-semibold text-amber-200 transition-all hover:scale-105 hover:bg-amber-500/25 hover:border-amber-400/70 active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+					class="mt-4 flex cursor-pointer items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-4 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-200 transition-all hover:scale-105 hover:bg-amber-500/25 hover:border-amber-500/70 active:scale-95 shadow-sm"
 				>
-					<HugeiconsIcon icon={SparklesIcon} size={13} class="text-amber-300" />
+					<HugeiconsIcon icon={SparklesIcon} size={13} class="text-amber-600 dark:text-amber-300" />
 					<span>Search Again</span>
 				</button>
 			</div>

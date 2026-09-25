@@ -411,7 +411,7 @@
 						<!-- Like Button -->
 						<button
 							onclick={toggleLike}
-							class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/5 border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all active:scale-95 shadow-md"
+							class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-slate-200/70 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 text-slate-700 dark:text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 shadow-md"
 							aria-label={t('common.like')}
 						>
 							<span class:animate-heart-pop={justLiked} onanimationend={() => (justLiked = false)}>
@@ -425,7 +425,7 @@
 					</div>
 
 					<div class="mt-1 flex items-center gap-2">
-						<span class="rounded-md bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400">
+						<span class="rounded-md bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
 							320kbps Lossless
 						</span>
 						<span class="rounded-md bg-primary/15 border border-primary/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
@@ -463,7 +463,7 @@
 							api.seek(targetTime);
 						}}
 					>
-						<div class="w-full h-1.5 rounded-full bg-white/15 overflow-hidden transition-all group-hover/seek:h-2">
+						<div class="w-full h-1.5 rounded-full bg-slate-300/80 dark:bg-white/15 overflow-hidden transition-all group-hover/seek:h-2">
 							<div
 								class="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-primary shadow-[0_0_8px_rgba(255,10,120,0.8)] rounded-full transition-all"
 								style="width: {playback.duration ? (shownPosition / playback.duration) * 100 : 0}%"
@@ -483,10 +483,10 @@
 							onchange={onSeekCommit}
 						/>
 					</div>
-					<div class="flex justify-between text-[11px] font-mono font-medium text-muted-foreground/80">
+					<div class="flex justify-between text-[11px] font-mono font-semibold text-slate-600 dark:text-muted-foreground/80">
 						<span>{fmt(shownPosition)}</span>
 						{#if playback.now?.duration === 'LIVE' || !playback.duration}
-							<span class="rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-400">LIVE</span>
+							<span class="rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-500 dark:text-rose-400">LIVE</span>
 						{:else}
 							<span>{fmt(playback.duration)}</span>
 						{/if}
@@ -498,7 +498,7 @@
 					<button
 						onclick={() => api.toggleShuffle()}
 						aria-label={t('player.shuffle')}
-						class="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer {shuffleOn ? 'text-primary' : ''}"
+						class="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer {shuffleOn ? 'text-primary' : ''}"
 					>
 						<HugeiconsIcon icon={ShuffleIcon} size={18} />
 					</button>
@@ -506,7 +506,7 @@
 					<button
 						onclick={() => api.prevTrack()}
 						aria-label={t('player.previous')}
-						class="flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
+						class="flex h-10 w-10 items-center justify-center rounded-full text-slate-800 dark:text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
 					>
 						<HugeiconsIcon icon={PreviousIcon} size={22} />
 					</button>
@@ -530,7 +530,7 @@
 					<button
 						onclick={() => api.nextTrack()}
 						aria-label={t('player.next')}
-						class="flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
+						class="flex h-10 w-10 items-center justify-center rounded-full text-slate-800 dark:text-foreground/80 hover:text-foreground hover:scale-105 active:scale-95 transition-all cursor-pointer"
 					>
 						<HugeiconsIcon icon={NextIcon} size={22} />
 					</button>
@@ -538,7 +538,7 @@
 					<button
 						onclick={cycleRepeat}
 						aria-label="Repeat"
-						class="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer {repeat !== 'off' ? 'text-primary' : ''}"
+						class="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer {repeat !== 'off' ? 'text-primary' : ''}"
 					>
 						<HugeiconsIcon
 							icon={RepeatIcon}
@@ -550,12 +550,12 @@
 				</div>
 
 				<!-- Bottom Controls Bar (Volume Slider + Add To Playlist + Equalizer + Share) -->
-				<div class="mt-2 shrink-0 flex items-center justify-between border-t border-white/10 pt-2 px-1">
+				<div class="mt-2 shrink-0 flex items-center justify-between border-t border-border/40 dark:border-white/10 pt-2 px-1">
 					<!-- Volume -->
 					<div class="flex items-center gap-1.5">
 						<button
 							onclick={toggleMute}
-							class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+							class="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
 							aria-label={playback.volume === 0 ? t('player.unmute') : t('player.mute')}
 						>
 							<HugeiconsIcon
@@ -577,14 +577,14 @@
 							onwheel={wheelVolume}
 							aria-label={t('player.volume')}
 						/>
-						<span class="text-[10px] font-mono text-muted-foreground/80 w-6">{playback.volume}%</span>
+						<span class="text-[10px] font-mono text-slate-600 dark:text-muted-foreground/80 w-6">{playback.volume}%</span>
 					</div>
 
 					<div class="flex items-center gap-1">
 						{#if currentSong}
 							<button
 								onclick={() => openAddToPlaylist(currentSong!)}
-								class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+								class="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
 								title="Add to Playlist"
 							>
 								<HugeiconsIcon icon={Add01Icon} size={15} />
@@ -593,7 +593,7 @@
 
 						<button
 							onclick={() => (showEq = true)}
-							class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+							class="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
 							title="Equalizer & Audio FX"
 						>
 							<HugeiconsIcon icon={SparklesIcon} size={15} class={audioFx.playbackMode !== 'normal' || audioFx.eqPreset !== 'flat' ? 'text-primary' : ''} />
@@ -611,7 +611,7 @@
 										thumbnail: now.thumbnail
 									});
 								}}
-								class="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+								class="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 dark:text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
 								title="Share Track"
 							>
 								<HugeiconsIcon icon={Share01Icon} size={15} />
@@ -624,13 +624,13 @@
 
 		<!-- Right: Clean Full-Height Tabbed Content (Queue, Visualizer, Lyrics, Story) -->
 		{#if tabbed}
-			<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/30 backdrop-blur-2xl shadow-2xl p-3 lg:p-4 {big ? 'max-w-5xl w-full' : ''}">
+			<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border/50 dark:border-white/10 bg-white/75 dark:bg-card/30 backdrop-blur-2xl shadow-xl dark:shadow-2xl p-3 lg:p-4 {big ? 'max-w-5xl w-full' : ''}">
 				<Tabs.Root
 					value={np.tab}
 					onValueChange={(v) => (np.tab = v as typeof np.tab)}
 					class="min-h-0 flex-1 flex flex-col"
 				>
-					<div class="flex items-center justify-between gap-2 pb-2 shrink-0 border-b border-white/10">
+					<div class="flex items-center justify-between gap-2 pb-2 shrink-0 border-b border-border/40 dark:border-white/10">
 						<Tabs.List class="flex-1 max-w-lg">
 							<Tabs.Trigger value="queue" class="gap-2">
 								<HugeiconsIcon icon={Queue01Icon} class="h-4 w-4" /> {t('player.queue')}
