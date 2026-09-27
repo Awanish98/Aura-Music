@@ -1,10 +1,12 @@
 <script lang="ts">
 	// State-of-the-Art Apple Music & Spotify Live Canvas Motion Engine
-	// With Video Canvas support — plays the current YouTube music video
-	// as a muted blurred background (Apple Music Animated Canvas style)
+	// With Real-Time Music Video Canvas support: plays the current track's
+	// music video as a vibrant, muted looping background with audio-reactive
+	// particle stardust & chromatic ambient mesh on top.
 	import { onMount, onDestroy } from 'svelte';
 	import { playback, audioFx } from '$lib/player.svelte';
-	import { webPlayer } from '$lib/webplayer';
+	import { webPlayer, cleanSearchQuery } from '$lib/webplayer';
+	import { fetchSearch } from '$lib/ytmusic';
 	import { thumb } from '$lib/thumb';
 	import { artworkAccent } from '$lib/artcolor';
 	import { hexToHsv, hsvToHex } from '$lib/color';
@@ -12,7 +14,7 @@
 	let {
 		class: className = '',
 		fit = 'cover',
-		videoMode = false,
+		videoMode = true,
 		interactive = true
 	}: {
 		class?: string;
@@ -31,15 +33,76 @@
 	let c3 = $state('#06b6d4');
 	let c4 = $state('#ec4899');
 
-	// Current video ID for iframe
-	let videoId = $derived(playback.now?.videoId ?? null);
+	// Resolved 11-char YouTube Video ID
+	let resolvedYtId = $state<string | null>(null);
+
+	// Resolve the real YouTube video ID for any track (even if played from JioSaavn or custom source)
+	$effect(() => {
+		const current = playback.now;
+		if (!current) {
+			resolvedYtId = null;
+			return;
+		}
+
+		const rawId = current.videoId;
+		// If already a valid 11-character YouTube video ID
+		if (rawId && rawId.length === 11 && !rawId.includes('_') && !rawId.includes(':') && !rawId.includes('/')) {
+			resolvedYtId = rawId;
+			return;
+		}
+
+		// Otherwise, resolve via YouTube Music search by title + artist
+		const q = cleanSearchQuery(current.title, current.artists);
+		if (q) {
+			fetchSearch(q)
+				.then((res) => {
+					const bestMatch = res.songs?.[0]?.id || res.top?.[0]?.id;
+					if (bestMatch && bestMatch.length === 11) {
+						resolvedYtId = bestMatch;
+					}
+				})
+				.catch((err) => {
+					console.warn('[LiveSongCanvas] YT search fallback error:', err);
+				});
+		}
+	});
 
 	// YouTube embed URL — autoplay, mute, loop, hide controls
-	const ytSrc = $derived(
-		videoId
-			? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&disablekb=1&iv_load_policy=3&modestbranding=1&rel=0&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`
-			: null
-	);
+	const ytSrc = $derived.by(() => {
+		if (!videoMode || !resolvedYtId) return null;
+		const params = new URLSearchParams({
+			autoplay: '1',
+			mute: '1',
+			loop: '1',
+			playlist: resolvedYtId,
+			controls: '0',
+			disablekb: '1',
+			fs: '0',
+			iv_load_policy: '3',
+			modestbranding: '1',
+			playsinline: '1',
+			rel: '0',
+			enablejsapi: '1'
+		});
+		return `https://www.youtube-nocookie.com/embed/${resolvedYtId}?${params.toString()}`;
+	});
+
+	// Synchronize play/pause with YouTube iframe via postMessage
+	$effect(() => {
+		const isPaused = playback.paused;
+		if (videoEl && videoEl.contentWindow) {
+			try {
+				videoEl.contentWindow.postMessage(
+					JSON.stringify({
+						event: 'command',
+						func: isPaused ? 'pauseVideo' : 'playVideo',
+						args: []
+					}),
+					'*'
+				);
+			} catch {}
+		}
+	});
 
 	// Extract dynamic colors from album art whenever track changes
 	$effect(() => {
@@ -159,11 +222,12 @@
 			const pulse = isPlaying ? 1 + smoothedEnergy * 0.25 : 1;
 
 			// In video mode, canvas is semi-transparent overlay — lighter blobs
-			const blobAlpha = videoMode ? 0.45 : 1.0;
+			const hasVideo = !!(videoMode && ytSrc);
+			const blobAlpha = hasVideo ? 0.38 : 0.95;
 
 			// 1. Apple Music Living Fluid Chromatic Gradients
 			ctx.save();
-			ctx.globalCompositeOperation = videoMode ? 'multiply' : 'screen';
+			ctx.globalCompositeOperation = hasVideo ? 'screen' : 'screen';
 			ctx.globalAlpha = blobAlpha;
 
 			const colors = [c1, c2, c3, c4];
@@ -188,7 +252,7 @@
 
 			// 2. Spotify Style Wave Ribbons
 			ctx.save();
-			ctx.globalAlpha = videoMode ? 0.35 : 1.0;
+			ctx.globalAlpha = hasVideo ? 0.25 : 0.75;
 			ctx.lineWidth = 1.4;
 			const waveCount = 3;
 			for (let wv = 0; wv < waveCount; wv++) {
@@ -218,7 +282,7 @@
 
 				const curAlpha = Math.max(0.1, Math.min(1, (p.baseAlpha + Math.sin(tick * 0.03 + p.phase) * 0.25) * pulse));
 				ctx.fillStyle = p.color;
-				ctx.globalAlpha = curAlpha * (videoMode ? 0.5 : 0.75);
+				ctx.globalAlpha = curAlpha * (hasVideo ? 0.5 : 0.75);
 				ctx.beginPath();
 				ctx.arc(p.x, p.y, p.size * (isPlaying ? 1.15 : 1), 0, Math.PI * 2);
 				ctx.fill();
@@ -242,34 +306,34 @@
 	});
 </script>
 
-<div class="relative h-full w-full overflow-hidden select-none {className}" aria-hidden="true">
+<div class="h-full w-full overflow-hidden select-none {className.includes('absolute') || className.includes('fixed') ? '' : 'relative'} {className}" aria-hidden="true">
 
 	{#if videoMode && ytSrc}
-		<!-- 🎬 YouTube Video Background (Apple Music Animated Canvas style) -->
-		<!-- Iframe plays muted, looping, controls-hidden music video -->
-		<iframe
-			bind:this={videoEl}
-			src={ytSrc}
-			title="Music Video Canvas"
-			allow="autoplay; encrypted-media"
-			class="absolute inset-0 w-full h-full pointer-events-none"
-			style="
-				border: none;
-				/* Scale up to cover black bars (16:9 in any aspect ratio) */
-				transform: scale(1.6);
-				filter: blur(8px) brightness(0.55) saturate(1.4);
-			"
-			referrerpolicy="no-referrer"
-		></iframe>
+		<!-- 🎬 YouTube Video Background (Apple Music & Spotify Live Canvas Style) -->
+		<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+			<iframe
+				bind:this={videoEl}
+				src={ytSrc}
+				title="Music Video Canvas"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+				class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[125%] w-[125%] min-h-full min-w-full"
+				style="
+					border: none;
+					transform: translate(-50%, -50%) scale(1.35);
+					filter: brightness(0.68) saturate(1.25) contrast(1.05);
+				"
+				referrerpolicy="no-referrer"
+			></iframe>
 
-		<!-- Dark overlay so canvas gradients blend nicely over the video -->
-		<div class="pointer-events-none absolute inset-0 bg-black/35"></div>
+			<!-- Dark overlay so canvas gradients & UI blend cleanly over video -->
+			<div class="pointer-events-none absolute inset-0 bg-black/40"></div>
+		</div>
 	{/if}
 
 	<!-- Canvas gradient + particle layer (always rendered on top) -->
-	<canvas bind:this={canvasEl} class="absolute inset-0 h-full w-full object-{fit}"></canvas>
+	<canvas bind:this={canvasEl} class="relative z-10 h-full w-full object-{fit}"></canvas>
 
 	<!-- Vignette & AMOLED Contrast Mask -->
-	<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
-	<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.55)_100%)]"></div>
+	<div class="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/85 via-transparent to-black/50"></div>
+	<div class="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.55)_100%)]"></div>
 </div>

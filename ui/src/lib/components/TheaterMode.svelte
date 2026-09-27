@@ -46,7 +46,8 @@
 		openShare,
 		sleepTimer,
 		setPlaybackSpeed,
-		wheelVolume
+		wheelVolume,
+		toggleLiveCanvas
 	} from '$lib/player.svelte';
 	import { webPlayer } from '$lib/webplayer';
 	import { artworkAccent } from '$lib/artcolor';
@@ -409,18 +410,18 @@
 	transition:fade={{ duration: 300 }}
 	onwheel={wheelVolume}
 	onpointermove={wake}
-	class="theater fixed inset-0 z-50 flex h-[100dvh] w-[100dvw] flex-col overflow-hidden bg-[#07080d] text-white select-none"
+	class="theater fixed inset-0 z-50 h-[100dvh] w-[100dvw] overflow-hidden bg-[#07080d] text-white select-none"
 >
-	<!-- 🌌 1. Apple Music & Spotify Style Live Animated Canvas Background -->
-	{#if audioFx.liveCanvasEnabled}
-		<LiveSongCanvas videoMode={true} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-90" />
-	{:else}
-		<!-- Deep Animated Particle & Bokeh Atmosphere Canvas -->
-		<canvas bind:this={starCanvas} class="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-80"></canvas>
-	{/if}
-
-	<!-- 🎨 2. Rich Dynamic Blurred Artwork Backdrop & Accent Mesh -->
+	<!-- 🌌 Ambient & Motion Video Canvas Background Layer (Isolated completely outside flex flow) -->
 	<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+		{#if audioFx.liveCanvasEnabled}
+			<LiveSongCanvas videoMode={true} class="absolute inset-0 h-full w-full opacity-90" />
+		{:else}
+			<!-- Deep Animated Particle & Bokeh Atmosphere Canvas -->
+			<canvas bind:this={starCanvas} class="absolute inset-0 h-full w-full opacity-80"></canvas>
+		{/if}
+
+		<!-- 🎨 Dynamic Blurred Artwork Backdrop & Accent Mesh -->
 		{#if src}
 			<img
 				src={src}
@@ -434,201 +435,231 @@
 		<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.7)_100%)] pointer-events-none"></div>
 	</div>
 
-	<!-- 🎛️ 3. TOP NAVIGATION HEADER -->
-	<header
-		class="absolute top-0 left-0 right-0 z-40 flex shrink-0 items-center justify-between px-6 pt-5 pb-3 sm:px-10 sm:pt-6 transition-all duration-400 {idle
-			? 'opacity-30 hover:opacity-100'
-			: 'opacity-100'}"
-	>
-		<!-- Left: Brand Logo -->
-		<div class="flex items-center gap-2.5">
-			<span
-				class="flex size-7 items-center justify-center rounded-lg bg-gradient-to-tr from-[#ff0a78] to-[#f43f5e] shadow-[0_0_15px_rgba(255,10,120,0.65)] font-black text-white text-xs tracking-tighter"
-			>
-				A
-			</span>
-			<span
-				class="font-heading font-black tracking-widest text-sm sm:text-base uppercase bg-gradient-to-r from-[#ff0a78] via-[#fb7185] to-white bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(255,10,120,0.4)]"
-			>
-				AURA MUSIC
-			</span>
-		</div>
-
-		<!-- Center: Floating Capsule Dock [ Lyrics | Queue | Visualizer | About ] -->
-		<div
-			class="flex items-center gap-1 rounded-full border border-white/15 bg-black/45 p-1 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.6)]"
+	<!-- 🎛️ Foreground Container: Strict full-height flex column pinned from top to bottom -->
+	<div class="relative z-10 flex h-full w-full flex-col min-h-0 overflow-hidden">
+		<!-- 🎛️ 3. TOP NAVIGATION HEADER -->
+		<header
+			class="flex shrink-0 items-center justify-between px-6 pt-4 pb-2 sm:px-10 sm:pt-6 sm:pb-3 transition-all duration-400 {idle
+				? 'opacity-30 hover:opacity-100'
+				: 'opacity-100'}"
 		>
-			{#each [
-				{ id: 'lyrics', label: 'Lyrics', icon: Mic01Icon },
-				{ id: 'queue', label: 'Queue', icon: Queue01Icon },
-				{ id: 'visualizer', label: 'Visualizer', icon: AudioWave01Icon },
-				{ id: 'about', label: 'About', icon: InformationCircleIcon }
-			] as tab (tab.id)}
-				<button
-					onclick={() => (activeTab = tab.id as any)}
-					class="flex items-center gap-1.5 rounded-full px-3.5 sm:px-4 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer {activeTab === tab.id
-						? 'bg-gradient-to-r from-amber-500/40 via-orange-500/30 to-amber-600/40 border border-amber-400/60 text-amber-100 shadow-[0_0_18px_rgba(245,158,11,0.45)] scale-100 font-bold'
-						: 'text-white/65 hover:text-white hover:bg-white/10'}"
+			<!-- Left: Brand Logo -->
+			<div class="flex items-center gap-2.5">
+				<span
+					class="flex size-7 items-center justify-center rounded-lg bg-gradient-to-tr from-[#ff0a78] to-[#f43f5e] shadow-[0_0_15px_rgba(255,10,120,0.65)] font-black text-white text-xs tracking-tighter"
 				>
-					<HugeiconsIcon
-						icon={tab.icon}
-						size={14}
-						class={activeTab === tab.id ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : ''}
-					/>
-					<span>{tab.label}</span>
-				</button>
-			{/each}
-		</div>
-
-		<!-- Right: Action Buttons [ Share | Fullscreen | More Options (...) ] -->
-		<div class="flex items-center gap-2">
-			<!-- Share -->
-			{#if playback.now}
-				<button
-					onclick={() => {
-						const now = playback.now!;
-						openShare({
-							id: now.videoId,
-							title: now.title,
-							subtitle: now.artists,
-							kind: 'song',
-							thumbnail: now.thumbnail
-						});
-					}}
-					class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
-					title="Share Song"
-					aria-label="Share"
+					A
+				</span>
+				<span
+					class="font-heading font-black tracking-widest text-sm sm:text-base uppercase bg-gradient-to-r from-[#ff0a78] via-[#fb7185] to-white bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(255,10,120,0.4)]"
 				>
-					<HugeiconsIcon icon={Share01Icon} size={15} />
-				</button>
-			{/if}
+					AURA MUSIC
+				</span>
+			</div>
 
-			<!-- Fullscreen Toggle -->
-			<button
-				onclick={toggleNativeFullscreen}
-				class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
-				title={isNativeFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-				aria-label="Fullscreen"
+			<!-- Center: Floating Capsule Dock [ Lyrics | Queue | Visualizer | About ] -->
+			<div
+				class="flex items-center gap-1 rounded-full border border-white/15 bg-black/45 p-1 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.6)]"
 			>
-				<HugeiconsIcon icon={isNativeFullscreen ? MinimizeScreenIcon : MaximizeScreenIcon} size={15} />
-			</button>
+				{#each [
+					{ id: 'lyrics', label: 'Lyrics', icon: Mic01Icon },
+					{ id: 'queue', label: 'Queue', icon: Queue01Icon },
+					{ id: 'visualizer', label: 'Visualizer', icon: AudioWave01Icon },
+					{ id: 'about', label: 'About', icon: InformationCircleIcon }
+				] as tab (tab.id)}
+					<button
+						onclick={() => (activeTab = tab.id as any)}
+						class="flex items-center gap-1.5 rounded-full px-3.5 sm:px-4 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer {activeTab === tab.id
+							? 'bg-gradient-to-r from-amber-500/40 via-orange-500/30 to-amber-600/40 border border-amber-400/60 text-amber-100 shadow-[0_0_18px_rgba(245,158,11,0.45)] scale-100 font-bold'
+							: 'text-white/65 hover:text-white hover:bg-white/10'}"
+					>
+						<HugeiconsIcon
+							icon={tab.icon}
+							size={14}
+							class={activeTab === tab.id ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : ''}
+						/>
+						<span>{tab.label}</span>
+					</button>
+				{/each}
+			</div>
 
-			<!-- More Options Button -->
-			<div class="relative">
+			<!-- Right: Action Buttons [ Live Canvas | Share | Fullscreen | More Options (...) | Close ] -->
+			<div class="flex items-center gap-2">
+				<!-- Live Canvas Video Motion Toggle -->
 				<button
-					onclick={() => (cardMenuOpen = !cardMenuOpen)}
-					class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
-					title="More Options"
-					aria-label="More Options"
+					onclick={() => toggleLiveCanvas()}
+					class="flex size-9 cursor-pointer items-center justify-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 active:scale-95 shadow-lg {audioFx.liveCanvasEnabled
+						? 'border-amber-400/60 bg-amber-500/25 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+						: 'border-white/15 bg-black/40 text-white/60 hover:bg-white/15 hover:text-white'}"
+					title="{audioFx.liveCanvasEnabled ? 'Live Video Canvas ON (Click to turn off)' : 'Live Video Canvas OFF (Click to turn on)'}"
+					aria-label="Toggle Live Canvas"
 				>
-					<HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
+					<HugeiconsIcon icon={SparklesIcon} size={15} class={audioFx.liveCanvasEnabled ? 'animate-pulse' : ''} />
 				</button>
 
-				{#if cardMenuOpen}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<div
-						class="absolute top-full right-0 mt-2 z-50 flex flex-col gap-1 min-w-[190px] rounded-2xl border border-white/20 bg-black/90 p-2 shadow-2xl backdrop-blur-2xl text-xs text-white"
-						transition:scale={{ start: 0.9, duration: 150 }}
-						onclick={(e) => e.stopPropagation()}
+				<!-- Share -->
+				{#if playback.now}
+					<button
+						onclick={() => {
+							const now = playback.now!;
+							openShare({
+								id: now.videoId,
+								title: now.title,
+								subtitle: now.artists,
+								kind: 'song',
+								thumbnail: now.thumbnail
+							});
+						}}
+						class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
+						title="Share Song"
+						aria-label="Share"
 					>
-						<!-- Sleep Timer -->
-						<button
-							class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
-							onclick={() => {
-								sleepModalOpen = true;
-								cardMenuOpen = false;
-							}}
+						<HugeiconsIcon icon={Share01Icon} size={15} />
+					</button>
+				{/if}
+
+				<!-- Fullscreen Toggle -->
+				<button
+					onclick={toggleNativeFullscreen}
+					class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
+					title={isNativeFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+					aria-label="Fullscreen"
+				>
+					<HugeiconsIcon icon={isNativeFullscreen ? MinimizeScreenIcon : MaximizeScreenIcon} size={15} />
+				</button>
+
+				<!-- More Options Button -->
+				<div class="relative">
+					<button
+						onclick={() => (cardMenuOpen = !cardMenuOpen)}
+						class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
+						title="More Options"
+						aria-label="More Options"
+					>
+						<HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
+					</button>
+
+					{#if cardMenuOpen}
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							class="absolute top-full right-0 mt-2 z-50 flex flex-col gap-1 min-w-[190px] rounded-2xl border border-white/20 bg-black/90 p-2 shadow-2xl backdrop-blur-2xl text-xs text-white"
+							transition:scale={{ start: 0.9, duration: 150 }}
+							onclick={(e) => e.stopPropagation()}
 						>
-							<HugeiconsIcon icon={Moon02Icon} size={15} />
-							<span>Sleep Timer {sleepTimer.active ? `(${Math.ceil(sleepTimer.remainingSecs / 60)}m)` : ''}</span>
-						</button>
+							<!-- Live Canvas Video Toggle in Menu -->
+							<button
+								class="flex items-center justify-between w-full rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
+								onclick={() => {
+									toggleLiveCanvas();
+								}}
+							>
+								<div class="flex items-center gap-2">
+									<HugeiconsIcon icon={SparklesIcon} size={15} />
+									<span>Live Video Canvas</span>
+								</div>
+								<span class="text-[11px] font-bold {audioFx.liveCanvasEnabled ? 'text-amber-400' : 'text-white/40'}">
+									{audioFx.liveCanvasEnabled ? 'ON' : 'OFF'}
+								</span>
+							</button>
 
-						<!-- Speed Menu Toggle -->
-						<button
-							type="button"
-							class="flex items-center justify-between w-full rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
-							onclick={() => (speedMenuOpen = !speedMenuOpen)}
-						>
-							<div class="flex items-center gap-2">
-								<HugeiconsIcon icon={DashboardSpeed01Icon} size={15} />
-								<span>Speed</span>
-							</div>
-							<span class="text-[11px] font-bold text-amber-400 font-mono">{playback.speed}x</span>
-						</button>
-
-						{#if speedMenuOpen}
-							<div class="flex items-center justify-around py-1 bg-white/5 rounded-lg">
-								{#each speeds as sp}
-									<button
-										type="button"
-										class="px-2 py-0.5 text-[11px] font-bold rounded {playback.speed === sp ? 'bg-amber-500 text-black' : 'text-white/60 hover:text-white'}"
-										onclick={() => {
-											setPlaybackSpeed(sp);
-											speedMenuOpen = false;
-											cardMenuOpen = false;
-										}}
-									>
-										{sp}x
-									</button>
-								{/each}
-							</div>
-						{/if}
-
-						<!-- Equalizer -->
-						<button
-							class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
-							onclick={() => {
-								showEq = true;
-								cardMenuOpen = false;
-							}}
-						>
-							<HugeiconsIcon icon={AudioWave02Icon} size={15} />
-							<span>Equalizer & FX</span>
-						</button>
-
-						<!-- Add to Playlist -->
-						{#if currentSong}
+							<!-- Sleep Timer -->
 							<button
 								class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
 								onclick={() => {
-									openAddToPlaylist(currentSong!);
+									sleepModalOpen = true;
 									cardMenuOpen = false;
 								}}
 							>
-								<HugeiconsIcon icon={Add01Icon} size={15} />
-								<span>Add to Playlist</span>
+								<HugeiconsIcon icon={Moon02Icon} size={15} />
+								<span>Sleep Timer {sleepTimer.active ? `(${Math.ceil(sleepTimer.remainingSecs / 60)}m)` : ''}</span>
 							</button>
-						{/if}
 
-						<!-- Shortcuts Guide -->
-						<button
-							class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
-							onclick={() => {
-								showShortcutsGuide = true;
-								cardMenuOpen = false;
-							}}
-						>
-							<HugeiconsIcon icon={SparklesIcon} size={15} />
-							<span>Keyboard Shortcuts (?)</span>
-						</button>
-					</div>
-				{/if}
+							<!-- Speed Menu Toggle -->
+							<button
+								type="button"
+								class="flex items-center justify-between w-full rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
+								onclick={() => (speedMenuOpen = !speedMenuOpen)}
+							>
+								<div class="flex items-center gap-2">
+									<HugeiconsIcon icon={DashboardSpeed01Icon} size={15} />
+									<span>Speed</span>
+								</div>
+								<span class="text-[11px] font-bold text-amber-400 font-mono">{playback.speed}x</span>
+							</button>
+
+							{#if speedMenuOpen}
+								<div class="flex items-center justify-around py-1 bg-white/5 rounded-lg">
+									{#each speeds as sp}
+										<button
+											type="button"
+											class="px-2 py-0.5 text-[11px] font-bold rounded {playback.speed === sp ? 'bg-amber-500 text-black' : 'text-white/60 hover:text-white'}"
+											onclick={() => {
+												setPlaybackSpeed(sp);
+												speedMenuOpen = false;
+												cardMenuOpen = false;
+											}}
+										>
+											{sp}x
+										</button>
+									{/each}
+								</div>
+							{/if}
+
+							<!-- Equalizer -->
+							<button
+								class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
+								onclick={() => {
+									showEq = true;
+									cardMenuOpen = false;
+								}}
+							>
+								<HugeiconsIcon icon={AudioWave02Icon} size={15} />
+								<span>Equalizer & FX</span>
+							</button>
+
+							<!-- Add to Playlist -->
+							{#if currentSong}
+								<button
+									class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
+									onclick={() => {
+										openAddToPlaylist(currentSong!);
+										cardMenuOpen = false;
+									}}
+								>
+									<HugeiconsIcon icon={Add01Icon} size={15} />
+									<span>Add to Playlist</span>
+								</button>
+							{/if}
+
+							<!-- Shortcuts Guide -->
+							<button
+								class="flex items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-white/90 hover:bg-white/15 transition cursor-pointer"
+								onclick={() => {
+									showShortcutsGuide = true;
+									cardMenuOpen = false;
+								}}
+							>
+								<HugeiconsIcon icon={SparklesIcon} size={15} />
+								<span>Keyboard Shortcuts (?)</span>
+							</button>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Close Button -->
+				<button
+					onclick={close}
+					class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
+					title="Minimize Theater (Esc)"
+					aria-label="Close"
+				>
+					<HugeiconsIcon icon={ArrowDown01Icon} size={17} />
+				</button>
 			</div>
+		</header>
 
-			<!-- Close Button -->
-			<button
-				onclick={close}
-				class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/15 hover:text-white active:scale-95 shadow-lg"
-				title="Minimize Theater (Esc)"
-				aria-label="Close"
-			>
-				<HugeiconsIcon icon={ArrowDown01Icon} size={17} />
-			</button>
-		</div>
-	</header>
-
-	<!-- 🎬 4. MAIN STAGE (Left: 3D Vinyl Player | Right: Synced Lyrics / Tabs) -->
-	<div class="relative z-10 flex-1 w-full h-full grid grid-cols-1 lg:grid-cols-2 pt-[72px] sm:pt-[84px] overflow-hidden px-4 pb-6 sm:px-10 lg:px-14">
+		<!-- 🎬 4. MAIN STAGE (Left: 3D Vinyl Player | Right: Synced Lyrics / Tabs) -->
+		<div class="grid min-h-0 flex-1 w-full grid-cols-1 lg:grid-cols-2 overflow-hidden px-4 pb-4 sm:px-10 lg:px-14">
 		
 		<!-- 💿 LEFT STAGE: 3D FLOATING VINYL RECORD SLEEVE & CONTROLS -->
 		<div class="relative flex h-full w-full flex-col items-center justify-center px-2 py-4 sm:px-6 select-none">
@@ -1005,6 +1036,7 @@
 				{/if}
 			</div>
 		</div>
+	</div>
 	</div>
 
 	<!-- ⌨️ Shortcuts Guide Dialog -->
