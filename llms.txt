@@ -1,0 +1,30 @@
+# Aura Music — Free High-Fidelity Music Streaming Platform
+
+> Aura Music is an open, high-fidelity music streaming and AI-powered audio discovery web application featuring lossless 320kbps audio playback, real-time synchronized karaoke lyrics, personalized playlists, YouTube Music integration, Google Drive streaming, and 24/7 live internet radios.
+
+## Key Features & Capabilities
+
+- **High-Fidelity Audio Streaming**: Stream millions of tracks at up to 320kbps lossless audio quality with gapless playback, hardware decoding, and DJ crossfade capabilities.
+- **Real-Time Synced Karaoke Lyrics**: Millisecond-accurate synchronized lyrics with romanized translations, line-by-line vocal tracking, and dynamic full-screen karaoke mode.
+- **Aura AI DJ & Vibe Station**: Generate customized mood playlists using natural language prompts (e.g., "Late night rainy Mumbai acoustic" or "Cyberpunk high-energy workout phonk") powered by generative AI.
+- **YouTube & Google Drive Sync**: Seamlessly import, sync, and stream personal YouTube playlists and Google Drive audio collections.
+- **24/7 Live Internet Radios**: Curated live non-stop web radios spanning Lofi, Synthwave, Classical, Jazz, Bollywood, and EDM genres.
+- **Studio Audio Visualizer & 10-Band Graphic Equalizer**: GPU-accelerated 60FPS audio visualizers, 3D spatial audio simulator, bass boost, and custom equalizer presets.
+- **Privacy-First & Ad-Free**: Zero third-party intrusive trackers, respectful of Do-Not-Track headers, and zero banner ads.
+
+## Core Navigation & Pages
+
+- [Homepage](https://aura-music-1no9.onrender.com/): Dynamic daypart greeting, personalized shortcuts, AI vibe station, popular artists rail, and daily trending charts.
+- [Discover](https://aura-music-1no9.onrender.com/discover): Explore curated moods, new releases, global top 50, and 24/7 live internet radios.
+- [Search](https://aura-music-1no9.onrender.com/search): Fast, predictive search across songs, artists, albums, playlists, and moods with instant suggestions.
+- [Library](https://aura-music-1no9.onrender.com/library): Personal collection including liked songs, custom playlists, listening history, local audio files, and Google Drive music.
+- [About](https://aura-music-1no9.onrender.com/about): Architecture overview, mission, and open-source credits.
+- [Privacy Policy](https://aura-music-1no9.onrender.com/privacy): Transparent data handling and privacy commitments.
+- [Terms of Service](https://aura-music-1no9.onrender.com/terms): Usage terms and licensing details.
+- [Contact Support](https://aura-music-1no9.onrender.com/contact): Community help, issue reporting, and feedback channels.
+
+## Technical Specifications
+
+- **Frontend**: SvelteKit 5 (Runes), Tailwind CSS 4, Lucide & Hugeicons, Web Audio API, Canvas 2D / WebGL 60FPS engine.
+- **Backend Server**: Node.js, Express, JioSaavn 320kbps audio engine, YouTube Music scrapers, FMHY Radio API, LRCLIB Synced Lyrics API.
+- **Audio Codecs**: MP3 (320kbps), AAC (256kbps), Opus (160kbps), OGG, FLAC.

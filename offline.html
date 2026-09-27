@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Offline – Aura Music</title>
+		<link rel="icon" href="/favicon.svg" />
+		<style>
+			:root {
+				--bg: #090b14;
+				--fg: #ffffff;
+				--primary: #ff2a7a;
+				--muted: #a1a1aa;
+			}
+			body {
+				margin: 0;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+				background-color: var(--bg);
+				color: var(--fg);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+				text-align: center;
+				padding: 24px;
+				box-sizing: border-box;
+			}
+			.card {
+				background: rgba(255, 255, 255, 0.04);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 24px;
+				padding: 40px 32px;
+				max-width: 440px;
+				width: 100%;
+				backdrop-filter: blur(20px);
+				box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+			}
+			.logo {
+				width: 64px;
+				height: 64px;
+				margin: 0 auto 20px;
+			}
+			h1 {
+				font-size: 24px;
+				margin: 0 0 12px;
+				font-weight: 800;
+				background: linear-gradient(135deg, #ff2a7a, #c084fc);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+			p {
+				color: var(--muted);
+				font-size: 14px;
+				line-height: 1.6;
+				margin: 0 0 24px;
+			}
+			.btn {
+				display: inline-block;
+				background: linear-gradient(135deg, #ff2a7a, #e11d48);
+				color: #fff;
+				text-decoration: none;
+				font-weight: 700;
+				font-size: 14px;
+				padding: 12px 28px;
+				border-radius: 9999px;
+				transition: transform 0.2s, box-shadow 0.2s;
+				box-shadow: 0 10px 25px rgba(255, 42, 122, 0.4);
+			}
+			.btn:hover {
+				transform: scale(1.04);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="card">
+			<img src="/favicon.svg" alt="Aura Logo" class="logo" />
+			<h1>You Are Currently Offline</h1>
+			<p>
+				Aura Music couldn't establish an internet connection. Please check your network or refresh when you are back online to stream your favorite music and lyrics.
+			</p>
+			<a href="/" class="btn" onclick="window.location.reload(); return false;">Retry Connection</a>
+		</div>
+	</body>
+</html>
